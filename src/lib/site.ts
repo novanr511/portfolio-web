@@ -8,7 +8,7 @@ export const site = {
   url:
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.NODE_ENV === "production"
-      ? "https://portfolio-web-six-zeta.vercel.app"
+      ? "https://novandri-portfolio.vercel.app"
       : "http://localhost:3000"),
   locale: "en_US",
   location: "Jakarta, Indonesia",

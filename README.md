@@ -21,7 +21,7 @@ To write or edit articles, open `/keystatic`. Locally, Keystatic writes directly
 
 For local authoring, run `npm run dev` and visit `http://localhost:3000/keystatic`. You can also create or edit the `.mdx` files directly; the filename becomes the article URL slug. Start the body with a lead paragraph, then use `##` sections (the page renders the `<h1>` title itself).
 
-Before enabling the production editor, configure `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and `KEYSTATIC_SECRET` in Vercel. `KEYSTATIC_SECRET` must be at least 32 characters. Without these values, `/keystatic` displays setup instructions and the API refuses writes rather than using non-persistent server storage. After adding the variables, redeploy. The production site URL defaults to `https://portfolio-web-six-zeta.vercel.app`; set `NEXT_PUBLIC_SITE_URL` only if using a different domain.
+Before enabling the production editor, configure `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and `KEYSTATIC_SECRET` in Vercel. `KEYSTATIC_SECRET` must be at least 32 characters. Without these values, `/keystatic` displays setup instructions and the API refuses writes rather than using non-persistent server storage. After adding the variables, redeploy. The production site URL defaults to `https://novandri-portfolio.vercel.app`; set `NEXT_PUBLIC_SITE_URL` only if using a different domain.
 
 The home page, `/articles`, sitemap, RSS feed, LLM content endpoints, and per-article OG images all derive from the MDX files and update on the next build. Article bodies support GitHub-flavored Markdown (tables, task lists) and internal links like `[how RAG works](/articles/rag-explained)`.
 
