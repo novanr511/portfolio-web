@@ -121,7 +121,7 @@ export default async function ArticlePage({
         }}
       />
 
-      <article className="mx-auto max-w-5xl px-6 pb-16 pt-14 sm:pt-20">
+      <article className="mx-auto max-w-2xl px-6 pb-16 pt-14 sm:pt-20">
         {/* Back link */}
         <Reveal>
           <Link
@@ -135,7 +135,7 @@ export default async function ArticlePage({
 
         {/* Article header */}
         <Reveal delay={60}>
-          <header className="mt-8 max-w-2xl">
+          <header className="mt-8">
             <div className="flex flex-wrap gap-1.5">
               {article.tags.map((tag) => (
                 <span
@@ -146,7 +146,7 @@ export default async function ArticlePage({
                 </span>
               ))}
             </div>
-            <h1 className="mt-5 text-[32px] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-[40px]">
+            <h1 className="mt-5 text-[34px] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-[44px]">
               {article.title}
             </h1>
             <p className="mt-4 text-[17px] leading-relaxed text-muted">
@@ -171,17 +171,17 @@ export default async function ArticlePage({
           </header>
         </Reveal>
 
-        {/* Body */}
+        {/* Body — Medium-style: narrower measure, larger type */}
         <Reveal delay={120}>
-          <div className="prose prose-article mt-12 max-w-2xl prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
+          <div className="prose prose-lg prose-article mt-12 max-w-none prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
             <Post />
           </div>
         </Reveal>
 
-        {/* Prev / next */}
+        {/* Prev / next — stacked, Medium-style */}
         <Reveal>
           <nav
-            className="mt-16 grid gap-4 border-t border-border pt-10 sm:grid-cols-2"
+            className="mt-16 flex flex-col gap-4 border-t border-border pt-10"
             aria-label="More articles"
           >
             {older ? (
@@ -204,7 +204,7 @@ export default async function ArticlePage({
               <Link
                 href={`/articles/${newer.slug}`}
                 transitionTypes={["nav-forward"]}
-                className="group rounded-2xl border border-border bg-surface p-5 text-right transition-colors hover:border-accent/30 hover:bg-tint sm:col-start-2"
+                className="group rounded-2xl border border-border bg-surface p-5 text-right transition-colors hover:border-accent/30 hover:bg-tint"
               >
                 <span className="text-[12px] font-medium uppercase tracking-wide text-muted">
                   Newer
