@@ -7,6 +7,7 @@ import {
   getAdjacentArticles,
   getArticle,
   getSortedArticles,
+  categorySlug,
 } from "@/lib/articles";
 import { site } from "@/lib/site";
 
@@ -141,12 +142,13 @@ export default async function ArticlePage({
           <header className="mt-8">
             <div className="flex flex-wrap gap-1.5">
               {article.tags.map((tag) => (
-                <span
+                <Link
                   key={tag}
+                  href={`/articles/category/${categorySlug(tag)}`}
                   className="rounded-full bg-tint px-2.5 py-0.5 text-[11px] font-medium text-accent"
                 >
                   {tag}
-                </span>
+                </Link>
               ))}
             </div>
             <h1 className="mt-5 text-[34px] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-[44px]">
@@ -156,9 +158,9 @@ export default async function ArticlePage({
               {article.description}
             </p>
             <div className="mt-6 flex items-center gap-3 border-t border-border pt-5 text-[13px] text-muted">
-              <span className="font-medium text-foreground">
+              <Link href="/about" className="font-medium text-foreground underline-offset-4 hover:text-accent hover:underline">
                 {site.author.penName}
-              </span>
+              </Link>
               <time dateTime={article.date}>
                 {new Date(article.date).toLocaleDateString("en-US", {
                   year: "numeric",
