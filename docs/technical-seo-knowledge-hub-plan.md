@@ -1,12 +1,156 @@
-# Technical SEO Knowledge Hub — Editorial Plan
+# NOVANDRI Personal Publication — Technical SEO Series Plan
 
-**Status:** planning document  
-**Article language:** English, consistent with the portfolio  
-**Planning language:** Indonesian  
-**Byline:** Rachmadwipa Novandri  
-**Positioning:** Technical SEO as web infrastructure engineering
+**Status:** planning document
+**Publication:** NOVANDRI — Technology. Business. Ideas.
+**Publication description:** A personal knowledge publication about technology, business, innovation, markets, and the ideas behind them.
+**Current series language:** English, consistent with existing portfolio convention. The publication-wide choice (English, Bahasa Indonesia, or bilingual) remains open unless the owner decides otherwise.
+**Planning language:** Indonesian
+**Byline:** Rachmadwipa Novandri
+**Scope of this document:** One evidence-based Technical SEO series within a broader personal publication; this is not the complete site-wide editorial plan.
+**Series positioning:** Technical SEO as web infrastructure engineering
 
 ## 1. Editorial direction
+
+NOVANDRI is a **personal knowledge publication**, not a site limited to Technical SEO, Web Development, and AI Engineering. Its consistent lens is how technology, business, data, and human thinking shape the modern world. This document plans one connected 32-chapter Technical SEO series within that larger editorial direction—not the complete publication strategy.
+
+**Brand line:** `NOVANDRI — Technology. Business. Ideas.`
+**Publication description:** `A personal knowledge publication about technology, business, innovation, markets, and the ideas behind them.`
+
+### Eight publication pillars
+
+These pillars define the broader range of future editorial work. They do not replace or renumber the Technical SEO series below.
+
+1. **Technology & The Digital World** — internet infrastructure, software, cybersecurity, cloud, and technology's effects.
+2. **Artificial Intelligence & Future Innovation** — AI engineering, adoption, labor, economics, creativity, and autonomous systems.
+3. **Business, Strategy & Entrepreneurship** — business models, unit economics, distribution, startups, and competitive advantage.
+4. **Marketing, Growth & Consumer Psychology** — SEO, advertising, branding, conversion, virality, and consumer behavior.
+5. **Data, Analytics & Decision Science** — metrics, causal reasoning, forecasting, machine learning, and data quality.
+6. **Markets, Economics & Emerging Industries** — crypto, energy, data centers, financial markets, and technological disruption.
+7. **Career, Productivity & Professional Development** — learning, cross-disciplinary work, portfolios, and future skills.
+8. **Industry Insights, Retail & Consumer Trends** — retail economics, assortment, SKU productivity, beauty, merchandising, and sell-through.
+
+Keep top-level navigation simpler than the eight pillars: **Technology** (technology/AI), **Business** (business/strategy/economics), **Growth** (marketing/SEO/branding/consumer), **Data** (analytics/ML/decision science), and **Insights** (career, retail, markets, and personal perspectives). Use tags for narrower subjects. A single phenomenon may be explored across multiple pillars, while each article keeps one clear reader need.
+
+Use three editorial formats where appropriate: **Deep Dive** (explain a concept), **Analysis & Case Studies** (analyze a company, technology, or industry using evidence), and **Perspectives & Ideas** (reasoned opinions and predictions clearly labeled as such). Do not create a case study or claim first-hand observation without evidence.
+
+### Initial cross-pillar idea bank (unvalidated candidates)
+
+These are topic seeds from the editorial discussion, not approved assignments, researched claims, or keyword-demand findings. Validate the question, evidence availability, originality, and overlap before adding any to a production queue.
+
+**01. Technology & The Digital World**
+- How the Internet Actually Works: From DNS to Global Connectivity
+- Why Every Business Is Becoming a Software Company
+- How Cloud Computing Changed the Modern Economy
+- The Hidden Infrastructure Behind Every Digital Platform
+- Open Source vs Proprietary Software: Who Really Wins?
+- Why Cybersecurity Is Becoming a Business Priority
+- How Operating Systems Shape the Modern Computing Experience
+- The Evolution of Web Browsers and the Future of the Internet
+
+**02. Artificial Intelligence & Future Innovation**
+- Will AI Replace Jobs or Create an Entirely New Economy?
+- How AI Is Changing the Economics of Software Development
+- AI Agents vs Traditional Automation: What Is Actually Different?
+- Why AI Adoption Is Harder Than Building an AI Model
+- The Future of Autonomous Businesses
+- How Small Businesses Can Compete Using AI
+- The Economics of AI: Why Intelligence Is Becoming a Commodity
+- From Chatbots to Autonomous Systems: The Evolution of AI
+
+**03. Business, Strategy & Entrepreneurship**
+- Why Some SaaS Businesses Have Better Economics Than Traditional Businesses
+- Understanding Unit Economics: CAC, LTV, Churn, and Contribution Margin
+- How to Validate a Startup Idea Before Building the Product
+- Why Distribution Is Often More Important Than Product Quality
+- The Difference Between Building a Product and Building a Business
+- How Marketplace Business Models Actually Work
+- Why Subscription Businesses Are So Attractive
+- How Companies Build Competitive Advantages
+- The Anatomy of a Successful Digital Business
+- Why Many Startups Fail Despite Having Great Products
+
+**04. Marketing, Growth & Consumer Psychology**
+- Why People Buy Products They Don't Actually Need
+- The Psychology Behind Successful Product Packaging
+- How Brands Build Desire Before Launching a Product
+- SEO vs Paid Advertising: Understanding the Economics of Customer Acquisition
+- Why Some Products Become Viral While Others Don't
+- How Consumer Behavior Changes in the Digital Economy
+- The Science of Conversion Rate Optimization
+- How UGC Changed the Economics of Digital Marketing
+- Brand Positioning: Why Being Different Is More Important Than Being Better
+- How Data Changes the Way Marketing Decisions Are Made
+
+**05. Data, Analytics & Decision Science**
+- Why Data-Driven Companies Still Make Bad Decisions
+- Correlation vs Causation: The Most Common Mistake in Data Analysis
+- How Companies Use Predictive Analytics to Make Business Decisions
+- Understanding Business Metrics Beyond Revenue
+- Why Average Can Be Misleading in Business Analytics
+- The Science Behind Forecasting and Predictive Models
+- How Recommendation Systems Influence What We Buy
+- The Difference Between Descriptive, Diagnostic, Predictive, and Prescriptive Analytics
+- How to Build a Decision-Making Framework Using Data
+- Why Data Quality Matters More Than Model Complexity
+
+**06. Markets, Economics & Emerging Industries**
+- How Bitcoin Became a Global Financial Asset
+- Understanding the Economics Behind Cryptocurrency Markets
+- What Is Real World Asset Tokenization and Why Does It Matter?
+- How Energy Markets Actually Work
+- Why Data Centers Are Becoming Critical Economic Infrastructure
+- The Business Behind Renewable Energy
+- How Interest Rates Influence Technology Companies
+- The Future of Decentralized Finance
+- Why GPU Computing Is Becoming a Strategic Resource
+- How Financial Markets React to Technological Disruption
+
+**07. Career, Productivity & Professional Development**
+- How to Become a T-Shaped Professional in the AI Era
+- Why Learning How to Learn Is a Competitive Advantage
+- The Difference Between Knowing a Tool and Understanding a System
+- How to Build a Technical Portfolio That Demonstrates Real Skills
+- Why Cross-Disciplinary Knowledge Is Becoming More Valuable
+- How to Transition from Marketing to Technology
+- The Future of Work: Skills That Will Matter in the Next Decade
+- How to Think Like an Engineer When Solving Business Problems
+
+**08. Industry Insights, Retail & Consumer Trends**
+- The Hidden Economics of Retail Store Displays
+- Why Product Assortment Matters More Than Having More Products
+- Understanding SKU Productivity in Modern Retail
+- How Beauty Brands Build Market Dominance
+- Why Some Beauty Products Become Viral in Indonesia
+- The Economics of Beauty Retail: From Distribution to Sell-Through
+- How Visual Merchandising Influences Consumer Purchase Decisions
+- The Role of Inventory Optimization in Retail Profitability
+- How Retailers Use Data to Optimize Product Placement
+- The Difference Between Sell-In and Sell-Out in Retail
+
+**Cross-pillar example:** “The Future of AI in Retail” can become distinct evidence-led pieces on computer vision and operations (Technology), AI adoption economics (Business), demand prediction (Data), personalization (Growth), and assortment/display decisions (Retail). Each piece still needs its own question, source base, and non-duplicative scope.
+
+### Evidence-Based Editorial standard
+
+The publication's core workflow is **research finding → source validation → evidence analysis → insight → writing → fact-check**. The standing rule is: **No Unsupported Claims. No Fabricated Facts. Research Before Writing.**
+
+- Every substantive article needs a verifiable research, data, experiment, primary document, or documented technical source appropriate to the topic.
+- Prefer original sources: peer-reviewed research and its paper/DOI; government and institutional data (e.g. BPS, World Bank, IMF, OECD, WHO); primary company filings; transparent industry research; and official technical documentation/standards. A famous publisher is not automatically authoritative for every claim. Google Scholar may help discover papers but is not itself the cited evidence.
+- Verify authenticity, exact claim support, context, methodology, sample/population, units, period, publication date, and limitations. Seek independent corroboration for consequential claims and note credible contradictory findings.
+- Put citations by the claims they support and include a `References & Further Reading` section with source title, author/institution, date/year, original link or DOI/report ID, and a short note on its relevance.
+- Distinguish source-reported facts, measured observations, reproducible tests, inference, and opinion. Do not overgeneralize one experiment; never invent a paper, DOI, quote, statistic, experiment, or finding. If evidence is limited or mixed, say so.
+- If sources cannot be accessed or claims cannot be checked, disclose the limitation and qualify, remove, or block those claims. Do not simulate research findings.
+
+#### Practical source hierarchy
+
+1. **Primary research and official data:** original peer-reviewed papers (e.g. Nature, Science, IEEE Xplore, ACM Digital Library), datasets and reports from BPS, World Bank, IMF, OECD, WHO, NIST, and comparable institutions; primary filings and original experiments.
+2. **Established research and industry reports:** e.g. McKinsey, Gartner, Deloitte, PwC, CB Insights, Statista, and Pew Research Center, after checking methodology, sponsorship, sample, and date.
+3. **Technical and industry documentation:** official Google Search Central, Microsoft Learn, AWS, OpenAI, Meta Engineering, Cloudflare, W3C, and relevant RFC/specifications.
+
+This is a starting hierarchy, not a reputation shortcut: use the source closest to the claim, evaluate its methods and incentives, and do not cite a secondary report when the underlying primary evidence is reasonably available.
+
+This plan applies that standard specifically to the Technical SEO series. See `docs/technical-seo-article-generation-prompt.md` for the reusable production workflow and QA gates.
+
+### Series architecture
 
 Bangun blueprint 32 chapter sebagai **seri artikel yang saling terhubung**, bukan satu artikel 15.000–25.000 kata. Satu hub menjadi peta belajar; setiap chapter menjadi artikel tersendiri yang menjawab satu kebutuhan pencarian dengan tuntas.
 
