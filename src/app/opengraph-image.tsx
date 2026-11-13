@@ -27,7 +27,7 @@ export default function Image() {
             color: "#264a80",
           }}
         >
-          Novan.
+          Novandri.
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div

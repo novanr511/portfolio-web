@@ -65,7 +65,7 @@ export default async function Image({
           }}
         >
           <div style={{ display: "flex", fontSize: 24, color: "#6e6e73" }}>
-            {site.author.name}
+            {site.author.penName}
             {article ? ` · ${article.readingTime}` : ""}
           </div>
           <div

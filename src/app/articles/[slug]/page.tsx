@@ -35,7 +35,7 @@ export async function generateMetadata({
       description: article.description,
       publishedTime: article.date,
       modifiedTime: article.updated ?? article.date,
-      authors: [site.author.name],
+      authors: [site.author.penName],
       tags: article.tags,
     },
     twitter: {
@@ -72,12 +72,12 @@ export default async function ArticlePage({
         author: {
           "@type": "Person",
           "@id": `${site.url}/#person`,
-          name: site.author.name,
+          name: site.author.penName,
           url: site.url,
         },
         publisher: {
           "@type": "Person",
-          name: site.author.name,
+          name: site.author.penName,
         },
         mainEntityOfPage: `${site.url}/articles/${article.slug}`,
         keywords: article.tags.join(", "),
@@ -154,7 +154,7 @@ export default async function ArticlePage({
             </p>
             <div className="mt-6 flex items-center gap-3 border-t border-border pt-5 text-[13px] text-muted">
               <span className="font-medium text-foreground">
-                {site.author.name}
+                {site.author.penName}
               </span>
               <time dateTime={article.date}>
                 {new Date(article.date).toLocaleDateString("en-US", {

@@ -10,6 +10,8 @@ export const site = {
   location: "Jakarta, Indonesia",
   author: {
     name: "Novandri R.",
+    /** Full pen name used for article bylines and Article JSON-LD */
+    penName: "Rachmadwipa Novandri",
     jobTitle: "Web Developer & SEO Specialist",
   },
   social: {
