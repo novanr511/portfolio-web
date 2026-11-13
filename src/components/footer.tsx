@@ -7,11 +7,12 @@ export function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-[15px] font-semibold tracking-tight text-foreground">
-            Novan<span className="text-accent">.</span>
+            {site.wordmark.replace(/\.$/, "")}
+            <span className="text-accent">.</span>
           </p>
           <p className="mt-1.5 max-w-xs text-[13px] leading-relaxed text-muted">
-            Frontend engineer building for the web, learning data science and
-            applied AI in public.
+            Web developer and SEO specialist in Jakarta, learning data science
+            and applied AI in public.
           </p>
         </div>
         <nav
@@ -43,10 +44,12 @@ export function Footer() {
             RSS feed
           </a>
           <a
-            href={`mailto:${site.social.email}`}
+            href={site.social.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-muted transition-colors hover:text-accent"
           >
-            {site.social.email}
+            LinkedIn ↗
           </a>
         </nav>
       </div>

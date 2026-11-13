@@ -4,12 +4,6 @@ import createMDX from "@next/mdx";
 const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
-  },
-  // Allow .mdx content files to be imported
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-  cacheComponents: true,
-  partialPrefetching: true,
-  turbopack: {
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
@@ -17,6 +11,10 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Allow .mdx content files to be imported
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  cacheComponents: true,
+  partialPrefetching: true,
 };
 
 const withMDX = createMDX({

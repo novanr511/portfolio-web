@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
+import { site } from "@/lib/site";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -36,7 +37,8 @@ export function Header() {
           transitionTypes={["nav-back"]}
           className="text-[17px] font-semibold tracking-tight text-foreground"
         >
-          Novan<span className="text-accent">.</span>
+          {site.wordmark.replace(/\.$/, "")}
+          <span className="text-accent">.</span>
         </Link>
 
         {/* Desktop nav */}

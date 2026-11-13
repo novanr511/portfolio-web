@@ -1,26 +1,32 @@
 export const site = {
-  name: "Novan",
-  title: "Novan — Frontend Engineer & Aspiring Data Scientist",
+  name: "Novandri R.",
+  /** Short wordmark used in the header/footer logo */
+  wordmark: "Novandri.",
+  title: "Novandri R. — Web Developer, SEO Specialist & Aspiring Data Scientist",
   description:
-    "Portfolio of Novan, a frontend engineer building websites with Next.js and WordPress, now diving into data science, machine learning, and applied AI. Practical articles on AI, RAG, LangChain, and LangGraph.",
+    "Portfolio of Novandri R., a web developer and SEO specialist from Jakarta building with Next.js and WordPress, now diving into data science, machine learning, and applied AI. Practical articles on AI, RAG, LangChain, and LangGraph.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en_US",
+  location: "Jakarta, Indonesia",
   author: {
-    name: "Novan",
-    jobTitle: "Frontend Engineer",
+    name: "Novandri R.",
+    jobTitle: "Web Developer & SEO Specialist",
   },
   social: {
-    email: "hello@novan.dev",
-    github: "https://github.com/novan",
-    linkedin: "https://www.linkedin.com/in/novan",
+    github: "https://github.com/novanr511",
+    linkedin: "https://www.linkedin.com/in/novandri511/",
   },
   /** Copyright year — bump it when the site is next updated */
   year: 2026,
   keywords: [
+    "Novandri",
     "Novan",
+    "web developer",
     "frontend engineer",
     "Next.js developer",
     "WordPress developer",
+    "SEO specialist",
+    "Jakarta",
     "data science",
     "machine learning",
     "RAG",

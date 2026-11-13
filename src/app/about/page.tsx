@@ -7,27 +7,27 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "About Novan: a frontend engineer specializing in Next.js and WordPress, currently transitioning into data science and applied AI.",
+    "About Novandri R.: a web developer and SEO specialist from Jakarta with years of WordPress and search work, now transitioning into data science and applied AI.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About — Novan",
+    title: "About — Novandri R.",
     description:
-      "Frontend engineer specializing in Next.js and WordPress, transitioning into data science and applied AI.",
+      "Web developer and SEO specialist from Jakarta, now transitioning into data science and applied AI.",
   },
 };
 
 const focus = [
   {
-    title: "Frontend & Web Platforms",
+    title: "Web Platforms",
     description:
-      "Production websites and platforms built on Next.js and React — fast, accessible, and maintainable. Deep WordPress experience when a real CMS workflow is what the team needs.",
+      "Production websites and platforms built on Next.js and React — fast, accessible, and maintainable. Years of WordPress work when a real editorial workflow is what the team needs.",
     tags: ["Next.js", "React", "WordPress", "TypeScript", "Tailwind"],
   },
   {
-    title: "Performance Engineering",
+    title: "SEO & Web Performance",
     description:
-      "Core Web Vitals as an engineering discipline: measurement first, then asset strategy, rendering strategy, and caching until the numbers are genuinely green.",
-    tags: ["Core Web Vitals", "Caching", "Edge", "Lighthouse"],
+      "Technical SEO as an engineering discipline — crawled, indexed, and fast. I've done it for the Ministry of Health of Indonesia and dozens of client sites, and I bring the same measurement mindset to Core Web Vitals.",
+    tags: ["Technical SEO", "Core Web Vitals", "Caching", "Structured Data"],
   },
   {
     title: "Data Science & AI (in progress)",
@@ -54,18 +54,21 @@ export default function AboutPage() {
         <Reveal delay={80}>
           <div className="mt-8 max-w-2xl space-y-5 text-[16px] leading-relaxed text-muted">
             <p>
-              I&apos;m {site.author.name}. For the last several years I&apos;ve
-              built for the web: WordPress sites where editors need a real
-              publishing workflow, and Next.js applications where performance
-              and craft matter. Somewhere along the way, the most interesting
-              part of the job stopped being the framework and started being the
-              data.
+              I&apos;m {site.author.name}, based in {site.location}. I&apos;ve
+              been building for the web since 2020 — starting as a freelance
+              WordPress developer, then working with studios, law firms, and
+              startups, alongside technical support and SEO roles at
+              Niagahoster and the Ministry of Health of Indonesia.
             </p>
             <p>
-              That observation turned into a deliberate transition. I&apos;m
-              now learning data science and applied AI in public — building
-              retrieval-augmented systems, training classical ML models, and
-              writing about everything that breaks along the way.{" "}
+              That SEO work quietly changed how I think: rankings are just
+              measurement, content, and engineering discipline compounded over
+              time. At some point the most interesting part of the job stopped
+              being the framework and started being the data — so I made the
+              transition deliberate. I&apos;m now learning data science and
+              applied AI in public, building retrieval-augmented systems,
+              training classical ML models, and writing about everything that
+              breaks along the way.{" "}
               <Link
                 href="/articles"
                 transitionTypes={["nav-forward"]}
@@ -76,10 +79,11 @@ export default function AboutPage() {
               are that learning process, distilled.
             </p>
             <p>
-              My conviction is that the best AI engineers come from exactly this
-              path: people who have shipped production web software, who know
-              what maintainable systems look like, and who now aim that
-              discipline at a stack that badly needs it.
+              My conviction is that the best AI engineers come from exactly
+              this path: people who have shipped production web software, who
+              understand how search and measurement actually work, and who now
+              aim that discipline at a stack that badly needs it. Lifelong
+              learning is the whole method — the rest is just repertoire.
             </p>
           </div>
         </Reveal>
@@ -115,15 +119,17 @@ export default function AboutPage() {
               Get in touch
             </h2>
             <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-muted">
-              Whether it&apos;s frontend work, a data science role, or
+              Whether it&apos;s web development, SEO, a data science role, or
               something at the intersection — I&apos;d love to hear from you.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <a
-                href={`mailto:${site.social.email}`}
+                href={site.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="rounded-full bg-accent px-5 py-2.5 text-[13.5px] font-medium text-accent-contrast transition-colors hover:bg-accent-strong"
               >
-                Email me
+                LinkedIn ↗
               </a>
               <a
                 href={site.social.github}
@@ -132,14 +138,6 @@ export default function AboutPage() {
                 className="rounded-full border border-border px-5 py-2.5 text-[13.5px] font-medium text-foreground transition-colors hover:border-accent/40 hover:text-accent"
               >
                 GitHub ↗
-              </a>
-              <a
-                href={site.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-border px-5 py-2.5 text-[13.5px] font-medium text-foreground transition-colors hover:border-accent/40 hover:text-accent"
-              >
-                LinkedIn ↗
               </a>
             </div>
           </div>

@@ -26,13 +26,20 @@ function homeJsonLd() {
         name: site.author.name,
         jobTitle: site.author.jobTitle,
         url: site.url,
-        email: `mailto:${site.social.email}`,
         description:
-          "Frontend engineer focused on Next.js and WordPress, transitioning into data science and applied AI.",
+          "Web developer and SEO specialist from Jakarta with years of WordPress and search-engine work, now building with Next.js and transitioning into data science and applied AI.",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Jakarta",
+          addressCountry: "ID",
+        },
         knowsAbout: [
           "Next.js",
           "WordPress",
           "Frontend Development",
+          "Search Engine Optimization",
+          "Technical SEO",
+          "Web Performance",
           "Data Science",
           "Machine Learning",
           "RAG",
@@ -83,10 +90,11 @@ export default function Home() {
 
         <Reveal delay={160}>
           <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-muted sm:text-[19px]">
-            I&apos;m {site.author.name}, a frontend engineer working with
-            Next.js and WordPress. These days I&apos;m applying that engineering
-            craft to machine learning, RAG systems, and AI agents — and writing
-            about what I learn along the way.
+            I&apos;m {site.author.name}, a web developer who spent years on
+            WordPress builds and SEO — from freelance sites to the Ministry of
+            Health — now building with Next.js and going deep on machine
+            learning, RAG systems, and AI agents. I write about what I learn
+            along the way.
           </p>
         </Reveal>
 
@@ -196,10 +204,12 @@ export default function Home() {
                 I&apos;m always up for a good technical conversation.
               </p>
               <a
-                href={`mailto:${site.social.email}`}
+                href={site.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-8 inline-flex rounded-full bg-background px-6 py-3 text-[14px] font-medium text-accent transition-opacity duration-300 hover:opacity-90"
               >
-                Get in touch
+                Connect on LinkedIn
               </a>
             </div>
           </Reveal>
