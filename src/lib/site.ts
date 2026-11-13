@@ -5,7 +5,11 @@ export const site = {
   title: "Novandri R. — Web Developer, SEO Specialist & Aspiring Data Scientist",
   description:
     "Portfolio of Novandri R., a web developer and SEO specialist from Jakarta building with Next.js and WordPress, now diving into data science, machine learning, and applied AI. Practical articles on AI, RAG, LangChain, and LangGraph.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.NODE_ENV === "production"
+      ? "https://portfolio-web-six-zeta.vercel.app"
+      : "http://localhost:3000"),
   locale: "en_US",
   location: "Jakarta, Indonesia",
   author: {

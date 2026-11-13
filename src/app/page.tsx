@@ -3,7 +3,7 @@ import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
 import { ProjectCard } from "@/components/project-card";
-import { sortedArticles } from "@/lib/articles";
+import { getSortedArticles } from "@/lib/articles";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
@@ -52,8 +52,8 @@ function homeJsonLd() {
   };
 }
 
-export default function Home() {
-  const latest = sortedArticles.slice(0, 3);
+export default async function Home() {
+  const latest = (await getSortedArticles()).slice(0, 3);
   const featured = projects.filter((p) => p.featured);
 
   return (
@@ -159,37 +159,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Highlighted projects */}
-      <section className="border-t border-border">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <Reveal>
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-[32px]">
-                  Highlighted work
-                </h2>
-                <p className="mt-2 text-[15px] text-muted">
-                  A selection of projects — from the web stack into the AI stack.
-                </p>
+      {/* Highlighted projects — hidden while there are no featured projects */}
+      {featured.length > 0 && (
+        <section className="border-t border-border">
+          <div className="mx-auto max-w-5xl px-6 py-20">
+            <Reveal>
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-[32px]">
+                    Highlighted work
+                  </h2>
+                  <p className="mt-2 text-[15px] text-muted">
+                    A selection of projects — from the web stack into the AI stack.
+                  </p>
+                </div>
+                <Link
+                  href="/projects"
+                  transitionTypes={["nav-forward"]}
+                  className="hidden shrink-0 text-[14px] font-medium text-accent transition-opacity hover:opacity-70 sm:inline-flex"
+                >
+                  All projects →
+                </Link>
               </div>
-              <Link
-                href="/projects"
-                transitionTypes={["nav-forward"]}
-                className="hidden shrink-0 text-[14px] font-medium text-accent transition-opacity hover:opacity-70 sm:inline-flex"
-              >
-                All projects →
-              </Link>
+            </Reveal>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              {featured.map((project, i) => (
+                <Reveal key={project.slug} delay={i * 90}>
+                  <ProjectCard project={project} />
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            {featured.map((project, i) => (
-              <Reveal key={project.slug} delay={i * 90}>
-                <ProjectCard project={project} />
-              </Reveal>
-            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA band */}
       <section className="border-t border-border">

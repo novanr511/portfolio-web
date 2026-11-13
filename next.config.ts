@@ -24,7 +24,14 @@ const nextConfig: NextConfig = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: ["remark-gfm"],
+    remarkPlugins: [
+      // Strip YAML frontmatter when compiling MDX (metadata is read
+      // separately via gray-matter in src/lib/articles.ts)
+      "remark-frontmatter",
+      "remark-mdx-frontmatter",
+      // GitHub-flavored markdown: tables, task lists, etc.
+      "remark-gfm",
+    ],
     rehypePlugins: ["rehype-slug"],
   },
 });

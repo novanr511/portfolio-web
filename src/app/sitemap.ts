@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { sortedArticles } from "@/lib/articles";
+import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 
 /**
@@ -7,7 +7,9 @@ import { site } from "@/lib/site";
  * so adding an article or a new content type flows through here
  * automatically on the next build — no manual URL bookkeeping.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const sortedArticles = await getSortedArticles();
+
   // The site changes whenever the newest article changes
   const latestArticleDate = sortedArticles[0]
     ? new Date(sortedArticles[0].updated ?? sortedArticles[0].date)

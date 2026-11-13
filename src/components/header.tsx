@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
 import { site } from "@/lib/site";
 
@@ -16,11 +16,6 @@ const nav = [
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  // Close the mobile menu whenever the route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   function isActive(href: string) {
     return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -101,6 +96,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setOpen(false)}
               className={`rounded-xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
                 isActive(item.href)
                   ? "bg-tint text-accent"

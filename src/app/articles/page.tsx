@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
-import { sortedArticles } from "@/lib/articles";
+import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 /** Blog + ItemList JSON-LD so crawlers see the full post inventory */
-function blogJsonLd() {
+function blogJsonLd(sortedArticles: Awaited<ReturnType<typeof getSortedArticles>>) {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -68,7 +68,8 @@ function blogJsonLd() {
   };
 }
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
+  const sortedArticles = await getSortedArticles();
   return (
     <ViewTransition
       enter={{ "nav-forward": "nav-forward", "nav-back": "nav-back", default: "none" }}
@@ -78,7 +79,7 @@ export default function ArticlesPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(blogJsonLd()).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(blogJsonLd(sortedArticles)).replace(/</g, "\\u003c"),
         }}
       />
       <div className="mx-auto max-w-5xl px-6 pb-24 pt-16 sm:pt-24">

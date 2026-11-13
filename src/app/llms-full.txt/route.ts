@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { sortedArticles } from "@/lib/articles";
+import matter from "gray-matter";
+import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 
 /**
@@ -9,6 +10,7 @@ import { site } from "@/lib/site";
  * MDX sources, so it always matches what readers see.
  */
 export async function GET() {
+  const sortedArticles = await getSortedArticles();
   const sections = await Promise.all(
     sortedArticles.map(async (a) => {
       const raw = await readArticleBody(a.slug);
@@ -44,6 +46,8 @@ async function readArticleBody(slug: string): Promise<string> {
     `${slug}.mdx`
   );
   const raw = await readFile(filePath, "utf8");
-  cache.set(slug, raw);
-  return raw;
+  // Strip frontmatter — LLMs get the prose only
+  const body = matter(raw).content;
+  cache.set(slug, body);
+  return body;
 }

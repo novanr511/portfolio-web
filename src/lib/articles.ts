@@ -1,3 +1,7 @@
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+import matter from "gray-matter";
+
 export type Article = {
   slug: string;
   title: string;
@@ -8,64 +12,70 @@ export type Article = {
   /** ISO date (last meaningful update), optional */
   updated?: string;
   tags: string[];
-  /** Human-readable, e.g. "12 min read" */
+  /** Human-readable, e.g. "12 min read" — computed from the content */
   readingTime: string;
 };
 
+const articlesDir = path.join(process.cwd(), "src", "content", "articles");
+
+let cache: Promise<Article[]> | null = null;
+
 /**
- * Add a new article:
- * 1. Create `src/content/articles/<slug>.mdx` with the article body.
- * 2. Add an entry below (newest first). Nothing else to wire up —
- *    lists, sitemap, RSS, and OG images pick it up automatically.
+ * Articles live as MDX files in `src/content/articles/<slug>.mdx`, with all
+ * metadata in YAML frontmatter. Edit them by hand or through the Keystatic
+ * CMS at /keystatic — both write the same files.
  */
-export const articles: Article[] = [
-  {
-    slug: "how-to-start-learning-ai",
-    title: "How to Actually Start Learning AI as a Developer in 2026",
-    description:
-      "A no-fluff roadmap for developers entering AI and machine learning: what to learn, in what order, what to skip, and how to build a portfolio of AI projects that proves you can do the work.",
-    date: "2026-11-08",
-    tags: ["AI", "Machine Learning", "Career", "Learning Path"],
-    readingTime: "11 min read",
-  },
-  {
-    slug: "rag-explained",
-    title: "Retrieval-Augmented Generation, Explained From the Inside Out",
-    description:
-      "How RAG actually works under the hood — chunking, embeddings, vector search, hybrid retrieval, and reranking — plus the design decisions that separate a demo chatbot from a production system.",
-    date: "2026-11-10",
-    tags: ["RAG", "Retrieval", "Embeddings", "LLM", "Vector Databases"],
-    readingTime: "14 min read",
-  },
-  {
-    slug: "langchain-to-langgraph",
-    title: "From LangChain to LangGraph: Building Stateful AI Agents That Don't Fall Apart",
-    description:
-      "Why chains stop scaling when agents get real, how LangGraph models agent state as a graph, and the patterns — checkpoints, human-in-the-loop, subgraphs — that make long-running agents reliable.",
-    date: "2026-11-13",
-    tags: ["LangGraph", "LangChain", "Agents", "LLM", "Python"],
-    readingTime: "13 min read",
-  },
-];
-
-export const sortedArticles = [...articles].sort(
-  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-);
-
-export function getArticle(slug: string): Article | undefined {
-  return sortedArticles.find((a) => a.slug === slug);
+export async function getSortedArticles(): Promise<Article[]> {
+  cache ??= loadArticles();
+  return cache;
 }
 
-export function getAdjacentArticles(slug: string): {
-  newer: Article | undefined;
-  older: Article | undefined;
-} {
-  const idx = sortedArticles.findIndex((a) => a.slug === slug);
+export async function getArticle(
+  slug: string
+): Promise<Article | undefined> {
+  const all = await getSortedArticles();
+  return all.find((a) => a.slug === slug);
+}
+
+export function getAdjacentArticles(
+  all: Article[],
+  slug: string
+): { newer: Article | undefined; older: Article | undefined } {
+  const idx = all.findIndex((a) => a.slug === slug);
   return {
-    newer: idx > 0 ? sortedArticles[idx - 1] : undefined,
+    newer: idx > 0 ? all[idx - 1] : undefined,
     older:
-      idx >= 0 && idx < sortedArticles.length - 1
-        ? sortedArticles[idx + 1]
-        : undefined,
+      idx >= 0 && idx < all.length - 1 ? all[idx + 1] : undefined,
   };
+}
+
+async function loadArticles(): Promise<Article[]> {
+  const files = (await readdir(articlesDir)).filter((f) =>
+    f.endsWith(".mdx")
+  );
+
+  const articles = await Promise.all(
+    files.map(async (file): Promise<Article> => {
+      const raw = await readFile(path.join(articlesDir, file), "utf8");
+      const { data, content } = matter(raw);
+      const slug = file.replace(/\.mdx$/, "");
+
+      const words = content.trim().split(/\s+/).length;
+      const minutes = Math.max(1, Math.round(words / 200));
+
+      return {
+        slug,
+        title: String(data.title ?? slug),
+        description: String(data.description ?? ""),
+        date: data.date ? new Date(data.date as string).toISOString().slice(0, 10) : "",
+        updated: data.updated
+          ? new Date(data.updated as string).toISOString().slice(0, 10)
+          : undefined,
+        tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+        readingTime: `${minutes} min read`,
+      };
+    })
+  );
+
+  return articles.sort((a, b) => b.date.localeCompare(a.date));
 }

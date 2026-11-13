@@ -9,19 +9,21 @@ Personal portfolio built with **Next.js 16 (App Router) + Tailwind CSS 4 + MDX**
 | `/` | Profile hero, latest articles, highlighted projects |
 | `/articles` | All articles |
 | `/articles/[slug]` | Full MDX article with prev/next navigation |
-| `/projects` | All projects (featured first) |
+| `/projects` | Project case studies (currently empty) |
 | `/about` | Bio, focus areas, contact |
+| `/keystatic` | Article CMS |
 
 ## Writing articles
 
-Article metadata lives in `src/lib/articles.ts`; article bodies are MDX files in `src/content/articles/`.
+Articles are MDX files in `src/content/articles/`. Each file contains its own YAML frontmatter (`title`, `description`, `date`, optional `updated`, and `tags`) followed by the article body. Reading time is calculated automatically.
 
-To publish a new article:
+To write or edit articles, open `/keystatic`. Locally, Keystatic writes directly to the MDX files. In production, it uses GitHub storage so saves are committed to the repository and trigger a Vercel deployment.
 
-1. Create `src/content/articles/<slug>.mdx` — start the body with a lead paragraph, then `##` sections (the page renders the `<h1>` title itself).
-2. Add an entry to the `articles` array in `src/lib/articles.ts` (newest first) with `slug`, `title`, `description`, `date`, `tags`, and `readingTime`.
+For local authoring, run `npm run dev` and visit `http://localhost:3000/keystatic`. You can also create or edit the `.mdx` files directly; the filename becomes the article URL slug. Start the body with a lead paragraph, then use `##` sections (the page renders the `<h1>` title itself).
 
-That's it — the home page, `/articles`, sitemap, RSS feed, and per-article OG images pick it up automatically on the next build. The body supports GitHub-flavored Markdown (tables, task lists) and internal links like `[how RAG works](/articles/rag-explained)`.
+Before enabling the production editor, configure `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and `KEYSTATIC_SECRET` in Vercel. `KEYSTATIC_SECRET` must be at least 32 characters. Without these values, `/keystatic` displays setup instructions and the API refuses writes rather than using non-persistent server storage. After adding the variables, redeploy. The production site URL defaults to `https://portfolio-web-six-zeta.vercel.app`; set `NEXT_PUBLIC_SITE_URL` only if using a different domain.
+
+The home page, `/articles`, sitemap, RSS feed, LLM content endpoints, and per-article OG images all derive from the MDX files and update on the next build. Article bodies support GitHub-flavored Markdown (tables, task lists) and internal links like `[how RAG works](/articles/rag-explained)`.
 
 ## Editing projects
 
@@ -43,7 +45,7 @@ Name, description, email, and social links live in `src/lib/site.ts`. Hero copy 
 - **RSS feed** at `/feed.xml`
 - Semantic HTML: single `<h1>`, ordered `h2`/`h3`, `<article>`, `<time>`
 
-Everything is **adaptive**: articles, sitemap, RSS, llms.txt, and OG images all derive from `src/lib/articles.ts` and `src/lib/projects.ts` — adding content there updates every endpoint on the next build, no manual URL bookkeeping.
+Projects are intentionally empty for now. Add project entries to `src/lib/projects.ts` when case studies are ready; the home page and `/projects` update automatically.
 
 ## Running locally
 
@@ -56,7 +58,7 @@ npm run build    # production build
 ## Deploying to Vercel
 
 1. Push this folder to a GitHub repo, then import it at [vercel.com/new](https://vercel.com/new).
-2. After the first deploy, add the environment variable `NEXT_PUBLIC_SITE_URL` (see `.env.example`) with your production URL — this makes canonical URLs, sitemap entries, RSS links, and OG images absolute.
+2. Add the Keystatic GitHub OAuth variables listed above to the Vercel project, then redeploy. Set `NEXT_PUBLIC_SITE_URL` if using a custom domain.
 3. Optionally point a custom domain at the project.
 
-No database, no CMS service, no runtime cost — articles are MDX files in the repo; editing one triggers a full rebuild on push.
+No database or external CMS service is needed — articles remain versioned MDX files in the GitHub repo; each production CMS save triggers a deploy.

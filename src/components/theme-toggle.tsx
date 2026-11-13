@@ -1,6 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const THEME_CHANGE_EVENT = "portfolio-theme-change";
+
+function subscribe(callback: () => void) {
+  window.addEventListener(THEME_CHANGE_EVENT, callback);
+  return () => window.removeEventListener(THEME_CHANGE_EVENT, callback);
+}
+
+function getSnapshot() {
+  return document.documentElement.classList.contains("dark");
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 /**
  * Theme toggle (light / dark). The initial theme is applied by an inline
@@ -8,11 +23,11 @@ import { useEffect, useState } from "react";
  * syncs from the DOM — no flash, no hydration mismatch.
  */
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
+  const isDark = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
   function toggle() {
     const next = !document.documentElement.classList.contains("dark");
@@ -22,7 +37,7 @@ export function ThemeToggle() {
     } catch {
       /* private mode */
     }
-    setIsDark(next);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
 
   return (
@@ -32,9 +47,7 @@ export function ThemeToggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors duration-300 hover:bg-surface hover:text-foreground"
     >
-      {isDark === null ? (
-        <span className="block h-4 w-4" aria-hidden />
-      ) : isDark ? (
+      {isDark ? (
         /* Sun */
         <svg
           width="18"

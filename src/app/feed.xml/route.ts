@@ -1,4 +1,4 @@
-import { sortedArticles } from "@/lib/articles";
+import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 
 /**
@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
  * for feed readers and AI answer engines alike.
  */
 export async function GET() {
+  const sortedArticles = await getSortedArticles();
   const items = sortedArticles
     .map(
       (a) => `    <item>

@@ -6,12 +6,15 @@ import { Reveal } from "@/components/reveal";
 import {
   getAdjacentArticles,
   getArticle,
-  sortedArticles,
+  getSortedArticles,
 } from "@/lib/articles";
 import { site } from "@/lib/site";
 
+/** Full prerender at build; skip instant-UI validation (static content) */
+export const instant = false;
+
 export function generateStaticParams() {
-  return sortedArticles.map((a) => ({ slug: a.slug }));
+  return getSortedArticles().then((all) => all.map((a) => ({ slug: a.slug })));
 }
 
 export async function generateMetadata({
@@ -20,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
   if (!article) return {};
 
   return {
@@ -52,11 +55,11 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
   if (!article) notFound();
 
   const { default: Post } = await import(`@/content/articles/${slug}.mdx`);
-  const { newer, older } = getAdjacentArticles(slug);
+  const { newer, older } = getAdjacentArticles(await getSortedArticles(), slug);
 
   const jsonLd = {
     "@context": "https://schema.org",
