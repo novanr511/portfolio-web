@@ -1,0 +1,100 @@
+---
+title: "Technical SEO at Scale: URL Inventory, Capacity, and Observability"
+description: "Manage technical SEO for large, frequently changing sites by measuring URL inventory, crawl demand, origin capacity, and operational bottlenecks."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Crawl Budget
+  - Observability
+  - Infrastructure
+---
+
+“Technical SEO at scale” is not simply a larger checklist. It is an operational problem that appears when a site has a large or fast-changing URL inventory, many low-value URL variants, constrained origin capacity, or a measured gap between important updates and crawler fetches. For a small, stable site whose important pages are crawled reliably, enterprise-style crawl controls may add complexity without solving a real problem.
+
+**Direct answer:** At scale, first measure which URLs exist, which should be discoverable and indexable, which are actually requested, and how the serving infrastructure responds. Segment verified crawler logs by URL class and response outcome; compare that evidence with sitemap and internal-link inventories. Then reduce unnecessary URL generation, improve paths to priority content, and address confirmed capacity or reliability problems. Do not assume every large site has a crawl-budget issue or treat an increase in crawl requests as a goal by itself.
+
+> **Data note:** The small table and calculations in this article are synthetic examples for demonstrating a method. They are not Googlebot measurements or findings from a real site.
+
+## 1. When scale changes the problem
+
+Scale becomes relevant when inventory and change rate interact with observable constraints. Examples include product catalogs with many filter combinations, publishing systems that create many near-duplicate routes, or sites where important updates remain un-fetched while logs show repeated requests to low-value variants.
+
+Before introducing special controls, ask:
+
+* Is there evidence that important URLs are not being crawled or refreshed when needed?
+* Does the site generate many URL variants with materially equivalent content?
+* Do verified crawler requests coincide with elevated origin latency, throttling, or errors?
+* Are sitemap and internal-link signals consistent with the intended inventory?
+
+If these questions have no evidence-backed problem statement, start with ordinary URL hygiene and availability checks rather than complex crawl allocation.
+
+## 2. Build an inventory that distinguishes URL states
+
+Do not equate “URL found” with “URL worth indexing.” Build categories that map to actions:
+
+| URL class | Example | Intended state | Useful evidence |
+| :--- | :--- | :--- | :--- |
+| Canonical content | Product or article URL | Discoverable; potentially indexable | Sitemap, internal links, status, canonical |
+| Duplicate variant | Tracking or parameter ordering | Consolidate or otherwise manage | Redirect/canonical policy, request volume |
+| Faceted combination | Multiple product filters | Deliberate policy by landing-page value | Link generation, inventory, logs |
+| Retired URL | Removed item or old path | Redirect if equivalent; otherwise appropriate removal behavior | Redirect map, response status, incoming links |
+| Utility endpoint | Internal search or API route | Usually not a search landing page | Access patterns and application purpose |
+
+Use sources such as the sitemap, a controlled site crawl, application route data, and access logs. These sources describe different sets; record their collection time and limitations. Avoid exporting personal or session-specific parameters into shared reports.
+
+## 3. Measure request distribution, not just totals
+
+Aggregate verified crawler requests by URL class, response status, and time window. One synthetic example:
+
+```text
+Synthetic 7-day request sample (illustrative only)
+Canonical articles/products       58,000 requests   200/304: 99.4%
+Filter and sort variants          31,000 requests   200:      98.8%
+Legacy redirected URLs             8,000 requests   301/308:  99.9%
+Application errors                 1,000 requests   5xx:       2.1%
+```
+
+This table alone cannot establish wasted crawl or an indexing impact. The next questions are whether the filter URLs are valuable landing pages, whether 5xx requests affect important templates, and whether the request pattern is representative. Compare URL classes against the intended inventory, content-change rate, and operational logs.
+
+For sites with suitable data infrastructure, store sanitized access-log events in a warehouse and aggregate by date, route template, status, and verified crawler class. Partition by time, avoid retaining unnecessary personal data, and document bot-verification logic. A BigQuery or similar query should answer a specific operational question; moving logs into a warehouse is not itself an SEO improvement.
+
+## 4. Interpret demand and capacity carefully
+
+Google's crawl-budget documentation discusses crawl capacity and crawl demand as related considerations, particularly for large sites. Treat these as concepts for diagnosing observed behavior, not a formula that lets a site owner assign a guaranteed number of requests.
+
+Look for evidence at both sides:
+
+* **Demand/inventory signals:** URL discovery, internal-link prominence, sitemaps, content changes, duplicates, and whether URLs serve distinct purposes.
+* **Serving/capacity signals:** verified crawler response codes, latency, `429`/`5xx` rates, edge challenge events, and origin load during crawl activity.
+
+Do not infer that a slow page necessarily caused a particular crawl schedule, or that a faster server guarantees more indexing. The goal is reliable delivery and a well-managed URL space, not maximizing bot traffic.
+
+Reference: [Google Search Central — Crawl Budget](https://developers.google.com/crawling/docs/crawl-budget). Check the live documentation when applying its guidance; product behavior and recommendations can change.
+
+## 5. Turn observations into bounded changes
+
+Use the smallest intervention that addresses a confirmed issue:
+
+1. **Reduce URL generation:** Stop linking to combinations that have no distinct landing-page purpose; normalize parameter order and avoid session IDs in crawlable links.
+2. **Improve priority discovery:** Link important, current pages from relevant navigational or contextual pages and maintain an accurate sitemap.
+3. **Correct serving failures:** Fix WAF false positives, recurring 5xx/429 responses, or slow application dependencies identified in logs.
+4. **Set an explicit page policy:** Decide which facets, sort states, and pagination routes should be crawlable or indexable. Align links, canonicals, directives, and sitemap entries.
+5. **Measure after the change:** Compare the same route classes and time windows; check for unintended loss of useful discovery or product access.
+
+For parameter-heavy catalog cases, see [E-commerce Technical SEO: Product URLs and Faceted Navigation](/articles/ecommerce-technical-seo-product-urls-faceted-navigation). For deciding whether crawl budget is relevant in the first place, see [Crawl Budget: When It Matters and How to Diagnose It](/articles/crawl-budget-when-it-matters-and-how-to-diagnose-it).
+
+## 6. Operational monitoring at scale
+
+Prefer a small set of metrics tied to an owner and response:
+
+* Verified crawler 5xx/429 ratio by route class.
+* Request volume to duplicate or unwanted URL patterns.
+* Latency percentiles and edge/origin cache outcomes for important templates.
+* Sitemap fetch status and changes in canonical URL inventory.
+* Age of high-priority content since its last observed crawl, where logs support that measurement.
+
+Use alert thresholds based on the service's own baseline and sample sizes. A low-volume route can show a dramatic percentage change from one request; require enough observations or use absolute counts. Add a runbook that explains how to confirm the signal before changing robots rules or blocking traffic.
+
+## Summary
+
+At scale, technical SEO depends on a trustworthy inventory, measured request behavior, and reliable delivery. Segment URLs by purpose, verify crawler requests, compare actual patterns with intended discovery, and fix demonstrated waste or capacity problems. Synthetic examples and aggregate counts are starting points for investigation—not proof of search impact or a universal enterprise recipe.

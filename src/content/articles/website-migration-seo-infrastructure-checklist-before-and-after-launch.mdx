@@ -1,0 +1,99 @@
+---
+title: "Website Migration SEO: Infrastructure Checklist Before and After Launch"
+description: "Plan an SEO-safe website migration with URL mapping, redirect validation, DNS and TLS checks, launch-day smoke tests, monitoring, and rollback criteria."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Website Migration
+  - Infrastructure
+  - Operations
+---
+
+A website migration changes one or more properties of a site—domain, URL structure, CMS, hosting, rendering stack, or CDN. The risk comes from changing several dependencies at once: a correct URL map cannot compensate for a blocked production site, and a healthy server cannot preserve old URLs if redirects are missing.
+
+**Direct answer:** Treat a migration as a controlled infrastructure release. Before launch, inventory important source URLs, map each to its closest relevant destination, test redirects and production-like rendering, and record a baseline. At launch, verify DNS/TLS, HTTP status, robots directives, canonicals, sitemap, and representative page templates. After launch, monitor server errors, redirect targets, crawl/indexing reports, and user-facing behavior; keep a documented rollback decision tied to specific failure conditions. A checklist reduces avoidable mistakes but cannot guarantee unchanged rankings or traffic.
+
+## 1. Define the migration and establish a baseline
+
+First record exactly what is changing. A domain move, a path redesign, a CMS switch, and a hosting move have different failure modes; bundling all of them makes diagnosis harder.
+
+Capture a pre-migration baseline that the team can reproduce:
+
+* A source URL inventory from the current sitemap, analytics or Search Console exports, and a crawl of important internal links.
+* Current response status, canonical target, indexability directives, page title, and template type for representative URLs.
+* Current DNS records, TLS certificate coverage, robots.txt, sitemap locations, and redirect rules.
+* Available server and edge request/error metrics, plus search performance and indexing reports with their collection dates.
+
+Keep sensitive analytics exports and logs private. The baseline is for comparison, not proof that every future variation was caused by the migration.
+
+## 2. Build and validate the URL map
+
+Create one explicit mapping from each valuable old URL to its best new destination. Avoid blanket redirects to the new homepage: a redirect should preserve the intent of the old URL where an equivalent page exists.
+
+| Source URL | Destination | Expected response | Validation |
+| :--- | :--- | :--- | :--- |
+| `/old-guide` | `/guides/new-guide` | Permanent redirect | Destination returns 200 and has relevant content |
+| `/products/item-a` | `/catalog/item-a` | Permanent redirect | Product equivalent is available or a suitable alternative is documented |
+| Removed URL with no equivalent | None or relevant replacement | 404/410 or carefully chosen destination | No misleading mass redirect |
+
+Test for redirect loops, chains, conflicting host/scheme rules, and destinations that themselves redirect. Update internal links and canonical tags to point directly at final URLs. A redirect is not a substitute for updating the site's own references.
+
+For redirect status semantics and verification, see [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx).
+
+## 3. Rehearse the release in a production-like environment
+
+Before launch, test the actual built application or staging deployment—not just source files. Verify a representative set of templates and routes:
+
+1. **HTTP and redirects:** old URLs reach the intended final URL; new URLs return the expected status; no loops or accidental temporary redirects remain.
+2. **Indexation controls:** production pages do not inherit staging `noindex`, authentication, or restrictive robots rules. Confirm the production robots.txt intentionally serves the correct policy.
+3. **Document signals:** titles, descriptions, canonicals, hreflang where applicable, and structured data reflect the new URLs and content.
+4. **Rendering and links:** inspect initial HTML and rendered output; confirm navigation and content links use the new URL scheme.
+5. **Sitemap:** ensure it contains only canonical, intended indexable destination URLs and is valid XML.
+6. **Operational capacity:** validate cache behavior, application health checks, error logging, and a way to restore the previous release.
+
+If staging is blocked from crawling, retain that protection until launch. Do not copy the block into production. Conversely, don't remove staging restrictions early just to make a test convenient.
+
+## 4. Launch-day smoke tests
+
+Run a short, deterministic test set immediately after traffic is switched. These examples are generic; replace hostnames and paths with values you control.
+
+```bash
+# Check DNS resolution
+dig +short example.com A
+dig +short example.com AAAA
+
+# Inspect TLS certificate and hostname
+openssl s_client -connect example.com:443 -servername example.com </dev/null
+
+# Check a new page and follow its redirects
+curl -sS -L -o /dev/null -w 'status=%{http_code} final=%{url_effective}\n' \
+  https://example.com/guides/new-guide
+
+# Inspect robots.txt and sitemap responses
+curl -sS -D - -o /dev/null https://example.com/robots.txt
+curl -sS -D - -o /dev/null https://example.com/sitemap.xml
+```
+
+Also check several old URLs against the mapping, then fetch page HTML and inspect canonical and robots directives. `curl` verifies a request from your environment; it does not establish what Googlebot fetched or indexed.
+
+## 5. Monitor, triage, and decide on rollback
+
+For the first hours and days, monitor the indicators that can reveal a broken release:
+
+* New-route 4xx/5xx rates and latency by template or service.
+* Old-URL redirect success and final destination status.
+* CDN/WAF blocks and cache behavior that differs from the expected configuration.
+* Sitemap fetch and parsing status, plus representative Search Console indexing signals as they become available.
+* User-facing errors in key conversion or publishing flows.
+
+Define rollback criteria before the migration. Examples include widespread 5xx responses, a production-wide `noindex`, a redirect loop affecting core routes, or inability to serve essential templates. Set thresholds with the service owner based on normal baselines and business impact; do not invent a universal traffic-loss percentage. If only a subset of URL mappings fails, a targeted fix may be safer than reverting the whole release.
+
+Search Console reports and search performance data can lag and aggregate observations. Pair them with edge/origin logs and direct checks rather than using one report as an instant pass/fail test. For a monitoring design, see [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts).
+
+## 6. Post-launch closeout
+
+Keep redirects in place according to the migration plan and platform constraints. Re-crawl the destination, compare the source inventory against redirect outcomes, repair internal links, and document unresolved exceptions. Revisit indexing and search data over an appropriate observation window; annotate other simultaneous changes so later analysis has context.
+
+## Summary
+
+Successful migration work is a sequence: baseline, map, rehearse, switch, verify, and monitor. The highest-value safeguards are precise URL mapping, production-specific crawl controls, direct-to-final internal links, representative launch tests, and a clear rollback owner. These controls improve diagnosability; they do not guarantee a particular search outcome.

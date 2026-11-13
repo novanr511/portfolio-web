@@ -1,0 +1,146 @@
+---
+title: "SEO Regression Tests in CI/CD: Catch Errors Before Release"
+description: "Add practical SEO smoke tests to CI/CD for HTTP status, robots directives, canonicals, sitemaps, and rendered pages—without brittle checks."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - CI/CD
+  - Testing
+  - Web Development
+---
+
+A deployment can succeed from the application's point of view and still break search-critical behavior: a route starts returning 404, production HTML inherits `noindex`, canonical URLs point to staging, or the sitemap no longer parses. These failures are preventable when a small set of important invariants is checked before and after release.
+
+**Direct answer:** Add SEO regression checks to the same delivery pipeline used for application tests. Test representative routes for expected HTTP status, absence of accidental `noindex`, canonical-host correctness, valid sitemap XML, and essential rendered content. Run build-time checks against a preview deployment and a short post-deploy smoke test against production. Keep checks focused on invariants the team controls; do not make CI fail merely because Google has not indexed a page or selected the expected canonical.
+
+## 1. Choose stable invariants, not every SEO recommendation
+
+An invariant is behavior that should remain true across releases. Start with a small, owned set:
+
+| Invariant | Useful check | Common false positive |
+| :--- | :--- | :--- |
+| Important routes respond successfully | HTTP status on a route fixture list | Temporary preview authentication or expected redirect |
+| Production pages are not accidentally `noindex` | Inspect response headers and HTML | Test/staging intentionally uses `noindex` |
+| Canonical URLs use the production origin | Parse canonical links on representative pages | Preview host legitimately differs |
+| Sitemap is valid and contains allowed URLs | Parse XML and inspect URL policy | Sitemap generation is asynchronous during preview |
+| Main content renders in the expected template | Check a stable heading or data marker | Copy changes or localization updates |
+
+Avoid brittle tests for exact title wording, exact page counts, or Google-selected canonical and index status unless a specific business requirement truly depends on them. A regression test should detect a defect, not freeze normal editorial changes.
+
+## 2. Split checks across build, preview, and production
+
+Different phases can observe different failure classes:
+
+```text
+Pull Request / Build             Preview Deployment          Production Smoke Test
+────────────────────             ───────────────────          ─────────────────────
+Unit tests, route fixtures  ───► HTTP/HTML invariants   ───► DNS/TLS + key routes
+Sitemap generation tests         canonical/robots checks       sitemap + error status
+Schema parse where relevant      rendered-template checks      monitor, don't mutate
+```
+
+Build-time tests are deterministic and fast. Preview checks verify that the application emits expected output through the deployment platform. Production smoke tests should be read-only, low volume, and run after deployment; they detect environment-specific problems such as wrong host configuration or missing production assets.
+
+## 3. A small route-and-HTML smoke test
+
+The following Node.js example uses only built-in APIs. It is an illustrative starting point: adapt the route fixtures, expected host, and HTML parsing to your application. The regular expressions intentionally cover simple generated HTML only; for arbitrary markup, use an HTML parser rather than relying on regex.
+
+```javascript
+// scripts/seo-smoke-test.mjs
+const origin = process.env.SITE_ORIGIN;
+if (!origin) throw new Error('Set SITE_ORIGIN to the deployment origin');
+
+const routes = [
+  { path: '/', canonical: '/' },
+  { path: '/articles', canonical: '/articles' },
+];
+
+let failed = false;
+
+for (const route of routes) {
+  const url = new URL(route.path, origin);
+  const response = await fetch(url, { redirect: 'manual' });
+
+  if (response.status !== 200) {
+    console.error(`FAIL ${url}: expected 200, got ${response.status}`);
+    failed = true;
+    continue;
+  }
+
+  const html = await response.text();
+  const robotsHeader = response.headers.get('x-robots-tag') ?? '';
+  const robotsMeta = html.match(/<meta\b[^>]*\bname=["']robots["'][^>]*>/i)?.[0] ?? '';
+  const canonicalTag = html.match(/<link\b[^>]*\brel=["']canonical["'][^>]*>/i)?.[0] ?? '';
+  const canonicalHref = canonicalTag.match(/\bhref=["']([^"']+)["']/i)?.[1];
+
+  if (/noindex/i.test(robotsHeader) || /noindex/i.test(robotsMeta)) {
+    console.error(`FAIL ${url}: production response contains noindex`);
+    failed = true;
+  }
+
+  if (!canonicalHref || new URL(canonicalHref, url).href !== new URL(route.canonical, origin).href) {
+    console.error(`FAIL ${url}: unexpected or missing canonical (${canonicalHref ?? 'missing'})`);
+    failed = true;
+  }
+
+  console.log(`${failed ? 'CHECK' : 'PASS'} ${url}`);
+}
+
+if (failed) process.exitCode = 1;
+```
+
+The test is deliberately limited: canonical tag attribute order and HTML variations can defeat simple regular expressions. For production-grade parsing, parse the response with a maintained HTML parser and test the resulting DOM. Also consider whether your pages legitimately use multiple robots directives or non-indexable route types before applying a blanket assertion.
+
+## 4. Validate sitemap XML and URL policy
+
+Sitemap tests should verify syntax and policy rather than require a fixed number of entries. Useful assertions include:
+
+* The sitemap endpoint returns the expected status and XML content type.
+* The response parses as XML and contains valid absolute URLs.
+* URLs use the canonical production host and expected scheme.
+* No preview, test, or explicitly non-indexable routes are included.
+
+If the sitemap is an index, validate child sitemap URLs and test a sample from each child. For large sitemaps, do not fetch every listed URL on every pull request; test the generator and run a bounded post-deploy sample. See the project's sitemap policy and [Google's sitemap documentation](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) for protocol guidance.
+
+## 5. Example GitHub Actions workflow
+
+This workflow sketch runs checks against a deployed preview after the deployment provider publishes its URL. It assumes the repository has an `npm run test:seo` command and that `SITE_ORIGIN` is supplied as a workflow variable or secret appropriate to the deployment.
+
+```yaml
+name: SEO smoke tests
+
+on:
+  workflow_dispatch:
+  deployment_status:
+
+jobs:
+  seo-smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run SEO checks against deployment
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+        run: npm run test:seo
+```
+
+This is a generic example, not a tested workflow for this repository. Provider-specific deployment events may expose the preview URL differently; wire the correct environment output before relying on it. Pin third-party actions to reviewed immutable commit SHAs under your organization's supply-chain policy. Do not place credentials in logs or test output.
+
+## 6. Prevent false alarms and protect production
+
+* **Use route fixtures:** Keep a short, reviewed list of representative route types rather than crawling the whole site on every change.
+* **Separate preview and production expectations:** A preview can have a different hostname and intentional access controls. Do not accidentally treat them as production signals.
+* **Keep tests read-only:** Do not submit indexing requests, modify content, or trigger expensive jobs as part of a smoke test.
+* **Report actionable context:** Include route, expected value, observed value, deployment ID, and a safe response excerpt.
+* **Handle secrets safely:** Use platform secret stores; redact authorization headers, cookies, and personal data.
+* **Pair automated checks with review:** A syntactically valid canonical can still be semantically wrong. Tests catch known invariants; humans review intent.
+
+## Summary
+
+SEO regression testing works best as a small safety net around application releases. Check route responses, robots directives, canonicals, sitemap validity, and rendered output at the stage where those signals exist. Keep the checks maintainable, distinguish preview behavior from production, and verify failures before rollback. CI can prevent known regressions; it cannot predict indexing or ranking outcomes.
+
+For ongoing checks beyond deployment, see [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts).

@@ -1,0 +1,105 @@
+---
+title: "A Technical SEO Audit That Follows the Request Path"
+description: "Run a risk-based technical SEO audit from DNS and HTTP delivery through rendering, crawling, and indexing, tying each finding to evidence and an owner."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Technical Audit
+  - Crawling
+  - Web Infrastructure
+---
+
+A technical SEO audit can produce hundreds of warnings without telling a developer what to fix first. A more useful approach follows a URL through the systems that deliver and interpret it: resolution, connection, response, document rendering, discovery, and indexing. This sequence helps distinguish a broken page from a page that is reachable but not selected for indexing.
+
+**Direct answer:** Scope the audit, select representative URLs, and trace each through DNS/TLS, HTTP response, HTML and rendered output, crawl directives, internal discovery, and indexation evidence. Prioritize failures that block access to important content or create broad template-level defects. Record each finding as symptom, evidence, likely layer, owner, action, and a regression test. Do not present warnings as confirmed search impact, and do not claim to audit a site comprehensively from a small sample.
+
+## 1. Scope before scanning
+
+Agree on the hostnames, environments, page types, and business-critical URL groups in scope. Confirm authorization before running high-volume crawls or accessing private logs. Identify changes underway—migration, redesign, CDN rollout—that could affect interpretation.
+
+Build a small URL sample from several sources:
+
+* Sitemap URLs for intended indexable pages.
+* Internal links discovered by a crawler.
+* Important pages named by the site owner.
+* Search Console examples or verified server-log requests, if available.
+
+Label the sample by template and purpose (home, category, article, product, pagination, or other relevant type). A handful of examples can reveal template defects, but cannot prove that every URL behaves identically.
+
+## 2. Follow the request path
+
+For each sample, record observations layer by layer. Keep observations separate from hypotheses and recommendations.
+
+| Layer | Check | Evidence to record | Example question |
+| :--- | :--- | :--- | :--- |
+| DNS and TLS | Host resolves; certificate covers hostname | Resolver output, certificate details | Does the requested host resolve and complete HTTPS? |
+| HTTP delivery | Status, redirect chain, headers, response time | `curl` output, edge/origin logs | Does the final URL return the intended response? |
+| Document | Title, robots, canonical, status semantics | Raw HTML and response headers | Are directives present and consistent? |
+| Rendering | Main content and links in rendered output | Browser render, URL Inspection when available | Does essential content depend on unavailable resources? |
+| Discovery | Crawlable internal links and sitemap references | Crawl graph, sitemap sample | Can a crawler find the intended URL through links or sitemap? |
+| Indexing | Search Console URL-level/report evidence | Inspection result and timestamp | What does the tool report, and what does it not establish? |
+
+This is a diagnostic order, not a claim that search engines process every URL through one fully observable linear pipeline. Use public documentation and the available evidence to describe stages carefully.
+
+## 3. Start with access and response behavior
+
+Run focused checks against URLs you control. For example:
+
+```bash
+curl -sS -L -o /dev/null \
+  -w 'status=%{http_code} final=%{url_effective} redirects=%{num_redirects} ttfb=%{time_starttransfer}s\n' \
+  https://example.com/articles/sample
+```
+
+Check DNS and TLS separately when connection problems are suspected. For HTTP behavior, include both the initial response and final destination; a successful final status can hide an unnecessary redirect chain. Compare results across templates and environments, and note that a single test from one network location is not a global availability measurement.
+
+For status interpretation, consult [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) and [HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects).
+
+## 4. Inspect document and rendered output
+
+For each sample, inspect the response HTML and, where JavaScript materially changes content, the rendered DOM. Check:
+
+* The intended main content and a meaningful page title are present.
+* Canonical and robots directives are appropriate for that URL class.
+* Important navigation and content links use usable destinations, typically anchor elements with `href` values.
+* Required assets and API calls do not fail in the rendered page.
+* Structured data, if present, corresponds to visible page content and the correct URL.
+
+Do not equate “present in the DOM” with “guaranteed to be indexed.” Rendering output is a diagnostic observation. See [Raw HTML vs Rendered DOM: What Can a Crawler Read?](/articles/raw-html-vs-rendered-dom-what-can-a-crawler-read) for the boundary between source and rendered output.
+
+## 5. Check discovery and indexation evidence
+
+Inspect internal linking and sitemap consistency: intended indexable URLs should be discoverable through relevant site links, and sitemap entries should reflect canonical URLs the site intends search engines to consider. Find parameter traps, orphaned pages in the sample, blocked resources, or contradictions between redirects, canonicals, and robots directives.
+
+Use Search Console as one evidence source, not a final verdict on every question. URL Inspection is URL-specific; reports may be delayed or grouped, and a successful live test does not guarantee indexing. Cross-check with server logs when request history matters. For a report-by-report workflow, use [Google Search Console for Technical SEO: A Diagnostic Workflow](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow).
+
+## 6. Prioritize findings by risk and evidence
+
+Use a simple triage model:
+
+* **P0 — broad access or directive failure:** production-wide 5xx, accidental `noindex`, or robots policy blocking critical sections. Escalate immediately and verify scope.
+* **P1 — important template defect:** incorrect canonicals or broken rendering across a high-value page type. Assign an engineering owner and add a regression test.
+* **P2 — bounded hygiene issue:** isolated redirect chain, stale internal link, or low-impact metadata inconsistency. Schedule based on reach and effort.
+
+These priority labels are operational conventions, not Google's classifications. Consider affected URL count, importance, duration, reproducibility, and confidence in the evidence. A suspected cause should remain labeled as a hypothesis until verified.
+
+Write each finding in a format that supports action:
+
+```text
+Finding: Article template emits canonical URLs on the preview host
+Evidence: 4 of 5 sampled article URLs; captured 2026-11-13; build ID abc123
+Layer: Document generation / environment configuration
+Impact scope: Sample indicates template-level risk; full population not yet measured
+Owner: Web platform
+Action: Use configured production origin for canonical generation
+Verification: Recheck the sample after deploy and add a CI canonical-host test
+Confidence: High for sampled routes; population estimate unknown
+```
+
+## 7. Close the loop
+
+After fixes, repeat the same checks against the same sample and record the release identifier. Add a monitor or automated test for recurring failures where practical. If a finding depends on changing search-engine behavior, note the source and re-check it when the documentation changes.
+
+## Summary
+
+A request-path audit replaces an undifferentiated warning list with a traceable diagnosis. Scope the work, test representative URLs at each system layer, separate observations from interpretations, prioritize by risk and confidence, and verify fixes with repeatable checks. The result is a decision-oriented audit—not a promise of rankings or a claim that a sample represents every page.

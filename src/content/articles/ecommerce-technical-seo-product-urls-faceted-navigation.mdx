@@ -1,0 +1,100 @@
+---
+title: "E-commerce Technical SEO: Product URLs and Faceted Navigation"
+description: "Control e-commerce URL growth by classifying filters, sorting, and pagination, then define crawl, canonical, and indexation rules for each URL type."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - E-commerce
+  - Crawling
+  - URL Architecture
+---
+
+An online store can expose a URL for every combination of size, color, brand, price range, and sort order. A small catalog can therefore generate a very large URL space, much of which represents the same products in a different order or filtered view.
+
+The engineering challenge is not to block every filter. Some filtered pages satisfy distinct shopping needs and deserve stable landing pages; other combinations add little value, create duplicate or near-duplicate pages, and consume crawl resources.
+
+**Direct answer:** Start by classifying each URL family by user purpose and unique content. Keep stable, useful category or curated-filter landing pages crawlable and potentially indexable; avoid creating crawlable links to arbitrary combinations that do not deserve search landing pages. Use consistent internal links, canonical URLs, robots directives, and sitemap inclusion rules—but remember that `robots.txt` blocks crawling, not indexing, and a canonical is a hint rather than a command. Verify the resulting behavior through rendered links, server logs, and Search Console rather than applying one global rule to all parameters.
+
+## 1. How facets create a URL space
+
+A facet is a product attribute used to narrow a listing: brand, color, size, price, availability, or rating. Sorting and pagination also change listing states, but they do not necessarily create valuable search landing pages.
+
+Consider this **illustrative URL set**, not a measured store or case study:
+
+```text
+/shoes
+/shoes?color=black
+/shoes?color=black&size=9
+/shoes?color=black&size=9&brand=acme
+/shoes?sort=price-low-to-high
+/shoes?page=2
+```
+
+With `n` independent facets and `k` possible values per facet, the number of combinations can grow multiplicatively. Real catalogs have constraints, but even a modest set of attributes can create many crawlable paths. Parameter order can add further URL variants if the application treats these as different URLs:
+
+```text
+?color=black&size=9
+?size=9&color=black
+```
+
+For background on URL normalization, see [SEO URL Structure: Normalize Hostnames, Paths, and Parameters](/articles/seo-url-structure-normalize-hostnames-paths-parameters).
+
+## 2. Decide which states deserve a landing page
+
+Make decisions by URL class, not by parameter name alone. A `brand` filter might be useful for one category and pointless for another. Use a table such as this as a starting point, then validate it against catalog data and search demand you can actually observe.
+
+| URL state | Typical treatment | Key question |
+| :--- | :--- | :--- |
+| Main category | Crawlable; usually self-canonical | Is this a useful, stable entry page? |
+| Curated, in-demand facet | Stable URL; consider indexability | Does it offer a distinct assortment and useful page content? |
+| Arbitrary multi-facet combination | Avoid exposing unlimited crawlable links | Is there a reason for this exact combination to be a landing page? |
+| Sort order | Usually not a separate search landing page | Does sorting only reorder the same inventory? |
+| Tracking parameter | Normalize/remove from canonical destination | Does it change the page's substantive content? |
+| Pagination | Preserve a usable route and crawlable navigation | Can users and crawlers reach later products? |
+
+This is a decision framework, not a universal directive. For each indexable landing page, define a stable URL, useful title and page content, a self-referencing canonical, and inclusion in the sitemap only when it is intended to be indexed. Do not include every filtered state in the sitemap.
+
+## 3. Choose controls that match the intended outcome
+
+Different controls solve different problems:
+
+* **Prevent URL generation or linking:** The strongest way to limit discovery of unwanted combinations is not to expose endless crawlable links. Use forms or client-side controls where appropriate, while preserving accessible product discovery and a usable interface.
+* **Canonicalize duplicates:** Where variants should consolidate, return a canonical URL pointing to the preferred equivalent page. Keep internal links and sitemap entries consistent with that choice. Google may select a different canonical.
+* **Use `noindex` when a crawled page should not be indexed:** The crawler must be able to fetch the page to see a page-level `noindex` directive. Blocking that same URL in `robots.txt` can prevent the directive from being read.
+* **Use `robots.txt` to manage crawling carefully:** A disallow may reduce fetches for known URL patterns, but it does not guarantee that a URL disappears from search results. It can also prevent a crawler from seeing page directives or links.
+
+Avoid contradictory combinations—for example, blocking a URL in `robots.txt` while expecting Google to read its `noindex` or canonical. More on the distinction in [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap).
+
+## 4. A reproducible audit for facet URL behavior
+
+Use a small, representative set before changing site-wide rules:
+
+1. **Inventory URL patterns.** Export URLs from a crawl, access logs, internal search, and sitemaps. Group by category path and query parameter pattern; redact user-specific or session parameters.
+2. **Sample each class.** Select a base category, one curated filter, a multi-filter combination, sort order, and a later pagination page.
+3. **Inspect response and directives.** For each sample, record status, redirect destination, canonical, robots directives, and whether the page has distinct content.
+4. **Check discoverability.** Inspect rendered HTML for crawlable `<a href>` links that generate combinations. Verify pagination and product links remain reachable.
+5. **Compare signals.** Check whether intended landing pages appear in the sitemap and whether internal links point to their preferred URL forms.
+6. **Validate after deployment.** Re-crawl the sample set, inspect server logs for bot requests to unwanted patterns, and use Search Console to review affected URLs over time.
+
+Example header check (replace the sample URL with a URL you control):
+
+```bash
+curl -sS -D - -o /dev/null \
+  'https://shop.example/shoes?color=black&size=9'
+```
+
+This shows response headers, not the HTML canonical or rendered link graph. Fetch and inspect the document separately, and do not treat a single `curl` result as proof of Google indexing behavior.
+
+## 5. Common failure modes
+
+* **Disallowing all parameters:** Can block useful pages, hide page directives, and leave URLs discoverable through links.
+* **Canonicalizing every filter to the category:** May discard a genuinely distinct landing page. Canonical targets should be meaningfully equivalent.
+* **Indexing every combination:** Creates low-value pages and a large, unstable URL inventory.
+* **Removing pagination links:** Can make products on later pages harder to discover. A filter policy should not accidentally strand product URLs.
+* **Changing parameter handling without log review:** Existing external links, campaign URLs, or application behavior may depend on those parameters.
+
+## Summary
+
+Treat faceted navigation as a URL architecture and product-discovery problem. Decide which filtered states merit stable search landing pages, prevent unnecessary combinations from becoming crawlable paths, and align canonicals, directives, internal links, and sitemaps. Then check actual requests and indexing reports; no single parameter rule guarantees a particular crawl or index outcome.
+
+Continue with [Crawl Budget: When It Matters and How to Diagnose It](/articles/crawl-budget-when-it-matters-and-how-to-diagnose-it) and [Canonical Tags and Duplicate URLs: Signals, Not Commands](/articles/canonical-tags-and-duplicate-urls-signals-not-commands).

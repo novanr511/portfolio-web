@@ -1,0 +1,161 @@
+---
+title: "Website Uptime, 5xx Errors, and Crawl Reliability"
+description: "Understand how website downtime and 5xx server errors impact Googlebot: the crawl back-off curve, using 503 Retry-After for maintenance, and outage recovery protocols."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Uptime
+  - Reliability
+  - Web Infrastructure
+---
+
+Every web system experiences downtime. Whether caused by an unexpected database deadlock, a memory leak during a traffic surge, an edge CDN network failure, or scheduled maintenance, servers will occasionally fail to return content.
+
+In technical SEO, downtime is frequently discussed with disproportionate panic: marketing teams fear that a 15-minute outage will permanently erase rankings, while developers sometimes overlook days of intermittent 5xx errors that silently cripple crawl capacity.
+
+**Direct Answer:** Uptime is an absolute prerequisite for web crawling, but search engines are engineered for resilience. Googlebot responds to transient outages (under 24 hours) with exponential back-off, temporarily slowing request rates to avoid overloading distressed servers while preserving existing search rankings. However, sustained server outages exceeding 48 to 72 hours force search engines to temporarily drop unreachable URLs from search results to protect users from broken links. Utilizing HTTP `503 Service Unavailable` with a `Retry-After` header signals planned downtime, preventing de-indexing during scheduled maintenance.
+
+Understanding how crawlers respond to server errors allows engineering teams to manage outages methodically and verify post-incident recovery.
+
+```text
+[Outage Begins: Server returns 5xx Errors]
+                    │
+                    ├── 0 to 6 Hours: Exponential Back-off
+                    │     └── Googlebot reduces fetch rate; no ranking or indexation changes
+                    │
+                    ├── 6 to 24 Hours: Severe Crawl Throttling
+                    │     └── Crawl capacity drops 80%+; newly published URLs stall in queue
+                    │
+                    ├── 24 to 48 Hours: Verification Re-crawls
+                    │     └── High-priority landing pages re-tested; warning flags raised in GSC
+                    │
+                    └── > 48 to 72 Hours: Temporary De-indexing
+                          └── Search engine begins dropping dead URLs from active search results
+```
+
+---
+
+## 1. The 5xx Error Catalog: Distinguishing Failure Modes
+
+HTTP status codes in the 5xx range communicate that the server failed to fulfill an apparently valid request. Search engine crawlers treat different 5xx codes with distinct operational logic:
+
+### 1. `500 Internal Server Error`
+Indicates an unhandled application exception (e.g., uncaught runtime error, broken template compilation). If isolated to a single dynamic route, Googlebot treats it as a software bug on that specific URL, leaving the rest of the host unaffected.
+
+### 2. `502 Bad Gateway` & `504 Gateway Timeout`
+As explored in [Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin), 502 and 504 errors indicate an architectural failure between the reverse proxy and the backend application runtime. Because these errors typically occur host-wide during resource saturation, they immediately trigger Googlebot's global crawl back-off algorithms.
+
+### 3. `503 Service Unavailable`
+The official HTTP response indicating that the server is temporarily unable to handle the request due to planned maintenance or temporary overload. Unlike a generic 500 or 502 error, **a 503 communicates intentional, temporary downtime**, instructing crawlers that the condition is transient.
+
+---
+
+## 2. The Googlebot Back-off Curve: From Throttling to De-indexing
+
+When search engine crawlers encounter elevated 5xx error rates, their behavior follows a predictable timeline:
+
+```text
+Host Error Rate (%)  │ Googlebot Action                    │ Search Index Status
+─────────────────────┼─────────────────────────────────────┼────────────────────────────────────────
+< 1%                 │ Normal crawling                     │ Unaffected
+5% - 20%             │ Crawl rate reduced by 30% - 50%     │ Unaffected
+> 50% (0 - 24 hours) │ Severe exponential back-off (80%+)  │ Existing rankings retained
+> 50% (24 - 48 hours)│ Crawl rate minimized; warning alerts│ High-traffic URLs risk temporary drop
+> 50% (> 72 hours)   │ Crawl halts; URLs purged from index │ Severe de-indexing to protect users
+```
+
+### Phase 1: Immediate Back-off (Hours 0–24)
+Google’s primary rule during an incident is **do no harm**. If a server returns 5xx errors, Googlebot assumes the host is struggling under load. To prevent its own crawl requests from exacerbating the outage, Googlebot immediately slashes its concurrent fetch threads. During this window:
+* Existing indexed pages remain safely in the search results.
+* Cached snippets continue to be served to users.
+* Newly published articles cannot be crawled or indexed.
+
+### Phase 2: Extended Outage (Hours 24–72)
+If the server remains in a 5xx state after 24 hours, Googlebot periodically attempts verification fetches against high-traffic URLs. If errors persist, Google Search Console triggers automated email alerts to site owners (*"Host availability issues detected"*).
+
+### Phase 3: Defensive De-indexing (> 72 Hours)
+Search engines exist to serve working documents to users. If a website remains completely offline for more than 3 consecutive days, Googlebot begins temporarily de-indexing unresolvable pages to prevent searchers from clicking through to dead error screens. Once the server recovers, these pages can be re-indexed, but recovering historical crawl frequency and cache state can take several weeks.
+
+---
+
+## 3. The 503 + `Retry-After` Safeguard
+
+When executing planned database migrations, framework upgrades, or data center cutovers, **never let the server fail with unhandled 500s or blank screens**.
+
+Always serve an explicit `503 Service Unavailable` response accompanied by a `Retry-After` header:
+
+```http
+HTTP/2 503 Service Unavailable
+Content-Type: text/html; charset=UTF-8
+Retry-After: 7200
+```
+
+### Why `Retry-After` Protects SEO:
+* **`Retry-After: 7200`** instructs search engine bots that the maintenance will conclude in 7,200 seconds (2 hours). Compliant crawlers will suspend requests to your domain and reschedule the crawl for the specified timestamp.
+* It explicitly prevents search engines from indexing the maintenance page or classifying it as a Soft 404.
+* It guarantees that existing search rankings and indexed snippets remain completely intact while the maintenance window is active.
+
+### Example Nginx Maintenance Configuration:
+```nginx
+# /etc/nginx/conf.d/maintenance.conf
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    # Return 503 for all requests except whitelisted office IPs
+    error_page 503 @maintenance;
+    
+    location / {
+        return 503;
+    }
+
+    location @maintenance {
+        add_header Retry-After 3600 always;
+        root /var/www/static-maintenance;
+        rewrite ^(.*)$ /maintenance.html break;
+    }
+}
+```
+
+---
+
+## 4. Emergency Outage Response Protocol
+
+If an unexpected, catastrophic incident occurs that will take more than an hour to fix:
+
+1. **Do NOT Return 200 OK with an "Under Maintenance" HTML Body:** This creates a massive **Soft 404 wave** that corrupts search indexing.
+2. **Deploy an Edge Maintenance Rule:** Configure your CDN (Cloudflare, Fastly, CloudFront) to immediately intercept incoming traffic at the edge PoPs and return a static HTML page with an HTTP `503` status and `Retry-After` header.
+3. **Preserve robots.txt and sitemap.xml:** Ensure that your edge maintenance rule still serves your normal, unblocked `robots.txt` file (`200 OK`). If `robots.txt` returns a 5xx error, Googlebot may pause crawling entirely because it cannot verify crawl permissions.
+
+---
+
+## 5. Post-Incident Recovery Verification
+
+Once your engineering team resolves the root cause and restores production services, verify that search engines have successfully resumed crawling:
+
+```text
+[Production Restored]
+          │
+          ▼
+1. Run `curl -Iv https://example.com` ──► Verify exact 200 OK headers
+          │
+          ▼
+2. Check GSC Crawl Stats (Settings > Crawl Stats)
+   └── Verify Host Status returns to 100% OK
+   └── Verify Average Response Time drops back to baseline (< 250ms)
+          │
+          ▼
+3. Inspect Live Access Logs: grep -i "googlebot" /var/log/nginx/access.log
+   └── Confirm Googlebot requests are returning 200 OK and response size > 0
+```
+
+---
+
+## Summary & Next Steps
+
+Short-term website outages are an inevitable reality of distributed systems and do not destroy search rankings. By configuring explicit `503 Service Unavailable` responses with `Retry-After` headers during maintenance, preventing soft 404 maintenance layouts, and monitoring crawl rate recovery in real time, engineering teams can protect their site's organic search equity during any infrastructure incident.
+
+Continue exploring infrastructure and log observability:
+* **[Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests)** — Monitoring live crawler requests and identifying 5xx clusters in access logs.
+* **[Google Search Console for Technical SEO: A Diagnostic Workflow](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow)** — Navigating Crawl Stats and host availability reports.
+* **[Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin)** — Preventing 502 and 504 reverse proxy timeouts.

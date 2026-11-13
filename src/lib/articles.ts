@@ -37,6 +37,17 @@ export async function getArticle(
   return all.find((a) => a.slug === slug);
 }
 
+export async function getArticleCategories(): Promise<string[]> {
+  const articles = await getSortedArticles();
+  return [...new Set(articles.flatMap((article) => article.tags))].sort((a, b) =>
+    a.localeCompare(b)
+  );
+}
+
+export function categorySlug(category: string): string {
+  return category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 export function getAdjacentArticles(
   all: Article[],
   slug: string

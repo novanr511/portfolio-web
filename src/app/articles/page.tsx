@@ -4,6 +4,8 @@ import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
 import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
+import Link from "next/link";
+import { categorySlug } from "@/lib/articles";
 
 export const metadata: Metadata = {
   title: "Articles",
@@ -93,6 +95,27 @@ export default async function ArticlesPage() {
             LangChain and LangGraph.
           </p>
         </Reveal>
+
+        <section className="mt-9" aria-label="Article categories">
+          <h2 className="text-sm font-semibold text-foreground">Browse by category</h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[...new Set(sortedArticles.flatMap((article) => article.tags))]
+              .sort((a, b) => a.localeCompare(b))
+              .map((category) => (
+                <Link
+                  key={category}
+                  href={`/articles/category/${categorySlug(category)}`}
+                  className="rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  {category}
+                </Link>
+              ))}
+          </div>
+        </section>
+
+        <p className="mt-6 text-sm text-muted">
+          Written by <Link href="/about" className="font-medium text-accent underline-offset-4 hover:underline">me</Link>.
+        </p>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {sortedArticles.map((article, i) => (
