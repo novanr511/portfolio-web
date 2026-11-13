@@ -51,7 +51,7 @@ export const projects: Project[] = [
     name: "Customer Churn Prediction",
     tagline: "From raw CSV to a model you can explain",
     description:
-      "A end-to-end machine learning workflow on a telecom churn dataset: exploratory analysis, feature engineering, gradient-boosted tree models, threshold selection tied to business cost, and a SHAP-based explanation layer so the results are actually usable by a non-technical audience.",
+      "An end-to-end machine learning workflow on a telecom churn dataset: exploratory analysis, feature engineering, gradient-boosted tree models, threshold selection tied to business cost, and a SHAP-based explanation layer so the results are actually usable by a non-technical audience.",
     tags: ["Python", "scikit-learn", "Pandas", "SHAP", "Jupyter"],
     year: "2025",
     links: { source: "https://github.com/novan" },

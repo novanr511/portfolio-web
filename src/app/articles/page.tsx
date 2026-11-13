@@ -3,6 +3,7 @@ import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
 import { sortedArticles } from "@/lib/articles";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Articles",
@@ -10,11 +11,62 @@ export const metadata: Metadata = {
     "In-depth articles on learning AI, retrieval-augmented generation (RAG), LangChain, LangGraph, and building reliable systems with large language models.",
   alternates: { canonical: "/articles" },
   openGraph: {
-    title: "Articles — Novan",
+    title: "Articles — Novandri R.",
     description:
       "In-depth articles on learning AI, RAG, LangChain, LangGraph, and building reliable LLM systems.",
   },
 };
+
+/** Blog + ItemList JSON-LD so crawlers see the full post inventory */
+function blogJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Blog",
+        "@id": `${site.url}/articles#blog`,
+        name: `${site.author.name} — Articles`,
+        description:
+          "In-depth articles on AI engineering: getting started, RAG, LangChain, and LangGraph.",
+        url: `${site.url}/articles`,
+        inLanguage: "en",
+        publisher: {
+          "@type": "Person",
+          "@id": `${site.url}/#person`,
+          name: site.author.name,
+          url: site.url,
+        },
+        blogPost: sortedArticles.map((a) => ({
+          "@type": "BlogPosting",
+          headline: a.title,
+          description: a.description,
+          url: `${site.url}/articles/${a.slug}`,
+          datePublished: a.date,
+          dateModified: a.updated ?? a.date,
+          author: {
+            "@type": "Person",
+            "@id": `${site.url}/#person`,
+            name: site.author.penName,
+            url: site.url,
+          },
+          keywords: a.tags.join(", "),
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Articles",
+            item: `${site.url}/articles`,
+          },
+        ],
+      },
+    ],
+  };
+}
 
 export default function ArticlesPage() {
   return (
@@ -23,6 +75,12 @@ export default function ArticlesPage() {
       exit={{ "nav-forward": "nav-forward", "nav-back": "nav-back", default: "none" }}
       default="none"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(blogJsonLd()).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="mx-auto max-w-5xl px-6 pb-24 pt-16 sm:pt-24">
         <Reveal>
           <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-[44px]">

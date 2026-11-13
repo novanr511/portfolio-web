@@ -36,10 +36,14 @@ Name, description, email, and social links live in `src/lib/site.ts`. Hero copy 
 - Static prerendering of every page (fast, fully crawlable HTML)
 - Per-page `<title>`, description, canonical URL, and Open Graph/Twitter cards
 - Auto-generated **OG images** per article via `next/og`
-- **JSON-LD**: `WebSite` + `Person` on the home page; `Article` + `BreadcrumbList` on article pages
-- `sitemap.xml` and `robots.txt` generated from the content data
+- **JSON-LD**: `WebSite` + `Person` on the home page; `Blog` + `ItemList` on `/articles`; `Article` + `BreadcrumbList` on article pages
+- `sitemap.xml` and `robots.txt` generated from the content data — robots.txt explicitly allows AI answer-engine crawlers (GPTBot, ClaudeBot, PerplexityBot, …)
+- **`/llms.txt`** — curated site index for LLMs (llmstxt.org standard), generated from the same data as the pages
+- **`/llms-full.txt`** — every article's complete content in plain markdown for AI ingestion
 - **RSS feed** at `/feed.xml`
 - Semantic HTML: single `<h1>`, ordered `h2`/`h3`, `<article>`, `<time>`
+
+Everything is **adaptive**: articles, sitemap, RSS, llms.txt, and OG images all derive from `src/lib/articles.ts` and `src/lib/projects.ts` — adding content there updates every endpoint on the next build, no manual URL bookkeeping.
 
 ## Running locally
 

@@ -41,7 +41,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
-    types: { "application/rss+xml": `${site.url}/feed.xml` },
+    types: {
+      "application/rss+xml": `${site.url}/feed.xml`,
+      "text/plain": `${site.url}/llms.txt`,
+    },
   },
 };
 
