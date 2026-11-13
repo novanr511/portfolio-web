@@ -1,0 +1,248 @@
+---
+title: "Technical SEO for Next.js and Headless CMS"
+description: "A production guide to technical SEO in Next.js and headless CMS: App Router metadata API, dynamic sitemaps, canonicals, ISR revalidation, and build audits."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Next.js
+  - Headless CMS
+  - Web Infrastructure
+---
+
+Decoupling content management from frontend presentation using a headless CMS (such as Keystatic, Sanity, or Strapi) and a modern meta-framework like Next.js gives engineering teams unparalleled developer velocity and content flexibility. However, architectural decoupling shifts the entire burden of technical SEO—URL canonicalization, metadata generation, XML sitemap synthesis, and crawlable HTML rendering—onto frontend developers.
+
+**Direct Answer:** In a headless Next.js architecture, the Next.js App Router owns the public URL lifecycle. To ensure optimal search crawlability, applications must generate complete HTML at build time using `generateStaticParams` (SSG) or incremental regeneration (ISR), emit deterministic head tags via the `generateMetadata` API, dynamically synthesize `sitemap.ts` and `robots.ts` directly from the CMS data layer, and verify raw server output before deployment.
+
+When properly configured, a headless Next.js application delivers sub-100ms Time to First Byte (TTFB), guaranteed Wave 1 crawler indexability, and automated sitemap synchronization.
+
+```text
+[Headless CMS Data Layer] (e.g., Keystatic MDX / Headless API)
+             │
+             ├── Pull Content & Slugs via Data Layer (src/lib/articles.ts)
+             │
+             ▼
+[Next.js App Router Server Runtime]
+  ├── generateStaticParams() ──► Pre-renders static HTML for all slugs at build
+  ├── generateMetadata()      ──► Injects canonicals, OpenGraph, title, and meta tags
+  ├── app/sitemap.ts         ──► Synthesizes dynamic sitemap.xml from CMS dates
+  └── app/robots.ts          ──► Serves dynamic robots.txt pointing to sitemap.xml
+             │
+             ▼
+[Edge CDN / Vercel] ─────────► Serves complete static HTML directly to Googlebot
+```
+
+---
+
+## 1. Architectural Ownership: Who Owns the Public URL?
+
+In traditional monolithic CMS architectures (such as WordPress or Drupal), the CMS core handles permalink rewriting, redirects, XML sitemaps, and database query caching out of the box.
+
+In a headless stack, **the CMS is merely a database of content entities**. The Next.js application layer owns:
+1. **Public Routing:** Determining the directory hierarchy, URL slug formats, and query parameters.
+2. **HTTP Signaling:** Emitting correct `200 OK`, `301 Moved Permanently`, and `404 Not Found` response codes.
+3. **Document Assembly:** Merging CMS fields (title, body, tags, timestamps) into valid HTML `<head>` and `<body>` tags.
+
+If your Next.js application fails to map a CMS field to a canonical tag or forgets to catch deleted content with a true 404, the headless CMS cannot fix it. Search engines never see the CMS; they only see the HTTP response delivered by Next.js.
+
+---
+
+## 2. Next.js App Router Metadata API: Deterministic Head Tags
+
+In older React applications, developers relied on client-side libraries like `react-helmet` to inject `<title>` and `<meta>` tags. As explored in [JavaScript SEO: SSR, CSR, SSG, and ISR Explained](/articles/javascript-seo-ssr-csr-ssg-isr), injecting head tags via client-side JavaScript risks search engines evaluating an empty head during Wave 1 crawling.
+
+The Next.js App Router introduces the native **Metadata API**, evaluating metadata on the server before streaming HTML to the client:
+
+```typescript
+// src/app/articles/[slug]/page.tsx
+import type { Metadata } from "next";
+import { getArticle } from "@/lib/articles";
+import { site } from "@/lib/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticle(slug);
+
+  if (!article) return {};
+
+  return {
+    title: article.title,
+    description: article.description,
+    keywords: [...article.tags],
+    alternates: {
+      canonical: `/articles/${article.slug}`,
+    },
+    openGraph: {
+      type: "article",
+      url: `${site.url}/articles/${article.slug}`,
+      title: article.title,
+      description: article.description,
+      publishedTime: article.date,
+      modifiedTime: article.updated ?? article.date,
+      authors: [site.author.penName],
+      tags: article.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.description,
+    },
+  };
+}
+```
+
+### Critical SEO Rules for App Router Metadata:
+* **Canonical URL Consistency:** Always declare `alternates: { canonical: ... }`. Use absolute paths or define `metadataBase` in your root layout so Next.js constructs fully qualified URLs (`https://example.com/articles/slug`).
+* **OpenGraph Parity:** Synchronize `title` and `description` between standard HTML tags and OpenGraph tags to prevent conflicting signals across social crawlers and search answer engines.
+* **Date Integrity:** Pass ISO-formatted strings to `publishedTime` and `modifiedTime` derived directly from your CMS timestamps.
+
+---
+
+## 3. Dynamic Sitemap and Robots Synthesis
+
+Instead of maintaining static XML and text files manually, Next.js allows you to synthesize `sitemap.xml` and `robots.txt` dynamically at build time using the CMS as the single source of truth.
+
+### Dynamic Sitemap (`src/app/sitemap.ts`)
+By defining a `sitemap.ts` file in the root `app/` directory, Next.js automatically creates a `/sitemap.xml` route compliant with the `sitemaps.org` protocol:
+
+```typescript
+// src/app/sitemap.ts
+import type { MetadataRoute } from "next";
+import { getSortedArticles } from "@/lib/articles";
+import { site } from "@/lib/site";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const articles = await getSortedArticles();
+
+  const articleEntries: MetadataRoute.Sitemap = articles.map((article) => ({
+    url: `${site.url}/articles/${article.slug}`,
+    lastModified: new Date(article.updated ?? article.date),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
+
+  const staticEntries: MetadataRoute.Sitemap = [
+    { url: site.url, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
+    { url: `${site.url}/articles`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+  ];
+
+  return [...staticEntries, ...articleEntries];
+}
+```
+
+### Dynamic Robots (`src/app/robots.ts`)
+Similarly, create `src/app/robots.ts` to output a dynamic `robots.txt` that automatically advertises your sitemap URL:
+
+```typescript
+// src/app/robots.ts
+import type { MetadataRoute } from "next";
+import { site } from "@/lib/site";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/", "/keystatic/"], // Protect admin & API routes
+      },
+    ],
+    sitemap: `${site.url}/sitemap.xml`,
+    host: site.url,
+  };
+}
+```
+
+This ensures that whenever a new article is drafted or updated in the CMS, the sitemap and robots directives update automatically upon build without manual configuration.
+
+---
+
+## 4. Rendering Strategy: SSG with Static Params vs ISR
+
+To guarantee that Googlebot receives complete HTML in Wave 1 without placing heavy runtime loads on your database, combine **Static Site Generation (SSG)** with **Incremental Static Regeneration (ISR)**.
+
+### Static Route Pre-Rendering (`generateStaticParams`)
+In your dynamic route handler (`app/articles/[slug]/page.tsx`), export `generateStaticParams`:
+
+```typescript
+// Instructs Next.js to compile all CMS articles to static HTML at build time
+export async function generateStaticParams() {
+  const articles = await getSortedArticles();
+  return articles.map((article) => ({
+    slug: article.slug,
+  }));
+}
+```
+
+When you run `next build`, Next.js queries your CMS, maps all existing slugs, and renders static `.html` files for every article. When a search crawler requests `/articles/my-slug`, the edge server delivers pre-rendered HTML in under 50ms.
+
+### Catching Missing Content with True 404s
+If an article is deleted in the CMS or an invalid slug is requested, trigger `notFound()`:
+
+```typescript
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const article = await getArticle(slug);
+
+  if (!article) {
+    notFound(); // Emits true HTTP 404 Not Found header
+  }
+
+  return <main><h1>{article.title}</h1>...</main>;
+}
+```
+
+As established in [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx), calling `notFound()` instructs Next.js to render your `not-found.tsx` component while emitting an exact HTTP `404` status code, avoiding Soft 404 penalties.
+
+---
+
+## 5. Build Verification and Static HTML Smoke Testing
+
+Never assume your Next.js build rendered crawlable HTML without verifying the output. Before deploying to production, execute a terminal-based smoke test:
+
+### 1. Build Verification
+Run the build script to ensure static route compilation completes without errors:
+
+```bash
+npm run build
+```
+
+Examine the output log to ensure article routes are marked as Static (Prerendered):
+
+```text
+Route (app)                              Size     First Load JS
+┌ ○ /                                    5.2 kB         92 kB
+├ ○ /articles                            4.1 kB         91 kB
+├ ● /articles/[slug]                     6.8 kB         94 kB
+├   ├ /articles/what-happens-when-a-crawler-requests-a-url
+└   └ /articles/javascript-seo-ssr-csr-ssg-isr
++ First Load JS shared by all            86.8 kB
+
+● (SSG) Prerendered as static HTML
+○ (Static) Prerendered as static content
+```
+
+### 2. Verify Initial Raw HTML with `curl`
+To ensure that search engine crawlers receive full text and metadata on the first byte stream without waiting for client-side JavaScript:
+
+```bash
+curl -s http://localhost:3000/articles/my-article-slug | grep -i "<title>"
+```
+
+* **Pass:** `<title>My Article Title</title>` is present in the byte stream.
+* **Pass:** `<link rel="canonical" href="https://example.com/articles/my-article-slug"/>` is present.
+* **Fail:** The output returns empty or shows an empty SPA wrapper.
+
+---
+
+## Summary & Next Steps
+
+Next.js and headless CMS architectures offer the ultimate combination of developer velocity and search performance when built on static pre-rendering principles. By leveraging `generateStaticParams`, the native `generateMetadata` API, and dynamic `sitemap.ts`/`robots.ts` endpoints, engineering teams can deliver rock-solid, fully indexed web applications.
+
+Continue through the Technical SEO series to master rendering models and discovery mechanics:
+* **[JavaScript SEO: SSR, CSR, SSG, and ISR Explained](/articles/javascript-seo-ssr-csr-ssg-isr)** — In-depth architectural trade-offs between client and server rendering.
+* **[Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap)** — Syntax, precedence, and avoiding fatal directive conflicts.
+* **[Discovered, Crawled, Rendered, Indexed: Why Stages Differ](/articles/discovered-crawled-rendered-indexed-why-stages-differ)** — Troubleshooting Search Console indexation discrepancies.

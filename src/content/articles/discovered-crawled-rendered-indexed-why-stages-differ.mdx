@@ -1,0 +1,156 @@
+---
+title: "Discovered, Crawled, Rendered, Indexed: Why Stages Differ"
+description: "Diagnose why URLs get stuck in Google Search Console: the difference between Discovered, Crawled, Rendered, and Indexed, and how to fix indexing backlogs."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - Indexing
+  - Crawling
+  - Google Search Console
+---
+
+One of the most persistent sources of confusion in technical SEO is treating search engine visibility as a binary state: a page is either known or unknown. In reality, a URL must pass through five distinct operational stages before it can ever appear in search results. When a page fails to rank, it has almost always stalled at one specific boundary inside this ingestion pipeline.
+
+**Direct Answer:** Discovery means a crawler knows a URL exists. Crawling (fetching) means the crawler downloaded the initial response bytes. Rendering means the Web Rendering Service executed client-side JavaScript to construct the DOM. Indexing means the document was parsed, clustered for duplicates, assigned canonical equity, and committed to the searchable database. A URL stuck in *Discovered — currently not indexed* indicates a crawl capacity or demand bottleneck, whereas *Crawled — currently not indexed* indicates a content quality, thinness, or duplicate clustering issue.
+
+Understanding why these stages differ allows engineers to diagnose Search Console status messages systematically rather than guessing.
+
+```text
+Discovery ──► Crawling (Fetch) ──► Rendering (WRS) ──► Canonicalization ──► Indexing ──► Serving
+   │                  │                   │                     │              │           │
+(URL Found)      (Bytes Streamed)     (DOM Built)        (Cluster Leader)  (In DB)    (Ranked)
+   │                  │                   │                     │              │           │
+   ▼                  ▼                   ▼                     ▼              ▼           ▼
+Discovered       Crawled - Not       Render Timeout       Duplicate /        Indexed    Search
+Not Indexed         Indexed          or Blocked JS        Not Selected                  Results
+```
+
+---
+
+## 1. The Five Stages of the Search Ingestion Pipeline
+
+To diagnose indexing issues, engineers must isolate exactly where a document stalls along the ingestion path.
+
+### Stage 1: Discovery (The URL Frontier)
+Googlebot identifies that a URL exists. Discovery occurs via internal hyperlinks (`<a href>`), XML sitemaps, HTTP redirect destinations, or external backlinks. At this point, **the server has not been contacted**. The URL is merely a string queued in the crawl frontier database.
+
+### Stage 2: Crawling / Fetching (Network Transmission)
+The crawler scheduler allocates host capacity and dispatches an HTTP GET request. The web server returns response headers and the initial HTML stream. If the server responds with `200 OK`, the byte stream is stored for processing. If it responds with `404`, `301`, `429`, or `5xx`, the URL exits the indexing pipeline immediately (as detailed in [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx)).
+
+### Stage 3: Rendering (Web Rendering Service)
+If the page relies on client-side JavaScript to render text, navigation, or metadata, it enters the Web Rendering Service (WRS) queue. Headless Chromium executes the code to produce the rendered DOM. If script execution times out or critical assets are blocked by `robots.txt`, the document is evaluated in a degraded state.
+
+### Stage 4: Canonical Selection & Deduplication
+Search engines cluster similar documents across your site and the wider web. Algorithms evaluate canonical tags (`rel="canonical"`), redirect targets, URL structure, and internal link equity to select a single representative URL (the "Canonical URL"). Non-canonical duplicates are omitted from the index.
+
+### Stage 5: Indexing and Serving (The Searchable Database)
+The document is parsed for terms, entities, and structural relationships, and written into the distributed inverted search index. Only indexed URLs are eligible to be scored and served in response to user queries.
+
+---
+
+## 2. "Discovered — Currently Not Indexed": The Crawl Queue Backlog
+
+In Google Search Console's Page Indexing report, *Discovered — currently not indexed* means Google found the URL, but decided not to crawl (fetch) it yet.
+
+```text
+Discovery Event (Sitemap / Internal Link)
+                  │
+                  ▼
+   [Crawl Frontier Evaluation]
+   ├── Is origin server latency elevated? ──► YES ──► Delay Crawl
+   ├── Has the host returned 5xx errors?   ──► YES ──► Throttle Crawl
+   └── Is site-wide crawl demand low?      ──► YES ──► De-prioritize URL
+                  │
+                  ▼
+   Status: "Discovered - currently not indexed"
+```
+
+### Why URLs Stall at the Discovered Stage:
+1. **Host Capacity Bottlenecks:** If your server response time (TTFB) is high or has recently emitted `502` or `503` errors, Googlebot throttles crawl velocity to protect your infrastructure. Discovered URLs accumulate in the queue without being fetched.
+2. **Low Crawl Demand:** For new or low-authority sites, Google allocates conservative crawl quotas. Deeply nested URLs (depth > 4) or URLs with minimal internal links are deprioritized.
+3. **URL Generation Bloat:** If an e-commerce catalog or faceted navigation generates thousands of filter permutations, Googlebot discovers millions of URLs but lacks the demand incentives to fetch them.
+
+**Engineering Fix:** Improve server response times, eliminate internal links to duplicate or low-value parameter URLs, and flatten your internal link graph so important pages are accessible within 2 to 3 clicks from the homepage.
+
+---
+
+## 3. "Crawled — Currently Not Indexed": The Quality & Uniqueness Filter
+
+*Crawled — currently not indexed* is fundamentally different: **Googlebot successfully fetched the page, rendered it, and actively chose not to include it in the search index.**
+
+This is not a network or crawling failure; it is an indexation and evaluation judgment.
+
+### Root Causes of Crawled But Excluded URLs:
+* **Duplicate or Near-Duplicate Content:** The content is substantially identical to another page on the same domain or an external site, and search engine heuristics decided not to index multiple versions.
+* **Thin Content:** The page contains minimal text, boilerplates with empty placeholders, or sparse programmatic entries (e.g., a user profile with no activity, or a category page with zero products).
+* **Soft 404s:** The server emitted a `200 OK` header, but the rendered body communicates that the item is missing or out of stock.
+* **Internal Canonical Conflicts:** The page contains a self-referencing canonical tag, but external links, redirects, and sitemaps point to an alternative URL, prompting Google to drop the crawled URL in favor of another version.
+
+**Engineering Fix:** Differentiate the content with unique data, consolidate near-duplicate variants via canonical tags or 301 redirects, or purge thin URLs from your sitemap and internal navigation.
+
+---
+
+## 4. The Myth of the "Request Indexing" Button
+
+In Google Search Console’s URL Inspection tool, developers frequently click the **"Request Indexing"** button assuming it guarantees indexation.
+
+```text
+Developer clicks "Request Indexing"
+                │
+                ▼
+  [Push to Priority Crawl Queue]
+                │
+                ▼
+  Googlebot Re-Fetches the URL (200 OK)
+                │
+                ▼
+  [Quality & Deduplication Algorithms Re-Evaluate]
+                │
+                ├── Pass? ──► Index Page
+                └── Fail? ──► Returns to "Crawled - currently not indexed"
+```
+
+### What "Request Indexing" Actually Does:
+* It queues the URL for an expedited **fetch (crawl)**.
+* It does **not** bypass quality filters, canonicalization algorithms, or indexation thresholds.
+* If a page was previously classified as *Crawled — currently not indexed* due to thin or duplicate content, re-requesting indexing will simply re-fetch the identical bytes, reach the same algorithmic conclusion, and remain unindexed.
+
+---
+
+## 5. Systematic Diagnostic Tree for Unindexed Pages
+
+When troubleshooting pages that fail to appear in search results, use this stepwise diagnostic sequence:
+
+```text
+[Start: URL is Missing from Search Results]
+               │
+               ▼
+Run GSC URL Inspection (Inspect URL)
+               │
+               ├─► Status: "URL is unknown to Google"
+               │     └── Cause: Discovery failure.
+               │     └── Fix: Add crawlable <a href> internal links; verify XML sitemap.
+               │
+               ├─► Status: "Discovered - currently not indexed"
+               │     └── Cause: Crawl capacity throttling or low demand.
+               │     └── Fix: Check Crawl Stats for 5xx/latency spikes; reduce click depth.
+               │
+               ├─► Status: "Crawled - currently not indexed"
+               │     └── Cause: Evaluated and rejected for indexation.
+               │     └── Fix: Review for thin text, boilerplate duplicates, or soft 404s.
+               │
+               └─► Status: "Duplicate without user-selected canonical"
+                     └── Cause: Google chose a different URL as the canonical version.
+                     └── Fix: Add explicit <link rel="canonical"> and align internal links.
+```
+
+---
+
+## Summary & Next Steps
+
+Search indexing is an incremental funnel. A URL cannot be indexed until it is crawled; it cannot be crawled until it is discovered; and it will not be served unless it passes canonical consolidation and uniqueness thresholds. By separating *Discovered* bottlenecks (capacity and crawl demand) from *Crawled* bottlenecks (content quality and duplicate signals), developers can apply precise infrastructure and architectural fixes.
+
+Continue through the Technical SEO series to master platform implementations and discovery controls:
+* **[How Googlebot Discovers and Crawls Pages](/articles/how-googlebot-discovers-and-crawls-pages)** — Managing the crawl frontier and crawl capacity limits.
+* **[Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap)** — Controlling crawler access and index eligibility.
+* **[Technical SEO for Next.js and Headless CMS](/articles/technical-seo-nextjs-headless-cms)** — Building deterministic, pre-rendered architectures that guarantee Wave 1 indexation.

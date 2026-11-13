@@ -1,0 +1,240 @@
+---
+title: "HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx"
+description: "A practical guide to HTTP status codes for SEO: how 200, 301, 302, 404, 410, 429, and 5xx impact crawling, indexing, and canonicalization with curl triage recipes."
+date: 2026-11-13
+tags:
+  - Technical SEO
+  - HTTP
+  - Web Infrastructure
+  - Crawling
+---
+
+When a search engine crawler requests a URL, the HTTP response status code is the very first piece of information it evaluates. Before the crawler reads a single byte of your HTML, parses a title tag, or queues an internal link, the three-digit status code dictates whether that payload is eligible for indexing, should be redirected, or must trigger an immediate crawler back-off.
+
+**Direct Answer:** HTTP status codes communicate state, not quality. A `200 OK` confirms document retrieval but does not guarantee indexing if content is thin (triggering a soft 404). Permanent redirects (`301`/`308`) pass canonical signals and link equity, whereas temporary redirects (`302`/`307`) preserve the original URL in the index. Client errors (`404`/`410`) remove pages from the crawl frontier, while rate limits (`429`) and server errors (`5xx`) force crawlers to reduce fetch velocity to prevent infrastructure collapse.
+
+Understanding how search engine crawlers interpret these status codes allows engineers to prevent indexing drops, diagnose redirect latency, and protect origin infrastructure.
+
+```text
+[HTTP Request Received]
+          │
+          ├── 2xx Success ──────► 200 OK (Inspect Content & X-Robots-Tag)
+          │                       └── 204 No Content (No body; dropped from indexing)
+          │
+          ├── 3xx Redirection ──► 301 / 308 (Permanent: Update index & pass canonical)
+          │                       └── 302 / 307 (Temporary: Retain requested URL in index)
+          │
+          ├── 4xx Client Error ─► 404 Not Found (Standard de-indexing after retries)
+          │                       ├── 410 Gone (Accelerated removal from index)
+          │                       └── 429 Too Many Requests (Throttle crawl rate)
+          │
+          └── 5xx Server Error ─► 500 / 502 / 503 / 504 (Server unhealthy: throttle & retry)
+```
+
+---
+
+## 1. 200 OK, 204 No Content, and the Limits of "Success"
+
+A `200 OK` response code indicates that the request succeeded and the origin server has returned the requested resource. However, one of the most common misconceptions in technical SEO is assuming that a `200 OK` guarantees indexing.
+
+### The Problem of the "Soft 404"
+
+Search engine crawlers evaluate HTTP status codes alongside response content. If your server returns an HTTP `200 OK` status, but the rendered document contains an error message (such as *"Product not found"*, *"Article deleted"*, or an empty product grid), Googlebot classifies the URL as a **Soft 404**.
+
+When a soft 404 occurs:
+* The page is disqualified from search results and dropped from the index.
+* Search engine crawlers continue to expend crawl budget requesting the URL because the server falsely signaled success.
+* Google Search Console flags the URL under the Page Indexing report as *Soft 404*.
+
+**Engineering Rule:** If a resource does not exist, never return a `200 OK` rendering an error layout. Always return a true `404 Not Found` or `410 Gone` header directly from the application layer or reverse proxy.
+
+### 204 No Content and Empty Payloads
+
+A `204 No Content` response tells the client that the request succeeded, but there is no message body to transmit. While useful for asynchronous logging endpoints or webhook receipts, a `204` status is ineligible for document search indexing. If an editorial or programmatic URL returns a `204`, search crawlers will not index the page because there is no document body to extract terms from.
+
+### Response Headers Accompanying 200 OK
+
+When evaluating a `200 OK`, crawlers examine critical HTTP headers before parsing the HTML body:
+
+* **`Content-Type`:** Must match `text/html; charset=utf-8` for web documents. If a misconfigured web server emits `text/plain` or `application/octet-stream`, crawlers may treat the file as an unrendered attachment.
+* **`X-Robots-Tag`:** Allows robots directives to be passed directly in the HTTP header (e.g., `X-Robots-Tag: noindex, nofollow`). This is evaluated before HTML meta tags, providing a fast method to control indexing on non-HTML assets like PDFs.
+* **`Cache-Control`:** Informs caching proxies and crawlers of content freshness. A `no-cache` directive forces validation, but does not prevent crawling or indexing.
+
+---
+
+## 2. Redirection Semantics: 301, 308, 302, and 307
+
+HTTP redirects route a client from the requested URL to an alternative destination specified in the `Location` header. In search engine architecture, redirects determine canonical URL selection and link equity transfer.
+
+```text
+Permanent Redirect (301 / 308):
+[Requested URL: /old-path] ──► Passes Link Equity & Canonical Signal ──► [Index URL: /new-path]
+
+Temporary Redirect (302 / 307):
+[Requested URL: /promo]    ──► Retains Original URL in Search Index  ──► [Destination: /seasonal-sale]
+```
+
+### Permanent Redirects: 301 Moved Permanently vs 308 Permanent Redirect
+
+* **`301 Moved Permanently`:** The traditional standard for permanent URL migrations. Historically, HTTP/1.0 clients were permitted to rewrite POST requests to GET when encountering a 301. For search engines, a 301 instructs crawlers to update their index, transfer historical ranking signals, and canonicalize toward the target URL.
+* **`308 Permanent Redirect`:** Defined in RFC 7538, the 308 code behaves identically to a 301 regarding search engine canonical consolidation, with one technical distinction: clients are strictly forbidden from changing the request method (e.g., a POST must remain a POST). Modern crawlers including Googlebot treat 301 and 308 identically for canonicalization.
+
+### Temporary Redirects: 302 Found vs 307 Temporary Redirect
+
+* **`302 Found`:** Indicates that the resource resides temporarily under a different URI. Because the move is temporary, search engines retain the original URL in the search index while fetching content from the target.
+* **`307 Temporary Redirect`:** The modern successor to 302 (RFC 7231). It guarantees that the HTTP request method remains unaltered when following the redirect. Like a 302, it signals that the original URL should remain indexed.
+
+> [!IMPORTANT]
+> **Long-Standing 302 Traps:** If a `302 Found` or `307 Temporary Redirect` remains active for months or years, search engine heuristics may eventually infer that the move is permanent, transferring canonical signals to the target. However, relying on heuristic conversion is risky; always use explicit `301` or `308` headers for intentional permanent moves.
+
+### The Performance Cost of Redirect Chains
+
+A redirect chain occurs when a request must hop across multiple intermediate URLs before reaching the final document:
+
+```text
+https://example.com/page ──(301)──► https://www.example.com/page ──(301)──► https://www.example.com/page/
+```
+
+Every hop introduces an additional DNS, TCP, and TLS round trip. Search engines cap the number of redirect hops they follow in a single crawl attempt (typically 5 to 10 hops before aborting with a redirect error). Consolidate all redirects into a single hop: `Request -> Final Destination (200 OK)`.
+
+---
+
+## 3. Client Errors: 404 Not Found vs 410 Gone
+
+Client error status codes in the 4xx range inform the crawler that the requested URI is inaccessible due to a client-side or missing resource condition.
+
+### 404 Not Found
+
+A `404 Not Found` indicates that the origin server cannot find a current representation for the target resource. When Googlebot encounters a 404:
+1. The URL is retained in the crawl database temporarily.
+2. Googlebot schedules re-crawls over subsequent days or weeks to verify that the 404 was not a temporary outage or configuration mistake.
+3. If the 404 status persists across repeated checks, the URL is permanently purged from the search index.
+
+### 410 Gone
+
+A `410 Gone` explicitly declares that access to the resource is no longer available and that no forwarding address is known.
+
+* **Index Purge Velocity:** Googlebot processes a `410 Gone` faster than a `404 Not Found`. While a 404 URL might undergo multiple verification fetches before removal, a 410 communicates intentional, permanent deletion, prompting immediate de-indexing.
+* **Use Cases:** Ideal for discontinued products, expired promotional campaigns, or legally removed content where you want search impressions stopped immediately.
+
+---
+
+## 4. Server Errors & Rate Limiting: 429 Too Many Requests and 5xx
+
+When your infrastructure experiences resource exhaustion, database crashes, or reverse proxy timeouts, the resulting status codes directly affect crawler throughput.
+
+### 429 Too Many Requests
+
+Defined in RFC 6585, the `429 Too Many Requests` code indicates that the client has sent too many requests in a given amount of time.
+
+When a crawler encounters a 429:
+* It recognizes that it has exceeded the origin host's capacity.
+* It immediately suspends crawling across that host and enters an exponential back-off state.
+* If a `Retry-After: <seconds>` header is provided (e.g., `Retry-After: 3600`), compliant search engine bots will pause crawling and resume only after the specified duration has elapsed.
+
+### 5xx Server Error Anatomy
+
+Server errors indicate that the server encountered an unexpected condition that prevented it from fulfilling the request:
+
+* **`500 Internal Server Error`:** Unhandled exceptions within your application codebase (e.g., Node.js uncaught error, fatal PHP script exception, or failed database query).
+* **`502 Bad Gateway`:** The reverse proxy or edge server (e.g., Nginx, Cloudflare) received an invalid response from the upstream application server.
+* **`503 Service Unavailable`:** The server is temporarily unable to handle the request due to maintenance or server overload. Like a 429, combining a `503` with a `Retry-After` header tells crawlers that the downtime is planned, preserving existing indexation while halting crawls.
+* **`504 Gateway Timeout`:** The reverse proxy timed out waiting for the upstream application server to generate a response.
+
+```text
+Crawler Request
+      │
+      ▼
+[Edge / Nginx Reverse Proxy]
+      │
+      ├── (Upstream app unreachable) ─────► Returns 502 Bad Gateway
+      ├── (Upstream app takes > 60s) ─────► Returns 504 Gateway Timeout
+      │
+      ▼
+[Node.js / App Runtime]
+      │
+      └── (Uncaught Exception / Crash) ──► Returns 500 Internal Server Error
+```
+
+**Crawl Reliability Impact:** Search engines prioritize user safety. If an endpoint repeatedly responds with 5xx status codes, crawlers throttle requests host-wide to prevent crashing your server. If server errors persist for several consecutive days, search engines will begin removing unresolvable URLs from the active search index.
+
+---
+
+## 5. Terminal Diagnostics: `curl -I -L` and Header Triage
+
+The most reliable way to diagnose HTTP status codes and headers is from the command line using `curl`. Browsers often mask intermediate status codes, auto-fill cached redirects, and obscure raw headers.
+
+### Recipe 1: Inspecting Headers and Redirect Chains
+
+To trace the complete response path and inspect headers for every redirect hop, use:
+
+```bash
+curl -s -i -L -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" \
+  -o /dev/null -w "%{url_effective} returned HTTP %{http_code}\n" \
+  https://example.com/legacy-route
+```
+
+### Recipe 2: Detailed Hop-by-Hop Trace
+
+To inspect every intermediate HTTP response and location header:
+
+```bash
+curl -IL -A "Googlebot" https://example.com/legacy-route
+```
+
+#### Sample Sanitized Output Trace
+
+```text
+HTTP/2 301
+location: https://www.example.com/legacy-route
+date: Thu, 13 Nov 2026 14:15:00 GMT
+server: cloudflare
+x-robots-tag: noindex
+
+HTTP/2 301
+location: https://www.example.com/new-route/
+date: Thu, 13 Nov 2026 14:15:01 GMT
+server: cloudflare
+
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+date: Thu, 13 Nov 2026 14:15:01 GMT
+cache-control: public, max-age=3600
+server: nginx
+```
+
+**Interpreting the Trace:**
+1. **Hop 1:** The non-www request is redirected via `301` to `https://www.example.com/legacy-route`. Notice that the first hop inadvertently emitted an `X-Robots-Tag: noindex`.
+2. **Hop 2:** The second hop redirects to add a trailing slash `/new-route/`.
+3. **Hop 3:** The terminal destination resolves with `200 OK` and `Content-Type: text/html`.
+4. **Actionable Fix:** Eliminate the intermediate hop. Configure the edge proxy to redirect `https://example.com/legacy-route` directly to `https://www.example.com/new-route/` in one single 301 execution.
+
+---
+
+## 6. HTTP Status Code Decision Matrix for SEO
+
+The following reference matrix summarizes how search engine crawlers process each major HTTP response status code:
+
+| Status Code | Protocol Name | Search Engine Crawler Action | Indexation & Canonical Impact | Common Engineering Pitfall |
+| :--- | :--- | :--- | :--- | :--- |
+| **`200`** | OK | Streams and parses response body; extracts discovered links. | Eligible for indexation (provided content is unique and no `noindex` tag is present). | Returning 200 for missing pages, creating Soft 404s. |
+| **`204`** | No Content | Terminates request immediately; no body fetched. | Not indexed; cannot rank as a document. | Emitting 204 on blank server-rendered article routes. |
+| **`301`** | Moved Permanently | Follows `Location` header; updates crawler URL mapping. | Passes canonical signal and link equity to destination URL. | Allowing redirect chains (`A -> B -> C`) to accumulate. |
+| **`302`** | Found (Temporary) | Follows destination; maintains original URL in crawl schedule. | Retains requested URL in index; destination page evaluated for content only. | Using 302 for permanent domain or route migrations. |
+| **`307`** | Temporary Redirect | Follows destination preserving HTTP request method. | Original URL remains indexed; signals temporary location. | Deploying 307 during permanent site migrations. |
+| **`308`** | Permanent Redirect | Follows destination preserving HTTP request method. | Permanent canonical consolidation identical to 301. | Lack of legacy browser client support (rare in modern search bots). |
+| **`404`** | Not Found | Aborts parsing; flags URL for verification re-crawls. | Dropped from active index after repeated verification crawls. | Forgetting to return a 404 header on custom error layout templates. |
+| **`410`** | Gone | Aborts parsing; marks URL as intentionally deleted. | Accelerated removal from search index; fewer re-crawls. | Using 410 on temporary out-of-stock product pages. |
+| **`429`** | Too Many Requests | Enters exponential back-off; halts crawling on host. | Crawl rate throttled host-wide; existing index unaffected short-term. | Missing `Retry-After` header during scheduled heavy batch jobs. |
+| **`500`** | Internal Error | Halts crawl of URL; flags server as unstable. | Persistent errors cause de-indexing; lowers overall host crawl capacity. | Uncaught runtime exceptions bubbling to web clients. |
+| **`503`** | Service Unavailable | Respects `Retry-After` header; retries fetch later. | Temporary protection against de-indexing during scheduled maintenance. | Failing to return 503 during database migration windows. |
+
+---
+
+## Summary & Next Steps
+
+HTTP status codes form the contractual boundary between your web infrastructure and search engine crawlers. Emitting the correct status code ensures that your compute resources are spent rendering valid pages, your canonical signals consolidate properly, and transient outages do not cause irreversible search performance degradation.
+
+Continue through the Technical SEO series to understand how search engines render the payloads delivered by these status codes:
+* **[What Happens When a Crawler Requests a URL?](/articles/what-happens-when-a-crawler-requests-a-url)** — The foundational DNS, TCP, and TLS request pipeline.
+* **[JavaScript SEO: SSR, CSR, SSG, and ISR Explained](/articles/javascript-seo-ssr-csr-ssg-isr)** — Understanding how Googlebot handles client-side vs server-side rendering once a 200 OK is received.
