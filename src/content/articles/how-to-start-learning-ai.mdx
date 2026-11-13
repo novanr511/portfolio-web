@@ -1,0 +1,139 @@
+Every year the "get into AI" advice gets longer and less useful. Roadmaps sprawl into dozens of checkboxes, courses stack on courses, and most people who follow them still can't build anything real at the end. The problem isn't lack of content — it's that almost none of it is sequenced for someone who already knows how to build software.
+
+This is the roadmap I wish someone had handed me: written for developers, optimized for building early, and honest about what you can skip.
+
+## What "learning AI" actually means now
+
+The field has split into two very different jobs, and confusing them is the first mistake.
+
+**Machine learning engineering** is close to classic ML: you train, fine-tune, and evaluate models — regression, gradient boosting, transformers — and you live in notebooks and metrics. This path rewards statistics depth and is where data science work mostly sits.
+
+**AI application engineering** is closer to backend or frontend engineering than to research. You compose pre-trained models into products: retrieval pipelines, tool-calling agents, evaluation harnesses, guardrails. Python matters, but judgment about architecture and failure modes matters more.
+
+The second path is dramatically easier to enter from a web development background, and — this is the under-reported part — it's where most of the actual hiring has been happening. Companies need people who can build with models far more than they need people who can train new ones. Start there, then deepen toward the first as your foundation grows.
+
+## The foundation: surprisingly little, and very specific
+
+You do not need a mathematics degree. You need three things, and you need them well:
+
+**Python that is genuinely fluent.** Not "I can write a loop" — you should be comfortable with dictionaries, list comprehensions, virtual environments, pip, and reading a library's source when its docs are thin. If you already know JavaScript deeply, expect two to four weeks of focused practice to feel normal in Python. The syntax is simple; the ecosystem's conventions take longer.
+
+**How models work conceptually — one weekend, not one semester.** You need working answers to: What is a token? Why do LLMs hallucinate? What is an embedding, geometrically? What does "temperature" do? What is a loss function doing at a high level? You are not deriving backpropagation by hand; you are building an accurate mental model so you can debug systems that use these pieces. The illustrated "Neural Networks and Deep Learning" by Michael Nielsen and 3Blue1Brown's transformer videos cover 80% of what you'll need for application work.
+
+**Just enough linear algebra and probability to not be scared.** Vectors, dot products, matrix multiplication, distributions, precision/recall. A weekend of focused review. Anything deeper can be learned on demand, when a real problem demands it.
+
+What you can skip, for now: calculus from first principles, manual differentiation, GPU internals, training large models from scratch. These are real skills, but they belong to jobs you're not applying for yet.
+
+## Phase 1 — Build your first AI application (weeks 1–3)
+
+Pick a tool you already use and make it smarter. Good first projects:
+
+- A document Q&A bot over your own notes or company docs (your first look at retrieval)
+- A CLI tool that summarizes GitHub issues and drafts replies
+- A smart search for a website you maintain, where embeddings rank results before the LLM answers
+
+Constraints for this phase: use an API (OpenAI, Anthropic, or a local model via Ollama), use plain Python — no frameworks yet. Frameworks hide the mechanics you're supposed to be learning: how the prompt is assembled, how context windows fill up, where the latency goes, what a tool call actually is.
+
+A working sketch of a tool-using agent, with zero frameworks:
+
+```python
+import json
+from openai import OpenAI
+
+client = OpenAI()
+
+def get_weather(city: str) -> str:
+    # Pretend this calls a real API
+    return json.dumps({"city": city, "temp_c": 21, "condition": "cloudy"})
+
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a city",
+        "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"],
+        },
+    },
+}]
+
+messages = [{"role": "user", "content": "What's the weather in Jakarta?"}]
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    tools=tools,
+)
+
+# The model doesn't run anything — it *asks* to run something.
+# You inspect the request, execute it, and feed the result back.
+tool_call = response.choices[0].message.tool_calls[0]
+result = get_weather(**json.loads(tool_call.function.arguments))
+
+messages.append(response.choices[0].message)
+messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": result})
+
+final = client.chat.completions.create(model="gpt-4o-mini", messages=messages)
+print(final.choices[0].message.content)
+```
+
+If you've only ever called an LLM through a chat UI, this is the moment the abstraction cracks open in a useful way: the model doesn't *do* anything. It requests actions. The reliability of your system is your code, not the model's.
+
+## Phase 2 — Level up properly (months 2–4)
+
+Now that you have intuition from building, formalize it:
+
+- **A short structured course, done critically.** fast.ai's *Practical Deep Learning for Coders* remains the best top-down entry: you train real models in lesson one and learn theory as it becomes relevant. Skip the bottom-up university lectures unless you discover you want them.
+- **The ML you'll actually use.** scikit-learn fundamentals — train/test splits, cross-validation, overfitting, regularization, and tree-based models (which still win on most tabular business data, LLM era or not). Kaggle's *Intro to Machine Learning* is a tight two weeks.
+- **Data handling.** Pandas fluency: loading messy CSVs, joins, groupbys, handling missing values. Annoyingly, this is 50% of real ML work.
+- **Modern Python project hygiene.** `uv` or Poetry, ruff, pytest, and structuring code as a package instead of one notebook. These habits matter more for employability than a tenth of a point of model accuracy.
+
+Then build project two with these skills — something where you *evaluate* rather than only *vibe*. Even a simple project gains enormous credibility the moment it has a train/test split and a metric.
+
+## Phase 3 — The current frontier: RAG and agents (months 4–6)
+
+This is where your developer background becomes an unfair advantage, because RAG and agent systems are mostly software architecture problems wearing an AI costume.
+
+**Retrieval-augmented generation (RAG)** — grounding model answers in documents you own — decomposes into a classical information-retrieval problem plus a generation step. If you've ever built search for a website, you already understand half of it. The other half is embeddings and vector databases, and you can learn it from one good article plus a weekend of code (I've written a full deep-dive on [how RAG works from the inside](/articles/rag-explained)).
+
+**Agents** — models that plan and call tools across multiple steps — are where frameworks like LangChain and, more importantly, LangGraph earn their keep. The key insight: naive agent loops collapse in production once conversations get long, tools fail, or humans need to step in. Graph-based state management fixes exactly that (again, I have a dedicated article on [moving from chains to stateful graphs](/articles/langchain-to-langgraph)).
+
+Do both, end to end, with evaluation. A RAG assistant over public documentation with a measured retrieval hit-rate is worth more in an interview than any certificate.
+
+## The meta-skill: evaluation
+
+If there is one habit that separates people who "played with AI" from people who build it, it's this: they measure. LLM systems fail non-deterministically, and "it seems to work" is not a release criterion. You need:
+
+- A small dataset of real inputs and expected outputs (even 30 examples)
+- A scoring script that runs your system against it on every change
+- Separation of retrieval quality ("did we fetch the right documents?") from answer quality ("did we answer correctly given them?")
+
+This costs one afternoon and instantly puts you ahead of most tutorial graduates. It is also, quietly, a data science skill — the mindset transfers directly to ML evaluation.
+
+## Portfolio, done right
+
+Hiring managers spend 90 seconds on your portfolio. Design for that:
+
+1. **Three finished projects beat ten started ones.** Each needs a README with: the problem, an architecture diagram, what broke and how you fixed it, and measured results.
+2. **Show your engineering taste.** A clean repo with tests, a Makefile, and honest "known limitations" section signals more than a flashy demo.
+3. **Write about what you build.** A blog post explaining a failure mode you debugged — a retrieval miss, a runaway agent loop, a prompt injection you caught — demonstrates judgment in a way no project screenshot can.
+4. **Bridge from your existing strengths.** A Next.js site with AI-powered search is more interesting to most employers than a generic MNIST classifier, precisely because it shows you shipping, not just studying.
+
+## A realistic week-by-week shape
+
+| Weeks | Focus | Output |
+| --- | --- | --- |
+| 1–2 | Python fluency + conceptual model of LLMs | 20 small Python exercises, notes in your own words |
+| 3–4 | First API-powered application, no framework | A working document Q&A CLI |
+| 5–8 | fast.ai first lessons + scikit-learn + pandas | One evaluated classical ML model on tabular data |
+| 9–16 | RAG end-to-end, with evaluation | RAG assistant with a measured retrieval benchmark |
+| 17–20 | Agents with LangGraph, state, human-in-the-loop | A multi-step agent that survives failure gracefully |
+| ongoing | Write about every failure you debug | 3+ technical posts |
+
+## Closing: what nobody tells beginners
+
+The models will keep changing. GPT-x will be replaced; some new framework will have a better tutorial. None of that matters, because the durable skills are not model-specific: decomposing problems into retrieval and generation, evaluating systems against reality, debugging non-determinism, and explaining your work clearly. That is the same judgment that makes a good senior engineer in any stack — pointed at a new set of tools.
+
+Start small, build in week one, measure everything, and write down what you learn. The rest is time.

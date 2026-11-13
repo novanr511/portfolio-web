@@ -1,0 +1,115 @@
+Most RAG tutorials stop at "split your documents, embed them, ask the model." That recipe produces an impressive demo on Friday and an unusable system on Monday. The gap between those two states lives entirely in the details of the retrieval pipeline — so this article goes deep on the whole thing: how the pieces fit, where the standard recipe breaks, and the decisions that matter in production.
+
+## The problem RAG solves
+
+An LLM has two knowledge sources: its training data (frozen at a point in time, sometimes wrong, never *yours*) and whatever fits in its context window. RAG exploits the second source to fix the first. Instead of asking the model what it knows, you ask it to answer using **retrieved documents** — your product docs, your policies, your knowledge base — placed into the context at query time.
+
+This buys you three things at once:
+
+1. **Freshness** — update the index, not the model. A retrained model is months away; a re-indexed document is minutes away.
+2. **Attribution** — answers can cite sources, which turns "the AI said so" into "the policy on page 12 says so." This matters enormously for trust and for audit.
+3. **Scope** — the model answers from your corpus, which reduces hallucination dramatically. Not eliminates — reduces. More on that later.
+
+The inverse is worth stating plainly: RAG is *not* a hallucination cure-all. If retrieval fetches the wrong document, the model will happily fabricate an answer that sounds authoritative about the wrong content. Retrieval quality is the ceiling on answer quality.
+
+## The pipeline, piece by piece
+
+A production RAG system has two phases. Ingestion happens offline, once per document; answering happens online, once per query.
+
+### Ingestion: chunking is the highest-leverage decision
+
+Documents get split into *chunks* which are embedded and stored. The chunk is your atomic unit of retrieval forever after, so getting this wrong poisons everything downstream.
+
+The naive rule — "chunk every 512 tokens" — is exactly the kind of advice that quietly ruins systems. Chunks need to be **semantically coherent**: a chunk should contain a complete thought, not a paragraph sliced mid-sentence or a heading divorced from its body. Practical guidance:
+
+- **Split on structure first, size second.** Use headings, paragraphs, and list items as boundaries; only fall back to token limits within them. Markdown/HTML-aware splitters exist precisely for this.
+- **Overlap slightly.** A 10–15% overlap (e.g. 512-token chunks with 64 tokens of overlap) prevents context that straddles a boundary from being lost.
+- **Keep metadata with the chunk.** Source URL, document title, section path, last-updated date. You will need these for citations and — critically — for filtering at query time ("only answer from the 2026 pricing page").
+- **Match chunk size to question size.** If users ask "what is our refund policy?", a full policy document of 10,000 tokens is a terrible chunk — the relevant 200 tokens drown in noise. If users ask "summarize this contract", the granularity needs differ. Know your query distribution before you tune.
+
+### Embeddings: meaning as geometry
+
+An embedding model maps text to a vector — say, 1,536 floating-point numbers — such that texts with similar meaning land near each other in that high-dimensional space. "How do I reset my password?" and "I can't log in" are far apart as strings but close as vectors. Keyword search can't see that relationship; cosine similarity between embeddings can.
+
+Choosing an embedding model, in order of importance:
+
+1. **Match the domain and language.** Public leaderboards (MTEB) are a starting point, but they compress hundreds of tasks into one number. If your corpus is legal English or Bahasa Indonesia, test the model *on your actual documents*.
+2. **Match the retrieval mode.** Some embedding models are trained for symmetric similarity (comparing two similar texts, like deduplication); others are asymmetric (matching a short query against a long document). Using the wrong mode silently degrades retrieval.
+3. **Mind the dimensions and cost.** Higher dimensions aren't automatically better, and embedding API costs add up when you re-index regularly. Local models (e.g. via sentence-transformers) trade a little quality for zero per-token cost and full privacy.
+
+One rule is absolute: **the same model must embed queries and documents.** Mixing embedding models breaks retrieval completely, and it's a surprisingly common deploy-day bug.
+
+### Storage: you don't need a database dressed up as a vector database
+
+Vectors get stored in an index that supports approximate nearest-neighbor (ANN) search — HNSW and IVF are the standard algorithms. The trade-off they make is universal: approximate results, but orders of magnitude faster than brute force.
+
+For your first build, options in ascending complexity:
+
+| Scale | Reasonable choice |
+| --- | --- |
+| < 50k chunks, prototyping | In-memory with NumPy, or `sentence-transformers` + a pickle file |
+| < 1M chunks, single app | SQLite + sqlite-vec, or pgvector on your existing Postgres |
+| Multi-tenant, high QPS, filtering-heavy | A dedicated engine (Qdrant, Weaviate, Pinecone, Vespa) |
+
+The database matters far less than people assume. What matters is **metadata filtering** — the ability to say "search only these documents, from this tenant, updated after this date" *inside* the ANN search rather than after it. Post-filtering a vector search result set is a classic bug farm.
+
+### Retrieval: hybrid search, because embeddings have blind spots
+
+Pure vector search fails in a specific, repeatable way: **exact terminology**. Product codes (`SK-4711-B`), error messages (`ECONNRESET`), person names, legal citations — embeddings smooth these into semantic mush, and the right document loses to a paraphrase of the wrong one.
+
+The fix is hybrid retrieval — run both searches and merge:
+
+- **Dense** (vector) results for semantic matches
+- **Sparse** (BM25/keyword) results for exact matches
+- Merged with **Reciprocal Rank Fusion**, a simple, training-free formula that re-scores results by their rank across both lists — `score = Σ 1 / (k + rank_i)` with `k ≈ 60`
+
+```python
+def rrf(rankings: list[list[str]], k: int = 60) -> dict[str, float]:
+    """Reciprocal Rank Fusion over multiple ranked doc-id lists."""
+    scores: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, doc_id in enumerate(ranking):
+            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
+    return dict(sorted(scores.items(), key=lambda x: -x[1]))
+```
+
+Every serious production RAG system I have seen uses some form of this. If you only adopt one idea from this article, adopt hybrid retrieval.
+
+### Reranking: cheap relevance on top of fast recall
+
+ANN search is optimized for recall at high speed; its precision is mediocre. A **reranker** fixes that in two stages: the retriever pulls, say, the top 25 candidates fast, then a cross-encoder model scores each candidate *against the full query* — reading both texts together, which first-stage embedding models structurally cannot do. The top 3–5 by cross-encoder score go to the LLM.
+
+It's the same pattern as a web search engine: fast candidate generation, then expensive but accurate scoring on the shortlist. The result is usually the single largest quality jump available from a one-line change.
+
+### Generation: the prompt is where retrieval meets responsibility
+
+The final assembly is a prompt with the query and the retrieved chunks. Three rules that are non-negotiable:
+
+- **Cite.** Ask for answers grounded in numbered sources. Unattributed answers are unverifiable, and unverifiable answers don't get adopted by users.
+- **Instruct the failure mode.** "If the provided context doesn't contain the answer, say so" turns a confident hallucination into an honest "I don't know" — which is the correct answer far more often than a guess.
+- **Watch the context budget.** More retrieved chunks isn't monotonically better: beyond a point, irrelevant chunks actively degrade answers ("lost in the middle" — models attend noticeably worse to the middle of long contexts). 4–8 high-quality chunks usually beats 20 mixed ones.
+
+## The part tutorials skip: evaluation
+
+A RAG system without evaluation is a vibes machine. The good news: a meaningful harness costs an afternoon.
+
+1. **Build a question set.** 30–50 real questions with the source document/section that should be retrieved. Mine them from actual support tickets or search logs, not from your imagination.
+2. **Measure retrieval first, separately.** Hit-rate@k (is the right chunk in the top k?) and MRR (how high does it rank?). If retrieval is broken, no prompt will save you — and these metrics pinpoint *where* it's broken: if the right document is retrieved but ranked below the cutoff, that's a reranking problem; if it's never retrieved at all, that's chunking or embedding.
+3. **Measure generation second.** For groundedness and correctness, use an LLM-as-judge against your retrieved evidence, with a rubric. It's imperfect but 100× cheaper than humans, and consistent enough to catch regressions.
+4. **Run it on every change.** New embedding model, new chunk size, new prompt — same harness, before/after. Without this, you're tuning blind.
+
+## The failure modes that actually bite
+
+After the happy path, these are the bugs that consume weeks:
+
+- **The silent index drift.** Documents change but the index doesn't. Schedule re-indexing; store content hashes; invalidate on change.
+- **Access-control leakage.** Chunks retrieved across permission boundaries. Solve with metadata filtering inside the retrieval call, enforced server-side. This is a security bug, not a UX bug.
+- **Query–corpus mismatch.** Users ask in conversational language; the corpus is formal. Rewrite or expand the query before retrieval ("multi-query" retrieval generates several paraphrases and fuses the results).
+- **Chunk fragmentation.** The answer exists in your corpus but straddles two chunks, so neither ranks well. Overlap helps; parent-document retrieval (retrieve small chunks, but feed their parent section to the LLM) fixes it thoroughly.
+- **Overconfident answers to out-of-scope questions.** Retrieval top-score on *nothing relevant* still returns something. Set a similarity floor below which the system answers "I couldn't find this in the documentation."
+
+## Where to go from here
+
+Build the minimal pipeline end-to-end first — chunk, embed, retrieve, generate, cite — then add hybrid search, then reranking, then evaluation, in that order. Each step is a few hours of work for a measurable jump in quality, and each one teaches you more than a week of tutorials.
+
+The deep insight worth carrying into every AI system you build: **RAG is an information-retrieval system with an LLM at the end, not an LLM with a search bolted on.** The engineering discipline lives in the middle, and that's where your existing software skills are worth the most.

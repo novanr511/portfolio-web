@@ -1,0 +1,128 @@
+LangChain was the library that made LLM apps approachable: chains, prompts, memory, all composed in a few lines. And for prototypes, it still is. But somewhere between the demo and production, most agent systems built as linear chains fall apart — not because the models got worse, but because the architecture can't express what real agent workloads need: state that survives, flow that branches, and humans who step in at the right moment.
+
+LangGraph is the answer that emerged from that failure mode. This article explains what actually changed, why it changed, and how to build agents on the graph model that hold up when things go wrong.
+
+## Why chains break in production
+
+A chain is a straight line: prompt in, response out, maybe a tool call in between. In a demo, every run is a gentle one-turn interaction. In production, agents face conditions chains structurally cannot represent:
+
+- **Long horizon.** A real task — "research these 40 companies and draft a report" — takes dozens of steps. Any single-step failure, transient API error, or context overflow destroys the whole run, because a chain has nowhere to keep intermediate progress.
+- **Branching control flow.** Real decisions aren't linear. "If the tool returned an error, retry with different parameters; if the retrieval came back empty, ask the user; if confidence is low, escalate." An if/else ladder sprawled across a chain becomes unreadable at exactly the moment reliability matters.
+- **Loops.** Agents are inherently iterative — plan, act, observe, replan. A chain's single-pass mental model means people end up nesting chains inside chains to fake a loop, and the code starts resembling spaghetti with dependency injection.
+- **Human in the loop.** The most valuable production agents aren't autonomous; they pause for approval before consequential actions — sending an email, deleting a record, spending money. A chain has no concept of "stop here and resume later."
+
+None of these are model problems. They are all *state and control flow* problems — which is to say, they are software architecture problems, and they deserve an architecture designed for them.
+
+## The core idea: state, nodes, edges
+
+LangGraph models an agent as a **state machine**. The primitives are deliberately small:
+
+- **State** — a typed dictionary (often a TypedDict or Pydantic model) holding everything the agent knows: messages, intermediate results, retry counts. Every node receives the current state and returns *updates* to merge into it.
+- **Nodes** — Python functions that do one thing: call a tool, run an LLM step, validate output. They're ordinary functions, which makes them trivially testable.
+- **Edges** — the wiring. Fixed edges go straight to a successor; **conditional edges** are functions that inspect state and route dynamically — this is where the if/else logic lives, as a first-class, inspectable structure rather than buried code.
+
+Here's a minimal but real agent — the canonical tool-calling loop — as a graph:
+
+```python
+from typing import Annotated, Literal
+from langchain_core.messages import AnyMessage
+from langchain_openai import ChatOpenAI
+from langgraph.graph import StateGraph, START, MessagesState
+from langgraph.prebuilt import ToolNode
+
+llm = ChatOpenAI(model="gpt-4o-mini").bind_tools(tools)
+
+# State: the running conversation. `add_messages` appends
+# instead of overwriting — the core of the memory model.
+class AgentState(MessagesState):
+    pass
+
+def agent_node(state: AgentState):
+    return {"messages": [llm.invoke(state["messages"])]}
+
+# A conditional edge IS the control flow: inspect state, name a route.
+def should_continue(state: AgentState) -> Literal["tools", "__end__"]:
+    last = state["messages"][-1]
+    if last.tool_calls:
+        return "tools"
+    return "__end__"
+
+builder = StateGraph(AgentState)
+builder.add_node("agent", agent_node)
+builder.add_node("tools", ToolNode(tools))
+
+builder.add_edge(START, "agent")
+builder.add_conditional_edges("agent", should_continue)
+builder.add_edge("tools", "agent")   # the loop: back to the model
+
+graph = builder.compile()
+
+result = graph.invoke({"messages": [("user", "Book me a table for 2 at 7pm")]})
+```
+
+That last edge — `tools` back to `agent` — is the entire point. The agent is a loop now, not a line. Notice what you got for free: the state accumulates across iterations, every node is a pure function you can unit-test, and the control flow ("keep calling tools until the model stops requesting them") reads like documentation rather than an accident of nested callbacks.
+
+## Checkpointing: state that survives
+
+The single biggest production upgrade LangGraph offers is the **checkpointer**. Attach one — backed by SQLite, Postgres, or Redis — and every superstep of the graph is persisted against a thread ID.
+
+What this unlocks in practice:
+
+- **Resumability.** A run that crashed at step 14 of 20 resumes at step 15. For long-running tasks, this converts "the agent died and we lost everything" into "the agent continued where it left off."
+- **Conversation memory without manual bookkeeping.** Load a thread's checkpointed state, append the new user message, invoke. Multi-turn agents across sessions stop being a bespoke "memory" subsystem.
+- **Time travel.** You can inspect or replay any past state — invaluable for debugging ("what exactly did the agent see when it decided to delete that row?").
+
+```python
+from langgraph.checkpoint.postgres import PostgresSaver
+
+with PostgresSaver.from_conn_string("postgresql://...") as checkpointer:
+    graph = builder.compile(checkpointer=checkpointer)
+
+    config = {"configurable": {"thread_id": "user-42-session-7"}}
+    result = graph.invoke(
+        {"messages": [("user", "Where were we?")]},
+        config,  # state for this thread is loaded and extended
+    )
+```
+
+If you've built agents before and remember gluing a message history to a session table by hand, this is the feature that retires all of that code.
+
+## Human in the loop, as an architecture primitive
+
+Production agents that take consequential actions — payments, deletions, emails to real customers — need approval gates. In most frameworks this is a hack. In LangGraph it's built into the graph: **interrupts**.
+
+You mark nodes as requiring approval (`interrupt_before=["risky_action"]`), and the graph simply pauses before executing them, checkpointing its state. Your application shows the proposed action to a human; on approval, you re-invoke the graph with the same thread ID and it continues. On rejection, you inject a rejection message into the state and the agent re-plans.
+
+The reason this matters beyond convenience: it means the *architecture* enforces that irreversible actions require a human, rather than a convention in your code review checklist. That difference shows up exactly once — the day someone adds a new tool and the gate is simply, structurally, still there.
+
+## What LangChain is still for
+
+A common misreading of this story: "LangChain is deprecated." It isn't. The libraries compose:
+
+- **LangChain** remains the toolkit for the components: model clients, prompt templates, retrievers, tool definitions. If you're building [a RAG pipeline](/articles/rag-explained), LangChain's retrievers and loaders are still an excellent, well-integrated way to assemble it.
+- **LangGraph** is the orchestration layer for anything with state, branching, or loops — which is to say, most agents beyond single-turn demos.
+- **LangSmith** (the observability product) matters more as systems grow: trace every node, see token spend and latency per step, replay failed runs.
+
+A pragmatic decision rule: if your "agent" is one LLM call plus maybe one tool call, you don't need a graph — a chain is fine, and simpler. The moment you have a loop, multi-step state, or a human gate, reach for LangGraph.
+
+## Patterns that make agents reliable
+
+Beyond the primitives, there are graph patterns worth knowing by name:
+
+- **ReAct** — the reason–act–observe loop above. The default agent topology; nearly everything else composes with it.
+- **Plan-and-execute** — a planner node produces a task list; an executor node runs tasks one at a time; a replanner node revises the plan after each result. Better for long tasks because the plan acts as a compass the agent can return to when a step fails.
+- **Supervisor / multi-agent** — a supervisor node routes between specialized sub-agents (retriever-agent, writer-agent, reviewer-agent). The payoff is context isolation: each sub-agent's context window stays focused instead of accreting everything.
+- **Reflection** — after drafting, a critic node reviews the output against criteria, and the graph loops back to revise. Costs tokens, buys correctness on high-stakes outputs.
+
+And some engineering discipline that applies regardless of topology:
+
+1. **Bound every loop.** A `recursion_limit` on the graph — an unbounded agent loop is a bill generator.
+2. **Make nodes pure and small.** If a node does "several things," it's two nodes. Testability comes free from the architecture if you respect it.
+3. **Keep state minimal and typed.** State is your agent's working memory; everything in it should be data the graph actually needs to route or resume.
+4. **Trace from day one.** Wire up observability before the first incident, not after.
+
+## The takeaway
+
+The move from chains to graphs mirrors a story every web developer already knows: from spaghetti scripts to frameworks with explicit state and routing. LangGraph is that same maturation, applied to agents — state as a first-class concept, control flow you can read, persistence you didn't have to build, and humans wired into the loop by design.
+
+Start with the minimal tool-calling loop above, add a checkpointer the day you need multi-turn memory, add interrupts the day your agent touches anything irreversible. Build up exactly as fast as your failure modes demand, and no faster.

@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Novan — Portfolio
 
-## Getting Started
+Personal portfolio built with **Next.js 16 (App Router) + Tailwind CSS 4 + MDX**, styled after [business.apple.com](https://business.apple.com/): white-dominant layout with `#264a80` as the single accent color, generous whitespace, subtle view transitions, and a light/dark mode toggle.
 
-First, run the development server:
+## Pages
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Profile hero, latest articles, highlighted projects |
+| `/articles` | All articles |
+| `/articles/[slug]` | Full MDX article with prev/next navigation |
+| `/projects` | All projects (featured first) |
+| `/about` | Bio, focus areas, contact |
+
+## Writing articles
+
+Article metadata lives in `src/lib/articles.ts`; article bodies are MDX files in `src/content/articles/`.
+
+To publish a new article:
+
+1. Create `src/content/articles/<slug>.mdx` — start the body with a lead paragraph, then `##` sections (the page renders the `<h1>` title itself).
+2. Add an entry to the `articles` array in `src/lib/articles.ts` (newest first) with `slug`, `title`, `description`, `date`, `tags`, and `readingTime`.
+
+That's it — the home page, `/articles`, sitemap, RSS feed, and per-article OG images pick it up automatically on the next build. The body supports GitHub-flavored Markdown (tables, task lists) and internal links like `[how RAG works](/articles/rag-explained)`.
+
+## Editing projects
+
+Everything is in `src/lib/projects.ts`. Set `featured: true` to show a project in the "Highlighted work" section on the home page.
+
+## Editing profile content
+
+Name, description, email, and social links live in `src/lib/site.ts`. Hero copy is in `src/app/page.tsx`; the bio is in `src/app/about/page.tsx`.
+
+## SEO / GEO checklist (already wired)
+
+- Static prerendering of every page (fast, fully crawlable HTML)
+- Per-page `<title>`, description, canonical URL, and Open Graph/Twitter cards
+- Auto-generated **OG images** per article via `next/og`
+- **JSON-LD**: `WebSite` + `Person` on the home page; `Article` + `BreadcrumbList` on article pages
+- `sitemap.xml` and `robots.txt` generated from the content data
+- **RSS feed** at `/feed.xml`
+- Semantic HTML: single `<h1>`, ordered `h2`/`h3`, `<article>`, `<time>`
+
+## Running locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploying to Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push this folder to a GitHub repo, then import it at [vercel.com/new](https://vercel.com/new).
+2. After the first deploy, add the environment variable `NEXT_PUBLIC_SITE_URL` (see `.env.example`) with your production URL — this makes canonical URLs, sitemap entries, RSS links, and OG images absolute.
+3. Optionally point a custom domain at the project.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No database, no CMS service, no runtime cost — articles are MDX files in the repo; editing one triggers a full rebuild on push.
