@@ -1,0 +1,66 @@
+---
+title: "Chinchilla and the Scaling Laws: Why 'Just Make It Bigger' Stopped Being the Rule"
+description: "What the Kaplan and Chinchilla scaling-law papers actually claim, why they disagree, and what a compute-optimal budget means for real teams."
+date: 2026-11-14
+tags:
+  - AI
+  - Machine Learning
+  - LLM
+  - Research
+---
+
+For years the practical wisdom in large-model training was that parameter count was the lever: scale the model, accept the loss curve, and quality follows. In March 2022, a DeepMind team published a paper arguing that this was the wrong emphasis — and then trained a model to demonstrate it. The paper is still routinely summarized in a way that inverts its actual conclusion, so this article is about what the two key papers say, where they conflict, and what survives contact with a real training budget.
+
+**Direct Answer:** The Chinchilla paper (Hoffmann et al., 2022) found that, for a *fixed compute budget*, the loss-minimizing allocation scales model size and training tokens together — doubling parameters requires roughly doubling tokens to keep the trade-off optimal. Its own headline model was trained on 1.4 trillion tokens, which works out to 20 tokens per parameter. The earlier Kaplan et al. (2020) result pointed the other way: they argued that very large models were *more* sample-efficient, so you should train big models on relatively modest data and stop well before convergence. Both sets of authors published; the disagreement was about method as much as about outcome.
+
+## The two claims
+
+Kaplan et al. (January 2020) studied how cross-entropy loss scales with model size, dataset size, and training compute, reporting power-law behaviour spanning more than seven orders of magnitude, and that architectural details like width or depth had minimal effect within a wide range. Their practical conclusion was specific: "optimally compute-efficient training involves training very large models on a relatively modest amount of data and stopping significantly before convergence."
+
+That is the "just make it bigger" rule, stated as a scaling law rather than as folklore.
+
+Chinchilla (Hoffmann et al., March 2022) attacked the problem from the allocation side. Their abstract: "We find that current large language models are significantly undertrained, a consequence of the recent focus on scaling language models whilst keeping the amount of training data constant." Their experiment was large and systematic — "over 400 language models ranging from 70 million to over 16 billion parameters on 5 to 500 billion tokens" — and the finding was symmetric: "for every doubling of model size the number of training tokens should also be doubled."
+
+They then tested the hypothesis directly. Using the same compute budget as Gopher (280B parameters), they trained a 70B-parameter model, Chinchilla, on 1.4 trillion tokens. The paper reports it "uniformly and significantly outperforms Gopher (280B), GPT-3 (175B), Jurassic-1 (178B), and Megatron-Turing NLG (530B)" on a large range of downstream tasks, with a state-of-the-art average accuracy of 67.5% on MMLU — more than a 7-point improvement over Gopher. They also note the practical payoff: a smaller model at the same training compute means substantially less compute for fine-tuning and inference.
+
+## Why they disagree — and why that matters
+
+It would be convenient if the newer paper had simply overturned the older one. It did not; the authors explicitly documented a methodological difference that changes the answer.
+
+Kaplan et al. "use a fixed number of training tokens and learning rate schedule for all models," which the Chinchilla paper argues "prevents them from modelling the impact of these hyperparameters on the loss." The counter-analysis: "setting the learning rate schedule to approximately match the number of training tokens results in the best final loss regardless of model size." With a fixed 130B-token cosine schedule, "the intermediate loss estimates (for D₀ ≈ 130B) are therefore overestimates of the loss of a model trained with a schedule length matching D₀," which biases the frontier toward large models and small data.
+
+So the disagreement is not "one team was wrong." It is: **the optimal allocation depends on the training recipe you actually use**, and a study that fixes part of the recipe cannot see the full frontier. That is a genuinely useful thing for practitioners to internalise, because it means "compute-optimal" is a property of a *configuration*, not a law of nature.
+
+## What "20 tokens per parameter" actually is
+
+The phrase is everywhere, and it is worth being precise about its status. It is not a quoted rule from the paper — the Chinchilla abstract says "scaled equally," not "twenty tokens per parameter." It is arithmetic on the headline configuration: 1.4 trillion tokens for 70 billion parameters is exactly 20 tokens per parameter. So the number is derived from one point on the fitted frontier, and the paper's own table shows the ratio is not constant across the frontier. The paper's predicted frontier lists, for one of its approaches, 400 million parameters paired with 9.2 billion tokens (23 tokens per parameter) and 175 billion parameters paired with 4.3 trillion tokens (about 24.6 per parameter), while the other approach pairs 10 billion parameters with 410.1 billion tokens (41 per parameter).
+
+Treat "20 tokens per parameter" as a rough descriptor of a mid-scale frontier, not a constant. If you have seen it presented as a rule you must follow, that presentation is wrong.
+
+## Choosing a budget you can actually defend
+
+The useful question is not "what is the optimal model?" It is: *given my compute budget, my inference constraints, and my data, where should I sit on the frontier?* Three constraints routinely pull in different directions:
+
+| Constraint | What it pushes you toward | What it costs |
+| --- | --- | --- |
+| Training compute only | Smallest model that fits the budget, maximum tokens | Larger model means more serving cost per token forever |
+| Inference cost dominates | Train a smaller model *longer* than compute-optimal | Training cost rises; data requirements rise with it |
+| Data availability is the binding limit | Bigger model, fewer tokens | The regime Kaplan et al. argued for |
+
+That middle row is the one most teams actually live in, and it is the reason "compute-optimal" is a poor stopping rule for production systems. A model that is optimal to train and ruinous to serve is not optimal for anything that matters.
+
+## The honest caveats
+
+Three things to keep in mind before quoting either paper:
+
+- **The range is bounded.** The 400+ models spanned 70 million to over 16 billion parameters and 5 to over 400 billion tokens. The 70B Chinchilla model sits near the top of that range. Conclusions about far larger models are extrapolations, and the paper is explicit that the frontier was estimated within the studied regime.
+- **Loss is not capability.** These studies optimize cross-entropy loss on held-out text. A better loss does not automatically mean better instruction-following, fewer hallucinations, or better performance on your task. The downstream benchmark comparisons are supportive evidence, not the optimization target itself.
+- **The recipe moved.** The learning-rate-schedule finding above is dated. Current recipes differ from both papers' setups, and the practical frontier moves as hardware, data quality, and optimisation techniques change. Re-derive it for your stack rather than inheriting a number.
+
+For the adjacent question of how to evaluate what you have built, see [Retrieval-Augmented Generation, Explained From the Inside Out](/articles/rag-explained) for evaluation harnesses in retrieval systems, and [How to Actually Start Learning AI as a Developer in 2026](/articles/how-to-start-learning-ai) for how to build these skills in order.
+
+## References & Further Reading
+
+- J. Hoffmann, S. Borgeaud, A. Mensch, et al., ["Training Compute-Optimal Large Language Models"](https://arxiv.org/abs/2203.15556), arXiv:2203.15556, submitted 2022-03-29. Supports the compute-optimal allocation finding, the 400-model experimental scale and parameter/token ranges, the Chinchilla 70B/1.4T-token configuration, the downstream comparison against Gopher, GPT-3, Jurassic-1 and Megatron-Turing NLG, the 67.5% MMLU figure, and the appendix discussion of how a fixed learning-rate schedule biases the estimate.
+- J. Kaplan, S. McCandlish, T. Henighan, et al., ["Scaling Laws for Neural Language Models"](https://arxiv.org/abs/2001.08361), arXiv:2001.08361, submitted 2020-01-23. Supports the power-law scaling behaviour across model size, dataset size and compute, the seven-orders-of-magnitude range, and the conclusion that optimally compute-efficient training uses very large models on relatively modest data and stops before convergence.
+- The Chinchilla paper's predicted-frontier table (Appendix D.3, "Predicted compute optimal frontier for all three methods") is the source for the parameter/token pairings quoted in the ratio discussion above.

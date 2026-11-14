@@ -3,7 +3,7 @@
 **Status:** planning document
 **Publication:** NOVANDRI — Technology. Business. Ideas.
 **Publication description:** A personal knowledge publication about technology, business, innovation, markets, and the ideas behind them.
-**Current series language:** English, consistent with existing portfolio convention. The publication-wide choice (English, Bahasa Indonesia, or bilingual) remains open unless the owner decides otherwise.
+**Publication language:** English only, as decided by the owner; applies across all pillars and formats.
 **Planning language:** Indonesian
 **Byline:** Rachmadwipa Novandri
 **Scope of this document:** One evidence-based Technical SEO series within a broader personal publication; this is not the complete site-wide editorial plan.

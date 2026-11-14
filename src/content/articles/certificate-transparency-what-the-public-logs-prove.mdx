@@ -1,0 +1,105 @@
+---
+title: "Certificate Transparency: What the Public Logs Prove, and What They Don't"
+description: "How CT logs, SCTs, and Merkle trees work, why browsers enforce them, and how to check your own certificates for transparency."
+date: 2026-11-14
+tags:
+  - TLS
+  - Security
+  - Web Infrastructure
+  - Observability
+---
+
+Every publicly trusted TLS certificate is now, in practice, a public record. Certificate Transparency (CT) turned certificate issuance into something an outsider can watch: logs publish what they received, and browsers refuse certificates that arrive without proof they were logged. That sounds like a solved problem. It is not — it is a *discoverability* mechanism, and the gap between "logged" and "legitimate" is where operational incidents actually happen.
+
+**Direct Answer:** CT proves that a specific certificate was submitted to at least one publicly monitored append-only log, not that the certificate is legitimate, that the domain owner wanted it, or that it is still safe to trust. The protocol guarantees *discoverability of misissuance*; everything after that — monitoring, response, revocation, reissuance — is operational work that the protocol deliberately leaves outside itself.
+
+## What CT actually guarantees
+
+RFC 6962 (June 2013, Experimental) defines the core model. Each log is a single, ever-growing, append-only Merkle tree of submitted certificates. When a log accepts a valid chain it must immediately return a **Signed Certificate Timestamp (SCT)** — and the RFC is explicit about what that promise is: the SCT is the log's promise to incorporate the certificate in the Merkle tree within a fixed time known as the **Maximum Merge Delay (MMD)**.
+
+Two consequences follow directly from that design:
+
+1. **Presentation.** RFC 6962 states that TLS servers must present an SCT from one or more logs to the client together with the certificate.
+2. **Rejection.** The same RFC states that TLS clients must reject certificates that do not have a valid SCT for the end-entity certificate.
+
+That is the entire guarantee. It is a *presence* guarantee, not a *validity* guarantee. The RFC is careful about this in its informal introduction: the logs "do not themselves prevent misissue, but they ensure that interested parties (particularly those named in certificates) can detect such misissuance."
+
+Read that clause again — **"particularly those named in certificates."** Detection is only useful if the domain owner is actually watching. CT converts a silent misissuance into a *public* event; it does not convert it into a resolved one.
+
+## The v2.0 revision and what changed
+
+RFC 9162 (December 2021, Experimental) obsoletes RFC 6962 and revises the protocol after years of deployment feedback. The changes are mostly structural, but three are worth internalizing:
+
+- **The TLS extension changed.** The `signed_certificate_timestamp` extension was replaced by a `transparency_info` extension, which carries CT artifacts more generally.
+- **Log identity changed.** Logs are now identified by an OID rather than by the hash of their public key, and log artifact extensions live in IANA registries.
+- **Proofs were added.** Clients can now request an inclusion proof (proving a specific entry is in the tree) and consistency proofs (proving two tree heads are consistent) rather than trusting the log's word. There are also defined **monitor** and **auditor** roles: a monitor watches logs for certificates of interest — for example, all certificates covering a domain you own.
+
+The monitor role is the operational hook. If you run infrastructure for a domain, a monitor over CT logs is how you find out that someone obtained a certificate for your name.
+
+## What browsers actually enforce
+
+The protocol says clients must reject uncertified certificates. Chrome's published CT policy is the concrete implementation, and it is more specific than the RFC.
+
+Under that policy, a publicly trusted TLS certificate must be **CT Compliant**, which requires a set of SCTs satisfying one of two paths:
+
+| Delivery path | Requirement |
+| --- | --- |
+| **Embedded SCTs** (in the certificate's `SignedCertificateTimestampList` X.509 extension) | At least one SCT from a log that was Qualified, Usable, or ReadOnly at the time of check; SCTs from at least **N** distinct logs (N = 2 for certificate lifetime ≤ 180 days, N = 3 for lifetime > 180 days); and among those, at least two SCTs from **distinct log operators** |
+| **SCTs delivered via TLS** | At least two SCTs from logs that were Qualified, Usable, or ReadOnly at the time of check, from at least two distinct log operators |
+
+Two details matter in practice. First, the log's *state* at the time of check is evaluated, not just at issuance — logs move through Pending, Qualified, Usable, ReadOnly, Retired, and Rejected states, and a retired log's SCTs stop counting for fresh certificates. Second, the policy notes that in Chrome versions prior to version 148, Chrome also accepted SCTs embedded in stapled OCSP responses; those no longer count toward the requirements above.
+
+Chrome also documents the practical consequence for operators: most TLS servers do not support the TLS extension, so **CAs should be prepared to embed SCTs into issued certificates** to ensure successful validation.
+
+## The current log landscape
+
+Chrome's CT log list is the machine-readable source of truth, published as JSON at `https://www.gstatic.com/ct/log_list/v3/log_list.json`. When I checked it on 2026-11-13, the list was at version 97.0 with a `log_list_timestamp` of `2026-11-13T13:36:42Z`, containing **26 logs operated by 11 organizations** — Google, Cloudflare, DigiCert, Sectigo, Let's Encrypt, TrustAsia, Geomys, IPng Networks, Microsec, GoDaddy, and HARICA.
+
+Individual entries carry their own parameters. One example, Google's `Argon2026h2`, listed an MMD of 86,400 seconds (24 hours) and, at that moment, a read-only tree size of 3,501,950,757 entries. MMD matters because it is the *worst-case* delay between an SCT being issued and the certificate actually appearing in the log — the window during which a monitor cannot yet see the entry.
+
+## Checking your own certificates
+
+You do not need to run a monitor to verify the basics. `openssl` will show you the SCTs on a live endpoint:
+
+```bash
+echo | openssl s_client -connect example.com:443 -servername example.com -showcerts 2>/dev/null \
+  | openssl x509 -noout -text \
+  | grep -A2 "1.3.6.1.4.1.11129.2.4.2"
+```
+
+That OID is the `SignedCertificateTimestampList` extension. On 2026-11-14, running the same check against three large production hosts returned:
+
+```text
+www.cloudflare.com : issuer Let's Encrypt YE1, 4 certs in chain, SCT extension present
+github.com         : issuer Sectigo DV E36,  3 certs in chain, SCT extension present
+www.mozilla.org    : issuer Let's Encrypt YR1, 3 certs in chain, SCT extension present
+```
+
+None of those three connections returned a stapled OCSP response in my check — which, given the Chrome 148 change above, is consistent with SCTs arriving as embedded extensions rather than inside a stapled OCSP response.
+
+For ongoing detection rather than a point check, the RFC 9162 monitor model is the mechanism: poll each log's signed tree head, fetch new entries, and filter for certificates covering domains you control. The same document defines the auditor role — an entity that verifies a log is behaving correctly, which matters because RFC 9162 notes the auditing mechanisms "can be circumvented by a misbehaving log that shows different, inconsistent views of itself to different clients," so logs have to be treated as trusted third parties.
+
+## Where CT still fails you
+
+Three failure modes are worth naming explicitly, because they are all operational rather than protocol-level:
+
+- **Issuance from a compromised CA.** If a CA is breached, CT faithfully records the attacker's certificates — and every domain in the CA's scope becomes a monitoring target at once. CT makes the blast radius *visible*, not smaller.
+- **SCTs for the wrong thing.** A certificate can be perfectly CT-compliant and still be the certificate you did not want issued. Compliance is a property of the certificate, not of the decision to issue it.
+- **Silent expiry of trust signals.** Because log states and Chrome's policy both change over time, a certificate issued and validated years ago can stop being compliant without anything on your side changing. A renewal that assumes yesterday's policy is a renewal that can fail.
+
+## Practical takeaways
+
+1. **Treat CT as an alerting source, not a control.** Its output is a signal to investigate, not a verdict.
+2. **Monitor your own names.** The protocol's value is concentrated in the "particularly those named in certificates" case, and that requires someone watching.
+3. **Check SCT delivery, not just certificate validity.** A site with a perfectly valid chain and no usable SCTs fails in CT-enforcing browsers and passes in `curl`. That asymmetry is why certificate problems sometimes look like "the site works for me."
+4. **Do not assume stapling covers you.** If your CT evidence arrives via stapled OCSP responses, it stopped counting in Chrome 148.
+
+For the request path that produces these certificates in the first place, see [What Happens When a Crawler Requests a URL?](/articles/what-happens-when-a-crawler-requests-a-url) and [HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects).
+
+## References & Further Reading
+
+- IETF, [RFC 6962 — Certificate Transparency](https://www.rfc-editor.org/rfc/rfc6962.txt), June 2013 (Experimental; B. Laurie, A. Langley, E. Kasper). Supports the log model, the SCT-as-promise definition, the Maximum Merge Delay, the append-only Merkle tree, the "logs do not themselves prevent misissue" limitation, and the detection-oriented framing in Section 1.
+- IETF, [RFC 9162 — Certificate Transparency Version 2.0](https://www.rfc-editor.org/rfc/rfc9162.txt), December 2021 (Experimental; B. Laurie, E. Messeri, R. Stradling). Supports the `transparency_info` extension replacing `signed_certificate_timestamp`, OID-based log IDs, inclusion and consistency proofs, and the monitor/auditor roles in Section 8.
+- IETF, [RFC 9163 — Expect-CT Extension for HTTP](https://www.rfc-editor.org/rfc/rfc9163.txt), June 2022 (Experimental; E. Stark). Supports the existence and purpose of the Expect-CT header as an operator-side signal for CT misconfiguration.
+- Chromium Projects, [Chrome Certificate Transparency Policy](https://googlechrome.github.io/CertificateTransparency/ct_policy.html), accessed 2026-11-13. Supports the CT compliance criteria, the embedded-versus-TLS SCT paths, the 180-day SCT count threshold, the distinct-operator requirement, the note on Chrome versions prior to 148 accepting SCTs in stapled OCSP responses, and the guidance to CAs to embed SCTs.
+- Google, [Certificate Transparency Log List (v3, JSON)](https://www.gstatic.com/ct/log_list/v3/log_list.json), version 97.0, list timestamp 2026-11-13T13:36:42Z. Supports the operator count, log count, MMD values, and tree sizes quoted above; this is a live document that changes daily, so re-check before quoting figures.

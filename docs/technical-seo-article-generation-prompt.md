@@ -20,7 +20,7 @@ The series plan is the source of truth for article scope and sequence:
 - Do not silently change the plan. If an article needs a scope change, explain why and propose it before drafting.
 
 ## Fixed editorial requirements
-- For this existing Technical SEO series, use clear natural English to match the current portfolio content. The broader publication-wide language choice (English, Bahasa Indonesia, or bilingual) was raised in the editorial conversation but not explicitly settled; do not describe it as a confirmed site-wide decision. Follow any explicit language instruction for a specific article, and flag the broader choice for the owner when planning new pillars.
+- Publication-wide language: clear, natural English only, as decided by the owner. Apply this to all pillars and formats; do not create Indonesian or bilingual versions unless the owner changes this decision. Planning notes and QA reports may be Indonesian.
 - Byline: Rachmadwipa Novandri. Do not add an author field to frontmatter unless the CMS schema is changed.
 - Audience: Technical SEO specialists, SEO engineers, developers, and infrastructure engineers who need to understand and diagnose root causes.
 - Publication positioning: a personal knowledge publication, not a narrow SEO blog or a multi-author magazine. Use a consistent analytical point of view across topics.

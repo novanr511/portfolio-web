@@ -8,6 +8,14 @@ import { site } from "@/lib/site";
 
 type Props = { params: Promise<{ category: string }> };
 
+/**
+ * This route awaits `params` and reads the article collection at request
+ * time. Under Cache Components that is uncached/runtime data, which blocks
+ * prerendering of the static shell. The sibling dynamic routes
+ * (`/articles/[slug]`, `/keystatic/[[...params]]`) opt out the same way.
+ */
+export const instant = false;
+
 export async function generateStaticParams() {
   const categories = await getArticleCategories();
   return categories.map((category) => ({ category: categorySlug(category) }));

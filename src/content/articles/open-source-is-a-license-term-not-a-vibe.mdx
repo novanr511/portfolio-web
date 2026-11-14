@@ -1,0 +1,95 @@
+---
+title: "Open Source Is a License Term, Not a Vibe: Reading OSD, OSAID, and BSL"
+description: "What OSI's Open Source Definition actually requires, what the Open Source AI Definition adds, and how the Business Source License sits outside both."
+date: 2026-11-14
+tags:
+  - Open Source
+  - Licensing
+  - Business Strategy
+  - Technology
+---
+
+"Open source" is used in vendor pages, conference slides, and funding rounds as though it were a single, checkable property. It is not — it is a family of licence terms with specific obligations, and the interesting engineering and business questions live in the gaps between them. When a project changes licence, the gap becomes a matter of public record and considerable consequence.
+
+**Direct Answer:** OSI's Open Source Definition (OSD) is a ten-criterion checklist that any licence must satisfy to be described as "open source" — the current version is 1.9, last modified 2007-03-22, derived from the Debian Free Software Guidelines. OSI's Open Source AI Definition (OSAID, version 1.0) extends the idea to AI systems by requiring, as the "preferred form" for modification, three things: detailed information about training data, the complete source code used to train and run the system, and the model parameters. The Business Source License (BSL) is deliberately *outside* both: it grants non-production use plus a time-limited production use, converting to an open licence on a stated Change Date. OSI's criteria and BUSL's mechanism are not in conflict — BUSL was written to fail the definition's test on purpose.
+
+## The ten criteria, and why they exist
+
+The OSD is not a vibe. Its opening line is categorical: "Open source doesn't just mean access to the source code. The distribution terms of open source software must comply with the following criteria."
+
+The criteria that most often decide real-world cases:
+
+1. **Free Redistribution.** "The license shall not restrict any party from selling or giving away the software as a component of an aggregate software distribution containing programs from several different sources. The license shall not require a royalty or other fee for such sale." Note the second sentence: this is a prohibition on *requiring* a fee, not a prohibition on charging one. The OSI-approved MIT licence grants the right to "sell" the software, explicitly.
+2. **Source Code.** "The program must include source code, and must allow distribution in source code as well as compiled form... The source code must be the preferred form in which a programmer would modify the program. Deliberately obfuscated source code is not allowed."
+3. **Derived Works.** "The license must allow modifications and derived works, and must allow them to be distributed under the same terms as the license of the original software."
+4. **Integrity of The Author's Source Code.** Modifications may be restricted only if the licence allows distribution of "patch files" for build-time modification and "must explicitly permit distribution of software built from modified source code."
+5. **No Discrimination Against Persons or Groups.**
+6. **No Discrimination Against Fields of Endeavor.** "The license must not restrict anyone from making use of the program in a specific field of endeavor. For example, it may not restrict the program from being used in a business, or from being used in genetic research."
+7. **Distribution of License.**
+8. **License Must Not Be Specific to a Product.**
+9. **License Must Not Restrict Other Software.** "The license must not place restrictions on other software that is distributed along with the licensed software. For example, the license must not insist that all other programs distributed on the same medium must be open source software."
+10. **License Must Be Technology-Neutral.**
+
+Criteria 6 and 9 are the ones that do the quiet work. Criterion 6 is what forbids a "non-commercial use only" restriction, and criterion 9 is what forbids copyleft contagion into adjacent components — the reason the MIT licence (which grants use, copying, modification, merging, publication, distribution, sublicensing and selling, with no warranty) satisfies the definition while a share-alike licence that reaches outside the work would not.
+
+Because the criteria are about *distribution terms*, they are testable. That testability is the entire point: "open source" is a claim about a licence that anyone can check against a published checklist.
+
+## What OSAID adds for AI
+
+Applying a software checklist to a model with weights, data and training code creates a gap. OSI's answer, in Open Source AI Definition version 1.0, keeps the four freedoms and adds a requirement about what form the system must be provided in.
+
+The freedoms are the software ones, restated for AI: use the system for any purpose without asking permission, study how it works, modify it including changing its output, and share it with or without modifications. These "apply both to a fully functional system and to discrete elements of a system."
+
+The substantive addition is the **preferred form to make modifications**, which must include three elements:
+
+- **Data Information** — "Sufficiently detailed information about the data used to train the system so that a skilled person can build a substantially equivalent system." Critically, this includes "the complete description of all data used for training, including (if used) of unshareable data, disclosing the provenance of its data, its scope and characteristics, how the data was obtained and selected, the labeling procedures, and data processing and filtering methodologies," plus listings of publicly available training data and of third-party training data, "including for fee."
+- **Code** — "The complete source code used to train and run the system," including code for data processing and filtering, "arguments and settings used," validation and testing, "supporting libraries like tokenizers and hyperparameters search code, inference code, and model architecture."
+- **Parameters** — "The model parameters, such as weights or other configuration settings," potentially including "checkpoints from key intermediate stages of training as well as the final optimizer state."
+
+The asymmetry in that definition is the interesting part, and it is easy to miss. The data requirement is *not* an obligation to release the training data. It is an obligation to release enough **information about** the data that a skilled person could rebuild a substantially equivalent system — while the data itself may remain unshareable. So "we open-sourced our data" is neither necessary nor sufficient under OSAID, and "we released the weights" is also not sufficient.
+
+## BSL: the deliberate exit from the definition
+
+The Business Source License is the counter-example that makes the definition meaningful. Its own text is short and blunt about what it does not grant:
+
+> The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work. The Licensor may make an Additional Use Grant, above, permitting limited production use.
+
+> Effective on the Change Date, or the fourth anniversary of the first publicly available distribution of a specific version of the Licensed Work under this License, whichever comes first, the Licensor hereby grants you rights under the terms of the Change License, and the rights granted in the paragraph above terminate.
+
+And the enforcement clause:
+
+> If your use of the Licensed Work does not comply with the requirements currently in effect as described in this License, you must purchase a commercial license from the Licensor, its affiliated entities, or authorized resellers, or you must refrain from using the Licensed Work.
+
+Three mechanics matter. The **Change Date** is a date specified per version; the **Change License** is the open licence that takes over on that date; the **Additional Use Grant** is the negotiated exception that allows a specific named production use before the conversion. Each version is licensed separately, the change date may differ per version, and violating the licence "will automatically terminate your rights under this License for the current and all other versions."
+
+This is a source-available or "fair-source" arrangement by construction: it fails OSD criterion 6 in spirit (it restricts use to non-production until a date) and criterion 3 (it does not require derived works to be distributed under the same terms indefinitely). It is designed to be temporary — the licence converts to an open licence on a schedule — which is what distinguishes it from a permanent proprietary licence.
+
+## The Terraform case, as a public record
+
+The clearest recent example of licence change as a business event is Terraform. According to the OpenTofu Manifesto, Terraform was open-sourced in 2014 under the Mozilla Public License (v2.0) and built "a community that included thousands of users, contributors, customers, certified practitioners, vendors, and an ecosystem of open-source modules, plugins, libraries, and extensions." The manifesto states that on August 10, 2023, "with little or no advance notice or chance for much, if not all, of the community to have any input, HashiCorp switched the license for Terraform from the MPL to the Business Source License (v1.1) (the 'BUSL'), a non-open source license."
+
+The response was the fastest possible form of governance: the manifesto says the community asked HashiCorp to switch back, received no response by August 25, 2023, and created a fork, "now public." The fork's own repository carries the Mozilla Public License, version 2.0, with a copyright line naming both "The OpenTofu Authors" and "HashiCorp, Inc." — the standard MPL-2.0 file-header pattern for a fork. The project announced general availability on January 10, 2024, describing itself as "a community-driven open source fork of Terraform" and "a drop-in replacement for Terraform."
+
+Two things are worth reading carefully here, because they are the durable lessons rather than the drama. First, the outcome was determined by *prior* licensing choices — MPL-2.0's file-level copyleft left the code licensable by others under the same terms, so a fork was legally available. Had the code been under a non-copyleft proprietary licence, the community would have had no exit. Second, the risk that materialised was not "the code stopped working"; it was "the licence a business depends on can change with little notice," which is a risk that propagates into procurement, vendor review, and internal policy.
+
+## How to evaluate a licence claim yourself
+
+A practical procedure that does not require a lawyer for a first pass:
+
+1. **Get the actual licence text**, not the project's marketing description. The OSI text for MIT, for example, is short and specific: it grants the four rights plus sublicensing and sale, requires only that "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software," and disclaims warranties and liability.
+2. **Run it against the OSD criteria.** Check each of the ten, especially 1 (free redistribution), 3 (derived works), 6 (fields of endeavor), and 9 (other software). Any failure means "not open source" in OSI's sense, whatever the README says.
+3. **If it is a model or an AI system, check against OSAID** — data information, code, parameters — and note that a weights-only release fails it.
+4. **If it is a BSL or similar, find the Change Date and the Change Licence.** The entire risk assessment reduces to: how long until conversion, and what converts it to.
+5. **Check the version, not just the project.** A BSL applies separately per version, and change dates may vary per version.
+
+For the tooling decisions that make licence terms matter in practice — picking libraries, frameworks, and model providers — see [How to Actually Start Learning AI as a Developer in 2026](/articles/how-to-start-learning-ai) and [From LangChain to LangGraph](/articles/langchain-to-langgraph).
+
+## References & Further Reading
+
+- Open Source Initiative, [The Open Source Definition](https://opensource.org/osd), version 1.9, last modified 2007-03-22, derived from the Debian Free Software Guidelines. Supports the "doesn't just mean access to the source code" framing, the wording of all ten criteria quoted above, and the stated provenance.
+- Open Source Initiative, [Open Source AI Definition](https://opensource.org/ai/open-source-ai-definition), version 1.0. Supports the four freedoms, the "preferred form to make modifications" requirement, and the Data Information, Code, and Parameters element definitions quoted above.
+- Open Source Initiative, [The MIT License](https://opensource.org/license/mit). Supports the grant of use, copying, modification, merging, publication, distribution, sublicensing and sale, the notice-retention condition, and the warranty and liability disclaimer.
+- MariaDB, [Business Source License 1.1](https://mariadb.com/bsl11/). Supports the non-production-use grant, the Additional Use Grant, the Change Date and fourth-anniversary conversion rule, the Change Licence mechanism, per-version applicability, and the commercial-licence-or-refrain enforcement clause.
+- OpenTofu, [The OpenTofu Manifesto](https://opentofu.org/manifesto/). Supports the 2014 MPL-2.0 open-sourcing of Terraform, the August 10, 2023 licence switch to BUSL 1.1, the request to revert, the August 25, 2023 fork, and Linux Foundation stewardship.
+- OpenTofu, [OpenTofu is going GA](https://opentofu.org/blog/opentofu-is-going-ga/), January 10, 2024. Supports the general-availability date and the "drop-in replacement" characterisation.
+- OpenTofu, [LICENSE (Mozilla Public License, version 2.0)](https://github.com/opentofu/opentofu/blob/main/LICENSE). Supports the fork's licence and its dual copyright header naming The OpenTofu Authors and HashiCorp, Inc.

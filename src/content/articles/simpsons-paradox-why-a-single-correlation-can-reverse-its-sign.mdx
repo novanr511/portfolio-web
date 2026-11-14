@@ -1,0 +1,122 @@
+---
+title: "Simpson's Paradox in Your Own Data: Why a Single Correlation Can Reverse Its Sign"
+description: "A reproducible sign reversal in a public dataset shows how pooled correlations invert — and what to check before trusting any single number."
+date: 2026-11-14
+tags:
+  - Data
+  - Statistics
+  - Analytics
+  - Decision Science
+---
+
+Every dashboard has one number at the top that everyone quotes. Sometimes that number is not merely imprecise — it points in the *opposite direction* from the truth. This is not a hypothetical failure mode; it is a mathematical property of averages, it shows up in real public datasets, and it is trivially reproducible. The point of this article is not that "correlation doesn't imply causation" but something sharper and more actionable: a pooled correlation can reverse sign relative to every subgroup it is composed of.
+
+**Direct Answer:** Simpson's paradox occurs when a trend present in every subgroup reverses direction in the pooled data, because the groups differ systematically on the variable you are not conditioning on. Using the Palmer Penguins dataset (344 observations, three species), bill depth correlates **negatively** with body mass when pooled across all penguins (r = −0.472), yet **positively** within every one of the three species (r = +0.576 Adelie, +0.604 Chinstrap, +0.719 Gentoo). The reversal is caused by Gentoo penguins having both shallower bills and greater mass than the other two species. Before quoting any single correlation, check the within-group sign.
+
+## The data
+
+The Palmer Penguins dataset is a curated, openly licensed version of measurements collected at Palmer Station on the Antarctic Peninsula. It is distributed via the `palmerpenguins` R package and archived on Zenodo (DOI 10.5281/zenodo.3960218) under a CC-0 public-domain dedication, with the underlying field data documented in Gorman, Williams and Fraser (2014). The version analysed here has 344 rows with three species (152 Adelie, 124 Gentoo, 68 Chinstrap), three islands, and three field seasons (2007–2009).
+
+Missing data is worth noting because it is exactly the kind of thing that silently changes a result: 11 rows have no `sex` value, and 2 rows each are missing `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, and `body_mass_g`. Dropping rows with any missing measurement leaves 342 observations. A table of means without disclosing that filter would be a small dishonesty in a spreadsheet and a serious one in a report.
+
+## The result
+
+Here is the entire analysis, runnable from a fresh checkout:
+
+```python
+import pandas as pd
+
+df = pd.read_csv("penguins.csv")
+df = df.dropna(subset=["bill_length_mm", "bill_depth_mm",
+                       "flipper_length_mm", "body_mass_g"])
+
+a, b = "bill_depth_mm", "body_mass_g"
+
+print("pooled", df[a].corr(df[b]).round(3))
+for species, g in df.groupby("species"):
+    print(species, len(g), g[a].corr(g[b]).round(3))
+```
+
+Output:
+
+```text
+pooled -0.472
+Adelie 151 0.576
+Chinstrap 68 0.604
+Gentoo 123 0.719
+```
+
+The pooled relationship says: deeper bill, lighter penguin. Every single species says: deeper bill, heavier penguin. If you only had the pooled number, you would draw the wrong conclusion about the biology — and you would draw it *confidently*, with a large sample size and a strong-looking correlation.
+
+## Why it happens
+
+The mechanism is that the species differ systematically on both variables at once. Species means:
+
+| Species | n | Mean bill depth (mm) | Mean body mass (g) |
+| --- | --- | --- | --- |
+| Adelie | 151 | 18.35 | 3700.7 |
+| Chinstrap | 68 | 18.42 | 3733.1 |
+| Gentoo | 123 | 14.98 | 5076.0 |
+
+Gentoo penguins are both the shallowest-billed and the heaviest. So the between-species comparison contributes a large *negative* covariance to the pooled sum — deep-billed penguins are mostly Adelie and Chinstrap, which are light. That negative between-group component outweighs the positive within-group covariances and flips the pooled sign.
+
+Islands show the same confound from a different angle. Because species and island are nearly collinear in this dataset (Biscoe holds 123 Gentoo and 44 Adelie, Dream holds 56 Adelie and all 68 Chinstrap, Torgersen holds only Adelie), island-level means inherit the same pattern: Biscoe's mean bill depth is 15.87 mm against a mean mass of 4716 g, while Dream and Torgersen sit near 18.4 mm and roughly 3710 g. Any analysis that treats "island" as an independent variable here is partly measuring species.
+
+The reverse also happens and is just as dangerous. The same dataset shows bill length correlating *positively* with body mass pooled (r = 0.595) with a slope of about 87 g per mm — yet the within-species slopes differ substantially (Adelie 94.5, Chinstrap 59.1, Gentoo 109.5 g/mm). A business rule derived from the pooled slope ("each extra millimetre of bill length implies 87 g more mass") would be roughly right on average and wrong by a factor of two depending on which species you apply it to.
+
+## The general shape of the trap
+
+Simpson's paradox is one instance of a broader failure: **conditioning on a variable that is a cause of both the predictor and the outcome**. In the penguin case, species is a genuine cause of both bill morphology and body mass, and it is also correlated with the environment. That makes it a confounder, and the reversal is the signature of a confounder you have not accounted for.
+
+The formal statement: if the pooled correlation decomposes into a between-group component and a within-group component, and they have opposite signs, the pooled number describes the *groups*, not the *relationship*. The pooled statistic answers "do the groups differ?" The within-group statistic answers "does the variable relate to the outcome, holding the group constant?" They are different questions, and only one of them is usually the one being asked.
+
+This is why the paradox is so persistent in organisational analytics. The framing "overall conversion rate went down" or "average session duration increased" implicitly asks a between-group question, while the decision-maker almost always means a within-group one: *did something we changed affect how users behave?* If a campaign shifted the traffic mix toward a lower-converting segment, the pooled metric moves for reasons that have nothing to do with the campaign's effect on any user.
+
+## A diagnostic routine that actually catches it
+
+This is the sequence I use on any correlation that will drive a decision:
+
+1. **Compute the pooled statistic.** Establish the number you were going to quote.
+2. **Compute it within every natural subgroup.** Species here; customer tier, channel, device class, or geography in a business dataset. Do not eyeball — calculate.
+3. **Compare signs, not just magnitudes.** If any subgroup's sign differs from the pooled sign, stop. You have a paradox, and the pooled number is not a summary of anything you can act on.
+4. **Check whether the subgroup variable is a confounder** — that is, whether it plausibly causes both the predictor and the outcome, or merely correlates with them.
+5. **Test whether your subgroups are collinear with the grouping variable.** If group membership and geography are nearly the same partition, as island and species are here, you cannot cleanly separate their effects.
+6. **Report the stratified result, not the pooled one,** and state the filter you applied.
+
+For step 2, the minimum viable check in any analysis tool is a group-by with the correlation computed per group:
+
+```python
+for species, g in df.groupby("species"):
+    print(species, len(g), g[a].corr(g[b]).round(3),
+          "slope", round(g[b].cov(g[a]) / g[a].var(), 1))
+```
+
+If you want the decomposition rather than the eyeball version, estimate the within-group slope directly by demeaning each variable within its group — algebraically equivalent to a regression with group indicators:
+
+```python
+d = df.copy()
+d["x_c"] = d[a] - d.groupby("species")[a].transform("mean")
+d["y_c"] = d[b] - d.groupby("species")[b].transform("mean")
+within = (d["x_c"] * d["y_c"]).sum() / (d["x_c"] ** 2).sum()
+print("within-group slope:", round(within, 1))
+```
+
+On this dataset that yields a within-group slope of **+256.6 g per mm** against a pooled slope of **−191.6 g per mm** — the reversal, stated as an effect size rather than a correlation. Both approaches need care: with three species, the within estimate is dominated by measurement noise inside small groups, and the same collinearity warning applies.
+
+## Guardrails for reporting
+
+A few habits that prevent the mistake from reaching a decision:
+
+- **Never report a pooled correlation without the subgroup check**, when the data has an obvious categorical structure.
+- **State the sample filter.** 344 rows in, 342 usable, and why.
+- **Prefer effect sizes with units over correlation coefficients.** "87 g per mm" invites the reader to ask whether that holds in their segment; "r = 0.595" invites them to accept a direction.
+- **Distinguish "the group with deeper bills is lighter" from "deeper bills cause lightness."** The first is what the pooled data says; the second is what nobody measured.
+- **Check the residual shape.** Correlations are sensitive to leverage. A few extreme points can manufacture or destroy a sign; the scatterplot is not optional.
+
+For the applied-engineering side of the same discipline — where the numbers come from and whether the measurement instrument is trustworthy — see [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts) and [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests).
+
+## References & Further Reading
+
+- A. M. Horst, A. P. Hill, K. B. Gorman, [*allisonhorst/palmerpenguins: v0.1.0*](https://doi.org/10.5281/zenodo.3960218), Zenodo, published 2020-07-25. The dataset analysed here: 344 observations, three species, three islands, 2007–2009, with the CC-0 licence and the missing-value pattern (11 missing `sex`, 2 missing per measurement) used above.
+- K. B. Gorman, T. D. Williams, W. R. Fraser, ["Ecological Sexual Dimorphism and Environmental Variability within a Community of Antarctic Penguins (Genus *Pygoscelis*)"](https://doi.org/10.1371/journal.pone.0090081), *PLoS ONE* 9(3): e90081, 2014-03-05. The primary field study underlying the curated measurements, and the source for the biological context.
+- The pooled and per-species correlations, slopes, and group means quoted in this article were computed by the author from the Zenodo CSV using the code shown; the `r` values are Pearson correlations and the slopes are ordinary least-squares coefficients of body mass on the stated predictor within each group.

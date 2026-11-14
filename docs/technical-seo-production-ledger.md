@@ -3,11 +3,11 @@
 **Last Updated:** 2026-11-13
 **Scope:** Tracks only the 32-chapter Technical SEO series and its pillar; NOVANDRI’s broader publication spans eight editorial pillars.
 **Editorial standard:** Evidence-Based Editorial — no unsupported claims, fabricated facts, or unverified citations.
-**Language note:** Existing Technical SEO series uses English; publication-wide language choice remains open.
+**Language:** English only across the publication, as decided by the owner.
 **Knowledge Hub Plan Reference:** `docs/technical-seo-knowledge-hub-plan.md`
 **Master Prompt Reference:** `docs/technical-seo-article-generation-prompt.md`
 **Total Planned:** 32 Chapters + 1 Hub Pillar
-**Current Progress:** 32 Drafted (including pillar), 1 Not started; evidence review pending
+**Current Progress:** 33 Drafted (32 chapters + pillar); evidence review pending
 
 ---
 
@@ -47,7 +47,7 @@
 | **29** | A Technical SEO Audit That Follows the Request Path | Platforms & Operations | `Drafted` | `src/content/articles/technical-seo-audit-follows-request-path.mdx` | 2026-11-13 | Review evidence and adapt sample audit to authorized site |
 | **30** | Three Technical SEO Bugs Diagnosed from Symptom to Root Cause | Platforms & Operations | `Drafted` | `src/content/articles/three-technical-seo-bugs-diagnosed-symptom-to-root-cause.mdx` | 2026-11-13 | Review source claims; examples are hypothetical lab scenarios |
 | **31** | Technical SEO at Scale: URL Inventory, Capacity, and Observability | Platforms & Operations | `Drafted` | `src/content/articles/technical-seo-at-scale-url-inventory-capacity-observability.mdx` | 2026-11-13 | Review current crawl-budget documentation; examples are synthetic |
-| **32** | AI Search and Technical SEO: What Website Owners Should Actually Do | Platforms & Operations | `Not started` | - | - | Queue for next batch |
+| **32** | AI Search and Technical SEO: What Website Owners Should Actually Do | Platforms & Operations | `Drafted` | `src/content/articles/ai-search-and-technical-seo-what-website-owners-should-do.mdx` | 2026-11-13 | Review AI Search claims and links against the cited primary docs |
 
 ---
 
@@ -64,4 +64,9 @@
 - **Batch 3 Run 3 (Platforms & Operations):** 26, 27 (`Drafted`; e-commerce examples are illustrative, not a real catalog case study)
 - **Batch 3 Run 4 (CI/CD & audit):** 28, 29 (`Drafted`; workflow/code examples are illustrative, not run in this repository)
 - **Batch 3 Run 5 (Debugging & scale):** 30, 31 (`Drafted`; case studies are hypothetical and dataset is synthetic)
-- **Next Up:** 32 (`DRAFT: 32`)
+- **Batch 3 Run 6 (AI Search):** 32 (`Drafted`; official Google documentation checked 2026-11-13)
+- **Next Up:** No undrafted chapter remains; next action is source review across drafts before marking any article `Ready`.
+
+## Related ledgers
+
+- `docs/broader-pillar-production-ledger.md` — articles produced against the publication's other seven pillars, outside this series.
