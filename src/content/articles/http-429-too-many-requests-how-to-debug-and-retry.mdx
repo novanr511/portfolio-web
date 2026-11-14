@@ -1,0 +1,63 @@
+---
+title: "HTTP 429 Too Many Requests: How to Debug and Retry Responsibly"
+description: "HTTP 429 signals rate limiting, but not its exact quota or identity key. Trace the response path, interpret Retry-After, and avoid retry storms."
+date: 2026-11-14
+tags:
+  - HTTP
+  - APIs
+  - Reliability
+  - Web Infrastructure
+---
+
+An HTTP 429 response means a server is rate-limiting requests. It does not tell you, by itself, whether the limit applies to one account, one IP address, one resource, or an entire service. Those policies are implementation-specific. Treating every 429 as a generic server failure—or immediately retrying in a tight loop—can make the problem worse.
+
+**Direct answer:** RFC 6585 defines `429 Too Many Requests` for a client that has sent too many requests in a given amount of time. A response may include `Retry-After` to indicate how long to wait. The RFC intentionally leaves the identity and counting rules to the server, and requires that 429 responses not be stored by caches. To diagnose one, record the response and request context, identify which layer generated it, and retry only according to the published policy or `Retry-After` guidance.
+
+## What a 429 tells you—and what it does not
+
+The status code identifies a rate-limiting condition, not the server’s algorithm. RFC 6585 gives examples of limits applied per resource, across a server, or across a group of servers; it also notes that a server might identify a user through authentication credentials or a stateful cookie. These are examples, not a prescribed universal scheme.
+
+Therefore, a 429 from a website does not prove that a particular visitor exceeded an account quota. A proxy, API gateway, CDN, or application component may have emitted the response. The status alone does not identify the responsible layer, the applicable window, or whether the quota is shared with other clients.
+
+## Read `Retry-After` as guidance, not a reset guarantee
+
+RFC 6585 says a 429 response may include a `Retry-After` field indicating how long to wait before making a new request. RFC 9110 defines its value as either an HTTP date or a non-negative delay in seconds. For example:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+```
+
+This asks the recipient to wait 60 seconds before retrying. It does not disclose the quota calculation, guarantee that a request will succeed after that interval, or promise that every client sharing the limit will become eligible at the same time. If the response has no `Retry-After`, do not invent a reset time; consult the API’s documented policy and use a conservative backoff strategy appropriate to the operation.
+
+## Why immediate retries create trouble
+
+If many clients retry as soon as they receive a 429, the service can receive another burst precisely when it is limiting demand. A client should respect explicit wait guidance and avoid synchronized retry loops. For automated clients, exponential backoff with random jitter is a common engineering strategy, but the exact policy is an implementation choice rather than a behavior mandated by RFC 6585.
+
+Also consider whether the request is safe to repeat. A 429 response generally indicates that the request was rate-limited, but the status alone is not a complete application-level guarantee about how far a request progressed through a distributed system. For a non-idempotent operation such as creating a payment or order, follow the API’s idempotency and retry contract rather than resending blindly. See [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean) for the protocol distinction.
+
+## A diagnostic workflow
+
+When a client or crawler reports 429s, preserve the evidence before changing limits:
+
+1. **Capture the response:** status, response fields including `Retry-After`, body, timestamp, request method, and target path.
+2. **Record request identity safely:** note the relevant authenticated principal or source context without exposing credentials or personal data in logs.
+3. **Identify the response layer:** correlate request IDs and timestamps across CDN, gateway, application, and origin logs. Check which layer actually generated the status.
+4. **Compare affected and unaffected requests:** look for common accounts, IP ranges, routes, concurrency, and time windows. Do not infer the rate-limit key from one incident.
+5. **Check documented policy:** verify quota scope, reset behavior, burst rules, and any API-specific rate-limit fields from the provider’s current documentation.
+6. **Adjust client behavior:** respect the wait instruction, reduce unnecessary concurrency, and apply bounded retries only where the operation can safely be repeated.
+7. **Validate after a change:** confirm that legitimate traffic recovers and that the same pattern does not simply move to another path or layer.
+
+HTTP 429 responses must not be stored by a cache according to RFC 6585. If a user repeatedly sees an old 429 page, inspect the actual request path, browser or intermediary behavior, and any application-level caching rather than assuming a compliant HTTP cache is entitled to reuse that response.
+
+## Keep 429 separate from neighboring failures
+
+`429` describes rate limiting. It is not interchangeable with `503 Service Unavailable`, which can describe temporary inability to handle a request, or `403 Forbidden`, which signals that the server understood the request but refuses to fulfill it. A system may choose different responses for its own policy, but operators should diagnose the actual status and source rather than translating every access failure into “rate limit.”
+
+For search infrastructure, seeing a 429 in a crawl log is a request-level observation. It does not, by itself, establish an indexing or ranking outcome. First determine whether the response came from the origin or an intermediary and whether it affected important URLs or repeated requests.
+
+## References & Further Reading
+
+- M. Nottingham and R. Fielding, [RFC 6585: Additional HTTP Status Codes](https://www.rfc-editor.org/rfc/rfc6585), IETF Standards Track, April 2012. Section 4 defines 429, optional `Retry-After` guidance, server-specific rate-limit identification/counting, and the prohibition on caching 429 responses.
+- R. Fielding, M. Nottingham, and J. Reschke, editors, [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110), IETF Standards Track, June 2022. Defines `Retry-After` syntax and HTTP status semantics.
+- R. Fielding, M. Nottingham, and J. Reschke, editors, [RFC 9111: HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111), IETF Standards Track, June 2022. Defines general cache behavior; RFC 6585 provides the specific 429 non-storage requirement.

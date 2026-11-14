@@ -1,0 +1,60 @@
+---
+title: "QUIC DATAGRAMs: When Unreliable Delivery Is Useful"
+description: "QUIC DATAGRAM frames carry application data without stream ordering or retransmission. Learn the negotiation requirements, limits, and suitable use cases."
+date: 2026-11-14
+tags:
+  - QUIC
+  - Networking
+  - Web Protocols
+  - Infrastructure
+---
+
+QUIC is usually associated with reliable streams: bytes arrive in order, and lost data is recovered. The QUIC DATAGRAM extension adds a different option for applications that can tolerate loss and prefer not to wait for retransmission. It is not “faster QUIC” in general, and it does not turn a QUIC connection into an unrestricted UDP tunnel.
+
+**Direct answer:** RFC 9221 defines QUIC DATAGRAM frames for unreliable application data carried within a QUIC connection. DATAGRAM frames are not retransmitted by QUIC and are not subject to stream-level ordering, while they still benefit from QUIC packet protection and congestion control. An application must negotiate support, respect the connection’s datagram size limit, and decide what to do when data is lost. The extension is useful only when the application’s semantics can handle that loss.
+
+## What the extension changes
+
+QUIC streams provide reliable, ordered byte delivery. That is appropriate for HTTP requests and many other exchanges where missing bytes make the rest unusable. But an application sometimes produces updates whose usefulness expires quickly. Resending a stale update can be less valuable than allowing the receiver to use a newer one.
+
+RFC 9221 adds DATAGRAM frames that carry application data without the retransmission and ordering guarantees of streams. If a packet carrying a DATAGRAM is lost, QUIC does not retransmit that DATAGRAM frame. The application may send a later update, tolerate the gap, or use its own recovery strategy.
+
+“Unreliable” here does not mean unencrypted or outside QUIC. DATAGRAM frames are carried in QUIC packets, which retain QUIC’s packet protection and congestion-control behavior. The extension changes the delivery semantics of the frame, not the security model of the connection.
+
+## Negotiation and size limits
+
+Support is negotiated using the `max_datagram_frame_size` transport parameter. A peer that does not send this parameter does not enable the extension for that connection. Applications need to check negotiated support rather than assuming every QUIC endpoint can send DATAGRAM frames.
+
+The parameter also communicates a limit related to the maximum DATAGRAM frame size the endpoint is willing to receive. It is not a promise that every packet of that size will fit on every network path. Packet overhead, path characteristics, and other frames in a packet matter. If the application’s message is too large for the available datagram size, it needs an application-level strategy—such as reducing the message, splitting data with its own reassembly rules, or choosing a stream. RFC 9221 does not provide a general fragmentation-and-reassembly service for application messages.
+
+## Where loss can be acceptable
+
+The right question is not “Are datagrams faster?” but “What is the cost of losing this particular update?” Examples may include time-sensitive state updates where a newer value supersedes an older one, or real-time media components designed to conceal or recover from loss. Those are design examples, not guarantees that every media or interactive protocol should use this extension.
+
+DATAGRAMs are a poor fit when every byte must eventually arrive and the application has no independent recovery mechanism. For such data, a QUIC stream’s reliability is usually the relevant property. Applications can also use both modes: reliable streams for setup, control, or durable state, and DATAGRAM frames for specific loss-tolerant updates, provided their protocol clearly defines the distinction.
+
+## Congestion control still applies
+
+Because DATAGRAM frames travel in QUIC packets, they are subject to QUIC congestion control. The extension does not authorize an application to send unlimited traffic simply because the payload will not be retransmitted. The application remains responsible for using the transport appropriately and for handling congestion and loss.
+
+This is an important operational distinction from a naive “UDP is fire-and-forget” mental model. QUIC DATAGRAMs are integrated with a secure, congestion-controlled connection; their payload delivery is unreliable, but the transport still manages the connection’s packet transmission behavior.
+
+## A deployment checklist
+
+Before using QUIC DATAGRAMs, an application team should answer:
+
+1. **What does loss mean?** Define how the receiver behaves when an update never arrives.
+2. **Can later data replace earlier data?** If so, identify which updates are safe to discard or supersede.
+3. **Was support negotiated?** Confirm the peer sent `max_datagram_frame_size` before relying on the extension.
+4. **What is the usable payload size?** Account for the negotiated limit and packet overhead; do not assume arbitrary message fragmentation.
+5. **How is congestion handled?** Ensure the application’s sending behavior remains compatible with QUIC congestion control.
+6. **What is the fallback?** Define whether the application can use streams or another protocol when DATAGRAM support is unavailable.
+
+Measure delivery, loss, latency, and application-level quality under representative network conditions. A protocol-level capability alone cannot determine whether a particular product will feel more responsive.
+
+For the reliable-stream transport that QUIC DATAGRAMs complement, see [HTTP/3: What Changes When HTTP Runs over QUIC?](/articles/http3-what-changes-when-http-runs-over-quic). That article explains HTTP/3’s mapping onto QUIC and its stream behavior.
+
+## References & Further Reading
+
+- T. Pauly, E. Kinnear, and D. Schinazi, [RFC 9221: An Unreliable Datagram Extension to QUIC](https://www.rfc-editor.org/rfc/rfc9221), IETF, March 2022. Defines DATAGRAM frames, negotiation using `max_datagram_frame_size`, and their unreliable delivery behavior.
+- J. Iyengar and M. Thomson, editors, [RFC 9000: QUIC: A UDP-Based Multiplexed and Secure Transport](https://www.rfc-editor.org/rfc/rfc9000), IETF, May 2021. Defines QUIC transport behavior, including streams and congestion control.

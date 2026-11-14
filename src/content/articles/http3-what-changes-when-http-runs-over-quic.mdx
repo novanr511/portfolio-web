@@ -1,0 +1,67 @@
+---
+title: "HTTP/3: What Changes When HTTP Runs over QUIC?"
+description: "Understand HTTP/3’s QUIC transport, independent streams, UDP fallback, TLS integration, and the practical checks that show whether a connection actually used it."
+date: 2026-11-14
+tags:
+  - HTTP
+  - HTTP/3
+  - QUIC
+  - Web Infrastructure
+---
+
+HTTP/3 is often described as “HTTP/2, but faster.” That shorthand hides the main change: HTTP semantics remain familiar, while the transport underneath changes from TCP to QUIC over UDP. This affects stream behavior, connection setup, and network compatibility. It does not guarantee that every request becomes faster, or that a server supporting HTTP/3 will cause a browser to use it for a particular visit.
+
+**Direct answer:** HTTP/3 maps HTTP semantics onto QUIC. QUIC provides encrypted, multiplexed streams with transport-level reliability and flow control; TLS 1.3 is integrated into its handshake. Unlike HTTP/2 over TCP, packet loss affecting one QUIC stream does not inherently block delivery on every other stream in the connection. But performance still depends on the path, endpoint implementation, workload, and whether the client can establish QUIC over UDP. [RFC 9114](https://www.rfc-editor.org/rfc/rfc9114) and [RFC 9000](https://www.rfc-editor.org/rfc/rfc9000) define the protocol behavior.
+
+## What stays the same—and what changes
+
+HTTP/3 uses the same HTTP semantics: methods, status codes, fields, and resource representations remain part of HTTP. The framing and transport change. HTTP/3 carries messages in frames on QUIC streams; a request-response exchange uses a client-initiated bidirectional stream. QUIC can carry multiple streams concurrently over a connection.
+
+HTTP/2 also multiplexes requests, but it typically runs over TCP. TCP presents an ordered byte stream to its application. If a TCP segment is lost, later bytes on that connection cannot be delivered to the application until the missing bytes are recovered. Since HTTP/2’s concurrent streams share that TCP connection, a loss can temporarily stall data across the connection.
+
+QUIC instead provides ordered delivery independently for each stream. Loss on one stream does not require another stream’s bytes to wait for in-order delivery of the lost stream’s data. The connection still has congestion control and packet loss recovery, so loss can affect how much data the connection sends overall. “No cross-stream head-of-line blocking from transport ordering” is accurate; “packet loss no longer affects performance” is not.
+
+## How HTTP/3 is discovered and negotiated
+
+A browser does not infer HTTP/3 merely because a server supports it. RFC 9114 describes advertising an alternative HTTP/3 endpoint using the `Alt-Svc` response header or an HTTP/2 `ALTSVC` frame. For example:
+
+```http
+Alt-Svc: h3=":443"; ma=86400
+```
+
+The `h3` token identifies HTTP/3, and the authority indicates the alternative service endpoint. A client may then try QUIC and negotiate HTTP/3 using the `h3` ALPN identifier during the TLS handshake. Implementations can also use other discovery or configuration mechanisms.
+
+QUIC uses UDP datagrams. Networks that block or impair UDP can prevent QUIC connection establishment; RFC 9114 says clients should attempt TCP-based HTTP versions in this case. As a result, a site can support HTTP/3 while some clients continue using HTTP/2 or HTTP/1.1. That is expected protocol fallback, not necessarily a broken deployment.
+
+## TLS is integrated, not removed
+
+QUIC uses TLS 1.3 or later for its handshake and cryptographic key negotiation. TLS handshake messages are carried in QUIC `CRYPTO` frames; QUIC packet protection then uses keys derived through TLS. This differs from HTTP/2 over TLS, where TLS records are carried over TCP.
+
+QUIC’s 0-RTT mode deserves a careful caveat. A client with suitable prior session state may send early application data before the handshake completes. The data can be replayed, so RFC 9001 warns that 0-RTT is unsuitable for actions whose replay could cause unwanted effects. Applications and servers must account for that risk; 0-RTT is not a blanket “free latency” switch.
+
+## A practical verification workflow
+
+For a browser visit, use the browser’s developer tools and inspect the Protocol column in the Network panel (enable it from the column menu if hidden). A request marked `h3` indicates the browser reports HTTP/3 for that request. This is a client-side observation, not a guarantee that every client, route, or resource uses HTTP/3.
+
+You can also inspect response headers for an `Alt-Svc` advertisement, but that only shows the server offered an alternative service; it does not prove that the client connected over QUIC. To investigate an apparent failure:
+
+1. Confirm that the DNS name and certificate are valid for the intended origin.
+2. Check whether the response advertises an `h3` alternative service, or whether the deployment has another documented discovery path.
+3. Verify UDP reachability to the advertised host and port from the affected network.
+4. Compare requests from more than one network and client, since local filtering and client support vary.
+5. Check the server or edge telemetry for negotiated application protocol and connection errors.
+6. Confirm that a TCP-based fallback still serves the same content and status correctly.
+
+The protocol-level specification does not prescribe a universal command that can prove what every browser negotiated. Use tooling that reports the negotiated ALPN or HTTP version for the actual connection; a generic `curl` invocation may use a different build, network path, or protocol preference than a user’s browser.
+
+## What HTTP/3 does not tell you about SEO
+
+HTTP/3 is a delivery protocol, not an indexing directive. A successful HTTP/3 connection does not establish that a page is crawlable, indexable, useful, or eligible to rank. Likewise, a page delivered over HTTP/2 is not inherently excluded from search. Assess availability, response behavior, rendered content, and search indexing separately.
+
+If you are evaluating adoption or performance, measure actual clients and representative paths. The HTTP Archive’s [2025 CDN chapter](/articles/what-http-archives-cdn-numbers-can-and-cannot-tell-you) shows why protocol shares depend on the dataset and request category. For HTTP caching behavior that can be investigated independently of the transport version, see [Cache-Control Is a Contract, Not a Suggestion](/articles/cache-control-is-a-contract-not-a-suggestion).
+
+## References & Further Reading
+
+- M. Bishop, editor, [RFC 9114: HTTP/3](https://www.rfc-editor.org/rfc/rfc9114), IETF, June 2022. Defines HTTP semantics over QUIC, stream mapping, endpoint discovery, `h3` negotiation, fallback considerations, and HTTP/3 framing.
+- J. Iyengar and M. Thomson, editors, [RFC 9000: QUIC: A UDP-Based Multiplexed and Secure Transport](https://www.rfc-editor.org/rfc/rfc9000), IETF, May 2021. Defines QUIC streams, flow control, connection behavior, and transport over UDP datagrams.
+- M. Thomson and S. Turner, editors, [RFC 9001: Using TLS to Secure QUIC](https://www.rfc-editor.org/rfc/rfc9001), IETF, May 2021. Defines TLS integration, packet protection, and 0-RTT’s replay considerations.

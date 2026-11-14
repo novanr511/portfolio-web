@@ -1,0 +1,70 @@
+---
+title: "HTTP 103 Early Hints: What the Interim Response Can—and Cannot—Do"
+description: "HTTP 103 lets a server send selected response hints before the final response. Understand Link preloads, browser behavior, and why it is no speed guarantee."
+date: 2026-11-14
+tags:
+  - HTTP
+  - Web Performance
+  - Browsers
+  - Infrastructure
+---
+
+HTTP 103 Early Hints gives a server a way to send selected hints before it is ready to send the final response. A browser may use those hints to prepare for resources it expects the final page to need. That can create an opportunity to start work earlier, but it does not guarantee a faster page: the hint must be correct, the client must act on it, and the eventual response still determines the resource and document behavior.
+
+**Direct answer:** RFC 8297 defines status code 103 as an informational response that can carry header fields—particularly `Link` fields—before a final response. A client can use those hints to prepare for processing the final response, such as initiating a connection or fetching a likely critical resource. RFC 8297 is an **Experimental** RFC, not an Internet Standards Track specification. Early Hints should be tested with the relevant server, intermediary, and browser path; its presence alone is not evidence of a performance improvement.
+
+## What “early” means in the HTTP exchange
+
+An HTTP response with status 103 is an interim response. It does not replace the final response, such as `200 OK`; the server can send one or more informational responses before the final response. The purpose is to convey hints while the origin is still preparing that final response.
+
+A simplified exchange might look like:
+
+```http
+HTTP/1.1 103 Early Hints
+Link: </assets/site.css>; rel=preload; as=style
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+...
+```
+
+The `Link` value is a hint about a resource, not the final HTML document itself. The browser may begin processing it before receiving the page, depending on its implementation and the circumstances. When the final response arrives, it remains authoritative for the response content and normal resource handling.
+
+## Choosing hints carefully
+
+Early Hints is most relevant when the server knows likely critical resources before it has completed generating or retrieving the final response. The `Link` header can describe such resources using relations such as `preload` or `preconnect`, subject to the semantics defined for those relations and client support.
+
+The hint should be based on a reliable expectation. If it names a resource the final page does not use, the client may spend bandwidth and connection capacity on unnecessary work. If the final response uses a different URL, or the resource’s `as`, credentials, or other relevant attributes do not match, early fetching may not be reusable as intended. The server should therefore prefer stable, well-understood dependencies over speculative lists.
+
+Early Hints is not a way to send arbitrary HTML early, and it does not tell a browser that the final response is guaranteed to succeed. A subsequent response may redirect, fail, or produce a page that does not use the hinted resource. The client must continue to handle the final response according to ordinary HTTP and browser behavior.
+
+## Intermediaries and browser behavior matter
+
+The protocol mechanism is only one part of the path. A reverse proxy, CDN, or other intermediary may affect whether an interim response is forwarded and when it reaches the browser. Browser behavior also varies by implementation and version. Consequently, a server log showing that it emitted a 103 does not prove that a browser received or acted on it.
+
+Test the actual delivery path: origin, intermediary configuration, protocol version, and target browsers. Capture the response sequence at the client or use browser tooling that can show the relevant network requests and timing. Compare a representative baseline with a controlled Early Hints configuration rather than attributing a page-level change to 103 based on timing coincidence alone.
+
+## How to evaluate it without overclaiming
+
+Start with a small set of pages and a short list of resources whose criticality is established. Then:
+
+1. Confirm that the server emits a valid 103 response before the final response.
+2. Verify that the intended browser receives it through the production edge and protocol path.
+3. Check whether the hinted request starts earlier and whether its result is reused by the final page.
+4. Measure user-facing outcomes with a consistent field or lab method and comparable page populations.
+5. Watch for wasted downloads, duplicate requests, connection contention, and changes in other resources’ timing.
+6. Remove or revise hints that are inaccurate or do not improve the measured outcome.
+
+Do not promise a fixed time saving from the status code itself. The effect depends on when the server can send the hint, how long the final response takes, the client’s network and cache state, and whether the hinted resources are needed. A hint may have little opportunity to help when the final response is already ready, or when the client already has the resource cached.
+
+## Early Hints is a protocol feature, not an SEO signal
+
+HTTP 103 concerns response timing and client preparation. RFC 8297 does not define it as a ranking signal, and a 103 response does not establish that a page is indexable or will rank better. Evaluate it as a potential delivery optimization, with measured user outcomes and correct fallback behavior.
+
+Early Hints is distinct from HTTP response prioritization: the former can expose resource hints before a final response, while the latter communicates scheduling preferences. See [The HTTP Priority Header: What Priority Signals Actually Do](/articles/http-priority-header-what-priority-signals-actually-do) for that complementary mechanism.
+
+## References & Further Reading
+
+- K. Oku, [RFC 8297: An HTTP Status Code for Indicating Hints](https://www.rfc-editor.org/rfc/rfc8297), IETF, December 2017. Defines status code 103, its informational-response role, and the experimental status of the specification.
+- M. Nottingham, R. Fielding, and J. Reschke, [RFC 8288: Web Linking](https://www.rfc-editor.org/rfc/rfc8288), IETF, October 2017. Defines the HTTP `Link` header framework used to express links and relations in response fields.
+- MDN Web Docs, [103 Early Hints](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/103). Browser-oriented overview; consult current browser documentation and test the actual deployment for implementation behavior.

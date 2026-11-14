@@ -1,0 +1,57 @@
+---
+title: "Safe and Idempotent HTTP Methods: What They Mean for Retries"
+description: "Safe and idempotent are different HTTP properties. Learn which standard methods have them and why they matter when a client must retry a request."
+date: 2026-11-14
+tags:
+  - HTTP
+  - APIs
+  - Web Development
+  - Reliability
+---
+
+When a request times out, a client may not know whether the server processed it. Whether retrying is appropriate depends partly on the HTTP method’s semantics. Two terms are easy to confuse: **safe** means the client is not requesting a state change; **idempotent** means repeating the same request has the same intended effect as making it once. Neither term guarantees that the response will be identical or that the server performs no incidental work.
+
+**Direct answer:** Under RFC 9110, `GET`, `HEAD`, `OPTIONS`, and `TRACE` are safe methods; safe methods are also idempotent. `PUT` and `DELETE` are not safe, but they are idempotent. `POST` is not defined as idempotent by default. Idempotency matters because a client can sometimes repeat an idempotent request after a communication failure, while repeating a non-idempotent operation may cause additional effects. Applications can define their own safeguards, but those must not be assumed from the method alone.
+
+## Safe is about requested intent
+
+RFC 9110 defines a method as safe when its defined semantics are essentially read-only: the client does not request, and does not expect, a state change on the origin server. This does not mean the server literally changes nothing. Logging, accounting, or other incidental effects may still occur. The relevant distinction is whether the client requested the action that changes resource state.
+
+The standardized safe methods are `GET`, `HEAD`, `OPTIONS`, and `TRACE`. A client or crawler should be able to invoke a safe method without fearing that the request is intended to place an order or delete a record. If a server performs a destructive action merely because a client followed a `GET` link, the application has violated the method’s intended semantics.
+
+Safe does not mean “always successful,” “publicly cacheable,” or “free of side effects.” A safe request can return an error, require authentication, or be logged. Caching is governed by separate HTTP rules and response metadata.
+
+## Idempotent is about repeated effect
+
+A method is idempotent when multiple identical requests have the same intended effect on the server as one request. The response can still differ between attempts: a repeated `DELETE` might receive a different status after the resource has already been removed, for example. Idempotency concerns the intended effect, not byte-for-byte response equality.
+
+RFC 9110 defines `PUT` and `DELETE` as idempotent, along with the safe methods. `POST` is not generally idempotent: repeating it can create multiple resources or trigger an action more than once. An application can design a particular POST endpoint to deduplicate requests using an idempotency key, but that is an application contract, not a property every POST request inherits from HTTP.
+
+## Why the distinction matters during a timeout
+
+Suppose a client sends a request and the connection fails before it receives a response. The client may not know whether the server processed the request before the failure. Retrying a request with idempotent semantics is generally safer because the repeated request is not supposed to add another intended effect. Retrying a non-idempotent request can duplicate the effect if the first attempt succeeded but its response was lost.
+
+This does not mean clients should retry every idempotent request without limits. Retries can amplify load, and an operation’s authentication, preconditions, rate limits, or application-specific behavior still matter. RFC 9110 says a client should not automatically retry a non-idempotent request unless it knows the request semantics are actually idempotent or can determine the original request was never applied.
+
+For a `POST` that creates a payment, for example, the service may offer an idempotency key so repeated submissions with the same key do not create duplicate charges. The guarantee, key scope, retention window, and error behavior must come from that service’s documentation; HTTP alone does not specify them.
+
+## A method-semantics check for API designers
+
+Before exposing or consuming an endpoint, ask:
+
+1. **What action does the method communicate?** The resource path does not override the method’s standardized semantics.
+2. **Can a safe method trigger a requested state change?** If so, redesign the interface; do not rely on crawlers or clients to avoid certain query parameters.
+3. **What happens when the exact request is repeated?** Document effects for repeated `PUT`, `DELETE`, or `POST` operations.
+4. **What is the retry contract?** State which failures are retryable, how clients should back off, and whether idempotency keys or conditional requests are supported.
+5. **Can the behavior be tested?** Send the same request twice in a controlled test environment and inspect state changes, while ensuring the test cannot affect real users or data.
+
+For a `PUT`, the resource should converge on the representation or state the request specifies rather than appending a second copy on every repetition. For `DELETE`, a repeated request should not produce an additional intended deletion effect, even if the subsequent response differs. These examples illustrate the semantics; endpoint details still need to be checked against the API contract.
+
+## Do not confuse method semantics with SEO status codes
+
+Method semantics govern what a request asks the server to do and how repetitions should be interpreted. Status codes describe the response to a particular request. A `200 OK` does not make a `POST` safe, and a `404 Not Found` does not tell you whether the original request had an idempotent effect. For crawl troubleshooting based on response outcomes, see [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx).
+
+## References & Further Reading
+
+- R. Fielding, M. Nottingham, and J. Reschke, editors, [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110), IETF Standards Track, June 2022. Section 9 defines safe and idempotent method properties, method classifications, and client retry considerations.
+- M. Nottingham and R. Fielding, [RFC 6585: Additional HTTP Status Codes](https://www.rfc-editor.org/rfc/rfc6585), IETF Standards Track, April 2012. Defines 429 Too Many Requests, a relevant response that clients may encounter when retrying too aggressively.

@@ -1,0 +1,73 @@
+---
+title: "IP Anycast Routes You to a Service, Not Necessarily the Nearest Server"
+description: "Learn how IP anycast uses routing to select among service locations, why topological closeness is not latency, and how to monitor distributed catchments."
+date: 2026-11-14
+tags:
+  - Network
+  - Infrastructure
+  - Reliability
+  - DNS
+---
+
+When a service says it uses anycast, it is tempting to picture a request being sent to the physically closest server. That is not quite what happens. Anycast makes one service address reachable from multiple locations; the routing system selects a path and, in doing so, directs packets toward one of those service nodes. The selected node is a product of routing topology and policy—not a promise of minimum geographic distance or lowest round-trip time.
+
+**Direct answer:** In IP anycast, multiple nodes advertise reachability for the same service IP address. Routing delivers a client’s packets to one of the reachable nodes, which defines that client’s current catchment. Routing “closeness” is topological, and can differ from physical or latency closeness. The approach can improve resilience or distribute demand, but requires careful service design, route-health coupling, and monitoring from multiple network locations. [RFC 4786](https://www.rfc-editor.org/rfc/rfc4786) describes operational considerations; [RFC 7094](https://www.rfc-editor.org/rfc/rfc7094) discusses architectural implications.
+
+## One address, multiple service nodes
+
+In ordinary unicast service, a destination address identifies a route toward one network endpoint. With anycast, multiple discrete nodes make the same service address reachable. The routing system chooses among the available routes according to its routing information and policies.
+
+The region of the network whose packets are directed to one particular node is commonly called that node’s **catchment**. Catchments are not fixed geographic circles. Routing changes, policy changes, failures, and differences between networks can change which node serves a given client. Two clients in the same city may follow different routes; one client may also reach a different node after a route change.
+
+This is why “nearest” needs a qualifier. A routing system can choose a topologically preferred path without that path minimizing physical distance or measured latency. RFC 4786 explicitly cautions that topological nearness does not generally correlate with round-trip performance; in some cases response time may not improve and may increase.
+
+## Why operators deploy anycast
+
+The technique can help distribute demand coarsely across nodes, localize some traffic spikes or denial-of-service traffic, and place service capacity closer in network topology to users. It can also make a distributed service reachable through a smaller set of addresses. These are possible objectives, not automatic outcomes.
+
+Anycast does not necessarily balance requests evenly. RFC 4786 notes that load distribution among nodes is typically difficult and often unbalanced. Routing chooses paths; it is not a global application-level scheduler with a full view of node load, user experience, and service state.
+
+Operational resilience depends on the relationship between the service and routing advertisements. If a node continues advertising a route while its application is broken, some clients may continue to be routed to the unhealthy node. Operators therefore need an explicit design for detecting service health and deciding whether to keep advertising or withdraw reachability. Rapid advertisement and withdrawal oscillations can create their own routing problems, so health checks and route policy should be designed together.
+
+## Stateful connections need special care
+
+Anycast is often a natural fit for short, independent transactions, but long-lived sessions introduce a challenge: packets belonging to one logical transaction need to reach a node that has the relevant state. If routing changes the selected node mid-session, the new node may not know about the active connection.
+
+RFC 7094 explains this risk for stateful transports: different packets with the same anycast destination can reach different hosts, and a host without the session state may reset or disrupt the connection. RFC 4786 similarly recommends comparing routing stability with transaction duration when deciding whether a service is suitable for anycast.
+
+This is not a claim that anycast can never support connection-oriented services. Actual behavior depends on the transport, routing design, and deployment architecture. QUIC, for example, has connection IDs and connection migration mechanisms, but those features do not remove the need for an operator’s routing and state architecture to be designed for the deployment. Do not assume that a transport feature automatically makes every anycast topology safe.
+
+## Monitor the service from more than one place
+
+A single probe to an anycast address can give a misleadingly narrow view. It measures the node and path selected from that probe’s network location at that time. RFC 4786 recommends distributed monitoring and, where possible, recording the identity of the node that answered each request.
+
+A practical monitoring plan should combine:
+
+1. **Distributed service probes:** check availability, response correctness, and latency from representative networks or regions.
+2. **Node identity:** include an observable node identifier in a response, diagnostic endpoint, or protocol field where appropriate.
+3. **Per-node health:** monitor the application, host, and local connectivity that underpin each route advertisement.
+4. **Routing visibility:** inspect route announcements and withdrawals from multiple vantage points, especially when a client cohort reports failures.
+5. **Change correlation:** compare failures with route changes, node maintenance, and service-health events without assuming correlation alone proves cause.
+
+Traceroute can offer clues about the path, but it is not a definitive node-identification system: paths can be asymmetric, filtering can hide hops, and routing can change between the failure and the test. An in-band node identifier is often more useful when a service can provide one.
+
+## A short troubleshooting sequence
+
+If clients report intermittent errors against an anycast service address:
+
+1. Collect the client’s source network, time, protocol, and exact failure—not just the destination IP.
+2. Compare probes from several network locations and record the responding node where possible.
+3. Check service and host health at the implicated node, then verify whether its route was still being advertised.
+4. Compare routing telemetry and path observations from multiple vantage points around the incident window.
+5. Determine whether failures affect only long-running or stateful sessions, which may point toward route changes or missing session state.
+6. Validate the corrective change from the affected catchment and from unaffected locations; one successful probe cannot establish global recovery.
+
+The goal is to identify whether the fault is service-wide, node-specific, or limited to a routing catchment. Treat anycast as a property of the network path and service deployment together—not as a DNS trick or a guarantee that every request goes to the nearest healthy server.
+
+For a related explanation of DNS routing and record behavior, see [DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works). For the separate role of content delivery networks in sampled web measurements, see [What HTTP Archive’s CDN Numbers Can—and Cannot—Tell You](/articles/what-http-archives-cdn-numbers-can-and-cannot-tell-you).
+
+## References & Further Reading
+
+- J. Abley and K. Lindqvist, [RFC 4786: Operation of Anycast Services](https://www.rfc-editor.org/rfc/rfc4786), IETF Best Current Practice 126, December 2006. Supports the operational model, catchment terminology, routing/health coupling, traffic distribution limitations, protocol-suitability concerns, and distributed monitoring recommendations.
+- D. McPherson, D. Oran, D. Thaler, and E. Osterweil, [RFC 7094: Architectural Considerations of IP Anycast](https://www.rfc-editor.org/rfc/rfc7094), Internet Architecture Board, January 2014. Informational RFC on routing behavior, stateful transport implications, and anycast’s architectural trade-offs; it is not an Internet Standards Track specification.
+- J. Iyengar and M. Thomson, editors, [RFC 9000: QUIC: A UDP-Based Multiplexed and Secure Transport](https://www.rfc-editor.org/rfc/rfc9000), IETF, May 2021. Defines QUIC connection IDs and migration; cited here as a transport mechanism, not as a universal solution to anycast session-state problems.
