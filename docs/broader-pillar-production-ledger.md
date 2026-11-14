@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Master Prompt Reference:** `docs/technical-seo-article-generation-prompt.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 5 Drafted (all pending source re-review)
+**Current Progress:** 11 Drafted (all pending source re-review)
 
 ---
 
@@ -20,6 +20,11 @@
 | **P-04** | Open Source Is a License Term, Not a Vibe: Reading OSD, OSAID, and BSL | Business, Strategy & Entrepreneurship | Analysis | `Drafted` | `src/content/articles/open-source-is-a-license-term-not-a-vibe.mdx` | 2026-11-14 | Confirm licence texts are current versions; BUSL parameters are licensor-specific |
 | **P-05** | Data Centre Electricity: Reading the IEA Forecasts Without Fooling Yourself | Markets, Economics & Emerging Industries | Analysis | `Drafted` | `src/content/articles/data-centre-electricity-reading-the-iea-forecasts-honestly.mdx` | 2026-11-14 | Re-verify figures against the current IEA editions before publishing; treat scope labels as version-specific |
 | **P-06** | Simpson's Paradox in Your Own Data: Why a Single Correlation Can Reverse Its Sign | Data, Analytics & Decision Science | Deep Dive | `Drafted` | `src/content/articles/simpsons-paradox-why-a-single-correlation-can-reverse-its-sign.mdx` | 2026-11-14 | Re-run the snippet against the pinned Zenodo CSV version before publishing |
+| **P-07** | AI Crawlers Are Not Googlebot: How to Govern Crawlers You Don't Control | Marketing, Growth & Consumer Psychology | Deep Dive | `Drafted` | `src/content/articles/ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control.mdx` | 2026-11-14 | Re-verify vendor user-agent lists, IP endpoints and propagation windows; all four vendor documents change |
+| **P-08** | Measuring GEO: What You Can Actually Count When Traffic Comes From Answers | Marketing, Growth & Consumer Psychology | Analysis | `Drafted` | `src/content/articles/measuring-geo-what-you-can-actually-count.mdx` | 2026-11-14 | Confirm Google AI-features documentation still folds AI traffic into the "Web" search type |
+| **P-09** | llms.txt, robots.txt, and the IETF Drafts: Sorting AI File Formats by Evidence | Marketing, Growth & Consumer Psychology | Analysis | `Drafted` | `src/content/articles/llms-txt-robots-txt-and-ietf-drafts-sorting-ai-file-formats-by-evidence.mdx` | 2026-11-14 | Re-check the llms.txt proposal version and the aipref draft revisions; both are versioned and moving |
+| **P-10** | How Crawlers Actually Fetch Pages: Protocol, Limits, and Caching on the Wire | Technology & The Digital World | Deep Dive | `Drafted` | `src/content/articles/how-crawlers-actually-fetch-pages-protocol-limits-and-caching.mdx` | 2026-11-14 | Re-verify Google's crawler documentation; file-size limits and HTTP/2 behaviour are version-sensitive |
+| **P-11** | robots.txt Is a Parsing Specification: The Rules Your Crawler Actually Follows | Technology & The Digital World | Deep Dive | `Drafted` | `src/content/articles/robots-txt-is-a-parsing-specification-the-rules-your-crawler-follows.mdx` | 2026-11-14 | Re-check against RFC 9309 and any successor; also confirm the `aipref` attach draft's robots.txt extension status |
 
 ---
 
@@ -38,4 +43,6 @@
 ## Batch Execution Log
 
 - **Batch A (Pillar expansion, run 1 — 2026-11-14):** P-01, P-02, P-03, P-04, P-05, P-06 drafted in a single session at the owner's explicit request for five drafts. This exceeds the master prompt's default of two full articles per run; the owner's instruction took precedence, and the quality gates were applied per article rather than per batch. Sources were fetched directly from publishers (rfc-editor.org, IETF datatracker, Chrome/Certificate Transparency policy pages, gstatic CT log list, arXiv, IEA PDFs, OSI, Zenodo) because the web search tool was returning HTTP 402 throughout the session.
-- **Next Up:** Review pass on P-01 through P-06; then decide whether the broader pillar queue should be formalised in the knowledge hub plan before further drafting.
+- **Batch B (SEO & GEO, run 2 — 2026-11-14):** P-07 through P-11 drafted at the owner's request to continue with SEO- and GEO-themed articles. Sources: RFC 9309; the IETF `aipref` working group's active drafts `draft-ietf-aipref-vocab-08` and `draft-ietf-aipref-attach-05`; Google's AI-features, canonicalisation, robots-meta and crawler-overview documentation; OpenAI, Anthropic and Perplexity crawler documentation; the llms.txt proposal. Note the `aipref` drafts are Internet-Drafts, not RFCs, and every article that cites them says so.
+- **Batch B also repaired two evidence violations** in existing drafts rather than leaving them to compound: `canonical-tags-and-duplicate-urls-signals-not-commands.mdx` described Google's clustering and canonical selection as documented internals (including a "simhash" mechanism, a named selection algorithm, and invented signal weights and percentages) and now cites the documented signal hierarchy instead, explicitly labelling the internal-mechanism claims as unsourced; `what-happens-when-a-crawler-requests-a-url.mdx` carried an unsourced "over 95% of indexed web traffic" statistic, which has been removed.
+- **Next Up:** Review pass on P-01 through P-11; then decide whether the broader pillar queue should be formalised in the knowledge hub plan before further drafting.

@@ -1,0 +1,127 @@
+---
+title: "How Crawlers Actually Fetch Pages: Protocol, Limits, and Caching on the Wire"
+description: "What Googlebot and AI crawlers do at the HTTP level — protocols, encodings, size limits, conditional requests, and the crawl rate signal you can read in your logs."
+date: 2026-11-14
+tags:
+  - Crawling
+  - HTTP
+  - Web Infrastructure
+  - Technical SEO
+---
+
+Crawl-budget arguments are usually conducted in the abstract: "Googlebot is consuming my resources." The published documentation actually answers most of these questions at the wire level — which protocol it negotiates, what it accepts compressed, where it truncates, what it revalidates with, and how it tells you to slow down. Knowing the specifics changes what you optimise.
+
+**Direct Answer:** Google's documentation specifies that its crawlers support HTTP/1.1 and HTTP/2, send `Accept-Encoding: gzip, deflate, br`, truncate files at 15MB by default with per-project and per-file-type limits that can be lower, and revalidate using `ETag`/`If-None-Match` (preferred) and `Last-Modified`/`If-Modified-Since` — with the explicit rule that when both validators are present, the `ETag` wins. Crawl rate is negotiated by the crawler against your server's capacity, and the documented lever you have is responding with a specific HTTP status code. AI crawlers from OpenAI, Anthropic, and Perplexity follow the same HTTP contract, differ in user agent and purpose, and publish their own IP ranges and propagation delays.
+
+## The three categories of client
+
+Google's crawler documentation draws a distinction that is worth internalising before anything else, because it determines which control applies to which request:
+
+**Common crawlers** — "The common crawlers used for Google's products (such as Googlebot). They always respect robots.txt rules for automatic crawls."
+
+**Special-case crawlers** — "similar to common crawlers, however are used by specific products where there's an agreement between the crawled site and the Google product about the crawl process. For example, AdsBot ignores the global robots.txt user agent (`*`) with the ad publisher's permission."
+
+**User-triggered fetchers** — "part of tools and product functions where the end user triggers a fetch. For example, Google Site Verifier acts on the request of a user."
+
+This is the same three-way split that the AI vendors use — search collection, product-specific, and user-initiated — and it recurs because the underlying distinction is real: whether the request is autonomous, contractual, or on behalf of a person. Each category has different robots.txt semantics, and conflating them is how sites end up blocking the wrong one.
+
+Note the precision in the special-case description: `AdsBot` ignores the `*` group *with the publisher's permission*. That is a negotiated exception, not a general capability, and the distinction matters if you are reasoning about what a bot "can" do.
+
+## Protocol and transport: what is actually negotiated
+
+Google's crawlers "support HTTP/1.1 and HTTP/2." The documentation is unusually candid about the reasoning, and it includes a sentence that ends a common argument:
+
+> The default protocol version used by Google's crawlers is HTTP/1.1; crawling over HTTP/2 may save computing resources (for example, CPU, RAM) for your site and Googlebot, but otherwise there's no Google-product specific benefit to the site (for example, no ranking boost in Google Search).
+
+So HTTP/2 is a mutual efficiency option, not a ranking factor. If you have been holding off on HTTP/2 for SEO reasons, that reasoning is not supported.
+
+The protocol version is not fixed per session either: crawlers "will use the protocol version that provides the best crawling performance and may switch protocols between crawling sessions depending on previous crawling statistics."
+
+There is an escape hatch, and it is unusual enough to be worth noting: "To opt out from crawling over HTTP/2, instruct the server that's hosting your site to respond with a 421 HTTP status code when Google attempts to access your site over HTTP/2." A `421 Misdirected Request` is the standards-compliant way to steer a client to a different origin representation, which makes it a legitimate tool rather than a hack.
+
+The documentation also notes that crawling infrastructure "supports crawling through FTP (as defined by RFC959) and FTPS (as defined by RFC4217)," though "crawling through these protocols is rare."
+
+## Compression and the 15MB truncation
+
+Content encodings: "Google's crawlers and fetchers support the following content encodings (compressions): gzip, deflate, and Brotli (br)." The specific set is advertised per request in the `Accept-Encoding` header, and the documentation notes "The content encodings supported by each Google user agent is advertised in the Accept-Encoding header of each request they make. For example, Accept-Encoding: gzip, deflate, br."
+
+This is worth verifying on your own logs rather than assuming, because the encoding set is a per-user-agent property. A crawler that requests `br` and receives `gzip` is telling you your compression negotiation is not working — a real, measurable inefficiency that no SEO tool will flag for you.
+
+File size limits are the more consequential item:
+
+> By default, Google's crawlers and fetchers only crawl the first 15MB of a file, and any content beyond this limit is ignored. However, individual projects may set different limits for their crawlers, and also for different file types. For example, a Google crawler like Googlebot may have a smaller size limit (for example, 2MB), or specify a larger file file size limit for a PDF than for HTML.
+
+Three things follow. Content past the limit is silently ignored — there is no error, so a truncated document looks like a short document. The limit is per-project and per-file-type, so a universal "15MB" assumption is wrong for HTML in practice. And if your HTML document exceeds the practical limit, the tail of your content simply does not exist as far as the crawler is concerned, which affects any content that appears late in the document.
+
+## Conditional requests: the revalidation contract
+
+Google's documentation is specific here, and it deviates from what many assume:
+
+> Google's crawling infrastructure supports heuristic HTTP caching as defined by the HTTP caching standard, specifically through the ETag response- and If-None-Match request header, and the Last-Modified response- and If-Modified-Since request header.
+
+> If both ETag and Last-Modified response header fields are present in the HTTP response, Google's crawlers use the ETag value as required by the HTTP standard. For Google's crawlers specifically, we recommend using ETag instead of the Last-Modified header to indicate caching preference as ETag doesn't have date formatting issues.
+
+And a line that catches teams out: "Other HTTP caching directives aren't supported."
+
+That last sentence is the practically important one, and it connects directly to the caching article in this publication. `Cache-Control: max-age`, `s-maxage`, `stale-while-revalidate`, `stale-if-error` — none of those are honoured by Googlebot's revalidation logic. Googlebot does not use `Cache-Control` to decide whether to revalidate a URL it already has. It uses the validators.
+
+The consequence for infrastructure: if you serve a document with an `ETag` that never changes while the body does, Googlebot will receive `304 Not Modified` and will never see your updated content. This is a genuine and easily-missed failure mode, and it is a much more common cause of "my content isn't updating in Search" than a crawl-rate problem.
+
+The documentation also notes that "Individual Google crawlers and fetchers may or may not make use of caching, depending on the needs of the product they're associated with. For example, Googlebot supports caching when re-crawling URLs for Google Search, and Storebot-Google only supports caching in certain conditions." So the caching behaviour is per-crawler, and you should verify rather than generalise.
+
+There is a recommendation about setting both validators regardless, with a practical reason: "Consider setting both the Etag and Last-Modified values regardless of the preference of Google's crawlers. These headers are also used by other applications such as CMSes." Note the guidance is to set *both*, because other software needs `Last-Modified`, while Google prefers `ETag` when both are present.
+
+For `Last-Modified`, the documentation gives an exact format recommendation: the date "must be formatted according to the HTTP standard," and to avoid parsing issues it recommends "Weekday, DD Mon YYYY HH:MM:SS Timezone".
+
+## Crawl rate and the 421 lever
+
+The documented position on crawl rate: "Our goal is to crawl as many pages from your site as we can on each visit without overwhelming your server. If your site is having trouble keeping up with Google's crawling requests, you can reduce the crawl rate." And the warning: "sending the inappropriate HTTP response code to Google's crawlers may affect how your site appears in Google products."
+
+That last sentence is the one to internalise: response codes are a *control surface* for crawl behaviour, and using them carelessly has consequences beyond throttling. The relevant codes are covered in [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) — 429 for rate limiting, 5xx for server errors, 503 for maintenance, and now 421 as a protocol-steer.
+
+This is also where the AI crawler picture differs, and the difference is worth knowing. Google publishes the mechanics of how it manages crawl rate against your capacity. The AI vendors publish their user agents, their IP ranges, and their robots.txt semantics — but not a crawl-rate negotiation mechanism. OpenAI's documentation mentions only the ~24-hour robots.txt propagation delay; Anthropic's mentions `Crawl-delay` support ("we support the non-standard Crawl-delay extension to robots.txt"), which is the only crawl-pacing hint in the vendor documentation set.
+
+So if a large AI crawler is loading your origin, the levers are: `robots.txt` rules for that agent, WAF rate limits, and the 429 status code — not a crawl-rate negotiation. And note the asymmetry with Google: `Crawl-delay` is a non-standard extension that Google does not support at all, so it is not a substitute for the documented status-code approach.
+
+## Verifying all of this on your own server
+
+None of the above requires trusting documentation — it is all visible in your access logs. A minimal classifier:
+
+```bash
+# Protocol, encoding, and validator negotiation, per request
+awk '$7 ~ /^\/articles\// {
+  print $6, $7, $12          # method, path, accept-encoding
+}' /var/log/nginx/access.log | head -20
+```
+
+And the check that catches the real problems — is the crawler getting `304` on a page you changed?
+
+```bash
+# Count 304s by user agent; a high 304 rate on recently-edited pages is the warning sign
+awk '$9 == 304 { print $0 }' /var/log/nginx/access.log \
+  | grep -oE '"[^"]+"$' | sort | uniq -c | sort -rn | head
+```
+
+For AI crawlers specifically, verify identity rather than trusting the header. Each vendor publishes its IP ranges as JSON — `openai.com/gptbot.json`, `openai.com/searchbot.json`, `perplexity.ai/perplexitybot.json` — and Anthropic notes that "If a crawler has a source IP address on this list, it indicates that the crawler is coming from Anthropic." A `User-Agent` string is trivially spoofed; the IP list is the check.
+
+## What this changes in practice
+
+Four adjustments this documentation supports, in order of how often they matter:
+
+1. **Make `ETag` correct.** An `ETag` that does not change when the body changes causes Googlebot to see `304` forever and never pick up your edits. This is the highest-value item here, and it is invisible to most SEO tooling because the symptom looks like "slow indexing" rather than "incorrect caching."
+2. **Send both validators.** `ETag` for the crawler, `Last-Modified` for your CMS and other consumers, per Google's own recommendation.
+3. **Verify compression is actually negotiated.** Check the `Accept-Encoding` in your logs against the `Content-Encoding` you return. Googlebot supports gzip, deflate, and Brotli.
+4. **Keep HTML documents well under the size limit.** The 15MB figure is a ceiling, not a working target, and the effective per-project limit may be lower. Content near the limit is at risk of silent truncation.
+
+And one thing to stop doing: treating HTTP/2 adoption as an SEO project. The documentation is explicit that there is "no ranking boost in Google Search" — it is a mutual resource saving, which is still worth having, on those grounds.
+
+For the surrounding request path — from DNS through TLS to the rendered response — see [What Happens When a Crawler Requests a URL?](/articles/what-happens-when-a-crawler-requests-a-url) and [HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects). For the caching semantics behind the validator contract, see [Cache-Control Is a Contract, Not a Suggestion](/articles/cache-control-is-a-contract-not-a-suggestion).
+
+## References & Further Reading
+
+- Google Search Central, [Overview of Google crawlers and fetchers (user agents)](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers), accessed 2026-11-14. Supports the three client categories (common, special-case, user-triggered), the `AdsBot` permission-based `*` exception, the HTTP/1.1 and HTTP/2 support and the explicit absence of a ranking benefit for HTTP/2, the 421 opt-out mechanism, FTP/FTPS support, the gzip/deflate/Brotli encoding set and `Accept-Encoding` advertisement, the 15MB default file limit and its per-project/per-file-type variation, the 2MB HTML example, the crawl-rate goal and the warning about inappropriate status codes, the `ETag`/`If-None-Match` and `Last-Modified`/`If-Modified-Since` support, the statement that other HTTP caching directives are not supported, the rule that `ETag` wins when both validators are present, the recommendation to set both, the per-crawler caching variation, and the recommended `Last-Modified` date format.
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features), last updated 2025-12-10. Supports the query fan-out description, the statement that AI Overviews and AI Mode may use different models and techniques, that AI Overviews appear only when additive and "often don't trigger," and the technical eligibility requirement.
+- IETF, [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.txt), June 2022 (Standards Track). The definition of the `ETag`, `If-None-Match`, `Last-Modified`, `If-Modified-Since`, `Accept-Encoding`, `Content-Encoding`, and `421 Misdirected Request` fields referenced above.
+- IETF, [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.txt), June 2022 (Standards Track, STD 98). The caching standard whose validator semantics Google's documentation defers to, and the source of the `Age` and freshness rules covered in [Cache-Control Is a Contract, Not a Suggestion](/articles/cache-control-is-a-contract-not-a-suggestion).
+- OpenAI, [Overview of OpenAI Crawlers](https://platform.openai.com/docs/bots), accessed 2026-11-14. Supports the AI crawler user agents, the published IP endpoints, and the ~24-hour robots.txt propagation delay.
+- Anthropic Help Center, ["Does Anthropic crawl data from the web, and how can site owners block the crawler?"](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler), accessed 2026-11-14. Supports the `Crawl-delay` extension support and the published IP list used for source verification.

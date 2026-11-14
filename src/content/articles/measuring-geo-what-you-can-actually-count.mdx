@@ -1,0 +1,134 @@
+---
+title: "Measuring GEO: What You Can Actually Count When Traffic Comes From Answers"
+description: "How to measure AI answer visibility with the tools that exist today — referral data, logs, and crawlers — without inventing metrics that do not exist."
+date: 2026-11-14
+tags:
+  - AI Search
+  - Observability
+  - Analytics
+  - Technical SEO
+---
+
+The measurement problem in generative engine optimisation is unusually well-suited to an honest answer, because almost everything claimed about "GEO metrics" in the wild is either a repackaged SEO metric with a new name or a number produced by a vendor that will not say how it was computed. Meanwhile the platforms themselves have been fairly explicit about what they do and do not expose. This article is about the measurement that survives scrutiny.
+
+**Direct Answer:** There is no official "AI visibility score" and no ranking-dashboard equivalent for answer engines. What you can measure today falls into four buckets: **referral traffic** from AI surfaces (measurable, but attribution-shaped and self-reported), **crawler activity** (fully measurable in your own logs, and the most reliable signal you control), **eligibility** (whether your pages are reachable, indexable, and snippet-capable — measurable but not a ranking factor), and **citation presence** (measurable only by manual sampling, which is a sample, not a metric). Search Console does not report AI Overviews or AI Mode as a separate traffic source — they are folded into the "Web" search type — so any claim that Google reports "AI traffic" separately is false.
+
+## What Search Console actually reports
+
+Google's AI features documentation is direct on this: "Just like the rest of the search results page, sites appearing in AI features (such as AI Overviews and AI Mode) are included in the overall search traffic in Search Console. In particular, they're reported on in the Performance report, within the 'Web' search type."
+
+Two implications follow, and both cut against common advice.
+
+**First, there is no AI-specific filter.** If a team says they are tracking "AI Overview traffic in Search Console" and filtering by a query pattern or a search type called AI, that filter does not exist in the documented interface. The traffic is there, mixed into "Web," and separating it requires query-level inference.
+
+**Second, "not reported" is not "not happening."** Google also states: "We've seen that when people click from search results pages with AI Overviews, these clicks are higher quality (meaning, users are more likely to spend more time on the site)." That is a source-reported observation, not a per-site measurement, and it does not come with a number. It is the kind of claim that gets quoted as a finding when it is a vendor statement.
+
+The useful, defensible move is to stop trying to find an AI bucket and instead instrument the two things that are genuinely separable: the referrer and the crawler.
+
+## Referral data: real, but shaped by the platform
+
+AI surfaces send referrer headers, and those headers land in your analytics as a distinct source. This is the closest thing to a measurable AI traffic channel, and it has one enormous caveat: **the referrer is what the platform chooses to send.** Some send their own domain, some send nothing at all, and a direct click from an in-app browser may arrive with no referrer whatsoever.
+
+That caveat deserves emphasis because it inverts the usual assumption. A referral that is present is attributable; a visit without a referrer is not necessarily direct traffic. That means "AI traffic" measured this way is a floor, not a total — and the floor is set by the platforms' disclosure choices, not by your site's configuration.
+
+The practical consequence: referral data can support a *direction* ("referrals from AI surfaces grew"), and it can support a *ranking* of surfaces relative to each other. It cannot support a claim like "AI sent us 12% of our traffic," because the denominator is contaminated by unattributed visits that may or may not have come from AI.
+
+To do this well, classify referrers into a distinct channel rather than lumping them into "referral" or "social":
+
+```text
+AI/answer surfaces (by referrer host):
+  chatgpt.com, chat.openai.com        → answer engines
+  claude.ai, anthropic.com             → answer engines
+  perplexity.ai                        → answer engines
+  gemini.google.com, bard.google.com   → answer engines
+  copilot.microsoft.com                → assistant surfaces
+```
+
+And separately, keep the crawler user agents in their own class, which is the subject of the next section. The two are different: one is a human arriving, the other is a machine collecting.
+
+## Crawler logs: the one channel you fully control
+
+Server logs and CDN analytics are the only AI-signal source you own end to end, and they are the one most teams never configure for this purpose. A crawler request is unambiguous — it carries a documented, specific user-agent string, and the vendors publish both the strings and the IP ranges so you can attribute it precisely.
+
+The reason this matters is that crawler behaviour is *leading* indicator data. If a training crawler starts visiting a page set, the content is being collected now; a citation or an answer surfacing that material is a downstream consequence, and if it never appears, you will not know why. Crawler logs tell you what was fetched; referral logs tell you who arrived. Only the first is fully attributable to you.
+
+The measurement that matters is not raw request counts — those are volume, and volume says nothing about value. It is the *shape* of the request set: which URL classes get fetched, how often, and what status codes come back. A crawler fetching your `/blog/` index at 400 requests/hour and never touching your comparison pages is telling you something specific about what it found useful.
+
+To make this measurable, classify at the edge or in log processing, not by eye:
+
+```text
+AI crawler class (user-agent → purpose):
+  OAI-SearchBot, Claude-SearchBot, PerplexityBot  → search-index collection
+  GPTBot, ClaudeBot, Google-Extended               → model training / grounding
+  ChatGPT-User, Claude-User, Perplexity-User       → user-initiated fetch
+  OAI-AdsBot                                       → ad landing validation
+```
+
+This taxonomy is not something you have to invent — it is documented by each vendor, and the semantics of each class differ in ways that change what you should optimise for. The details, including why blocking a search crawler and blocking a training crawler are not the same decision, are covered in [AI Crawlers Are Not Googlebot](/articles/ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control).
+
+## Eligibility: measurable, and not a ranking factor
+
+There is a third category that is fully measurable and is routinely mis-sold as a performance metric. Google's documentation states the technical bar for appearing as a supporting link in AI Overviews or AI Mode: "To be eligible to be shown as a supporting link in AI Overviews or AI Mode, a page must be indexed and eligible to be shown in Google Search with a snippet, fulfilling the Search technical requirements. There are no additional technical requirements."
+
+This gives you a genuinely verifiable checklist, and every item is testable:
+
+| Requirement | How you verify it |
+| --- | --- |
+| Page is indexed | Search Console URL Inspection / Page Indexing report |
+| Eligible to show a snippet | Not blocked by `noindex`, `nosnippet`, `max-snippet:0`, or `data-nosnippet` |
+| Crawlable | `robots.txt` allows the path; no 4xx/5xx on the crawl |
+| Renderable | Raw HTML contains the content, not just the shell |
+| Preview controls honoured | URL Inspection shows the HTML Googlebot received |
+
+Note the second row carefully. Google's documentation lists `nosnippet`, `data-nosnippet`, `max-snippet`, and `noindex` as the controls for limiting information shown from pages in Search, and warns that if you implemented preview controls and content still appears, you should check with the URL Inspection tool "to see the HTML that Googlebot received while crawling the page." The failure mode this addresses is concrete: a `noindex` in the head but not in the rendered output, or a preview control applied to a template that does not cover the route.
+
+What eligibility is *not*: a ranking factor, a citation guarantee, or a traffic predictor. Google's documentation is explicit that "just because a page meets all requirements, best practices, and complies with the policies, doesn't mean that Google will crawl, index, or serve its content." Eligibility is a gate, not a score.
+
+## Citation sampling: a sample, and you should say so
+
+The last bucket is the one most GEO advice misrepresents. There is no citation metric. What exists is manual sampling: you run a defined set of queries against defined AI surfaces and record whether and where your content appears.
+
+That is a legitimate technique, and it is how most organisations evaluate answer presence. It is also a **sample with a sample**, and honesty requires labelling it as such:
+
+- **The query set is a choice.** Ten hand-picked prompts measure ten hand-picked prompts. Conclusions do not generalise unless the set is defined in advance and representative of how users actually ask.
+- **Answer surfaces are non-deterministic.** The same query can return different citations on different runs. A single observation is not a finding; a rate over repeated runs is.
+- **Sampling is not measurement of a population.** There is no denominator — no "total AI citations" exists to divide into.
+
+What you *can* do with a well-run sample is report it honestly as a rate with a stated method: "Across 40 defined queries × 5 runs each on two surfaces, our pages were cited in 18 of 200 runs (9%), versus 0% for the two comparator pages." That is a defensible, reproducible statement, and it is more useful than a vendor score with an undisclosed methodology.
+
+Two practical disciplines make the difference. Define the query set and freeze it before running, so you cannot unconsciously pick queries that flatter you. And re-run the *same* set on a fixed cadence, so the number is a time series rather than a series of anecdotes — because a citation rate that drifts is a signal, and a single good week is not.
+
+For the measurement discipline in the classical sense — choosing summary statistics that do not mislead — see [Simpson's Paradox in Your Own Data](/articles/simpsons-paradox-why-a-single-correlation-can-reverse-its-sign), and for the alerting side, [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts).
+
+## A measurement plan that survives scrutiny
+
+Put together what a defensible GEO measurement setup looks like:
+
+1. **Segment referrers** into AI/answer surfaces as a distinct analytics channel, and record the unattributed share alongside it so the floor is visible.
+2. **Classify crawler requests** by purpose at the edge, and track URL-class coverage and status codes — not just volume.
+3. **Monitor eligibility** as a boolean checklist per URL class, using Search Console and URL Inspection, and alert on drift rather than on scores.
+4. **Sample citations** on a frozen query set at a fixed cadence, reporting rates with the method stated, and never as a single headline number.
+5. **Label every claim** by what produced it: your own logs, the platform's documentation, a manual sample, or a third party. Vendor-reported findings are findings about the vendor's aggregate, not about you.
+
+That structure has one property worth more than any individual metric: every number in it can be traced to a source you control or a statement you can quote. When someone asks "how do you know?", the answer is a command or a document, not a dashboard.
+
+## What you cannot measure, stated plainly
+
+For completeness, and because these are the claims most often made:
+
+- **Your rank within an AI answer.** Surfaces do not expose a rank position for cited sources.
+- **Why you were cited or not cited.** The selection mechanisms are not public.
+- **The total volume of AI referrals.** Only the attributed floor is observable, and the attribution is platform-controlled.
+- **Whether AI surfaces are a net traffic gain.** They can displace clicks that would have happened anyway; separating that requires a counterfactual you cannot run.
+- **Any guaranteed inclusion, citation, or traffic outcome.** Google's documentation states plainly: "You don't need to create new machine readable files, AI text files, or markup to appear in these features. There's also no special schema.org structured data that you need to add."
+
+That last quote is the single most useful sentence in this area, and it belongs on the wall of every team doing GEO work.
+
+## References & Further Reading
+
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features), last updated 2025-12-10. Supports the statement that AI Overviews and AI Mode traffic is included in overall Search Console traffic and reported under the "Web" search type, the technical eligibility requirement (indexed, snippet-eligible, no additional requirements), the list of preview controls (`nosnippet`, `data-nosnippet`, `max-snippet`, `noindex`), the URL Inspection troubleshooting step, the note that crawling can take days to months, the observation that AI Overview clicks are higher quality, and the explicit statement that no special machine-readable files, AI text files, or markup are needed.
+- Google Search Central, [Robots meta tag and `data-nosnippet` specifications](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag), accessed 2026-11-14. Supports the precise semantics of the snippet-control directives used in the eligibility checklist.
+- OpenAI, [Overview of OpenAI Crawlers](https://platform.openai.com/docs/bots), accessed 2026-11-14. Supports the user-agent strings and purposes used in the crawler classification table, and the published IP endpoints.
+- Anthropic Help Center, ["Does Anthropic crawl data from the web, and how can site owners block the crawler?"](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler), accessed 2026-11-14. Supports the `ClaudeBot`, `Claude-User`, and `Claude-SearchBot` definitions and the "may reduce your site's visibility for user-directed web search" consequence.
+- Perplexity, [Perplexity Crawlers](https://docs.perplexity.ai/guides/bots), accessed 2026-11-14. Supports the `PerplexityBot` and `Perplexity-User` definitions and the statement that the user-triggered fetcher generally ignores robots.txt.
+- Google Search Central, [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap) and [Google Search Console for Technical SEO: A Diagnostic Workflow](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow) — the publication's own articles on the eligibility and console workflows referenced above.

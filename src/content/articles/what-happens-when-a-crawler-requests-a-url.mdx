@@ -62,7 +62,7 @@ Once an IP address is resolved, the crawler opens a network socket with the dest
 To establish reliable transmission, client and server perform the standard SYN, SYN-ACK, ACK exchange defined in RFC 793. Over transatlantic connections, this single round trip can introduce 60–120ms of baseline network latency before any data transfers.
 
 ### TLS Handshake (RFC 8446)
-On HTTPS connections (which represent over 95% of indexed web traffic), the crawler immediately negotiates TLS. In TLS 1.3, this exchange is streamlined to a single round-trip:
+On HTTPS connections, the crawler immediately negotiates TLS. In TLS 1.3, this exchange is streamlined to a single round-trip:
 * **Client Hello:** The crawler sends supported cryptographic cipher suites, a key share, and the Server Name Indication (SNI) extension indicating the target hostname.
 * **Server Hello & Certificate:** The server returns its selected cipher, its key share, and its cryptographic certificate chain.
 * **Verification:** The crawler validates the certificate against its trusted certificate authorities (checking expiration, host mismatch, and revocation status).
@@ -208,3 +208,13 @@ In upcoming chapters of this knowledge hub, we will examine specific layers of t
 * **[DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works)** — Configuring resolvers, anycast routing, and TTLs for resilient crawling.
 * **[HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects)** — Handshake optimizations and avoiding redirect loops.
 * **[HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx)** — Detailed handling of status codes and conditional headers.
+
+## References & Further Reading
+
+- IETF, [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.txt), June 2022 (Standards Track). The normative definition of the HTTP request/response model, the status codes, and the header fields referenced throughout the request lifecycle described here.
+- IETF, [RFC 8446 — The Transport Layer Security (TLS) Protocol Version 1.3](https://www.rfc-editor.org/rfc/rfc8446.txt), August 2018 (Standards Track). The source for the TLS 1.3 handshake, the ClientHello/ServerHello key exchange, and the SNI extension described in the TLS section.
+- IETF, [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.txt), June 2022 (Standards Track, STD 98). The caching standard governing the `ETag`/`If-None-Match` and `Last-Modified`/`If-Modified-Since` revalidation behaviour referenced in the HTTP request section.
+- IETF, [RFC 1035 — Domain Names: Implementation and Specification](https://www.rfc-editor.org/rfc/rfc1035.txt), November 1987 (Standards Track). The DNS specification underlying the resolution step, including the `SERVFAIL` and `NXDOMAIN` response codes named in the failure-mode table.
+- IETF, [RFC 9293 — Domain Name System (DNS) Transport Protocol](https://www.rfc-editor.org/rfc/rfc9293.txt), October 2022 (Standards Track). The current specification for DNS over TCP and TLS, replacing the transport rules in RFC 1035.
+- Google Search Central, [Overview of Google crawlers and fetchers (user agents)](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers), accessed 2026-11-14. Supports the crawler/fetcher distinction, the three client categories, the supported transfer protocols and content encodings, and the documented file-size limits referenced in the HTTP and rendering sections.
+- The publication's own [How Crawlers Actually Fetch Pages](/articles/how-crawlers-actually-fetch-pages-protocol-limits-and-caching) article for the wire-level detail on protocol negotiation, size limits, and conditional requests.

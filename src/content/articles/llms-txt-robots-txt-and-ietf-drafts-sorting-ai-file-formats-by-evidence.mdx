@@ -1,0 +1,104 @@
+---
+title: "llms.txt, robots.txt, and the IETF Drafts: Sorting AI File Formats by Evidence"
+description: "What llms.txt is, what the IETF aipref drafts standardise, and why 'just add a file' is not yet an SEO technique — with the sources checked."
+date: 2026-11-14
+tags:
+  - AI Search
+  - robots.txt
+  - Technical SEO
+  - Evidence-Based SEO
+---
+
+There is now a file you can add to your site that some people call an "AI SEO" technique, and there is a pair of IETF drafts that define a related mechanism. Both are real. Neither is what most coverage says. The problem is not that these things are fake — it is that they are proposals and experimental conventions being reported as established practice, and the gap between those two things is where sites waste effort.
+
+**Direct Answer:** `llms.txt` is a **proposal** by Jeremy Howard, first published 3 September 2024 and now at version 2 (modified 10 August 2026) — a voluntary Markdown file at a site path, for agents that want a curated overview. It is not an IETF standard, not a Google or OpenAI requirement, and Google explicitly states you do not need it: "You don't need to create new machine readable files, AI text files, or markup to appear in these features." The IETF `aipref` working group's `Content-Usage` mechanism is a **different** thing — a standards-track effort to express machine-readable AI usage preferences, currently at Active Internet-Draft stage, not RFC. Neither is a ranking factor. Here is what each one actually is, and what the evidence supports.
+
+## What `llms.txt` is
+
+The proposal is specific and worth reading in its own terms. Its stated purpose: "We propose adding a /llms.txt markdown file to websites to provide LLM-friendly content. The file can be placed at the site root, or at any path within it, covering the pages under that path."
+
+Two mechanisms are proposed. First, the file itself, which "offers brief background information, guidance, and links to detailed markdown files." Second, a convention for machine-readable page versions: "pages with information that agents might need provide a clean markdown version of those pages at the same URL as the original page, either with `.md` appended (`page.html.md`) or with the extension replaced by `.md` (`page.md`)."
+
+Discovery is handled with standard link relations, which is the part most technically literate proposals get wrong:
+
+```html
+<link rel="alternate" type="text/markdown" href="/docs/page.html.md">
+<link rel="describedby" href="/docs/llms.txt">
+```
+
+The proposal notes the header form works too and has an operational advantage: "The header form also works for non-HTML resources, such as the markdown files themselves, and can be added in web server or CDN configuration without modifying any pages."
+
+## The adoption evidence is real — and it is not SEO evidence
+
+The proposal's own page makes a case from adoption, and the claim is checkable. It states that as of v2, "thousands of sites publish an llms.txt file, documentation platforms generate one automatically, and Chrome's Lighthouse audits sites for one as part of its agentic browsing checks," and that "The AI labs themselves publish llms.txt files for their own developer docs: OpenAI, Anthropic, and Gemini."
+
+That is a meaningful signal, and it is the strongest part of the argument. But read it carefully: the adopters are **documentation platforms and AI labs**. These are sites whose content is API references — text-heavy, link-dense, and read by coding agents that need exact syntax. That is not a generalisation to content sites, and it is not a signal about search visibility.
+
+The proposal itself is careful about the purpose split, and its framing is directly relevant to SEO. On the distinction from `robots.txt`: "robots.txt lets automated tools know what access to a site is considered acceptable, such as for search indexing bots. llms.txt information is instead used on demand, when an agent needs information about a topic while assisting a user." And critically: "Our expectation was that llms.txt would mainly be useful for inference rather than training, and that is how it has been used, though training runs could take advantage of the information too."
+
+So by its author's own account, `llms.txt` is an *agent-navigation convenience*, not a discoverability mechanism for search. A page that already ranks well and is easy to crawl does not need one to be found. A page that ranks poorly does not get found by adding one.
+
+The proposal also explains what it is *not*, which is refreshingly direct. It is not a `sitemap.xml` substitute, for reasons that apply directly to SEO: a sitemap "Often won't have the LLM-readable versions of pages listed," "Doesn't include URLs to external sites, even though they might be helpful," and "Will generally cover documents that in aggregate will be too large to fit in an LLM context window, and will include a lot of information that isn't necessary to understand the site."
+
+That last point is the one SEO practitioners should internalise. A sitemap exists to enumerate everything indexable. An `llms.txt` exists to be small enough to be worth reading. Optimising one for the other's goal is a category error.
+
+## The IETF `aipref` drafts are a different project
+
+This is where most coverage merges two unrelated things. The `aipref` working group is not building an `llms.txt` successor. It is standardising **usage preferences** — machine-readable statements about how content may be used.
+
+The vocabulary draft (`draft-ietf-aipref-vocab-08`, 14 September 2026) defines three categories of use with the labels `train-ai`, `ai-use`, and `search`, and a preference model where each category takes one of three values: allowed, disallowed, or **unknown**. That third value is the operationally important one — silence is not consent.
+
+The attachment draft (`draft-ietf-aipref-attach-05`, 19 August 2026) defines two ways to express those preferences: a `Content-Usage` HTTP response header, and a new `robots.txt` rule extending RFC 9309's ABNF.
+
+The relationship to `llms.txt` is essentially nil. `llms.txt` says "here is a curated overview for agents." `Content-Usage` says "here is what you are allowed to do with this content." One is navigation; the other is permission. Treating them as two versions of the same "AI file" is a category error in the opposite direction.
+
+And the status matters enormously for anyone about to implement. Both documents are **Active Internet-Drafts**, not RFCs. The datatracker records the WG state as "WG Document" and IESG state as "I-D Exists." Their *intended* RFC status is Proposed Standard — the vocabulary draft was described in the IETF announcement as "a standard track specification describing vocabulary for expressing AI-related preferences to the IESG for publication" with an August 2026 milestone. Intended status is not current status.
+
+There is also an explicit caveat inside the vocabulary draft itself: the core section "does not yet have consensus," with a note attached. A careful reader should treat a specification with a no-consensus marker in its central section as a work in progress, and the draft says so.
+
+## What the platforms actually say
+
+The strongest available evidence about whether any of this affects search is what the search platforms document.
+
+Google's AI features documentation is unambiguous and has not changed its position: "The best practices for SEO remain relevant for AI features in Google Search (such as AI Overviews and AI Mode). There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary." And on files specifically: "You don't need to create new machine readable files, AI text files, or markup to appear in these features. There's also no special schema.org structured data that you need to add."
+
+That statement covers `llms.txt` directly — it is a machine-readable AI text file. Google's position is that it is not required.
+
+For crawling control, Google draws the line between its two systems clearly: "robots.txt directives for Googlebot is the control for site owners to manage access to how their sites are crawled for Search. To limit AI training and grounding in some of Google's other systems, read more about Google-Extended." So `robots.txt` (and `Google-Extended`) govern access; a new content file does not.
+
+Elsewhere, the vendor documentation shows the same split of concerns: OpenAI's crawler documentation is entirely about *crawlers* and *robots.txt tags*, with no mention of an `llms.txt` convention for search inclusion; Perplexity's is likewise about user agents and WAF configuration.
+
+The reasonable inference — and it is an inference, not a documented statement by these platforms — is that discovery in these surfaces runs through search indexes and their own crawlers, not through a site-authored convention file. Nobody has documented requiring `llms.txt` for inclusion, and the one platform that documents its AI inclusion requirements in detail says such files are unnecessary.
+
+## A decision framework
+
+If you are deciding whether to invest, the questions separate cleanly:
+
+**Do you have content that agents must fetch to complete a task — API references, SDK docs, a product schema, a machine-readable catalogue?** Then `llms.txt` plus `.md` page versions and `rel="alternate"` links is a reasonable, low-cost, self-contained ergonomics improvement. It is also, by its author's account, an inference-time convenience. Do it for developers and agents, and expect no direct search effect.
+
+**Do you want to be cited in AI answers?** The documented requirements are the ordinary ones: be indexable, be snippet-eligible, be crawlable, be reachable, be genuinely useful. Everything else is unfalsifiable optimism. Measure what is measurable — see [Measuring GEO](/articles/measuring-geo-what-you-can-actually-count).
+
+**Do you want to control how your content may be used?** Then `robots.txt` user-agent rules work today, and the `aipref` drafts are the standards-track direction for expressing it more precisely. Vendor documentation is currently the operative source of truth for each vendor's implementation.
+
+**Are you doing this because someone said it is an "AI SEO ranking factor"?** Then the honest answer is that no such factor has been documented by any platform, and adding a file that changes nothing measurable is a cost with no evidenced return.
+
+## What I would actually ship
+
+For most content sites, in priority order:
+
+1. **The ordinary fundamentals** — crawlable, indexable, snippet-eligible, fast, genuinely useful. Google's documentation says these remain what matters.
+2. **Correct crawler governance** by purpose, using documented user agents and IP ranges, and separating search collection from training. See [AI Crawlers Are Not Googlebot](/articles/ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control).
+3. **Machine-readable content where it is genuinely useful** — which for API documentation means real, complete, current reference material. Whether that is delivered as `.md` variants, an `llms.txt` index, or well-structured HTML is a preference, not a ranking decision.
+4. **An `llms.txt` file if you run documentation** and it costs you an afternoon. Treat it as developer experience, not as SEO.
+5. **No `Content-Usage` rules in production yet** — unless you have a specific partner that has announced support, and you are prepared for the syntax to change. The drafts are not consensus, and Anthropic's own implementation note says the reading of these settings "may change too."
+
+The through-line is worth stating plainly: the AI-facing web is being standardised, but the standards are about *permission* and *navigation*, not about *promotion*. No specification in this space makes your content rank better or get cited. The parts that decide that — crawlability, indexability, usefulness, and the structure of your content — are the parts that have always decided it.
+
+## References & Further Reading
+
+- Jeremy Howard, [The /llms.txt file, v2](https://llmstxt.org/), published 3 September 2024, modified 10 August 2026. Supports the proposal's purpose, the root-or-path placement rule, the `.md` page-version convention, the `rel="alternate"` and `rel="describedby"` link relations and `Link:` header form, the adoption claims (thousands of sites, documentation platforms, Lighthouse audits, and llms.txt files published by OpenAI, Anthropic and Gemini), the explicit distinction between robots.txt and llms.txt purposes, the inference-versus-training expectation, and the reasons llms.txt is not a sitemap substitute.
+- IETF, ["A Vocabulary For Expressing AI Usage Preferences"](https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/), draft-ietf-aipref-vocab-08, 14 September 2026 (Active Internet-Draft, `aipref` WG; P. Keller, M. Thomson). Supports the `train-ai`, `ai-use` and `search` categories, the allowed/disallowed/unknown preference model, the category labels, and the statement that the core section does not yet have consensus.
+- IETF, ["Associating AI Usage Preferences with Content in HTTP"](https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/), draft-ietf-aipref-attach-05, 19 August 2026 (Active Internet-Draft, `aipref` WG; G. Illyes, M. Thomson). Supports the `Content-Usage` header field, the extended robots.txt ABNF, and the acquisition-versus-usage two-stage arrangement.
+- IETF, [RFC 9309 — Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.txt), September 2022 (Standards Track). The base specification updated by the attachment draft, and the source of the `rule` ABNF the `Content-Usage` rule extends.
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features), last updated 2025-12-10. Supports the statements that SEO best practices remain relevant, that there are no additional requirements or special optimizations for AI Overviews and AI Mode, that machine-readable AI text files and extra markup are not needed, the technical eligibility requirement, and the distinction between Googlebot robots.txt control for Search and Google-Extended for other systems.
+- Anthropic Help Center, ["Does Anthropic crawl data from the web, and how can site owners block the crawler?"](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler), accessed 2026-11-14. Supports the statement that Anthropic recognises an IETF-work-group-based preference signal from 30 October 2026, that standards in this area are still evolving, and that the way settings are read and applied may change.

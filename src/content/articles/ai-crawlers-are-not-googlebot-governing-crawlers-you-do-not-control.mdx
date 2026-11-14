@@ -1,0 +1,132 @@
+---
+title: "AI Crawlers Are Not Googlebot: How to Govern Crawlers You Don't Control"
+description: "A practical, evidence-based guide to AI crawler user agents, robots.txt governance, and the emerging IETF preference standard for AI usage."
+date: 2026-11-14
+tags:
+  - Crawling
+  - robots.txt
+  - AI Search
+  - Technical SEO
+---
+
+The most consequential change in crawling since sitemaps is not a new algorithm — it is a population of new clients. A server that spent a decade tuning for one crawler now fields requests from a dozen distinct AI user agents, each with a different purpose, a different business model behind it, and a different opinion about whether your content should be indexed, quoted, or used as training data. Most sites respond to this with a blanket `Disallow: /` aimed at everything unfamiliar, and then wonder why their content stopped appearing in AI results.
+
+**Direct Answer:** AI crawlers are split by *purpose*, not by vendor, and the vendors document the split themselves. OpenAI runs `OAI-SearchBot` (search results), `GPTBot` (model training), `OAI-AdsBot` (ad landing-page validation), and `ChatGPT-User` (user-initiated fetches). Anthropic runs `Claude-SearchBot`, `ClaudeBot` (training), and `Claude-User`. Perplexity runs `PerplexityBot` (search) and `Perplexity-User`. Google separates `Googlebot` (Search, where robots.txt is the control) from `Google-Extended` (training and grounding in other systems). Because the purposes are separate, a single `robots.txt` rule cannot express the decision you actually want to make — which is why the IETF `aipref` working group is standardising an explicit usage-preference mechanism.
+
+## The vendor docs already split the categories
+
+This is the part most advice gets wrong. The vendor documentation does not describe "AI crawlers" as one category. It describes distinct user agents with distinct consequences, and it states plainly what happens when you block each one.
+
+OpenAI's crawler documentation makes the distinction explicit and states that the settings are independent: "a webmaster can allow OAI-SearchBot in order to appear in search results while disallowing GPTBot to indicate that crawled content should not be used for training OpenAI's generative AI foundation models." For `OAI-SearchBot`: "Sites that are opted out of OAI-SearchBot will not be shown in ChatGPT search answers, though can still appear as navigational links." For `GPTBot`: "Disallowing GPTBot indicates a site's content should not be used in training generative AI foundation models."
+
+Anthropic's documentation uses the same three-way structure and, importantly, states the consequence of each choice. For `ClaudeBot`: "When a site restricts ClaudeBot access, it signals that the site's future materials should be excluded from our AI model training datasets." For `Claude-SearchBot`: "Disabling Claude-SearchBot on your site prevents our system from indexing your content for search optimization, which may reduce your site's visibility and accuracy in user search results." For `Claude-User`: "Disabling Claude-User on your site prevents our system from retrieving your content in response to a user query."
+
+Perplexity's documentation states the same pattern and adds a detail that matters operationally: `Perplexity-User` "generally ignores robots.txt rules" because "Since a user requested the fetch, this fetcher generally ignores robots.txt rules."
+
+Google's position is the one most SEO readers already know, but the AI-specific half is often missed. Google's AI features documentation states that "robots.txt directives for Googlebot is the control for site owners to manage access to how their sites are crawled for Search," and then draws a separate line: "To limit AI training and grounding in some of Google's other systems, read more about Google-Extended." Two different controls, two different systems.
+
+Two more details from these documents that affect how you should write rules:
+
+- **Propagation delay is real.** OpenAI states "it can take ~24 hours from a site's robots.txt update for our systems to adjust." Perplexity's docs say "it may take up to 24 hours for our systems to reflect changes." A rule change is not instantaneous, and a crawler that fetched the old file will keep behaving per the old file.
+- **IP-blocking is a fragile substitute.** Anthropic warns that "Alternate methods like blocking IP address(es) from which Anthropic Bots operates may not work correctly or persistently guarantee an opt-out, as doing so impedes our ability to read your robots.txt file." If you block the crawler's IP, it can never fetch the file that grants or denies it.
+
+## The user-initiated category is genuinely different
+
+Look again at the three categories that recur across all three vendors:
+
+| Purpose | OpenAI | Anthropic | Perplexity |
+| --- | --- | --- | --- |
+| Search results / indexing | `OAI-SearchBot` | `Claude-SearchBot` | `PerplexityBot` |
+| Model training | `GPTBot` | `ClaudeBot` | (none — "not used to crawl content for AI foundation models") |
+| User-initiated fetch | `ChatGPT-User` | `Claude-User` | `Perplexity-User` |
+
+The third category is the subtle one. OpenAI describes `ChatGPT-User` as used "for certain user actions in ChatGPT and Custom GPTs," noting that "ChatGPT-User is not used for crawling the web in an automatic fashion" and that "because these actions are initiated by a user, robots.txt rules may not apply." Anthropic frames `Claude-User` as supporting "Claude AI users" and warns that disabling it "may reduce your site's visibility for user-directed web search."
+
+The practical consequence: **a user-initiated fetch is arguably not "crawling" at all.** It is a request on behalf of a person who asked a question, much like a browser loading a page. Treating it as a crawl — and blocking it as you would a scraper — removes you from user-directed answers without a corresponding benefit, because the fetch is not accumulating a corpus.
+
+This is also where the vendor guidance is genuinely uncertain about the future, and where you should not let a confident blog post fill the gap. Anthropic states plainly: "Because standards in this space are still evolving, the way we read and apply these settings may change too."
+
+## What the IETF is standardising, and what that means for you
+
+The `aipref` (AI Preferences) working group is the standards-track answer to the problem that `robots.txt` was never designed to solve. Its two active drafts are worth reading directly, because they are live and the mechanism is concrete.
+
+**`draft-ietf-aipref-vocab-08`** (Keller & Thomson, 14 September 2026, Proposed Standard track) defines a vocabulary of usage categories. There are three:
+
+- **`train-ai`** — "Using an asset to modify the learned parameters of a generative AI model."
+- **`ai-use`** — "Using an asset as input to a generative AI model, where the asset is not directly provided by the user."
+- **`search`** — "Using an asset in an application where the primary purpose of the application is to select assets and direct users to the location of those assets."
+
+The `search` category carries conditions that matter: it applies where "the presentation of an asset in search output — if selected for presentation — includes a direct reference or link to the original location from which the asset was retrieved," and where "when excerpts from the asset are displayed they serve to assist users in evaluating the relevance of the result." Crucially, "this category does not include the use of assets to generate summaries," and "this category overrides any usage that falls into other categories, including AI Training and AI Use." That last rule is the interesting one: a search application's internal processing is permitted, including training models on the assets, provided the outputs are used only in ways that meet the search conditions.
+
+**`draft-ietf-aipref-attach-05`** (Illyes & Thomson, 19 August 2026, updates RFC 9309) defines *how* to attach those preferences. Two mechanisms:
+
+The first is a `Content-Usage` HTTP response header field, "a structured field dictionary" following the vocabulary and processing rules. It is representation metadata applying to the content of a message. Notably, "The Content-Usage field does not have any special effect on caching."
+
+The second is a new `robots.txt` rule, extending the RFC 9309 ABNF:
+
+```text
+rule =/ content-usage
+
+content-usage = *WS "content-usage" *WS ":" *WS
+                [ path-pattern 1*WS ] usage-pref EOL
+usage-pref    = <usage preference vocabulary from [VOCAB]>
+```
+
+With a worked example from the draft:
+
+```text
+User-Agent: *
+Allow: /
+Disallow: /never/
+Content-Usage: train-ai=n
+Content-Usage: /ai-ok/ train-ai=y
+
+User-Agent: ExampleBot
+Allow: /
+Content-Usage: train-ai=y
+```
+
+The semantics are the part to internalise, because they resolve the ambiguity that makes `robots.txt` confusing. The draft states that this "creates a two-stage arrangement that distinguishes acquisition and usage. Acquisition relies on Allow/Disallow rules; usage preference relies on Content-Usage rules." Usage preferences "apply only to those resources that can be crawled according to Allow/Disallow rules; no preferences are implied for resources that are disallowed."
+
+There are two behavioural details that differ from `robots.txt` convention and would surprise anyone assuming the old semantics:
+
+- **Conflicts resolve more strictly.** Where identical paths carry conflicting usage preferences, "this differs from the Allow/Disallow rules, where a conflict leads to the more permissive option, allowing crawling."
+- **Specificity still wins.** The draft's own processing rules are more-specific-instructions, and Anthropic's implementation note confirms the precedence: "If your robots.txt file names ClaudeBot, we follow that rule, even if your general setting says something different."
+
+The preference values themselves are simple: `y` for allow, `n` for disallow, and — the state that matters most in practice — **unknown**. A category with no statement is "unknown," not "allowed."
+
+## The honest status: drafts, not standards
+
+Both `aipref` documents are **Active Internet-Drafts**, not RFCs. The datatracker records their state as "WG Document" and "I-D Exists," and the vocabulary draft carries an explicit editorial note that "This section does not yet have consensus." Their intended RFC status is Proposed Standard, but intended status is not current status.
+
+That has a direct practical consequence: **do not deploy `Content-Usage` rules as if they were enforced.** Today they are inert unless a specific crawler implements them. Anthropic's own announcement is the clearest example of what "implementing" means in practice: "As of October 30, 2026, Anthropic has begun recognizing a machine-readable signal... We're rolling this out across all of our services over time and globally." One vendor, gradually, with an explicit statement that behaviour "may change too."
+
+The same caution applies to the alternative mechanism the drafts describe. The `Content-Usage` *header* requires the same cooperation as the `robots.txt` rule — someone has to send it and someone has to read it. Neither happens automatically.
+
+## A governance model that works today
+
+Given all that, the practical approach is layered, with the current-standard mechanisms first:
+
+**Layer 1 — decide by purpose, not by vendor.** Write down, for each purpose, whether you want to be found, quoted in answers, or used for training. These are genuinely different decisions with different consequences, and the vendor docs quantify them.
+
+**Layer 2 — use the documented user agents.** Each vendor publishes both the user-agent string and the IP ranges as JSON (`openai.com/gptbot.json`, `openai.com/searchbot.json`, `perplexity.ai/perplexitybot.json`, and equivalents). Match on both, as Perplexity's WAF guidance describes, and keep the ranges updated — the docs change them.
+
+**Layer 3 — verify identity rather than trusting the header.** A `User-Agent` header is trivially spoofed. Each vendor publishes its IP ranges precisely so you can check the source address, and Anthropic notes that a request from a listed IP "indicates that the crawler is coming from Anthropic." Verify the IP against the published list; do not grant access on the header alone.
+
+**Layer 4 — separate blocking from training consent.** If you want to be findable but not trained on, allow the search bot and disallow the training bot. This is the single most consequential distinction in the current landscape, and both OpenAI and Anthropic document it explicitly.
+
+**Layer 5 — treat user-initiated fetches separately.** Decide explicitly whether to allow `ChatGPT-User`, `Claude-User`, and `Perplexity-User`, recognising that some of them ignore `robots.txt` anyway and that blocking them removes you from user-directed answers.
+
+**Layer 6 — monitor rather than assume.** Log the AI user agents as a distinct traffic class in your server logs or CDN analytics, with the purpose labelled per agent. You cannot govern what you do not measure, and the whole point of the split taxonomy is that "AI traffic" is not one measurable thing.
+
+For how to fold this into existing crawl-budget and log-analysis workflows, see [How Googlebot Discovers and Crawls Pages](/articles/how-googlebot-discovers-and-crawls-pages) and [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests). For the standards background on `robots.txt` itself, see [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap).
+
+## References & Further Reading
+
+- IETF, [RFC 9309 — Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.txt), September 2022 (Standards Track). The base specification that `draft-ietf-aipref-attach` updates, and the source of the `rule` ABNF, path-prefix matching, and 24-hour caching guidance referenced above.
+- IETF, ["A Vocabulary For Expressing AI Usage Preferences"](https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/), draft-ietf-aipref-vocab-08, 14 September 2026 (Active Internet-Draft, `aipref` WG; P. Keller, M. Thomson). Supports the three usage categories and their definitions, the allow/disallow/unknown preference model, the `train-ai=y, search=n` exemplary serialization, the category labels, and the statement that the Search category overrides AI Training and AI Use.
+- IETF, ["Associating AI Usage Preferences with Content in HTTP"](https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/), draft-ietf-aipref-attach-05, 19 August 2026 (Active Internet-Draft, `aipref` WG; G. Illyes, M. Thomson). Supports the `Content-Usage` header field, the extended `robots.txt` ABNF, the two-stage acquisition/usage distinction, the path-prefix matching rules, the conflicting-preference behaviour, and the worked example and table.
+- OpenAI, [Overview of OpenAI Crawlers](https://platform.openai.com/docs/bots), accessed 2026-11-14. Supports the `OAI-SearchBot`, `OAI-AdsBot`, `GPTBot`, and `ChatGPT-User` descriptions, the independence of the settings, the stated consequences of each opt-out, the robots.txt marker on user-agent strings, the published IP endpoints, and the ~24-hour propagation time.
+- Anthropic Help Center, ["Does Anthropic crawl data from the web, and how can site owners block the crawler?"](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler), accessed 2026-11-14. Supports the `ClaudeBot`, `Claude-User`, and `Claude-SearchBot` descriptions and their stated consequences, the `Crawl-delay` extension support, the warning about IP-based blocking, the October 30, 2026 start of `aipref`-based signal recognition, the ClaudeBot-specific-rule precedence, and the statement that the standard is still evolving.
+- Perplexity, [Perplexity Crawlers](https://docs.perplexity.ai/guides/bots), accessed 2026-11-14. Supports the `PerplexityBot` and `Perplexity-User` descriptions, the statement that `PerplexityBot` is not used to crawl for foundation models, the note that the user-triggered fetcher generally ignores robots.txt, the published IP endpoints, the WAF configuration guidance, and the ~24-hour propagation time.
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features), last updated 2025-12-10. Supports the statement that robots.txt directives for Googlebot are the control for crawling for Search, that Google-Extended is the separate control for limiting AI training and grounding in other Google systems, and that there are no additional technical requirements or special markup for AI Overviews and AI Mode.

@@ -19,32 +19,48 @@ Understanding how search engines calculate canonical confidence allows engineers
 
 ```text
 [Incoming Crawled URL: /product?color=blue]
-               │
-               ▼
+               |
+               v
 [Inspect Canonical Signals]
-  ├── User Declared: <link rel="canonical" href="/product">  (Signal Weight: High)
-  ├── 301 Redirect Target: None (200 OK)                     (Signal Weight: Neutral)
-  ├── Internal Link Volume: 95% of links point to /product   (Signal Weight: High)
-  ├── XML Sitemap Inclusion: Only /product listed             (Signal Weight: Moderate)
-  └── Content Similarity: 98% identical to /product          (Signal Weight: High)
-               │
-               ▼
-[Canonical Selection Algorithm] ──► Selects /product as Canonical Leader
-               │
-               ▼
-[Index Action] ──► /product indexed; /product?color=blue consolidated
+   |- Redirect: none (200 OK)                                 (no signal)
+   |- rel="canonical": not present                            (no signal)
+   |- XML Sitemap: /product listed, /product?color=blue not   (weak signal)
+   |- Internal links point to /product                         (not a documented signal)
+               |
+               v
+[Google selects a canonical URL for the cluster] --> /product
+               |
+               v
+[Index Action] --> /product indexed; the variant consolidated into it
 ```
+
+Note what is *not* in that diagram: no percentages, no similarity scores, and no named algorithm. Google's public documentation describes the signals it honours and their relative strength; it does not publish a clustering implementation, a similarity metric, or a scoring formula. Anything presented as one is an illustration of a mental model, not a description of the system.
 
 ---
 
-## 1. The Duplicate Cluster: How Search Engines Group Pages
+## 1. The Duplicate Cluster: What Google Actually Documents
 
-Search engines do not index the web URL by URL in isolation. During the indexing pipeline, algorithms group pages into **Duplicate Clusters**:
+Google's documentation on canonicalisation is specific about the signals it uses and explicit about their relative strength. From the "How to specify a canonical URL" documentation, the methods are listed "in order of how strongly they can influence canonicalization":
 
-1. **Clustering:** When Googlebot fetches a page, it computes content hashes (simhashes) of the text, structure, and media. If two or more URLs share substantially identical content, they are assigned to the same cluster.
-2. **Canonical Selection:** The algorithm evaluates all URLs in the cluster and selects a single representative URL—the **Canonical URL**.
-3. **Signal Consolidation:** Inverted index metrics, external backlinks, and anchor text signals from all cluster members are consolidated into the chosen canonical URL.
-4. **Serving:** Only the canonical URL is served in search results. Non-canonical duplicates are filtered out of search listings.
+1. **Redirects** - "A strong signal that the target of the redirect should become canonical."
+2. **`rel="canonical"` link annotations** - "A strong signal that the specified URL should become canonical."
+3. **Sitemap inclusion** - "A weak signal that helps the URLs that are included in a sitemap become canonical."
+
+The documentation adds that "these methods can stack and thus become more effective when combined."
+
+Two points follow that are routinely misstated online.
+
+First, **none of these methods are required.** Google's documentation states: "While we encourage you to use these methods, none of them are required; your site will likely do just fine without specifying a canonical preference. That's because if you don't specify a canonical URL, Google will identify which version of the URL is objectively the best version to show to users in Search."
+
+Second, and more importantly, **the clustering and selection mechanisms are not public.** Google does not document whether it uses hashing, near-duplicate detection, embedding similarity, or any other method to group URLs, nor does it publish a canonical-scoring formula or a signal-weighting table. Claims that describe Google's internal process - that it computes "simhashes," that it applies a named "canonical selection algorithm," or that internal links carry a specific "signal weight" - are not supported by any primary source. They may be reasonable analogies, but they are not documentation, and building an audit checklist on them means building on sand.
+
+What you *can* work from is the documented signal hierarchy above, plus these observable behaviours:
+
+- **Strong signals:** a permanent redirect to the target, and a `rel="canonical"` annotation pointing at it. Google's documentation also states that "Google prefers HTTPS pages over equivalent HTTP pages as canonical," with exceptions, and that Google "generally doesn't support URL fragments" for canonicalisation.
+- **Weak signals:** sitemap inclusion. The documentation is candid that when using the sitemap method, "Google must still determine the associated duplicate for any canonicals that you declare in the sitemap."
+- **Your job:** make the strong signals agree with each other. If your redirect points at `/product` and your canonical tag points at `/product?color=blue`, you have created a conflict that no amount of internal linking will resolve.
+
+That last point is the actionable one, and it is fully supported: "these methods can stack and thus become more effective when combined." Stacking only helps when the stack is coherent.
 
 ---
 
@@ -58,36 +74,39 @@ Developers frequently confuse `rel="canonical"` with `noindex`:
 | **`robots.txt` Disallow** | Strict Command | Search engines **must not** fetch the URL path. | Aborts socket request immediately. |
 | **`rel="canonical"` tag** | Suggestion / Signal | Search engines **weigh** the tag against other structural signals. | Fetches page; evaluates tag alongside redirects, links, and content. |
 
-### Why Google Overrides Canonical Tags
+### Why Google May Override a Canonical Tag
 If you place `<link rel="canonical" href="/master-page">` on `/variant-page`, but:
-* 99% of your internal navigation links point to `/variant-page`;
 * Your XML sitemap lists `/variant-page` instead of `/master-page`;
-* `/variant-page` has hundreds of external backlinks while `/master-page` has none;
+* `/variant-page` is the version your internal links and external links actually point to;
 * Or the content on the two pages is noticeably different;
 
-Googlebot will conclude that your canonical tag is an error or configuration mistake. It will disregard your tag, choose `/variant-page` as the canonical URL, and report a canonical discrepancy in Search Console.
+then the signals conflict. Google documents that it prefers HTTPS versions, that redirects and canonical annotations are strong signals while sitemap inclusion is weak, and that when methods are combined their effect stacks. It also documents, in its Search Console reporting, a "canonical" designation for the URL it considers canonical and a "user-declared canonical" field that can disagree with it - so a conflicting setup shows up as a discrepancy you can inspect rather than as a silent outcome.
+
+What the documentation does *not* state is a threshold, a weight, or a rule about how many internal links it takes to override a canonical tag. Claims like "Googlebot ignores your canonical when 99% of internal links point elsewhere" describe a mechanism Google has not published. The defensible version is the weaker and still useful one: strong signals that disagree with each other make the outcome less predictable, and the site owner is the only party who can resolve that by making them agree.
 
 ---
 
 ## 3. The Hierarchy of Canonical Signals
 
-When Google evaluates a duplicate cluster, it aggregates signals across your infrastructure. These signals carry different weights:
+Google's documentation gives a three-level ordering, and it is worth using the documented one rather than an invented one:
 
 ```text
-High Authority Signals (Hard Infrastructure):
-1. HTTP 301 / 308 Permanent Redirects (Absolute transfer of intent)
-2. Consistent rel="canonical" tags (HTML head or HTTP header)
+Strong signals:
+1. HTTP 301 / 308 permanent redirects  ("A strong signal that the target
+   of the redirect should become canonical")
+2. rel="canonical" annotations         ("A strong signal that the
+   specified URL should become canonical")
 
-Medium Authority Signals (Structural Navigation):
-3. Internal Link Graph volume and anchor text consistency
-4. XML Sitemap inclusion (<loc> presence)
+Weak signal:
+3. XML Sitemap inclusion               ("A weak signal that helps the
+   URLs that are included in a sitemap become canonical")
 
-Low / Heuristic Signals (Content & Protocol):
-5. HTTPS preference over insecure HTTP
-6. Clean, shorter URL path preference over parameterized URLs
+Documented preferences (not ranked against the above):
+4. HTTPS over equivalent HTTP
+5. URL fragments are generally not supported for canonicalisation
 ```
 
-If these signals point to different URLs, you have **Canonical Conflict**. Resolving the conflict requires aligning every tier of this hierarchy so that redirects, canonical tags, internal links, and sitemaps point to the exact same URI string.
+"If these signals point to different URLs, you have **Canonical Conflict**. Resolving it means aligning the strong signals so that redirects, canonical annotations, and sitemaps all point to the exact same URI string - and making sure your internal links agree with that URL too, even though internal linking is not one of the documented canonicalisation methods.
 
 ---
 
@@ -153,7 +172,7 @@ Inspect "User-declared canonical" vs "Google-selected canonical"
 ### Common Canonical Mistakes to Avoid:
 1. **Canonical Chains (`A -> B -> C`):** Page A points its canonical to Page B, which points its canonical to Page C. Always point directly to the terminal canonical destination.
 2. **Canonicalizing to a 404 or 301:** A canonical tag must never point to a URL that returns a non-200 status code.
-3. **Canonicalizing Dissimilar Content:** Placing a canonical tag from a blue t-shirt page to a red shoes page will be ignored by Googlebot because the content hashes do not match.
+3. **Canonicalizing Dissimilar Content:** Placing a canonical tag from a blue t-shirt page to a red shoes page is a misconfiguration. Google documents that it weighs canonical annotations against other signals and prefers the version it considers objectively best, so a canonical pointing at unrelated content will not be honoured. The content-hash mechanism that would detect this is not documented, so treat the case as "expect it to be ignored" and fix the mapping rather than relying on the tag to be overruled.
 
 ---
 
@@ -177,3 +196,11 @@ Continue exploring indexing and semantic markup:
 * **[Structured Data and Schema.org: What It Can—and Cannot—Do](/articles/structured-data-and-schema-org-what-it-can-and-cannot-do)** — Enhancing indexed canonical pages with semantic entity markup.
 * **[SEO URL Structure: Normalize Hostnames, Paths, and Parameters](/articles/seo-url-structure-normalize-hostnames-paths-parameters)** — Preventing duplicate URLs before canonical tags are needed.
 * **[Discovered, Crawled, Rendered, Indexed: Why Stages Differ](/articles/discovered-crawled-rendered-indexed-why-stages-differ)** — How canonical selection operates within the search ingestion funnel.
+
+## References & Further Reading
+
+- Google Search Central, [How to specify a canonical URL with `rel="canonical"` and other methods](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), accessed 2026-11-14. Supports the documented signal hierarchy (redirects and `rel="canonical"` as strong signals, sitemap inclusion as a weak signal), the statement that these methods can stack, the statement that none of them are required and that Google will otherwise identify the objectively best version, the preference for HTTPS over equivalent HTTP, the statement that URL fragments are generally not supported, the requirement that Google must still determine the associated duplicate for sitemaps, the guidance that `rel="canonical"` annotations with `hreflang`, `lang`, `media` and `type` attributes are ignored for canonicalisation, and the rule that the `ETag` wins when both validators are present.
+- Google Search Central, [Consolidate duplicate URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), accessed 2026-11-14. Background on how duplicate URL consolidation is handled and how to diagnose it with the URL Inspection tool.
+- Google Search Central, [Robots meta tag and `data-nosnippet` specifications](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag), accessed 2026-11-14. Supports the distinction between `noindex` as a directive and canonical handling of pages that must remain crawlable.
+- IETF, [RFC 9309 — Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.txt), September 2022 (Standards Track). The normative robots.txt specification, including group selection and the rule that a `Sitemap` record must not terminate a group - both relevant to the sitemap signal discussed above.
+- The publication's own [robots.txt parsing article](/articles/robots-txt-is-a-parsing-specification-the-rules-your-crawler-follows) for the normative parsing rules behind `robots.txt` groups and path matching.
