@@ -84,6 +84,29 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+   Horizontal category scroller (/articles)
+   Single row; native scrollbar is hidden in favour of arrow buttons and
+   edge fades, but the container stays keyboard-scrollable via tabindex.
+   --------------------------------------------------------------------------- */
+.category-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.category-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Keep a visible focus ring on the scroll container itself so keyboard
+   users can tell where they are when tabbing into the strip. */
+.category-scroller:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
    View transitions (React <ViewTransition> during navigation)
    --------------------------------------------------------------------------- */
 ::view-transition {

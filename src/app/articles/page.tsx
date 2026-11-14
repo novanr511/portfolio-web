@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
+import { CategoryScroller } from "@/components/category-scroller";
 import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 import Link from "next/link";
@@ -97,20 +98,19 @@ export default async function ArticlesPage() {
         </Reveal>
 
         <section className="mt-9" aria-label="Article categories">
-          <h2 className="text-sm font-semibold text-foreground">Browse by category</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <CategoryScroller>
             {[...new Set(sortedArticles.flatMap((article) => article.tags))]
               .sort((a, b) => a.localeCompare(b))
               .map((category) => (
                 <Link
                   key={category}
                   href={`/articles/category/${categorySlug(category)}`}
-                  className="rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
+                  className="shrink-0 whitespace-nowrap rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
                 >
                   {category}
                 </Link>
               ))}
-          </div>
+          </CategoryScroller>
         </section>
 
         <p className="mt-6 text-sm text-muted">
