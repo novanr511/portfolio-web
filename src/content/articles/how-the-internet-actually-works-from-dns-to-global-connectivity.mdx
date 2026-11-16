@@ -1,0 +1,69 @@
+---
+title: "How the Internet Actually Works: From DNS to Global Connectivity"
+description: "The internet is not a cloud. It is a network of networks, held together by DNS, IP routing, undersea cables, and exchange points. Learn how a request actually travels."
+date: 2026-11-16
+tags:
+  - Internet
+  - DNS
+  - Networking
+  - Infrastructure
+---
+
+The internet is often drawn as a cloud, which hides how it actually works. It is not a single thing. It is a network of networks, held together by agreements, cables, and protocols that most users never see.
+
+**Direct answer:** The internet works by breaking data into packets, addressing them with IP, routing them across interconnected networks via BGP, and translating human-readable names into addresses via DNS. A request from your browser to a server on another continent typically crosses multiple autonomous systems, undersea cables, and exchange points before a response comes back. No single company owns or controls the whole path.
+
+## Names become addresses: DNS
+
+Before a browser can connect to a server, it needs an IP address. DNS (Domain Name System) is the distributed directory that maps names like `example.com` to addresses like `93.184.216.34`.
+
+DNS is hierarchical. The root zone knows where top-level domains like `.com` live. TLD servers know where authoritative servers for individual domains live. Resolvers—operated by ISPs, public DNS providers, or your network—walk this hierarchy, cache answers, and return them to your device.
+
+A DNS failure looks like an internet failure: the network is fine, but names cannot be resolved, so nothing loads. That is why DNS is often the first thing checked when a site is unreachable.
+
+## Packets and IP: the best-effort delivery
+
+Once a name is resolved, data is broken into packets. Each packet carries a source and destination IP address. IP (Internet Protocol) is best-effort: it tries to deliver packets, but does not guarantee delivery, order, or speed. Lost packets are handled by higher layers such as TCP.
+
+Packets from the same message can take different paths. The internet routes around damage dynamically, which is why it is resilient—but also why latency and packet loss vary moment to moment.
+
+## Routing across networks: BGP
+
+The internet is made of autonomous systems (ASes): networks operated by ISPs, universities, companies, and governments. Each AS controls its own routing policy. BGP (Border Gateway Protocol) is the protocol ASes use to tell each other which IP prefixes they can reach.
+
+BGP is trust-based. An AS announces routes, and neighbors accept them. Misconfigurations or malicious announcements can misdirect traffic—a BGP hijack—or make a network unreachable—a BGP leak. Because BGP relies on trust rather than validation, routing incidents happen regularly and can affect large parts of the internet.
+
+## The physical layer: cables and exchange points
+
+Packets do not travel through the air for most of their journey. They travel through fiber-optic cables: undersea cables between continents, terrestrial cables across land, and local loops to homes and offices.
+
+Internet exchange points (IXPs) are physical locations where networks connect directly to exchange traffic. Peering at an IXP is often cheaper and faster than sending traffic through a third-party transit provider. The density of IXPs and undersea cables in a region affects cost, latency, and resilience for users there.
+
+## From your device to the server
+
+A typical request looks like this:
+
+1. Your device resolves the domain name via DNS.
+2. Your device opens a TCP connection (with TLS) to the server IP.
+3. Your router forwards packets to your ISP.
+4. Your ISP routes them through its network, possibly via an IXP, to another network.
+5. Packets cross undersea cables if the server is overseas.
+6. The destination network delivers packets to the server.
+7. The server responds, and the reverse path carries the response back.
+
+Each hop adds latency. Each network on the path can see the packet headers (but not the encrypted contents if TLS is used). No single network sees the whole picture.
+
+## What this means in practice
+
+Understanding the internet as a network of networks changes how you diagnose problems:
+
+- A slow site may be fine locally but slow because of a congested transit link or a BGP detour.
+- A site unreachable from one ISP may work from another because of different routing.
+- DNS changes take time to propagate because of caching at every level.
+- Local infrastructure—cables, IXPs, data centers—matters as much as the software running on servers.
+
+For the related question of how DNS specifically affects site availability and crawling, see [DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works). For how servers and applications fit into the request path, see [Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin).
+
+## References & Further Reading
+
+This article synthesizes standard internet architecture concepts and does not cite a specific network, provider, or incident by name. No specific ISP, IXP, or cable system is used as evidence because no specific claim about one is made. For technical details, consult RFC 1034/1035 (DNS), RFC 791 (IP), RFC 4271 (BGP), and public documentation from network operators and internet measurement projects.
