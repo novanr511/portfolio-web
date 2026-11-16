@@ -1,0 +1,90 @@
+---
+title: "Customer Data Platforms: Unifying Data for Personalization"
+description: "CDPs unify customer data across touchpoints. Learn CDP architecture, identity resolution, activation, and vendor landscape."
+date: 2026-11-16
+tags:
+  - CDP
+  - Customer Data Platform
+  - Data Unification
+  - Personalization
+  - MarTech
+---
+
+Data fragmentation kills personalization. CDPs unify it.
+
+**Direct answer:** A Customer Data Platform (CDP) is packaged software that creates a persistent, unified customer database accessible to other systems. It ingests data from sources (web, mobile, CRM, email, POS, support), resolves identities into unified profiles, and activates segments to destinations (ads, email, push, web personalization). CDPs differ from DMPs (anonymous, cookie-based), CRMs (sales-focused), and data warehouses (analytical).
+
+## CDP core capabilities
+
+**Ingest:** batch + streaming. Sources: web/mobile SDKs, server-side APIs, ETL/ELT (Fivetran, Airbyte), CRM (SFDC, HubSpot), ESP, POS, support (Zendesk), loyalty.
+
+**Identity resolution:** deterministic (email, phone, user_id, loyalty ID) + probabilistic (device graph, IP, behavior). Creates unified customer profile (Golden Record).
+
+**Profile unification:** single customer view with attributes (demographics, preferences, consent), events (timeline), computed traits (LTV, churn risk, propensity scores), segments.
+
+**Segmentation:** rule-based (SQL/no-code), predictive (ML scores), real-time (streaming). Export to destinations.
+
+**Activation:** real-time APIs (web personalization, push, SMS), batch exports (ad audiences, email lists), webhooks, reverse ETL to warehouse.
+
+**Governance:** consent management (GDPR/CCPA), data lineage, access controls, audit logs, data quality monitoring.
+
+## CDP vs DMP vs CRM vs Warehouse
+
+| | CDP | DMP | CRM | Data Warehouse |
+|---|---|---|---|---|
+| **Primary ID** | PII (email, user_id) | Cookie/device ID | Account/contact | Any |
+| **Data type** | 1st party (known) | 3rd party (anonymous) | Sales interactions | All |
+| **Latency** | Real-time | Near-real-time | Batch/near-real | Batch |
+| **Use case** | Personalization, activation | Ad targeting | Sales pipeline | Analytics, BI |
+| **Retention** | Years | 30-90 days | Indefinite | Indefinite |
+
+## CDP architectures
+
+**Packaged CDP (traditional):** all-in-one (Segment, mParticle, Tealium, Braze, Bloomreach, ActionIQ, Treasure Data). Fast deployment, vendor lock-in.
+
+**Composable CDP (warehouse-native):** source of truth = data warehouse (Snowflake, BigQuery, Redshift). Activation layer (Hightouch, Census, RudderStack). No data copy. SQL-defined segments.
+
+**Hybrid:** CDP for real-time + warehouse for analytics.
+
+## Identity resolution deep dive
+
+**Deterministic:** exact match on email, phone, user_id, login. High precision, lower reach.
+
+**Probabilistic:** ML models on device graph, IP, behavior. Higher reach, lower precision.
+
+**Hybrid:** deterministic backbone + probabilistic expansion. Cross-device graphs (LiveRamp, Tapad, native).
+
+**Challenges:** guest users, shared devices, privacy regulations (no cross-site tracking).
+
+## Activation use cases
+
+- **Web personalization:** product recommendations, content blocks, pop-ups.
+- **Email/SMS:** triggered journeys (abandoned cart, browse abandonment, win-back).
+- **Paid media:** suppression (exclude customers), lookalikes, retargeting.
+- **In-app:** messaging, feature flags, onboarding.
+- **Sales/CS:** lead enrichment, account scoring, churn alerts.
+
+## Vendor landscape (categories)
+
+**Enterprise:** Segment (Twilio), mParticle, Tealium, ActionIQ, Treasure Data (Arm).
+
+**Marketing clouds:** Adobe RTCDP, Salesforce Data Cloud, Oracle Unity, SAP CDP.
+
+**Composable:** Hightouch, Census, RudderStack, Segment (reverse ETL).
+
+**Specialized:** Bloomreach (ecomm), Braze (engagement), Klaviyo CDP.
+
+## Selection criteria
+
+- **Data volume / latency needs.**
+- **Identity resolution sophistication.**
+- **Integration ecosystem (sources + destinations).**
+- **Compliance (GDPR, CCPA, HIPAA).**
+- **Team skills (SQL vs no-code).**
+- **TCO: license + implementation + maintenance.**
+
+For the related question of data strategy, see [Data Strategy: How Organizations Use Data to Compete](/articles/data-strategy-how-organizations-use-data-to-compete) and data governance, see [Data Governance: Managing Data as an Asset](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+This article synthesizes standard CDP concepts and does not cite a specific vendor, implementation, or benchmark by name. No specific product is endorsed. For research, consult CDP Institute, Gartner MQ, Forrester Wave, and literature on customer data management and martech architecture.
