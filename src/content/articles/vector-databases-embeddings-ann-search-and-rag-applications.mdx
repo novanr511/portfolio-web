@@ -1,84 +1,88 @@
 ---
 title: "Vector Databases: Embeddings, ANN Search, and RAG Applications"
-description: "Vector databases store and search high-dimensional embeddings. Learn ANN algorithms, indexing strategies, and RAG architectures."
+description: "ANN search is a memory-versus-recall trade-off, and the index families differ in where they spend it. Read how FAISS, HNSW, and SPANN solve it."
 date: 2026-11-16
 tags:
   - Vector Databases
   - Embeddings
   - ANN Search
   - RAG
-  - Generative AI
 ---
 
-Vectors are the new language of search.
+"Vector database" is a category name rather than a technical one, and it hides a specific engineering decision: you are choosing how to spend memory in exchange for how often a nearest-neighbour search returns the true nearest neighbour. Every design in this space is a position on that trade-off, and the published systems differ mainly in where they put the pressure.
 
-**Direct answer:** Vector databases store, index, and query high-dimensional vector embeddings. They enable semantic search, recommendation, and Retrieval-Augmented Generation (RAG) by finding nearest neighbors in embedding space. Approximate Nearest Neighbor (ANN) algorithms (HNSW, IVF, DiskANN) trade exactness for speed at scale. Vector databases add CRUD, filtering, hybrid search, and multi-tenancy on top of ANN indexes.
+**Direct answer:** A vector store embeds your data as vectors and serves approximate nearest-neighbour queries. The interesting part is the index, and the useful way to read the literature is by what each index spends. HNSW spends memory to get logarithmic search complexity. FAISS spends compute on GPUs and gives you exact search when you can afford it. SPANN spends memory-disk hierarchy and keeps most of the data out of RAM. None of them removes the trade-off; they relocate it, and the relocation determines which one fits your corpus.
 
-## Embeddings as the universal representation
+## The problem underneath the category
 
-Embeddings map discrete or unstructured data (text, images, audio, user behavior) to dense vectors where semantic similarity = geometric proximity (cosine similarity, dot product, Euclidean distance).
+Once documents are vectors, "find the documents most similar to this query" becomes "find the nearest neighbours of this vector in high-dimensional space". Two properties of that space make it hard.
 
-**Sources of embeddings:**
-- **Text:** Sentence-BERT, OpenAI embeddings, Cohere, Voyage, E5, BGE.
-- **Images:** CLIP, ResNet, DINOv2, SigLIP.
-- **Multimodal:** ImageBind, CLIP (joint text-image space).
-- **Users/items:** collaborative filtering embeddings, two-tower models.
+First, the curse of dimensionality: in high dimensions, distance concentration means that the nearest neighbour and the hundredth nearest neighbour are nearly equidistant, and distance-based pruning loses its selectivity. Algorithms that work in two or three dimensions do not transfer.
 
-## Approximate Nearest Neighbor (ANN) algorithms
+Second, brute force is linear in corpus size, and it is also *exact*. That combination is the whole trade-off: exact search over a billion vectors means a billion distance computations per query; approximate search means you can often find the right answer after examining a tiny fraction of the data, at the price of sometimes missing it.
 
-Exact k-NN is O(N) — too slow for millions of vectors. ANN trades recall for speed.
+The second property is the one that makes the engineering choice interesting. Approximate search is not a compromise you are forced into at scale — it is a deliberate trade of recall for latency, and it can be traded back if you have the compute.
 
-**HNSW (Hierarchical Navigable Small World):** graph-based, multi-layer. Fast, high recall, memory-intensive. Dominant in production (Pinecone, Weaviate, Qdrant, Milvus, pgvector).
+## HNSW: spending memory for logarithmic search
 
-**IVF (Inverted File Index):** partition space with k-means, search subset of clusters. Lower memory, faster build. Used in Faiss, Milvus.
+Malkov and Yashunin build a hierarchy of graphs over the vectors, where the upper layers are sparse and the lower layers are dense. The search starts at the top and descends greedily, and the key property is what the upper layer buys you.
 
-**DiskANN / SPANN:** disk-resident graph index for billion-scale. Low memory, SSD-optimized.
+Their description of the mechanism is precise: "Starting search from the upper layer together with utilizing the scale separation boosts the performance compared to NSW and allows a logarithmic complexity scaling." The scale separation is the point — the upper layer gives the search a long-range entry point into the dense graph below, so it does not have to explore locally to find its way.
 
-**PQ (Product Quantization):** compress vectors, search in compressed domain. Reduces memory 8–16x.
+The measured claim is comparative rather than absolute: their "general metric space search index is able to strongly outperform previous opensource state-of-the-art vector-only approaches."
 
-**Hybrid:** IVF + HNSW (IVF for coarse, HNSW for fine), PQ + HNSW.
+This is the index most vector databases ship, and the reason is the shape of its cost: the graph is built with a parameter that controls how many neighbours each node keeps, and the memory cost is roughly linear in the corpus while the search cost is close to logarithmic in it. Raise the neighbour count and recall goes up and memory goes up. That is the dial, and it is the same dial HNSW exposes in every implementation.
 
-## Vector database features beyond ANN
+## FAISS: spending compute, and keeping exactness available
 
-- **CRUD:** insert, update, delete, upsert vectors with metadata.
-- **Filtering:** pre-filter (pre-ANN) or post-filter (post-ANN) by metadata (tenant, category, date).
-- **Hybrid search:** combine vector similarity + keyword (BM25) + filters. Reciprocal rank fusion (RRF) or weighted score fusion.
-- **Multi-tenancy:** namespace isolation, per-tenant quotas.
-- **Versioning / snapshots:** point-in-time recovery, reproducibility.
-- **Replication / sharding:** horizontal scaling, multi-region.
+Johnson, Douze and Jégou took the opposite approach: put the search on the GPU and make the algorithm's constant factor small enough that exact search becomes practical at a scale nobody had reached before.
 
-## RAG (Retrieval-Augmented Generation)
+The numbers define the contribution. Their implementation "enables the construction of a high accuracy k-NN graph on 95 million images from the Yfcc100M dataset in 35 minutes, and of a graph connecting 1 billion vectors in less than 12 hours on 4 Maxwell Titan X GPUs." The abstract also reports being "5x faster than prior GPU state of the art".
 
-RAG = retrieval + generation. Solves LLM knowledge cutoff and hallucination.
+The architecturally interesting decision is that FAISS is a *library of methods* rather than one index. It contains both exact algorithms — brute-force and refinement-based — and approximate ones, and the practical consequence is that the exactness/approximation choice becomes a runtime parameter rather than an architectural commitment. For a corpus where you cannot tolerate a wrong answer, or where the corpus is small enough that exact search is affordable, that is a real option, and it is why "FAISS" and "vector database" are not synonyms.
 
-**Pipeline:**
-1. **Ingest:** chunk documents → embed → upsert to vector DB.
-2. **Retrieve:** embed query → ANN search → top-K chunks.
-3. **Rerank (optional):** cross-encoder reranker for precision.
-4. **Generate:** LLM prompt with retrieved context + query.
-5. **Cite:** return sources with answer.
+The lesson for a practitioner: the index is not the product. The product is the ability to choose your recall/latency point at query time, or to run exact and approximate side by side and measure the gap.
 
-**Chunking strategies:** fixed size, semantic (paragraph), recursive, semantic + overlap. Chunk size affects recall/precision tradeoff.
+## SPANN: spending memory hierarchy
 
-**Reranking:** cross-encoder (e.g., bge-reranker, Cohere Rerank) scores (query, chunk) pairs. Improves precision at cost of latency.
+Chen et al. attack the problem that shows up when the corpus stops fitting in RAM, and they are explicit about the method: SPANN is "a simple but efficient memory-disk hybrid indexing and search system... that follows the inverted index methodology".
 
-## Index selection guide
+The design bet is that you do not need every vector resident. You keep a small in-memory summary and let the rest live on disk, retrieving candidates in bulk — the same inversion trick an inverted file index plays on text. The measured result: "SPANN is 2× faster than the state-of-the-art ANNS solution DiskANN to reach the same recall quality 90% with same memory cost in three billion-scale datasets."
 
-| Scale | Latency Budget | Recall Need | Recommended |
-|---|---|---|---|
-| < 1M vectors | < 50ms | > 0.95 | HNSW (pgvector, Qdrant, Weaviate) |
-| 1M–10M | < 100ms | > 0.90 | IVF+HNSW (Milvus, Pinecone) |
-| 10M–100M | < 200ms | > 0.90 | IVF+PQ, DiskANN (Milvus, Vespa) |
-| 100M+ | < 500ms | > 0.85 | DiskANN, SPANN (Vespa, proprietary) |
+Two things in that sentence matter. It is 2× faster *at the same recall and the same memory* — which means the improvement is in the search path, not in a cheaper configuration. And the recall target is stated as 90%, which is a realistic operating point rather than a claim of exactness.
 
-## Practical considerations
+For anyone operating a large corpus, this is the design that matters, because RAM is the resource that actually runs out.
 
-- **Dimensionality:** match embedding model (384, 768, 1024, 1536). Higher = more info, more memory.
-- **Distance metric:** cosine (normalized), dot product (unnormalized), L2. Match training objective.
-- **Filtering strategy:** pre-filter (fast, may miss), post-filter (accurate, slower). Hybrid: pre-filter broad, post-filter precise.
-- **RAG evaluation:** retrieval metrics (recall@K, MRR), generation metrics (faithfulness, answer relevance, groundedness).
+## The embedding side is where the speed came from
 
-For the related question of NLP fundamentals, see [NLP Fundamentals: Tokenization, Embeddings, and Transformers](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+Indexes are only half the story, and the half people forget. If your query and your documents must both be run through a cross-encoder, the search cannot be precomputed — and then the index buys you nothing.
+
+Reimers and Gurevych spell out the cost of the cross-encoder approach: it "requires that both sentences are fed into the network, which causes a massive computational overhead: Finding the most similar pair in a collection of 10,000 sentences requires about 50 million inference computations (~65 hours) with BERT". The construction of BERT "makes it unsuitable for semantic similarity search as well as for unsupervised tasks like clustering".
+
+Their fix is the bi-encoder: Sentence-BERT uses "siamese and triplet network structures to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity", which "reduces the effort for finding the most similar pair from 65 hours with BERT / RoBERTa to about 5 seconds with SBERT, while maintaining the accuracy from BERT".
+
+That is the prerequisite for the entire category. A vector store is only fast if embedding is a one-time cost per document and per query. The moment you need to run the model against the query *and* every candidate, the index stops being the bottleneck and becomes irrelevant.
+
+This is also the trade-off to know about: a bi-encoder embeds each item independently, so its vector cannot depend on what it will be compared against. A cross-encoder can attend across both texts and rank better. You are choosing between a better ranking and a searchable corpus, and the SBERT numbers are the cost of that choice, quantified.
+
+## What this has to do with RAG
+
+Retrieval-augmented generation inherits both halves. The RAG pipeline embeds your corpus once, searches it with an ANN index at query time, and hands the retrieved passages to a generator. The index choice determines recall; the embedding choice determines whether recall is even meaningful.
+
+The failure modes follow directly. A low-recall index produces a generator that never saw the answer. A cross-encoder at query time makes retrieval too slow to be interactive. An embedding model trained on a domain that does not match your corpus produces a nearest neighbour that is topically near and semantically wrong. And a hybrid system that mixes dense and sparse retrieval inherits the failure modes of both plus the tuning burden of combining their scores.
+
+That is why the sensible order is: fix the embedding and the evaluation set first, and only then choose an index. An index tuned against a bad embedding is a very efficient way to return the wrong document quickly.
+
+## A checklist before you pick an index
+
+1. **Do you need exact search?** If the corpus is small, or a wrong answer is unacceptable, GPU brute force may be affordable and better. Do not approximate before you have measured the cost of exactness.
+2. **How much recall do you need, and how much latency can you spend?** These are the two ends of the same dial. Write both numbers down, because every index decision follows from the pair.
+3. **Does the corpus fit in RAM?** If not, the memory-disk designs are not an optimisation, they are the plan.
+4. **Can you embed each document once?** If the scoring function requires the query and the document together, an index will not save you.
+5. **How will you measure recall?** Approximate search without a recall measurement is a guess. Keep an exact-search subset as ground truth, and measure against it whenever the index changes.
+6. **What happens when the corpus changes?** Rebuild cost, index versioning, and partial updates are operational costs that dominate the query cost in practice.
+
+For the retrieval layer's role in a generation system, see [Retrieval-Augmented Generation, Explained From the Inside Out](/articles/rag-explained); for the embedding and language stack underneath, see [NLP Fundamentals](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers).
 
 ## Further Reading
 
