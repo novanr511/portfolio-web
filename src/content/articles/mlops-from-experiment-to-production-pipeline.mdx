@@ -1,63 +1,78 @@
 ---
 title: "MLOps: From Experiment to Production Pipeline"
-description: "MLOps bridges the gap between ML experimentation and production deployment. Learn the key components: versioning, CI/CD, monitoring, and automation."
+description: "A production ML system is a set of contracts, not a sequence of steps. Learn what must be immutable, what must be monitored, and what usually breaks."
 date: 2026-11-16
 tags:
   - MLOps
-  - Machine Learning Engineering
-  - ML Pipeline
-  - Production ML
+  - Machine Learning
+  - CI/CD
+  - Reliability
 ---
 
-A model in a notebook is not a product. MLOps makes it one.
+The standard picture of MLOps is a pipeline: data goes in, training runs, a model comes out, it is deployed, and someone watches it. That picture is the reason so many ML systems work in a notebook and fail in production. A pipeline diagram shows what happens when everything succeeds. It says nothing about what must be true for the results to mean anything.
 
-**Direct answer:** MLOps (Machine Learning Operations) is the practice of applying DevOps principles to machine learning workflows. It covers the end-to-end lifecycle: data versioning, model training, validation, deployment, monitoring, and retraining. Without MLOps, models stall in notebooks; with MLOps, they become reliable, scalable products.
+**Direct answer:** A production ML system is a set of contracts, and each one has to be enforced mechanically. The training/evaluation split must be immutable and must precede every fitted step. The evaluation must be organised so that it resembles the conditions the model will meet, including time. The model must be treated as a small component inside a much larger system whose failure modes are mostly not about modelling. The pipeline itself must be reproducible, versioned, and running before the model is trusted — and after it, the real work is knowing when the system has degraded and rolling it back.
 
-## The MLOps lifecycle
+## Contract one: the split comes first and never moves
 
-MLOps extends the traditional ML workflow with operational rigor:
+This is the contract most often violated and the cheapest to enforce.
 
-1. **Data versioning:** track datasets alongside code (DVC, Delta Lake).
-2. **Experiment tracking:** log parameters, metrics, artifacts (MLflow, Weights & Biases).
-3. **Model registry:** version models, promote from staging to production (MLflow Model Registry, Vertex AI).
-4. **CI/CD for ML:** automated testing, building Docker images, deploying to staging/production (GitHub Actions, GitLab CI, Kubeflow).
-5. **Deployment:** batch, real-time API, edge, or streaming inference.
-6. **Monitoring:** track data drift, concept drift, latency, error rates.
-7. **Retraining:** automated or scheduled retraining triggers.
+scikit-learn states the failure mode precisely: "Data leakage occurs when information that would not be available at prediction time is used when building the model." The remedy they prescribe is procedural rather than technical: "Always split the data into train and test subsets first, particularly before any preprocessing steps", and they note that a pipeline "ensures that the appropriate method is performed on the correct data subset".
 
-## Key components
+The ordering is the whole point. It is not that scaling is dangerous; it is that scaling fitted on the full dataset has already seen the evaluation fold, and no later correction repairs it. The symptom is a validation score that looks excellent and a production score that does not, and because the number was never wrong in any step you can point at, the debugging session is long.
 
-**Version control for data and models:** Code is in Git; data and models need their own versioning. Tools like DVC, Delta Lake, or LakeFS track data lineage alongside Git commits.
+The enforcement is a code-review rule with no exceptions: the split happens in one place, before anything is fitted, and every subsequent transform is an object with `fit`/`transform` that lives inside the pipeline. If a preprocessing step cannot be expressed as an object with a fit method, it does not belong in the pipeline.
 
-**Experiment tracking:** Every run logs parameters, metrics, and artifacts. MLflow, Weights & Biases, and ClearML provide UI and APIs to compare runs.
+## Contract two: the evaluation must resemble production time
 
-**Model registry:** A centralized store for model versions with stages (staging, production, archived). Supports rollback and audit trails.
+Random splits are the default in most tutorials and the wrong default whenever the data has a time dimension. A random split lets the model learn from the future.
 
-**Continuous integration/continuous deployment:** Automate linting, unit tests, integration tests, Docker build, and deployment to Kubernetes, Vertex AI, SageMaker, or serverless endpoints.
+scikit-learn's `TimeSeriesSplit` makes the alternative explicit. It is a cross-validator for time-ordered data, and its signature shows the two controls that matter: `TimeSeriesSplit(n_splits=5, *, max_train_size=None, test_size=None, gap=0)`. The default behaviour is expanding-window: the documented example shows fold 0 training on index `[0 1 2 3 4 5]` and testing on `[6 7]`, fold 1 training on `[0 1 2 3 4 5 6 7]` and testing on `[8 9]`, fold 2 training on `[0 1 2 3 4 5 6 7 8 9]` and testing on `[10 11]`. Two properties fall out of that. Every training fold contains only the past relative to its test fold, so no future leaks backwards. And the training set grows, so the model is re-evaluated at multiple points in its own lifecycle rather than one arbitrary cut.
 
-**Feature stores:** Centralize feature definitions and computation (Feast, Tecton, Hopsworks). Ensures training/serving consistency.
+The `gap` parameter is the detail worth knowing about. It inserts a period between the end of the training window and the start of the test window — the documented example adds "a 2 period gap". That models the case where recent data is not yet usable: labels arrive late, a settlement cycle is still open, a manual review queue has not cleared. Without a gap, your evaluation scores a model on a test period that starts immediately after training, which flatters it if your features need time to mature.
 
-**Monitoring and alerting:** Track prediction latency, error rates, data drift (input distribution shift), concept drift (label distribution shift), and model performance decay.
+`max_train_size` is the other lever: capping the training window turns expanding validation into a rolling one, which is what you want when the relationship is non-stationary and old data is worse than useless.
 
-## CI/CD for ML vs traditional CI/CD
+## Contract three: the model is a small part of the system
 
-| Aspect | Traditional CI/CD | ML CI/CD |
-|---|---|---|
-| Artifact | Binary / Docker image | Model + Docker image + data schema |
-| Tests | Unit, integration, contract | Unit + data validation + model quality gates |
-| Deployment | Promote binary | Promote model version + retrain pipeline |
-| Rollback | Redeploy previous binary | Rollback model version + feature store version |
+Sculley et al. examined real-world ML systems using "the software engineering framework of technical debt" and found "it is common to incur massive ongoing maintenance costs in real-world ML systems". Their list of the recurring debts is the most useful sentence in the paper for a team planning a pipeline: "boundary erosion, entanglement, hidden feedback loops, undeclared consumers, data dependencies, configuration issues, changes in the external world, and a variety of system-level anti-patterns."
 
-## When to invest in MLOps
+Read that list against the pipeline diagram. Only one item — data dependencies — is about modelling. The rest describe a system whose boundaries erode as features get computed in more places, whose configuration drifts, and whose consumers appear without being declared. A pipeline that trains and deploys a model perfectly can still fail every one of these debts.
 
-- **Multiple models in production** or planned.
-- **Team size > 2 ML engineers** or cross-functional team.
-- **Regulatory requirements** for audit trails and reproducibility.
-- **Frequent retraining** needed (weekly/daily).
+Two consequences follow for how you build the pipeline. First, the pipeline has to capture more than the training step: the data lineage, the configuration, the environment, and the deployment target all belong to the artefact. Second, the real test of whether you have an MLOps system is not "can we retrain" but "can we explain, six months later, exactly which data and which configuration produced the model currently serving traffic".
 
-Start small: version data, track experiments, containerize inference. Add CI/CD and monitoring as the system matures.
+## Contract four: the pipeline is a software artefact before the model is
 
-For the related question of model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) and feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
+A pipeline that is not under version control and not run automatically is a sequence of manual steps, and manual steps do not survive staff turnover, laptop upgrades, or a curious engineer's quick fix.
+
+The minimum for reproducibility is unglamorous: the pipeline code in version control, the environment pinned, the data versioned or hashed, and the run triggered by a commit rather than by a person. Continuous integration is where this is enforced — the same machinery that runs a test suite on every push should run the pipeline, because a pipeline that only runs manually will be run manually on a machine that does not have the right dependencies.
+
+The artefact to produce from each run is not just a model file. It is the model plus the data version, the configuration, the metrics, the environment, and the decision to promote it. "Which model is in production" should be answerable from the artefact, not from someone's memory.
+
+## What production adds after the model ships
+
+A pipeline that trains and deploys a model is not yet an MLOps system. Production adds three obligations that the notebook never had.
+
+**Monitoring.** Not just uptime — the model's behaviour on live data. See [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) for what to measure and what the failure modes are.
+
+**Rollback.** When a bad model ships, the response time is measured in minutes. Keeping the previous artefact and the mechanism to restore it is part of the pipeline, not an emergency task.
+
+**Retraining triggers.** Who decides, on what signal, and how often? If the answer is "whoever notices", the retraining cadence will be driven by the loudest person in the room. Sculley et al.'s list of "changes in the external world" is precisely the case where a model that was correct last quarter is quietly wrong today.
+
+## A pipeline checklist
+
+Before a model goes to production, confirm each of these is true of the pipeline rather than of a person's habits:
+
+1. **The split happens first**, in one place, before any fitted step, and every transform is inside the pipeline object.
+2. **The validation scheme matches deployment time.** If the data is time-ordered, the folds are expanding or rolling windows with an explicit gap for late-arriving labels.
+3. **Every run produces a complete artefact** — data version, configuration, environment, code commit, metrics, model file — and the promoted model can be traced to one.
+4. **The pipeline runs in CI on every change**, not only on a schedule or on request.
+5. **The non-model components are inventoried**: where each feature is computed, who consumes the outputs, and which configuration values can change behaviour.
+6. **Monitoring and rollback exist before launch,** with a named owner and a defined retraining trigger.
+
+If a pipeline satisfies the first four, it is reproducible. If it satisfies all six, it is operable. The gap between the two is where most of the production ML failures live.
+
+For the monitoring side in detail, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation), and for the organisational side of why these systems stall, see [Why AI Adoption Is Harder Than Building an AI Model](/articles/why-ai-adoption-is-harder-than-building-an-ai-model).
 
 ## Further Reading
 
