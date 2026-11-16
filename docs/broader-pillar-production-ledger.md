@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Master Prompt Reference:** `docs/technical-seo-article-generation-prompt.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 0 Drafted, 97 Ready (P-01 through P-97 all passed review)
+**Current Progress:** 0 Drafted, 100 Ready (P-01 through P-100 all passed review)
 
 ---
 
@@ -111,6 +111,9 @@
 | **P-95** | Omnichannel Retail: Selling Wherever Customers Are | Industry Insights, Retail & Consumer Trends | Analysis & Case Studies | `Ready` | `src/content/articles/omnichannel-retail-selling-wherever-customers-are.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; standard retail concepts, no specific retailer cited) |
 | **P-96** | Private Label: Retailers Competing with Brands | Industry Insights, Retail & Consumer Trends | Analysis & Case Studies | `Ready` | `src/content/articles/private-label-retailers-competing-with-brands.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; standard retail concepts, no specific brand cited) |
 | **P-97** | Mergers and Acquisitions: When 1+1 Equals 3 (or Less) | Business, Strategy & Entrepreneurship | Deep Dive | `Ready` | `src/content/articles/mergers-and-acquisitions-when-1-plus-1-equals-3-or-less.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; standard M&A concepts, no specific deal cited) |
+| **P-98** | DevOps: Bridging Development and Operations | Technology & The Digital World | Deep Dive | `Ready` | `src/content/articles/devops-bridging-development-and-operations.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; standard DevOps concepts, no specific tool cited) |
+| **P-99** | AI Governance: Managing AI Responsibly at Scale | Artificial Intelligence & Future Innovation | Deep Dive | `Ready` | `src/content/articles/ai-governance-managing-ai-responsibly-at-scale.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; general AI governance concepts, no specific framework cited) |
+| **P-100** | Personal Finance for Professionals: Managing Income, Saving, and Investing | Career, Productivity & Professional Development | Analysis & Case Studies | `Ready` | `src/content/articles/personal-finance-for-professionals-managing-income-saving-and-investing.mdx` | 2026-11-16 | Publish (quality gates passed 20/20; general personal finance concepts, no specific product cited) |
 
 ---
 
@@ -153,3 +156,5 @@
 - **Review complete:** P-01 through P-87 all `Ready` (quality gates ≥17/20, no zeros in Accuracy, Evidence integrity, Intent, CMS readiness; see per-article QA).
 - **Batch Q (Pillar expansion, run 11 — 2026-11-16):** P-88 through P-97 drafted at the owner's request to add ten more non-duplicate articles across underrepresented pillars. P-88 and P-89 fill Technology & The Digital World (technical debt, API design). P-90 and P-97 fill Business/Strategy (business model canvas, M&A). P-91 fills Marketing/Growth (customer lifetime value). P-92 fills Data/Analytics (data governance). P-93 and P-94 fill Career/Productivity (career transitions, negotiation). P-95 and P-96 fill Industry Insights/Retail (omnichannel retail, private label). All use standard concepts with no fabricated studies, vendor quotes, or invented statistics. All passed review 20/20 and are `Ready`.
 - **Review complete:** P-01 through P-97 all `Ready` (quality gates ≥17/20, no zeros in Accuracy, Evidence integrity, Intent, CMS readiness; see per-article QA).
+- **Batch R (Pillar expansion, run 12 — 2026-11-16):** P-98 through P-100 drafted at the owner's request to reach the target of 100 articles. P-98 fills Technology & The Digital World (DevOps). P-99 fills Artificial Intelligence (AI governance). P-100 fills Career/Productivity (personal finance). All use standard concepts with no fabricated studies, vendor quotes, or invented statistics. All passed review 20/20 and are `Ready`.
+- **Review complete:** P-01 through P-100 all `Ready` (quality gates ≥17/20, no zeros in Accuracy, Evidence integrity, Intent, CMS readiness; see per-article QA).
