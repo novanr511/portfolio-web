@@ -1,0 +1,57 @@
+---
+title: "Why Data Quality Matters More Than Model Complexity"
+description: "A simple model on clean data beats a complex model on messy data. Learn why data quality is the binding constraint in most analytics and AI projects."
+date: 2026-11-16
+tags:
+  - Data
+  - Analytics
+  - Machine Learning
+  - Decision Science
+---
+
+Teams spend months tuning models and weeks cleaning data. The order should usually be reversed.
+
+**Direct answer:** Data quality is the binding constraint in most analytics and machine learning projects. A simple model trained on clean, well-defined data usually outperforms a complex model trained on messy, mislabeled, or incomplete data. Model complexity cannot compensate for garbage inputs, and the most sophisticated algorithm will confidently produce wrong answers from bad data.
+
+## Garbage in, garbage out is not a cliché
+
+Models learn patterns from data. If the data contains errors, inconsistencies, missing values, or mislabeled outcomes, the model learns those flaws as signal. A model does not know which rows are trustworthy; it treats all rows as equally valid.
+
+Common data quality problems that silently destroy models:
+
+- **Mislabeled outcomes.** If 5 % of your "churned" customers are actually still active, the model learns to predict noise.
+- **Inconsistent definitions.** "Active user" means one thing in the app analytics table and another in the billing table. Joining them creates phantom segments.
+- **Missing data handled carelessly.** Filling missing values with zeros or means can invent relationships that do not exist.
+- **Duplicate records.** The same customer counted twice appears as two customers with identical behavior, over-representing that segment.
+- **Leakage.** Information from after the prediction target leaks into training features, making the model look accurate in tests and fail in production.
+
+None of these are fixed by adding layers, neurons, or hyperparameter tuning.
+
+## Simple models on clean data
+
+A logistic regression on clean, well-understood features often beats a gradient-boosted model on messy data. The simple model is interpretable: you can see which features drive predictions and spot when data quality drifts. The complex model is a black box that hides data problems until they cause business harm.
+
+This is not an argument against complexity. It is an argument for sequencing: fix the data first, then consider whether added complexity is worth the cost.
+
+## Data quality is a process, not a project
+
+Data quality degrades over time. Sources change schemas, upstream systems introduce new error modes, and business definitions evolve. A one-time cleanup does not last.
+
+Sustainable data quality requires:
+
+- **Ownership.** Someone is accountable for each critical dataset.
+- **Validation at entry.** Check formats, ranges, and relationships when data is captured, not after it has flowed through ten systems.
+- **Monitoring.** Alerts when distributions shift, null rates spike, or volumes change unexpectedly.
+- **Documentation.** Definitions, sources, and known limitations travel with the data, not in a separate wiki nobody reads.
+
+## Model complexity has its place
+
+Complex models are justified when the problem is genuinely complex, the data is clean and abundant, and the cost of error justifies the engineering effort. Image recognition, fraud detection at scale, and recommendation systems often benefit from advanced techniques.
+
+But these are exceptions. Most business analytics problems—forecasting demand, segmenting customers, prioritizing leads—are well-served by transparent models on reliable data. The competitive advantage usually comes from better data and clearer definitions, not from a fancier algorithm.
+
+For the related question of how to measure without overgeneralizing, see [What HTTP Archive's CDN Numbers Can—and Cannot—Tell You](/articles/what-http-archives-cdn-numbers-can-and-cannot-tell-you) and [Correlation vs Causation: The Most Common Mistake in Data Analysis](/articles/correlation-vs-causation-the-most-common-mistake-in-data-analysis).
+
+## References & Further Reading
+
+This article synthesizes standard data science and machine learning concepts and does not cite a specific paper, dataset, or vendor by name. No specific tool, algorithm, or company case is used as evidence because no specific claim about one is made. For foundational treatment of data quality and modeling, consult literature in statistics, data engineering, and applied machine learning.

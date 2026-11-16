@@ -1,0 +1,68 @@
+---
+title: "Correlation vs Causation: The Most Common Mistake in Data Analysis"
+description: "Two variables moving together does not mean one causes the other. Learn how to tell correlation from causation and avoid bad decisions."
+date: 2026-11-16
+tags:
+  - Data
+  - Statistics
+  - Causation
+  - Decision Science
+---
+
+Dashboards are full of correlations. Two lines move together, and someone concludes one causes the other. That conclusion is often wrong.
+
+**Direct answer:** Correlation means two variables move together; causation means one variable directly produces a change in another. Correlation does not imply causation, and treating it as if it did is one of the most common and costly mistakes in data analysis. Establishing causation requires more than a shared trend—it requires ruling out confounders, reverse causation, and coincidence.
+
+## What correlation actually measures
+
+A correlation coefficient tells you the strength and direction of a linear relationship between two variables. It says nothing about mechanism, direction, or whether a third factor drives both.
+
+Ice cream sales and drowning incidents both rise in summer. The correlation is positive and strong. But ice cream does not cause drowning, and drowning does not cause ice cream sales. Hot weather causes both: more people eat ice cream and more people swim. Temperature is the confounder—the third variable that creates the illusion of a direct link.
+
+This is the central trap. A strong correlation can exist because:
+
+- **A confounder causes both.** (Weather causes ice cream and swimming.)
+- **Reverse causation.** (B causes A, not A causes B.)
+- **Pure coincidence.** (Two trends happen to align over a limited period.)
+- **A mediator chain.** (A causes C, C causes B, so A and B correlate even though A never touches B directly.)
+
+## Why this mistake is expensive
+
+Businesses act on correlations all the time. Examples:
+
+- A retail chain notices stores with more staff also have higher sales, and hires more staff everywhere. Causality may run the other way: busier stores get more staff, not the reverse.
+- A SaaS company sees users who invite teammates churn less, and concludes referral programs reduce churn. It may be that engaged users both invite teammates and stay, with no causal link from inviting to retention.
+- A manufacturer finds machines operated by senior technicians fail less often, and concludes seniority prevents failure. It may be that senior technicians are assigned to newer, more reliable machines.
+
+Each error wastes money, and worse, it locks in a wrong theory that is hard to dislodge because the dashboard "confirms" it.
+
+## How to test for causation
+
+There is no single test, but several approaches strengthen causal claims:
+
+**1. Randomized controlled experiments.** Randomly assign treatment and control groups. If the treated group improves and the control does not, and everything else is balanced, you have strong evidence of causation. This is the gold standard but not always feasible.
+
+**2. Natural experiments.** Look for situations where the world assigns treatment as-if-random—a policy change in one region, a sudden outage affecting some users but not others. These mimic randomization.
+
+**3. Control for confounders.** Measure and statistically adjust for variables that might cause both A and B. This helps, but you can only control for confounders you know about and can measure.
+
+**4. Temporal precedence.** The cause must precede the effect. If B changes before A, A cannot cause B.
+
+**5. Dose-response.** If more of A produces more of B, the relationship looks more causal. But dose-response can also arise from confounders.
+
+**6. Falsification tests.** Check whether the correlation appears where it should not. If "ice cream causes drowning," it should not appear in winter. If it does, the theory is wrong.
+
+## What to do when you cannot run an experiment
+
+Most business data is observational. You cannot randomize pricing, store locations, or marketing channels at will. In that case:
+
+- **State the limitation.** Say "associated with" rather than "caused by."
+- **Look for contradictory evidence.** Actively try to disprove your favorite theory.
+- **Use multiple data sources.** A correlation that holds across datasets, regions, and time periods is more credible than one that appears in a single report.
+- **Think about mechanisms.** Can you explain how A would produce B? If no plausible mechanism exists, treat the correlation with skepticism.
+
+For a concrete example of how pooling data can reverse relationships, see [Simpson's Paradox in Your Own Data](/articles/simpsons-paradox-why-a-single-correlation-can-reverse-its-sign).
+
+## References & Further Reading
+
+This article synthesizes standard statistics and research design concepts and does not cite a specific study, dataset, or researcher by name. No specific company, industry, or data example is used as evidence because no specific claim about one is made. For formal treatment of causal inference, consult textbooks on epidemiology, econometrics, or causal statistics.
