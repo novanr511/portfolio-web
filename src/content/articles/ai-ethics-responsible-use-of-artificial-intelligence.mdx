@@ -1,74 +1,75 @@
 ---
 title: "AI Ethics: Responsible Use of Artificial Intelligence"
-description: "AI ethics is about decisions, not just technology. Learn the principles of responsible AI and how organizations can use AI without harming people."
+description: "Ethics becomes engineering when it changes the artifact. See how documentation, principle-writing, and anti-discrimination limits turn values into constraints."
 date: 2026-11-16
 tags:
   - AI
   - Ethics
-  - Responsibility
-  - Technology
+  - Responsible AI
+  - Policy
 ---
 
-AI ethics is not a technical problem. It is a human one.
+Ethics in AI tends to arrive as a list of principles — fairness, transparency, accountability, privacy — which everyone endorses and which change nothing about the system. Principles matter only when they alter the artefact: the dataset that gets collected, the metric that gets optimised, the rule written into a prompt, the escalation path that a user can actually reach.
 
-**Direct answer:** AI ethics concerns the decisions organizations make when building and deploying AI: what data to use, who benefits, who bears the risk, and who is accountable when things go wrong. Responsible AI means designing systems that are fair, transparent, safe, and accountable—recognizing that technical performance alone does not make an AI system ethical.
+**Direct answer:** Responsible use of AI is a set of engineering constraints, not a statement of intent. Four of them do most of the work: know what your data is and what it was collected for; know how your model performs on the groups it actually affects; decide who is accountable when it fails; and be honest about what the law can and cannot settle. The hard part is not agreeing that these matter. It is that each one requires someone to make a choice that other people might reasonably have made differently — and to write that choice down where it can be reviewed.
 
-## What AI ethics covers
+## Constraint one: you must know what your data is
 
-AI ethics addresses questions that technology cannot answer itself:
+Gebru et al. start from an absence: "The machine learning community currently has no standardized process for documenting datasets, which can lead to severe consequences in high stakes domains." Their remedy is an analogy everyone already accepts — electronics. "Every component, no matter how simple or complex, is accompanied with a datasheet that describes its operating characteristics, test results, recommended uses, and other information." By that analogy, a dataset should ship with a datasheet documenting "its motivation, composition, collection process, recommended uses, and so on".
 
-- **Fairness:** does the system treat different groups of people equitably, or does it amplify existing biases?
-- **Transparency:** can users understand how decisions are made, or is the system a black box?
-- **Accountability:** when the system causes harm, who is responsible—the developer, the deployer, or the user?
-- **Privacy:** is personal data collected and used with consent and purpose?
-- **Safety:** does the system behave predictably, even in unexpected situations?
-- **Autonomy:** does the system respect human agency, or does it manipulate behavior?
+The ethical weight of this is easy to miss. A dataset collected for one purpose and reused for another has a story that nobody wrote down — and the reuse is where the harm appears. Who was in the collection, who was not, what was collected under what conditions, and what was the collection *for*? Those answers determine whether the reuse is legitimate, and they are recoverable only if someone recorded them at collection time. A datasheet written after the model is trained is a reconstruction; the ethics were decided at collection.
 
-## Bias is not a glitch; it is a reflection
+There is a second reason this matters that is less about harm and more about honesty: without a datasheet, an organisation cannot accurately describe what its own system was trained on. Claims about representativeness, about coverage, about "our data is diverse" — all unverifiable without the record.
 
-AI learns from data. If the data reflects historical discrimination—hiring patterns, lending decisions, policing—the model will reproduce it. Bias is not introduced by the algorithm alone; it is present in the data, the labels, the features, and the definition of success.
+## Constraint two: you must know who your model affects differently
 
-Addressing bias requires more than technical fixes. It requires examining what data is collected, whose interests are represented, and what outcomes are optimized for.
+Mitchell et al. make the same argument for models, and their framing is more demanding than a single accuracy number. Model cards are "short documents accompanying trained machine learning models that provide benchmarked evaluation in a variety of conditions, such as across different cultural, demographic, or phenotypic groups (e.g., race, geographic location, sex, Fitzpatrick skin type) and intersectional groups (e.g., age and race, or sex and Fitzpatrick skin type) that are relevant to the intended application domains". They also disclose "the context in which models are intended to be used, details of the performance evaluation procedures, and other relevant information".
 
-## Transparency vs explainability
+The motivation is stated in the first line of their abstract: trained models "are increasingly used to perform high-impact tasks in areas such as law enforcement, medicine, education, and employment". Those are the domains where an aggregate metric is least sufficient.
 
-Transparency means making the system's existence, purpose, and limitations known. Explainability means being able to explain why a specific decision was made. Complex models (deep neural networks, ensembles) are often accurate but hard to explain. Simple models (decision trees, logistic regression) are easier to understand but may be less accurate.
+This is where ethics becomes measurement rather than sentiment. The phrase "relevant to the intended application" does real work — it means the groups you must measure are determined by who is affected, not by whoever happened to be in your dataset. A fairness report that lists demographic parity as a headline number without stating the intended use has not done the work; a model card that says "this classifier screens dermatology images" and then reports performance by Fitzpatrick skin type has.
 
-The ethical choice is not always the most accurate model. It is the model whose behavior can be understood, challenged, and corrected when necessary.
+Note also what the framework does *not* ask for. It does not ask you to make the model fair in the abstract. It asks you to document the evaluation, the intended use, and the limits — which is a claim the reader can check.
 
-## Accountability cannot be automated
+## Constraint three: "harmless" is a design choice, and someone writes the rules
 
-An AI system cannot be sued, fired, or imprisoned. Accountability always rests with humans: the team that built it, the organization that deployed it, the regulator that oversees it. Responsible AI requires clear ownership: who approves deployment, who monitors performance, who responds to incidents, and who compensates harmed parties.
+The most interesting ethical question in modern AI is not whether models can be aligned, but who decides what alignment means.
 
-## Privacy and consent
+Bai et al. answer it with a mechanism rather than a mandate. Their *Constitutional AI* method trains "a harmless AI assistant through self-improvement, without any human labels identifying harmful outputs", and they are explicit about where the human contribution sits: "The only human oversight is provided through a list of rules or principles, and so we refer to the method as Constitutional AI."
 
-AI systems often require large amounts of data, including personal information. Responsible use means collecting only what is needed, informing users how data will be used, obtaining meaningful consent, and protecting data from breach or misuse. Data that is collected for one purpose should not be repurposed without consent.
+The method has two phases. In the supervised phase, the system samples from an initial model, generates self-critiques and revisions, and is fine-tuned on the revised responses. In the RL phase, it samples from the fine-tuned model, uses a model to evaluate which of two samples is better, trains a preference model on that dataset of AI preferences, and then uses that preference model as the reward signal — "RL from AI Feedback" (RLAIF). The result they report is an assistant that is "harmless but non-evasive", one that "engages with harmful queries by explaining its objections to them".
 
-## The business case for ethics
+Read the ethics inside the engineering. The principles list is a governance artefact in the fullest sense: it is where the values of the organisation become machine-enforceable. There is no way to write a constitution without making contested choices — about which harms count, how a refusal should sound, whether explanation is required or merely permitted. The method does not remove those choices; it makes them explicit, versioned, and reviewable, and then applies them at scale without a human in the loop for every case.
 
-Ethical AI is not just a moral obligation; it is a business necessity. Unethical AI leads to:
+The counterargument deserves a hearing. A rules-based refusal system inherits every flaw in its rules and can be rigid in exactly the situations where judgement matters. "Non-evasive" is a design goal with a cost: a system that always explains its objection will sometimes object where an exception was appropriate. The honest conclusion is not that constitutions beat humans, but that a written, owned, versioned set of principles is often a better governance instrument than an unwritten convention — and that an organisation using this approach still owes the review that the constitution itself does not provide.
 
-- **Reputational damage:** customers lose trust when systems harm them.
-- **Legal liability:** regulators and courts increasingly hold companies accountable.
-- **Operational risk:** biased or unsafe systems make errors that cost money.
-- **Talent risk:** engineers and product managers want to work on responsible technology.
+## Constraint four: the law sets limits, not answers
 
-Organizations that treat ethics as a constraint rather than a cost build more durable systems.
+The temptation in an ethics discussion is to reach for a single criterion and call it the answer. The legal reality is more constrained and more useful.
 
-## A practical framework
+The *Fairness and Machine Learning* textbook includes a chapter on United States anti-discrimination law that states plainly what it "is and isn't, how it navigates tradeoffs, its limits, and how it applies to machine learning". Two things follow. First, the law does not supply a technical criterion you can implement directly; it navigates trade-offs and has limits. Second, it does apply to machine learning, which means an engineering decision about a classifier can be a legal decision about who is treated how.
 
-Before deploying an AI system, ask:
+The practical implication is that "we are compliant" is a statement about a jurisdiction and a date, not about ethics. It says nothing about whether your deployment is reasonable outside the jurisdiction, and it says nothing about the groups the law does not reach. Responsible use requires a position that survives the legal answer — and someone must be accountable for taking it.
 
-1. **What could go wrong?** Identify harms to individuals, groups, and society.
-2. **Who is accountable?** Name the person responsible for the decision.
-3. **Is the data representative?** Does it reflect the population the system will serve?
-4. **Can decisions be explained?** Can a user understand and challenge an outcome?
-5. **Is there human oversight?** Can a human intervene when the system fails?
-6. **How will you monitor?** How will you detect drift, bias, or failure over time?
+## Who is accountable, and what that means operationally
 
-If you cannot answer these questions, you are not ready to deploy.
+Every framework above converges on the same structural point: accountability cannot be delegated to the model.
 
-For the related question of AI's limits, see [The Limits of AI: What Machines Cannot Do](/articles/the-limits-of-ai-what-machines-cannot-do) and why AI adoption is hard, see [Why AI Adoption Is Harder Than Building an AI Model](/articles/why-ai-adoption-is-harder-than-building-an-ai-model). For data ethics specifically, see [Data Ethics: Responsible Use of Customer Data](/articles/data-ethics-responsible-use-of-customer-data).
+The governance frameworks make this concrete by treating risk management as continuous and by extending into sector-specific profiles, where the unacceptable outcomes are written down for a specific context. NIST's AI RMF is described as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems" — note that evaluation is in the list, and that the framework's own status as voluntary is why organisations have to do the work themselves.
+
+The international measurement effort, run through the OECD's AI Policy Observatory, exists because the ethical claims need to be comparable across jurisdictions and across vendors. Where there is no shared vocabulary of adoption, effect, and risk, every organisation asserts its own, and the assertion is unfalsifiable.
+
+So the answer to "who is accountable" is a person or an institution, named, with a decision right and a duty to review. That is not a slogan — it is a design constraint on the org chart, and it is the one that most reliably distinguishes organisations that use AI responsibly from those that have a policy document.
+
+## A test to run on your own system
+
+1. **Can you name the person accountable for this system's use?** If the answer is a committee with no decision right, the accountability is nominal.
+2. **Does a datasheet exist for the training data, written at collection time?** If not, you cannot describe your own system honestly, let alone defend it.
+3. **Does the model card report performance for the groups your users fall into, and state the intended use?** If the evaluation was run on an aggregate only, you do not know what you are shipping.
+4. **Have you written down the values you encode?** If you use a constitutional or rules-based approach, the rules are a governance artefact and should be versioned and owned. If you do not, identify who makes that call at runtime.
+5. **What does the law in your jurisdiction actually require, and what does it not reach?** Treat the compliance answer as one input with a date attached, not as the conclusion.
+
+For the process and framework mechanics, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale) and [Responsible AI: Ethics, Fairness, and Regulatory Compliance](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
 
 ## Further Reading
 
