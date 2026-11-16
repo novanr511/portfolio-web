@@ -171,7 +171,7 @@ for (const [key, source, result] of results) {
   // Guard against a registry entry that points at a real page but is
   // labelled as a different work: the stored title must still overlap the
   // observed page title.
-  if (source.match && !titleMatches(source.title, result.title)) {
+  if (source.match && !source.titleMayDiffer && !titleMatches(source.title, result.title)) {
     const stored = keywords(source.title);
     const observed = keywords(result.title);
     const overlap = stored.size === 0 ? 0 : [...stored].filter((w) => observed.has(w)).length / stored.size;
@@ -188,6 +188,11 @@ for (const [key, source, result] of results) {
   console.log(`ok    ${key}`);
   if (update && result.title && result.title !== normalise(expected)) {
     updates.push([key, result.title]);
+  }
+  if (source.titleMayDiffer && !source.titleReason) {
+    failures.push({ key, url: source.url, reason: "titleMayDiffer is set but titleReason is missing" });
+    console.log(`FAIL  ${key}\n      ${source.url}\n      titleMayDiffer requires a titleReason`);
+    continue;
   }
   if (result.title) observed[key] = result.title;
 }

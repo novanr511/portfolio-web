@@ -1,91 +1,66 @@
 ---
 title: "Model Explainability: SHAP, LIME, and Interpreting Black Boxes"
-description: "Model explainability reveals why models predict. Learn SHAP, LIME, feature importance, and when to use each method."
+description: "Post-hoc explanation is not explanation, and the strongest critique is mathematical. Read what SHAP and LIME actually compute and when to trust them."
 date: 2026-11-16
 tags:
-  - Explainable AI
+  - Model Explainability
   - SHAP
   - LIME
-  - Model Interpretability
-  - Responsible AI
+  - Machine Learning
 ---
 
-A model that cannot explain itself is a risk.
+"Explainable AI" became a category when practitioners discovered that a black box's output could not be defended to a customer, a regulator, or a colleague. The category filled with methods that produce a plausible-looking attribution for any prediction. The interesting question is not which method is best but what any of them can legitimately claim — and the answer is narrower than the marketing.
 
-**Direct answer:** Model explainability (XAI) provides human-understandable reasons for model predictions. Global methods explain overall model behavior; local methods explain individual predictions. SHAP (SHapley Additive exPlanations) provides theoretically grounded, consistent attributions. LIME (Local Interpretable Model-agnostic Explanations) approximates local behavior with interpretable surrogates. Choose based on model type, audience, and regulatory requirements.
+**Direct answer:** Post-hoc explanation methods such as LIME and SHAP estimate how features contributed to a *particular* prediction, under assumptions that are rarely stated and rarely hold. SHAP derives its values from Shapley values, which gives it a principled definition of feature contribution and a well-specified set of conditions under which that definition is the right one. LIME fits a local surrogate, which is fast and flexible but approximate in a way that is easy to under-estimate. And the strongest argument in the literature is not that these methods are unusable — it is that in high-stakes settings, designing an interpretable model should be preferred over explaining an opaque one.
 
-## Global vs local interpretability
+## The tension the framework names
 
-**Global:** how does the model behave overall? Feature importance, partial dependence plots (PDP), accumulated local effects (ALE), permutation importance.
+Lundberg and Lee open with the problem statement. "Understanding why a model makes a certain prediction can be as crucial as the prediction's accuracy in many applications." But they note that "the highest accuracy for large modern datasets is often achieved by complex models that even experts struggle to interpret, such as ensemble or deep learning models, creating a tension between accuracy and interpretability."
 
-**Local:** why this prediction for this instance? SHAP, LIME, counterfactuals, anchors.
+Their contribution is to make the field less ad hoc. The stated problem is that "various methods have recently been proposed to help users interpret the predictions of complex models, but it is often unclear how these methods are related and when one method is preferable over another". SHAP's answer is a unified framework: it "assigns each feature an importance value for a particular prediction", with "the identification of a new class of additive feature importance measures" and a theoretical grounding.
 
-**Cohort:** behavior on subgroups. Slice-based analysis.
+The Shapley connection is the substantive part, and it is worth understanding what it buys. Shapley values come from cooperative game theory: a prediction is treated as a value produced by a set of features, and each feature's contribution is the average marginal effect of including it across all possible orderings of the coalition. That definition has properties — consistency, missingness, local accuracy — that most ad-hoc attributions do not, and the SHAP paper's contribution is showing that a specific class of additive feature-importance measures can satisfy all of them simultaneously.
 
-## SHAP: Shapley Additive exPlanations
+That is a real theoretical advance, and it is also exactly where the limitations live: the definition is sound, but computing it is exponential in the number of features. The practical implementations approximate. Every SHAP number you see in production is an approximation of a well-defined quantity, and the approximation quality is not reported in most outputs.
 
-SHAP values are based on Shapley values from game theory: fairly distribute the "payout" (prediction minus baseline) among features.
+## What LIME actually does, and why it is fast
 
-**Properties:** local accuracy (sum of SHAP = prediction - baseline), missingness (missing features get 0), consistency (if feature contribution increases, SHAP increases).
+LIME takes the opposite approach. Ribeiro, Singh and Guestrin describe the problem it solves: to explain a single prediction, "fit a local interpretable model (surrogate) approximating the black-box model's behavior *locally*". The surrogate is weighted so that the points near the prediction of interest dominate, and it is fitted to the model's outputs rather than to the labels.
 
-**Variants:**
-- **TreeSHAP:** exact, fast for tree models (XGBoost, LightGBM, CatBoost, sklearn).
-- **KernelSHAP:** model-agnostic, samples coalitions, slower.
-- **DeepSHAP:** combines DeepLIFT with Shapley for deep learning.
-- **LinearSHAP:** exact for linear models.
+The advantage is speed and flexibility: LIME works with any black-box model, including ones with no internal structure, and it needs no retraining. The disadvantage is inherent to the approach — a local linear approximation is an approximation, and the quality of the explanation depends on a neighbourhood choice and a sampling procedure that are usually hyperparameters with defaults nobody validated for their data.
 
-**Outputs:** feature importance (mean |SHAP|), summary plots (beeswarm, bar), dependence plots, force plots (local), waterfall plots.
+The honest way to compare the two is not "SHAP is more principled so use SHAP". It is: SHAP's quantity is defined and the approximation error can be measured; LIME's surrogate is local and the error is harder to bound. If you need a defensible number, that asymmetry matters. If you need an explanation for a model you cannot modify, LIME's flexibility may still win.
 
-## LIME: Local Interpretable Model-agnostic Explanations
+## The critique that should change your design decisions
 
-LIME approximates model behavior locally with an interpretable model (linear model, decision tree).
+Rudin makes the strongest case in the literature, and it is not a critique of any particular method. She argues that "trying to explain black box models, rather than creating models that are interpretable in the first place, is likely to perpetuate bad practices and can potentially cause catastrophic harm to society". Her paper "clarifies the chasm between explaining black boxes and using inherently interpretable models, outlines several key reasons why explainable black boxes should be avoided in high-stakes decisions, identifies challenges to interpretable machine learning, and provides several example applications where interpretable models could potentially replace black box models in criminal justice, healthcare, and computer vision".
 
-**Process:**
-1. Perturb input around instance (sample nearby points).
-2. Get model predictions for perturbed samples.
-3. Weight samples by proximity to original instance.
-4. Fit weighted interpretable model (sparse linear model).
-5. Coefficients = local feature importance.
+The argument's force is in the last clause. She is not saying interpretable models are always as accurate. She is saying that the accuracy gap is frequently smaller than assumed, and that where it is not, the decision should be made explicitly rather than by default.
 
-**Strengths:** model-agnostic, works on text/images/tabular, fast for single explanations.
-**Weaknesses:** unstable (sampling variance), linear approximation may not capture nonlinear local behavior, hyperparameter sensitive (kernel width, samples).
+There is also a mathematical objection that has become standard. Zhang et al. observe that "model explanations based on pure observational data cannot compute the effects of features reliably, due to their inability to estimate how each factor alteration could affect the rest". A feature attribution computed from a static dataset answers "which features co-varyred with this prediction", which is not the same question as "which features caused this prediction". For a decision where you intend to *act* on the explanation — change the feature and expect the outcome to change — the distinction is not academic.
 
-## Other methods
+## Choosing an explanation method, and choosing a model
 
-**Permutation importance:** shuffle feature, measure performance drop. Global, model-agnostic.
+A workable decision order:
 
-**Partial Dependence Plot (PDP):** average prediction as feature varies. Shows marginal effect.
+1. **Can you use an interpretable model at all?** If the task permits it — and for many tabular tasks it does — that dominates any explanation technique. Start there and measure the accuracy you give up.
+2. **If not, decide whether you need a local or a global explanation.** A local explanation answers "why this prediction"; a global one answers "what does this model use". These need different methods, and a SHAP summary plot is not a global explanation.
+3. **If you need local attributions, use a method with a defined target quantity,** and check the approximation. SHAP gives you Shapley values under stated assumptions; LIME gives you a local fit. Know which one you are quoting.
+4. **State the assumptions when you report.** The most common misuse is reporting a number with no statement of what it approximates and how well.
+5. **Test the explanation against something you can check.** Where possible, perturb the input in the way the explanation says matters and confirm the model's output moves as predicted. An explanation you cannot test is a story.
+6. **For high-stakes decisions, treat the black box itself as the finding.** If the explanation cannot support a defensible decision, the answer is a different model, not a better attribution.
 
-**Accumulated Local Effects (ALE):** unbiased PDP for correlated features.
+One practical warning about any of these tools: explanations are computed on the data you have, so they inherit its pathologies, and a model that learned a spurious correlation will produce a confident explanation pointing at the spurious feature. An explanation is not a validation.
 
-**Counterfactuals:** "what minimal change flips the prediction?" Actionable for users.
+## What to do with the explanation
 
-**Anchors:** high-precision rules that locally anchor prediction.
+The most valuable use of a local explanation is not the report; it is the debugging. An attribution that says a prediction was driven by a token that turned out to be a formatting artefact, a postcode, or a null value tells you where the bug is. That is a genuinely better use of explainability than reassuring a stakeholder, and it is the use that survives contact with an incident.
 
-**Integrated Gradients / DeepLIFT / Grad-CAM:** gradient-based attribution for deep learning.
-
-## Choosing a method
-
-| Need | Recommended |
-|---|---|
-| Tree models, global + local | TreeSHAP |
-| Any model, quick local | LIME |
-| Deep learning | Integrated Gradients, DeepSHAP, Grad-CAM |
-| Global feature importance | Permutation importance, SHAP summary |
-| Regulatory / audit | SHAP (theoretical guarantees) |
-| Actionable user explanations | Counterfactuals, Anchors |
-
-## Common pitfalls
-
-- **Correlation vs causation:** high SHAP ≠ causal.
-- **Correlated features:** SHAP splits importance; use ALE or grouped SHAP.
-- **Baseline choice:** SHAP depends on reference value (mean, median, or specific instance).
-- **Over-reliance on local explanations:** local fidelity ≠ global truth.
-
-For the related question of model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+For the reverse direction — building a model that is explainable by construction rather than by annotation — see [Data Strategy](/articles/data-strategy-how-organizations-use-data-to-compete) for the organisational context, and [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do) for why the surrounding process matters as much as the technique.
 
 ## Further Reading
 
 - Scott M. Lundberg and Su-In Lee, 2017. [A Unified Approach to Interpreting Model Predictions](https://arxiv.org/abs/1705.07874) — The Shapley-value method behind SHAP.
 - Christoph Molnar, 2022. [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) — A free, complete survey of interpretation methods by model family.
 - Cynthia Rudin, 2019. [Stop Explaining Black Box Machine Learning Models for High Stakes Decisions and Use Interpretable Models Instead](https://arxiv.org/abs/1811.10154) — The strongest argument that post-hoc explanation can be misleading.
+- Kai Zhang et al., 2019. [Explaining Visual Models by Causal Attribution](https://arxiv.org/abs/1909.08891) — The argument that observational-only explanations cannot compute the effects of altering a feature.
