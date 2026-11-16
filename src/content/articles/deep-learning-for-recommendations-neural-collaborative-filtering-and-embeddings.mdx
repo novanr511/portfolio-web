@@ -1,0 +1,68 @@
+---
+title: "Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings"
+description: "Deep learning enhances recommender systems with neural collaborative filtering and embedding-based representations. Learn how NCF works and when to use it."
+date: 2026-11-16
+tags:
+  - Deep Learning
+  - Recommender Systems
+  - Neural Collaborative Filtering
+  - Embeddings
+---
+
+Traditional collaborative filtering assumes linear relationships. Deep learning relaxes that assumption.
+
+**Direct answer:** Deep learning for recommendations uses neural networks to model user-item interactions beyond linear assumptions. Neural Collaborative Filtering (NCF) replaces matrix factorization dot products with learnable neural architectures, while embeddings represent users and items as dense vectors. These methods capture complex, non-linear patterns but require more data, compute, and tuning than classical methods.
+
+## From matrix factorization to neural networks
+
+Classic matrix factorization approximates the user-item interaction matrix as the product of two low-dimensional matrices: user embedding × item embedding. The predicted score is a dot product. This is powerful but linear in the latent space.
+
+Neural Collaborative Filtering (NCF) generalizes this:
+
+- **GMF (Generalized Matrix Factorization):** element-wise product of user and item embeddings, followed by neural layers.
+- **MLP (Multi-Layer Perceptron):** concatenates user and item embeddings and passes them through fully connected layers, learning arbitrary interaction functions.
+- **NeuMF:** combines GMF and MLP, combining linearity and non-linearity.
+
+## Embeddings: the shared language
+
+Embeddings map discrete IDs (user_id, item_id, category) to continuous vectors. Similar users or items have nearby vectors. Embeddings are learned during training, not hand-engineered.
+
+Key properties:
+
+- **Dimensionality:** typically 32–256 dimensions. Too few underfits; too many overfits.
+- **Initialization:** random or pre-trained (e.g., from word2viz on item text).
+- **Regularization:** L2 weight decay, dropout to prevent overfitting.
+
+Embeddings also enable content integration: concatenate content features (genre, price, text embeddings) for hybrid models.
+
+## Architecture choices
+
+- **Two-tower models:** separate user and item encoders; score via dot product. Efficient for retrieval at scale (candidate generation).
+- **Deep & Cross networks:** explicit feature interaction layers for ranking.
+- **Sequence models:** Transformers or RNNs over user interaction sequences for session-based recommendations.
+
+Two-tower architectures dominate production because they allow pre-computing item embeddings and using approximate nearest neighbor search for fast retrieval.
+
+## Training considerations
+
+- **Loss functions:** binary cross-entropy (for implicit feedback), ranking loss (BPR, hinge loss), or pointwise MSE (for explicit ratings).
+- **Negative sampling:** for implicit feedback, sample unobserved interactions as negatives. The ratio of negatives to positives affects quality.
+- **Evaluation:** use ranking metrics (NDCG, HR@K), not just accuracy. Recommendation is a ranking problem.
+
+## When deep learning helps—and when it doesn't
+
+**Use deep learning when:**
+- You have abundant interaction data (millions of events).
+- You need complex feature interactions (user context + item attributes + sequence).
+- You serve at scale and can afford GPU inference.
+
+**Skip deep learning when:**
+- Data is sparse or small. Classical matrix factorization often wins with less data.
+- Interpretability is critical. Neural models are black boxes.
+- Latency requirements are strict. Linear models are faster and cheaper.
+
+For the related question of building Python pipelines, see [Building a Recommendation Engine with Python: End-to-End Pipeline](/articles/building-a-recommendation-engine-with-python-end-to-end-pipeline) and how to evaluate experiments, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
+
+## References & Further Reading
+
+This article synthesizes standard deep learning for recommender concepts and does not cite a specific paper, model implementation, or vendor by name. No specific framework is endorsed because no specific claim about one is made. For research on neural recommender architectures, consult literature in machine learning, information retrieval, and deep learning.

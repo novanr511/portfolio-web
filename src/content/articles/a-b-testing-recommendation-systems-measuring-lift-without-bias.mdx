@@ -1,0 +1,70 @@
+---
+title: "A/B Testing Recommendation Systems: Measuring Lift Without Bias"
+description: "A/B testing recommendation systems requires special care. Learn how to run experiments, measure lift, and avoid common biases."
+date: 2026-11-16
+tags:
+  - A/B Testing
+  - Recommender Systems
+  - Experimentation
+  - Measurement
+---
+
+A recommendation system that cannot be measured cannot be improved.
+
+**Direct answer:** A/B testing recommendation systems compares a treatment algorithm against a control to measure causal lift in metrics like click-through, conversion, or retention. Unlike simple page tests, recommendation experiments face network effects, position bias, and carryover effects. Proper design requires random assignment at the right unit, adequate sample size, and metrics that reflect long-term value, not just immediate clicks.
+
+## Why recommendation A/B tests are different
+
+Recommendation systems create feedback loops: showing an item changes user behavior, which changes future data, which changes future recommendations. This means:
+
+- **Carryover effects:** a user exposed to better recommendations in week 1 may behave differently in week 2, even if switched to control.
+- **Network effects:** in two-sided marketplaces, recommendations affect both buyers and sellers.
+- **Position bias:** users click top results more, regardless of relevance. A change in position can look like a change in preference.
+
+## Experimental design
+
+**Unit of randomization:** randomize at the user level (session-level randomization can fragment the experience and contaminate results). Ensure a user sees the same variant throughout the experiment.
+
+**Sample size:** recommendation lift is often small (1–5%). Power analysis determines required sample size. Underpowered tests produce false negatives or inflated effect estimates (winner's curse).
+
+**Duration:** run for at least one full business cycle (weekly seasonality) and until pre-specified sample size is reached. Do not stop early because results look significant (peeking).
+
+**Holdout group:** consider a permanent holdout (5–10%) never exposed to any algorithmic change. It measures long-term cumulative impact and detects slow creep.
+
+## Metrics beyond CTR
+
+Click-through rate is easy to measure but can mislead:
+
+- **CTR lift:** more clicks, but are they quality clicks?
+- **Conversion lift:** did recommendations lead to purchases, sign-ups, or watches?
+- **Revenue per user:** the ultimate business metric for commercial systems.
+- **Retention / repeat usage:** did users come back because recommendations were good?
+- **Diversity and novelty:** did users see new items, or just the same popular ones?
+
+A system that boosts CTR by showing sensational content may hurt retention. Measure the right outcome.
+
+## Common biases and how to handle them
+
+**Selection bias:** treatment and control groups must be comparable. Randomization handles this if sample size is adequate.
+
+**Position bias:** if the treatment changes where items appear, CTR differences may reflect position, not quality. Use position-aware metrics or randomize positions within the test.
+
+**Novelty effect:** users click new things because they are new, not because they are better. Longer experiments reveal whether lift persists.
+
+**A/A testing:** run control vs. control to validate your experimentation infrastructure. If you detect "significant" differences, your system is biased.
+
+## Implementation checklist
+
+1. Define the hypothesis and primary metric before launching.
+2. Randomize at the user level with sticky assignment.
+3. Calculate required sample size and duration.
+4. Instrument both variants identically (same logging, same latency).
+5. Run an A/A test first.
+6. Launch, monitor for bugs, and do not peek.
+7. Analyze with pre-specified metrics; decide to roll out, iterate, or kill.
+
+For the related question of general experimentation, see [A/B Testing: Making Decisions with Experiments](/articles/ab-testing-making-decisions-with-experiments) and how recommender systems influence behavior, see [How Recommendation Systems Influence What We Buy](/articles/how-recommendation-systems-influence-what-we-buy).
+
+## References & Further Reading
+
+This article synthesizes standard experimentation and recommender evaluation concepts and does not cite a specific platform, tool, or experiment by name. No specific A/B testing tool is endorsed because no specific claim about one is made. For research on online experimentation, consult literature in statistics, data science, and human-computer interaction.

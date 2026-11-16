@@ -1,0 +1,92 @@
+---
+title: "Building a Recommendation Engine with Python: End-to-End Pipeline"
+description: "Learn how to build a Python recommendation engine from data ingestion to model serving, including collaborative filtering and evaluation."
+date: 2026-11-16
+tags:
+  - Python
+  - Recommendation Engine
+  - Data Science
+  - Machine Learning
+---
+
+A recommendation engine is code that turns data into suggestions.
+
+**Direct answer:** Building a recommendation engine with Python involves five stages: data ingestion and preprocessing, interaction matrix construction, model training (collaborative or content-based), candidate generation and ranking, and evaluation. Python's ecosystem—pandas, scikit-learn, implicit, Surprise, and FastAPI—makes this pipeline accessible for small teams and prototypes.
+
+## Stage 1: Data ingestion and preprocessing
+
+Start with interaction data: user_id, item_id, timestamp, and implicit or explicit signals (clicks, ratings, purchases). Clean the data:
+
+- Remove duplicate interactions.
+- Handle missing values.
+- Filter out bots or test accounts.
+- Convert timestamps to datetime.
+
+Use pandas to load and manipulate the data. Store interactions in a sparse matrix format (scipy.sparse) because most user-item pairs are empty.
+
+## Stage 2: Interaction matrix
+
+Construct a user-item matrix where rows are users, columns are items, and cells are interaction values (rating, count, or binary). For implicit feedback, treat absence of interaction as unknown, not negative.
+
+Use pandas to load and manipulate the data. Store interactions in a sparse matrix format (scipy.sparse) because most user-item pairs are empty.
+
+Example with implicit:
+```python
+from scipy.sparse import csr_matrix
+import pandas as pd
+
+df = pd.read_csv("interactions.csv")
+user_ids = df["user_id"].unique()
+item_ids = df["item_id"].unique()
+user_to_idx = {u: i for i, u in enumerate(user_ids)}
+item_to_idx = {i: j for j, i in enumerate(item_ids)}
+
+rows = df["user_id"].map(user_to_idx)
+cols = df["item_id"].map(item_to_idx)
+data = df["interaction_value"]
+
+matrix = csr_matrix((data, (rows, cols)), shape=(len(user_ids), len(item_ids)))
+```
+
+## Stage 3: Model training
+
+Choose based on your data:
+
+- **Item-based collaborative filtering:** `implicit` or `surprise` libraries. Compute item similarity (cosine, Pearson) from the interaction matrix.
+- **Matrix factorization:** Alternating Least Squares (ALS) or Singular Value Decomposition (SVD) to latent-factor representations.
+- **Content-based:** TF-IDF or embeddings over item descriptions; cosine similarity between item vectors.
+
+Train on historical data, hold out a test set for evaluation.
+
+## Stage 4: Candidate generation and ranking
+
+For a target user:
+
+1. **Generate candidates:** items similar to items the user interacted with (item-based) or items liked by similar users (user-based).
+2. **Score:** predicted rating or affinity score from the model.
+4. **Filter:** remove items the user already interacted with.
+5. **Rank:** sort by score, return top-K.
+
+For production, serve via FastAPI or similar, with caching for frequent users.
+
+## Stage 5: Evaluation
+
+Split data by time (train on past, test on future) to simulate real deployment. Compute:
+
+- **Precision@K:** relevant items in top-K / K.
+- **Recall@K:** relevant items in top-K / total relevant items.
+- **NDCG:** ranking quality, rewarding relevant items at top positions.
+
+Avoid random splits for time-series data; they leak future information into training.
+
+## Common pitfalls
+
+- **Popularity bias:** the model keeps recommending the same blockbuster items. Add diversity or re-ranking.
+- **Cold start:** new users or items have no interactions. Use content features or default recommendations.
+- **Feedback loops:** recommendations influence what users see, which influences future data. Monitor and intervene.
+
+For the related question of evaluating recommendation systems, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias) and how systems influence buying, see [How Recommendation Systems Influence What We Buy](/articles/how-recommendation-systems-influence-what-we-buy).
+
+## References & Further Reading
+
+This article synthesizes standard Python recommendation engineering practices and does not cite a specific library version, dataset, or production system by name. No specific library is endorsed because no specific claim about one is made. For implementation details, consult documentation for pandas, scikit-learn, implicit, Surprise, and FastAPI.

@@ -1,0 +1,86 @@
+---
+title: "Python for Data Analytics: Pandas, NumPy, and Visualization Workflows"
+description: "Python is the standard tool for data analytics. Learn pandas, NumPy, and visualization workflows for cleaning, exploring, and presenting data."
+date: 2026-11-16
+tags:
+  - Python
+  - Data Analytics
+  - Pandas
+  - NumPy
+  - Visualization
+---
+
+Python turns messy data into answers.
+
+**Direct answer:** Python for data analytics centers on pandas for data manipulation, NumPy for numerical computing, and visualization libraries (matplotlib, seaborn, plotly) for communication. A typical workflow loads data, cleans and transforms it, explores patterns, and communicates findings—all in reproducible code rather than manual spreadsheet steps.
+
+## pandas: the core tool
+
+pandas provides DataFrames, the standard in-memory structure for tabular data.
+
+Key operations:
+
+- **Load:** `pd.read_csv()`, `pd.read_sql()`, `pd.read_excel()`.
+- **Inspect:** `df.head()`, `df.info()`, `df.describe()`, `df.isnull().sum()`.
+- **Filter:** `df[df["column"] > value]`, `.query()`.
+- **Group and aggregate:** `df.groupby("category")["value"].mean()`.
+- **Reshape:** `pivot_table`, `melt`, `merge`, `concat`.
+- **Handle missing:** `dropna()`, `fillna()`.
+
+Example:
+```python
+import pandas as pd
+df = pd.read_csv("sales.csv")
+df["revenue"] = df["quantity"] * df["price"]
+monthly = df.groupby(df["date"].str[:7])["revenue"].sum()
+```
+
+## NumPy: numerical foundation
+
+NumPy underlies pandas and provides array operations for numerical work:
+
+- **Arrays:** `np.array()`, vectorized operations (faster than loops).
+- **Statistics:** `np.mean()`, `np.median()`, `np.std()`, `np.percentile()`.
+- **Linear algebra:** `np.dot()`, `np.linalg` for matrix operations.
+- **Random:** `np.random` for sampling and simulation.
+
+Use NumPy when you need raw numerical performance; use pandas when you need labeled, tabular data manipulation.
+
+## Visualization: communicating findings
+
+Choose the library by purpose:
+
+- **matplotlib:** foundation, customizable, good for static plots.
+- **seaborn:** statistical visualizations built on matplotlib, better defaults for exploration.
+- **plotly:** interactive web charts, good for dashboards and exploration.
+- **Altair:** declarative grammar of graphics, clean syntax.
+
+Essential charts:
+
+- **Histogram:** distribution of a numeric variable.
+- **Bar chart:** categorical comparison.
+- **Line chart:** time series.
+- **Scatter:** relationship between two numerics.
+- **Box plot:** distribution and outliers by category.
+
+Always label axes, add titles, and choose colorblind-friendly palettes.
+
+## The analytics workflow
+
+1. **Question:** what decision does this analysis support?
+2. **Load:** ingest data into pandas.
+3. **Profile:** check missing values, duplicates, distributions.
+4. **Clean:** fix types, handle missing, filter outliers.
+5. **Explore:** group, aggregate, visualize patterns.
+6. **Answer:** state the finding with evidence.
+7. **Share:** export charts, notebooks, or summaries for stakeholders.
+
+## Reproducibility
+
+Use Jupyter notebooks for exploration, but convert final work to scripts or parameterized notebooks for reuse. Pin package versions (`requirements.txt` or `pyproject.toml`). Document assumptions and data sources.
+
+For the related question of data analytics versus data science, see [Data Analytics vs Data Science: Differences, Workflows, and When to Use Each](/articles/data-analytics-vs-data-science-differences-workflows-and-when-to-use-each) and how to visualize responsibly, see [Data Visualization: Telling Stories with Numbers](/articles/data-visualization-telling-stories-with-numbers).
+
+## References & Further Reading
+
+This article synthesizes standard Python data analytics practices and does not cite a specific dataset, package version, or tutorial by name. No specific library is endorsed because no specific claim about one is made. For implementation details, consult documentation for pandas, NumPy, matplotlib, seaborn, and plotly.

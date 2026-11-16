@@ -1,0 +1,68 @@
+---
+title: "Cold Start Problem in Recommender Systems: Strategies for New Users and Items"
+description: "The cold start problem occurs when recommender systems lack data for new users or items. Learn strategies to handle it without sacrificing quality."
+date: 2026-11-16
+tags:
+  - Recommender Systems
+  - Cold Start
+  - Personalization
+  - Data Science
+---
+
+New users and new items break traditional recommenders.
+
+**Direct answer:** The cold start problem occurs when a recommender system lacks sufficient interaction data to make reliable predictions—for new users (no history), new items (no interactions), or both. Strategies include content-based fallbacks, demographic or contextual cues, explicit preference collection, and hybrid models. No single method eliminates cold start; a layered approach works best.
+
+## Types of cold start
+
+**User cold start:** a new user has no interaction history. Collaborative filtering cannot compute similarities.
+
+**Item cold start:** a new item has no interactions. Item-based collaborative filtering cannot recommend it.
+
+**Cold start for both:** a brand-new platform with few users and items. Everything is uncertain.
+
+## Strategies for user cold start
+
+**Explicit preference elicitation:** ask new users to rate or select favorite categories, genres, or items during onboarding. Netflix asks "pick three movies you like." This provides immediate signal.
+
+**Demographic or contextual fallback:** use location, device, time of day, or referral source to infer initial preferences. A mobile user at 8 PM may want entertainment; a desktop user at 9 AM may want productivity tools.
+
+**Popularity or trending fallback:** show globally popular or trending items until personal data accumulates. Not personalized, but better than random.
+
+**Progressive personalization:** start generic, personalize more as interactions accumulate. Monitor when to switch strategies (e.g., after 5–10 interactions).
+
+## Strategies for item cold start
+
+**Content-based features:** recommend new items based on attributes (genre, category, price, description) similar to items users already like. A new action movie can be recommended to action fans immediately.
+
+**Editorial seeding:** manually feature new items in prominent slots (homepage, newsletters) to generate initial interactions.
+
+**Transfer learning:** use embeddings from similar domains or pre-trained models (e.g., item text embeddings) to estimate similarity before interactions exist.
+
+**Incentivize early interactions:** offer discounts or bonuses for users who try new items, accelerating feedback collection.
+
+## Hybrid cold-start handling
+
+Combine strategies in a cascade:
+
+1. If user has history: collaborative filtering.
+2. Else if item has features: content-based.
+3. Else: popularity or editorial.
+
+This ensures every user sees something relevant, even on day one.
+
+## Monitoring cold-start health
+
+Track:
+
+- **New user retention:** do new users return after their first session?
+- **New item exposure rate:** what percentage of new items receive at least one interaction?
+- **Time to first relevant recommendation:** how quickly does the system personalize?
+
+If new users churn quickly, the cold-start strategy is failing.
+
+For the related question of how recommendation systems work generally, see [Recommender Systems: Collaborative Filtering, Content-Based, and Hybrid Approaches](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches) and how to evaluate experiments, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
+
+## References & Further Reading
+
+This article synthesizes standard recommender system cold-start concepts and does not cite a specific platform, dataset, or algorithm by name. No specific tool or vendor is endorsed because no specific claim about one is made. For research on cold-start and new-item recommendation, consult literature in information retrieval and machine learning.

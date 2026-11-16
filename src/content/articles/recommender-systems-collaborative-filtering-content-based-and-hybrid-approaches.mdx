@@ -1,0 +1,74 @@
+---
+title: "Recommender Systems: Collaborative Filtering, Content-Based, and Hybrid Approaches"
+description: "Recommender systems predict what users will like. Learn collaborative filtering, content-based filtering, and hybrid methods—and when to use each."
+date: 2026-11-16
+tags:
+  - Recommender Systems
+  - Data Science
+  - Machine Learning
+  - Personalization
+---
+
+Recommender systems decide what you see next.
+
+**Direct answer:** Recommender systems predict user preferences by analyzing behavior, item attributes, or both. The three core approaches are collaborative filtering (user-item interactions), content-based filtering (item features), and hybrid methods (combining both). Choosing the right approach depends on data availability, cold-start constraints, and business goals.
+
+## Collaborative filtering
+
+Collaborative filtering relies on the wisdom of the crowd: if two users agreed in the past, they will likely agree in the future.
+
+**User-based collaborative filtering:** finds users similar to the target user and recommends items those similar users liked.
+
+**Item-based collaborative filtering:** finds items similar to items the target user liked and recommends those similar items.
+
+Both approaches use interaction data—ratings, clicks, purchases, watch time. The core assumption is that past behavior predicts future preference.
+
+**Strengths:** no need to understand item content; works well with rich interaction data.
+
+**Weaknesses:** suffers from cold start (new users or items with no interactions), popularity bias (recommending only popular items), and sparsity (most user-item pairs are unobserved).
+
+## Content-based filtering
+
+Content-based filtering recommends items similar to those a user has liked before, based on item attributes.
+
+If a user watches action movies, the system recommends other action movies based on genre, director, actors, and tags. Each item is represented as a feature vector; user profiles are built from items they interacted with.
+
+**Strengths:** no cold start for items (can recommend new items immediately if features exist); transparent explanations (recommended because it is similar to X you liked).
+
+**Weaknesses:** limited to content features (cannot capture subtle preferences); overspecialization (users only see more of the same); requires good feature engineering.
+
+## Hybrid approaches
+
+Hybrid systems combine collaborative and content-based methods to offset each other's weaknesses.
+
+**Weighted hybrid:** combines scores from both models linearly.
+
+**Switching hybrid:** chooses collaborative or content-based depending on context (e.g., use content-based for new users, collaborative for established ones).
+
+**Feature combination hybrid:** appends content features to collaborative features in a single model.
+
+**Cascade hybrid:** uses one method to narrow candidates, then another to rank them.
+
+**Strengths:** better coverage, reduced cold-start impact, more robust recommendations.
+
+**Weaknesses:** higher complexity, more data pipelines to maintain, harder to debug.
+
+## Evaluation metrics
+
+- **Precision@K / Recall@K:** of the top K recommendations, how many are relevant / how many relevant items were found.
+- **NDCG (Normalized Discounted Cumulative Gain):** rewards relevant items ranked higher.
+- **MRR (Mean Reciprocal Rank):** useful when only one relevant item exists per user.
+- **Coverage:** what percentage of the catalog gets recommended (combats popularity bias).
+- **Diversity:** how varied the recommendations are.
+
+## When to choose which
+
+- **Early-stage product, little interaction data:** start with content-based or popularity-based.
+- **Growing interaction data:** shift toward collaborative filtering.
+- **Mature product with rich features and interactions:** hybrid approaches yield the best results.
+
+For the related question of how recommendation systems influence purchasing behavior, see [How Recommendation Systems Influence What We Buy](/articles/how-recommendation-systems-influence-what-we-buy) and how to evaluate experiments, see [A/B Testing: Making Decisions with Experiments](/articles/ab-testing-making-decisions-with-experiments).
+
+## References & Further Reading
+
+This article synthesizes standard recommender system concepts and does not cite a specific platform, algorithm implementation, or company by name. No specific tool or vendor is endorsed because no specific claim about one is made. For research on recommender algorithms, consult literature in information retrieval, machine learning, and human-computer interaction.

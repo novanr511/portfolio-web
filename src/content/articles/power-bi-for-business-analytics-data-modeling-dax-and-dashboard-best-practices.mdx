@@ -1,0 +1,80 @@
+---
+title: "Power BI for Business Analytics: Data Modeling, DAX, and Dashboard Best Practices"
+description: "Power BI turns raw data into business insight. Learn data modeling, DAX measures, and dashboard design principles for reliable analytics."
+date: 2026-11-16
+tags:
+  - Power BI
+  - Business Analytics
+  - Data Modeling
+  - DAX
+  - Dashboards
+---
+
+A dashboard is only as good as the model behind it.
+
+**Direct answer:** Power BI enables business analytics through connected data models, DAX measures, and interactive dashboards. Effective use requires star-schema modeling, well-written DAX, and report design that prioritizes clarity over visual flair. Poor modeling leads to incorrect numbers; good modeling makes insights trustworthy and scalable.
+
+## Data modeling: the foundation
+
+Power BI is not Excel. Dumping flat tables into one table creates ambiguous relationships and incorrect aggregates. Use a star schema:
+
+- **Fact tables:** quantitative events (sales, orders, logins) with foreign keys to dimensions.
+- **Dimension tables:** descriptive entities (products, customers, dates, regions) with unique keys.
+
+Model rules:
+
+- **One-to-many from dimension to fact**, single direction.
+- **Avoid bidirectional relationships** unless absolutely necessary; they confuse filter propagation.
+- **Hide key columns** from report users; expose only meaningful attributes.
+- **Use a dedicated date table** with Mark as Date Table for time intelligence.
+
+A clean model makes DAX simpler and numbers auditable.
+
+## DAX: measures, not calculated columns
+
+DAX is Power BI's formula language. Know the difference:
+
+- **Calculated columns:** computed row-by-row at refresh, stored in the model. Use for row-level categorization (e.g., age group).
+- **Measures:** computed at query time based on filter context. Use for aggregations (sum, average, ratio).
+
+Best practices:
+
+- **Prefer measures** for KPIs; they respond to slicers and filters dynamically.
+- **Use variables** (`VAR` / `RETURN`) for readability and performance.
+- **Avoid `SUMX` over large tables** when a simple `SUM` suffices.
+- **Understand filter context vs. row context.** A common error is expecting a measure to behave like a column.
+
+Example measure:
+```dax
+Total Sales = SUM(Sales[Amount])
+YoY Growth % = 
+VAR CurrentYear = CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Date'[Date]))
+VAR PriorYear = CALCULATE([Total Sales], DATEADD('Date'[Date], -1, YEAR))
+RETURN DIVIDE([Total Sales] - PriorYear, PriorYear, 0)
+```
+
+## Dashboard design: clarity first
+
+Dashboards answer questions, not impress with visuals.
+
+- **Start with the question.** What decision does this dashboard support?
+- **One screen, one story.** Avoid cramming 20 visuals onto one page.
+- **Use appropriate charts:** bar for comparison, line for trends, scatter for correlation, card for KPIs. Avoid pie charts with many slices.
+- **Use slicers sparingly.** Too many slicers overwhelm users and hurt performance.
+- **Add tooltips and titles.** Explain what the number means and how it is calculated.
+- **Set a default date range.** Users should see something useful immediately.
+
+Performance: reduce visual-level calculations, use aggregations, and limit imported data to what is needed.
+
+## Common mistakes
+
+- **Using calculated columns for measures.** Bloats the model and breaks filter context.
+- **Bi-directional filters.** Creates ambiguous filter paths and incorrect totals.
+- **No date table.** Makes time intelligence impossible or unreliable.
+- **Designing for the creator, not the user.** Stakeholders need answers, not data exploration.
+
+For the related question of how data informs decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+
+## References & Further Reading
+
+This article synthesizes standard Power BI and business analytics concepts and does not cite a specific report, template, or Microsoft feature version by name. No specific tool version is endorsed because no specific claim about one is made. For implementation details, consult Microsoft Power BI documentation and literature on data modeling and DAX.
