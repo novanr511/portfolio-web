@@ -1,0 +1,85 @@
+---
+title: "Vector Databases: Embeddings, ANN Search, and RAG Applications"
+description: "Vector databases store and search high-dimensional embeddings. Learn ANN algorithms, indexing strategies, and RAG architectures."
+date: 2026-11-16
+tags:
+  - Vector Databases
+  - Embeddings
+  - ANN Search
+  - RAG
+  - Generative AI
+---
+
+Vectors are the new language of search.
+
+**Direct answer:** Vector databases store, index, and query high-dimensional vector embeddings. They enable semantic search, recommendation, and Retrieval-Augmented Generation (RAG) by finding nearest neighbors in embedding space. Approximate Nearest Neighbor (ANN) algorithms (HNSW, IVF, DiskANN) trade exactness for speed at scale. Vector databases add CRUD, filtering, hybrid search, and multi-tenancy on top of ANN indexes.
+
+## Embeddings as the universal representation
+
+Embeddings map discrete or unstructured data (text, images, audio, user behavior) to dense vectors where semantic similarity = geometric proximity (cosine similarity, dot product, Euclidean distance).
+
+**Sources of embeddings:**
+- **Text:** Sentence-BERT, OpenAI embeddings, Cohere, Voyage, E5, BGE.
+- **Images:** CLIP, ResNet, DINOv2, SigLIP.
+- **Multimodal:** ImageBind, CLIP (joint text-image space).
+- **Users/items:** collaborative filtering embeddings, two-tower models.
+
+## Approximate Nearest Neighbor (ANN) algorithms
+
+Exact k-NN is O(N) — too slow for millions of vectors. ANN trades recall for speed.
+
+**HNSW (Hierarchical Navigable Small World):** graph-based, multi-layer. Fast, high recall, memory-intensive. Dominant in production (Pinecone, Weaviate, Qdrant, Milvus, pgvector).
+
+**IVF (Inverted File Index):** partition space with k-means, search subset of clusters. Lower memory, faster build. Used in Faiss, Milvus.
+
+**DiskANN / SPANN:** disk-resident graph index for billion-scale. Low memory, SSD-optimized.
+
+**PQ (Product Quantization):** compress vectors, search in compressed domain. Reduces memory 8–16x.
+
+**Hybrid:** IVF + HNSW (IVF for coarse, HNSW for fine), PQ + HNSW.
+
+## Vector database features beyond ANN
+
+- **CRUD:** insert, update, delete, upsert vectors with metadata.
+- **Filtering:** pre-filter (pre-ANN) or post-filter (post-ANN) by metadata (tenant, category, date).
+- **Hybrid search:** combine vector similarity + keyword (BM25) + filters. Reciprocal rank fusion (RRF) or weighted score fusion.
+- **Multi-tenancy:** namespace isolation, per-tenant quotas.
+- **Versioning / snapshots:** point-in-time recovery, reproducibility.
+- **Replication / sharding:** horizontal scaling, multi-region.
+
+## RAG (Retrieval-Augmented Generation)
+
+RAG = retrieval + generation. Solves LLM knowledge cutoff and hallucination.
+
+**Pipeline:**
+1. **Ingest:** chunk documents → embed → upsert to vector DB.
+2. **Retrieve:** embed query → ANN search → top-K chunks.
+3. **Rerank (optional):** cross-encoder reranker for precision.
+4. **Generate:** LLM prompt with retrieved context + query.
+5. **Cite:** return sources with answer.
+
+**Chunking strategies:** fixed size, semantic (paragraph), recursive, semantic + overlap. Chunk size affects recall/precision tradeoff.
+
+**Reranking:** cross-encoder (e.g., bge-reranker, Cohere Rerank) scores (query, chunk) pairs. Improves precision at cost of latency.
+
+## Index selection guide
+
+| Scale | Latency Budget | Recall Need | Recommended |
+|---|---|---|---|
+| < 1M vectors | < 50ms | > 0.95 | HNSW (pgvector, Qdrant, Weaviate) |
+| 1M–10M | < 100ms | > 0.90 | IVF+HNSW (Milvus, Pinecone) |
+| 10M–100M | < 200ms | > 0.90 | IVF+PQ, DiskANN (Milvus, Vespa) |
+| 100M+ | < 500ms | > 0.85 | DiskANN, SPANN (Vespa, proprietary) |
+
+## Practical considerations
+
+- **Dimensionality:** match embedding model (384, 768, 1024, 1536). Higher = more info, more memory.
+- **Distance metric:** cosine (normalized), dot product (unnormalized), L2. Match training objective.
+- **Filtering strategy:** pre-filter (fast, may miss), post-filter (accurate, slower). Hybrid: pre-filter broad, post-filter precise.
+- **RAG evaluation:** retrieval metrics (recall@K, MRR), generation metrics (faithfulness, answer relevance, groundedness).
+
+For the related question of NLP fundamentals, see [NLP Fundamentals: Tokenization, Embeddings, and Transformers](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+
+## References & Further Reading
+
+This article synthesizes standard vector database and RAG concepts and does not cite a specific vendor, paper, or benchmark by name. No specific product is endorsed because no specific claim about one is made. For implementation details, consult Pinecone, Weaviate, Qdrant, Milvus, pgvector, Vespa, Faiss documentation, and literature on vector search and RAG.
