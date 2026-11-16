@@ -1,0 +1,82 @@
+---
+title: "Edge AI: Model Compression, Quantization, and On-Device Inference"
+description: "Edge AI runs ML on devices. Learn quantization, pruning, distillation, and frameworks for efficient on-device inference."
+date: 2026-11-16
+tags:
+  - Edge AI
+  - Model Compression
+  - Quantization
+  - On-Device Inference
+  - ML Engineering
+---
+
+Cloud is not always the answer. Edge brings intelligence to the device.
+
+**Direct answer:** Edge AI deploys ML models directly on devices (phones, IoT, sensors, vehicles) instead of relying on cloud inference. Benefits: low latency, privacy (data stays local), offline capability, bandwidth savings, cost reduction. Core techniques: quantization (INT8/INT4), pruning, knowledge distillation, efficient architectures. Frameworks: TensorFlow Lite, PyTorch Mobile, ONNX Runtime, Core ML, TensorRT.
+
+## Why Edge AI
+
+- **Latency:** sub-ms inference for real-time (AR, robotics, autonomous driving).
+- **Privacy:** raw data never leaves device (face unlock, health monitoring).
+- **Bandwidth:** no video/audio upload to cloud.
+- **Availability:** works offline (maps, translation, voice assistants).
+- **Cost:** no cloud GPU inference bills.
+
+## Model compression techniques
+
+**Quantization:** reduce weight/activation precision.
+- **Post-training quantization (PTQ):** INT8 dynamic, static, full integer. No retraining. 4x size reduction, 2-4x speedup.
+- **Quantization-Aware Training (QAT):** simulate quantization during training. Recovers accuracy. INT4/INT2 emerging.
+- **Mixed precision:** sensitive layers FP16/INT8, others INT4/INT8.
+
+**Pruning:** remove redundant weights.
+- **Unstructured:** zero individual weights (sparse). Needs sparse hardware support.
+- **Structured:** remove channels/filters/heads (dense). Compatible with dense kernels.
+- **Iterative pruning:** prune → fine-tune → repeat.
+
+**Knowledge distillation:** train small student to mimic large teacher. Soft labels (logits) + hard labels. Temperature scaling. Self-distillation (teacher = student ensemble).
+
+**Efficient architectures:** MobileNetV3, EfficientNet-Lite, GhostNet, ShuffleNet, MobileViT, FastViT. Designed for mobile NPUs.
+
+## Quantization details
+
+**INT8 symmetric:** int8 weights, uint8/INT8 activations. Per-tensor or per-channel scale.
+**INT4:** 4-bit weights, 8-bit activations. 2x smaller than INT8. Requires GEMM support (ARM NEON, Apple Neural Engine, Qualcomm Hexagon).
+**Mixed precision:** sensitive layers (first/last, attention) higher precision.
+
+**Calibration:** static quantization needs representative dataset for activation ranges. ~100-500 samples.
+
+## Frameworks and deployment
+
+| Framework | Platform | Quantization | Hardware Acceleration |
+|---|---|---|---|
+| TensorFlow Lite | Android, iOS, Linux | PTQ, QAT | GPU, NNAPI, Hexagon, Core ML delegate |
+| PyTorch Mobile | Android, iOS | PTQ, QAT | Metal, NNAPI |
+| ONNX Runtime | Cross-platform | PTQ, QAT | CPU, GPU, TensorRT, Core ML, NNAPI |
+| Core ML | iOS/macOS | PTQ, QAT | Neural Engine |
+| TensorRT | NVIDIA GPU | PTQ, QAT | Tensor Cores |
+| TVM / Apache TVM | Cross-platform | Auto-tuning | CPU, GPU, NPU |
+
+## Deployment workflow
+
+1. Train model (PyTorch/TensorFlow).
+2. Export to ONNX / SavedModel.
+3. Quantize (PTQ or QAT).
+4. Convert to target format (TFLite, ONNX, Core ML).
+5. Benchmark on target device (latency, memory, accuracy).
+6. Profile: Nsight, Instruments, Perfetto.
+7. Iterate: prune → distill → quantize.
+
+## Challenges
+
+- **Accuracy drop:** aggressive quantization hurts. QAT + mixed precision mitigates.
+- **Operator support:** custom ops may not quantize. Fallback to FP32.
+- **Hardware fragmentation:** diverse NPUs, drivers, APIs.
+- **Model size vs accuracy:** Pareto frontier.
+- **Security:** model extraction, adversarial attacks on device.
+
+For the related question of model compression for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+
+## References & Further Reading
+
+This article synthesizes standard edge AI and model compression concepts and does not cite a specific vendor, tool, or benchmark by name. No specific framework is endorsed. For implementation, consult TensorFlow Lite, PyTorch Mobile, ONNX Runtime, Core ML, TensorRT documentation, and literature on model compression and edge ML.

@@ -1,0 +1,65 @@
+---
+title: "Reinforcement Learning: Q-Learning, Policy Gradients, and Applications"
+description: "Reinforcement learning trains agents to make sequential decisions. Learn Q-learning, policy gradients, actor-critic, and real-world applications."
+date: 2026-11-16
+tags:
+  - Reinforcement Learning
+  - Q-Learning
+  - Policy Gradients
+  - AI
+  - Machine Learning
+---
+
+RL learns by interacting with an environment, not from static datasets.
+
+**Direct answer:** Reinforcement Learning (RL) trains an agent to maximize cumulative reward through trial-and-error interaction with an environment. Core approaches: value-based (Q-learning, DQN), policy-based (REINFORCE, PPO), and actor-critic (A2C, A3C, SAC). RL excels in sequential decision-making: robotics, games, trading, recommendation, resource allocation.
+
+## RL fundamentals
+
+**Markov Decision Process (MDP):** states (S), actions (A), transition dynamics P(s'|s,a), reward function R(s,a), discount factor γ ∈ [0,1].
+
+**Objective:** maximize expected discounted return G = Σ γ^t r_t.
+
+**Value functions:** V(s) = expected return from state s. Q(s,a) = expected return from state s taking action a.
+
+**Bellman equations:** recursive relationships for optimal value functions.
+
+## Value-based methods
+
+**Q-learning:** off-policy TD learning. Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') - Q(s,a)].
+
+**DQN (Deep Q-Network):** neural network approximates Q(s,a). Key innovations: experience replay (breaks correlation), target network (stabilizes targets), ε-greedy exploration.
+
+**Extensions:** Double DQN (reduces overestimation), Dueling DQN (separate value/advantage streams), Rainbow (combines improvements).
+
+## Policy gradient methods
+
+**REINFORCE:** directly optimize policy π(a|s;θ) via gradient ascent: ∇θ J(θ) = E[∇θ log π(a|s;θ) G_t]. High variance, use baselines.
+
+**Actor-Critic:** combines value function (critic) with policy (actor). Critic reduces variance. A2C (synchronous), A3C (asynchronous parallel).
+
+**PPO (Proximal Policy Optimization):** clipped objective prevents large policy updates. Industry standard for continuous control.
+
+**SAC (Soft Actor-Critic):** off-policy, entropy regularization for exploration. State-of-the-art for continuous control.
+
+## Applications
+
+- **Games:** AlphaGo/Zero (MCTS + RL), Dota 2, StarCraft II.
+- **Robotics:** sim-to-real transfer, dexterous manipulation.
+- **Trading:** portfolio optimization, execution.
+- **Recommendation:** sequential recommendation, slate optimization.
+- **Resource scheduling:** data center cooling, traffic control.
+
+## Challenges
+
+- **Sample efficiency:** RL needs many environment interactions.
+- **Reward design:** sparse/reward shaping, specification gaming.
+- **Exploration vs exploitation:** ε-greedy, entropy regularization, curiosity-driven.
+- **Sim-to-real:** domain randomization, domain adaptation.
+- **Safety:** safe RL, constrained RL, human-in-the-loop.
+
+For the related question of MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+
+## References & Further Reading
+
+This article synthesizes standard RL concepts and does not cite a specific paper, algorithm, or benchmark by name. No specific library is endorsed. For research, consult Sutton & Barto "Reinforcement Learning: An Introduction", Spinning Up (OpenAI), and libraries: Stable Baselines3, RLlib, CleanRL, Tianshou.

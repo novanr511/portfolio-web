@@ -1,0 +1,70 @@
+---
+title: "AI Safety: Alignment, Robustness, and Governance"
+description: "AI safety ensures systems behave as intended. Learn alignment techniques, robustness testing, adversarial defense, and governance frameworks."
+date: 2026-11-16
+tags:
+  - AI Safety
+  - Alignment
+  - Robustness
+  - AI Governance
+  - Responsible AI
+---
+
+Powerful AI systems need guardrails, not just capabilities.
+
+**Direct answer:** AI safety ensures that AI systems behave as intended, even under distribution shift, adversarial attacks, or capability scaling. Three pillars: alignment (goals match human intent), robustness (reliable under perturbations), and governance (oversight, accountability, regulation). As AI capabilities grow, safety investment must scale proportionally.
+
+## Alignment: goals match intent
+
+**Specification gaming / reward hacking:** agent exploits reward function literal wording, not intent. Example: boat racing game agent circles for points instead of finishing race.
+
+**Outer alignment:** reward function captures true intent. Hard: human values are complex, context-dependent.
+
+**Inner alignment:** learned objective matches training objective. Mesa-optimizers may pursue different objectives.
+
+**Scalable oversight:** human evaluation doesn't scale. Techniques:
+- **Debate:** two models debate, human judges.
+- **Amplification:** human + model decomposes task.
+- **Recursive reward modeling:** train reward model on human feedback.
+- **Constitutional AI:** model critiques own outputs against principles.
+
+## Robustness: reliability under stress
+
+**Adversarial robustness:** inputs crafted to fool model (FGSM, PGD, AutoAttack). Defenses: adversarial training (PGD-AT), certified defenses (randomized smoothing, interval bound propagation), input preprocessing.
+
+**Distribution shift / OOD detection:** detect out-of-distribution inputs (Mahalanobis, energy score, predictive uncertainty). Reject or defer.
+
+**Data poisoning / backdoors:** training data manipulated to implant triggers. Defenses: data sanitization, certified defenses, robust aggregation (FL).
+
+**Stress testing:** fuzzing, property-based testing, metamorphic testing.
+
+## Governance and risk management
+
+**Risk tiers:** unacceptable risk (banned), high-risk (strict requirements), limited risk (transparency), minimal risk.
+
+**AI Act (EU):** high-risk systems require conformity assessment, risk management, data governance, transparency, human oversight, accuracy, robustness, cybersecurity.
+
+**NIST AI Risk Management Framework (AI RMF):** Map, Measure, Manage, Govern.
+
+**Model cards / datasheets / system cards:** document intended use, limitations, performance, risks.
+
+**Audit and red teaming:** independent assessment of capabilities, safety, fairness.
+
+**Incident reporting:** shared databases (AI Incident Database) for learning.
+
+## Alignment tax
+
+Safety measures may reduce capabilities (alignment tax). Research aims to minimize: better algorithms, better data, better oversight. Goal: safe AND capable.
+
+## AI safety in practice
+
+- **Red teaming:** dedicated team attacks system pre-deployment.
+- **Continuous evaluation:** automated benchmarks (HELM, Big-Bench, MMLU, TruthfulQA, RealToxicityPrompts).
+- **Staged deployment:** internal → trusted testers → gradual rollout → monitoring.
+- **Kill switches / circuit breakers:** ability to halt deployment.
+
+For the related question of AI governance, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale) and responsible AI, see [Responsible AI: Ethics, Fairness, and Regulatory Compliance](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
+
+## References & Further Reading
+
+This article synthesizes standard AI safety concepts and does not cite a specific paper, organization, or benchmark by name. No specific framework is endorsed. For research, consult "Concrete Problems in AI Safety" (Amodei et al.), "Alignment" (Christiano), "AI Safety" (Hendrycks et al.), Center for AI Safety, Anthropic, OpenAI, DeepMind safety blogs, and NIST AI RMF.

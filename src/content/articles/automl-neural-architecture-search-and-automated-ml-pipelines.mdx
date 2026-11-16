@@ -1,0 +1,75 @@
+---
+title: "AutoML: Neural Architecture Search and Automated ML Pipelines"
+description: "AutoML automates the ML lifecycle. Learn neural architecture search, hyperparameter optimization, and end-to-end automated pipelines."
+date: 2026-11-16
+tags:
+  - AutoML
+  - Neural Architecture Search
+  - Hyperparameter Optimization
+  - ML Engineering
+---
+
+AutoML automates the tedious parts of ML. Experts design search spaces; AutoML searches them.
+
+**Direct answer:** AutoML (Automated Machine Learning) automates the end-to-end ML pipeline: data preprocessing, feature engineering, model selection, hyperparameter optimization (HPO), neural architecture search (NAS), and model deployment. It democratizes ML for non-experts and accelerates expert workflows. Key components: search space definition, search strategy, performance estimation, and resource management.
+
+## AutoML pipeline stages
+
+1. **Data preprocessing:** missing value handling, encoding, scaling, feature selection.
+2. **Feature engineering:** automated feature construction (Featuretools, tsfresh).
+3. **Model selection:** choose algorithm family (tree, linear, neural, ensemble).
+4. **Hyperparameter optimization (HPO):** search hyperparameter space.
+5. **Neural Architecture Search (NAS):** search neural network architectures.
+6. **Ensembling:** stack/blend top models.
+6. **Deployment:** export model, generate inference code, monitoring setup.
+
+## Hyperparameter Optimization (HPO)
+
+Search space: learning rate, batch size, layers, dropout, regularization, optimizer.
+
+**Strategies:**
+- **Grid / Random search:** baseline.
+- **Bayesian optimization (TPE, GP, SMAC):** surrogate model, acquisition function. Optuna, Hyperopt, SMAC.
+- **Multi-fidelity:** Hyperband, ASHA, BOHB. Early stopping, resource allocation.
+- **Population-based training (PBT):** evolutionary, online adaptation.
+
+## Neural Architecture Search (NAS)
+
+NAS searches neural network topology: layers, connections, operations, widths.
+
+**Search space:** macro (entire architecture) or micro (cell repeated). DARTS (differentiable), ENAS (weight sharing), ProxylessNAS, FBNet, MobileNetV3.
+
+**Search strategy:**
+- **RL-based:** controller RNN samples architectures, reward = validation accuracy.
+- **Evolutionary:** mutation/crossover, tournament selection.
+- **Gradient-based (DARTS):** relax discrete search to continuous, optimize via gradient descent.
+- **One-shot / weight-sharing:** train supernet once, evaluate sub-networks.
+
+**Efficiency:** weight sharing, progressive shrinking, early stopping, proxy tasks.
+
+## AutoML systems
+
+| System | Focus | Strength |
+|---|---|---|
+| Auto-sklearn | Tabular, HPO + meta-learning | Strong on tabular |
+| AutoKeras | NAS for vision/text | Easy API |
+| H2O AutoML | Ensemble, stacked models | Production-ready |
+| TPOT | Genetic programming | Pipeline optimization |
+| AutoGluon | Multi-modal, tabular, text, image | Strong benchmark |
+| Ray Tune + Ray AIR | Distributed HPO/NAS | Scalable |
+| Optuna | HPO framework | Flexible, pruning |
+| NNI (Microsoft) | HPO + NAS + compression | Extensible |
+
+## Evaluation and pitfalls
+
+- **Data leakage in CV:** must isolate test set completely.
+- **Overfitting to validation:** too many trials, use nested CV or holdout.
+- **Compute cost:** NAS can take GPU-days. Use proxy tasks, weight sharing.
+- **Reproducibility:** seed control, config versioning.
+- **Deployment gap:** AutoML models may need optimization (quantization, distillation) for production.
+
+For the related question of hyperparameter tuning, see [Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization](/articles/hyperparameter-tuning-grid-search-random-search-and-bayesian-optimization) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+
+## References & Further Reading
+
+This article synthesizes standard AutoML concepts and does not cite a specific system, paper, or benchmark by name. No specific tool is endorsed. For research, consult AutoML benchmarks (AutoML Benchmark, OpenML), AutoML Conference proceedings, and literature on NAS, HPO, and meta-learning.

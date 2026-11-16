@@ -1,0 +1,68 @@
+---
+title: "Graph Neural Networks: Graph Convolutional Networks and Applications"
+description: "Graph neural networks process graph-structured data. Learn GCN, GraphSAGE, GAT, and applications in recommendation, fraud detection, and molecular design."
+date: 2026-11-16
+tags:
+  - Graph Neural Networks
+  - GCN
+  - GraphSAGE
+  - GAT
+  - Deep Learning
+---
+
+Many real-world systems are graphs. GNNs learn from structure.
+
+**Direct answer:** Graph Neural Networks (GNNs) operate on graph-structured data (nodes, edges, features) by passing messages along edges to learn node, edge, or graph-level representations. Core architectures: GCN (spectral convolution), GraphSAGE (inductive sampling), GAT (attention-based aggregation). Applications: recommendation, fraud detection, molecular property prediction, traffic forecasting, social network analysis.
+
+## Graph representation
+
+A graph G = (V, E) with nodes V, edges E, node features X ∈ R^(N×D), adjacency matrix A ∈ {0,1}^(N×N). May include edge features E_f.
+
+## Message passing framework
+
+GNNs follow a message passing neural network (MPNN) paradigm:
+
+1. **Message:** m_v = Σ_{u∈N(v)} M(h_u, h_v, e_uv) — aggregate neighbor info.
+2. **Update:** h_v' = U(h_v, m_v) — update node representation.
+
+After K layers, node embeddings capture K-hop neighborhood structure.
+
+## Core architectures
+
+**GCN (Graph Convolutional Network):** spectral convolution approximated by localized first-order filter. H^(l+1) = σ(D^(-1/2) A D^(-1/2) H^(l) W^(l)). Transductive (requires full graph during training).
+
+**GraphSAGE:** inductive. Samples fixed-size neighborhood, applies aggregator (mean, LSTM, pooling). Learns aggregator function, generalizes to unseen nodes.
+
+**GAT (Graph Attention Network):** attention-weighted aggregation. α_ij = softmax(LeakyReLU(a^T [Wh_i || Wh_j])). Learns edge importance. Multi-head attention.
+
+**GraphTransformer / Graphormer:** transformer on graphs with structural encodings. Strong on molecular graphs.
+
+**Message Passing Neural Networks (MPNN):** general framework unifying GNN variants.
+
+## Training objectives
+
+- **Node classification:** semi-supervised (GCN, GraphSAGE).
+- **Link prediction:** predict missing edges (dot product of embeddings).
+- **Graph classification:** readout (sum/mean/max pooling + MLP).
+- **Node embedding:** unsupervised (DeepWalk, Node2Vec) or contrastive (GraphCL, GRACE).
+
+## Applications
+
+- **Recommendation:** user-item bipartite graph (PinSage, LightGCN).
+- **Fraud detection:** transaction graph, anomalous subgraphs.
+- **Drug discovery:** molecular property prediction (Graphormer, Grover).
+- **Traffic forecasting:** spatial-temporal GNNs (STGCN, DCRNN).
+- **Knowledge graphs:** RGCN, CompGCN for relation prediction.
+
+## Challenges
+
+- **Scalability:** mini-batch sampling (GraphSAGE, Cluster-GCN), distributed training.
+- **Oversmoothing:** deep GNNs converge to similar embeddings. Residual connections, jumping knowledge.
+- **Heterophily:** neighbors have different labels. H2GCN, GPR-GNN.
+- **Dynamic graphs:** temporal GNNs (TGN, DyRep).
+
+For the related question of deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings) and vector databases, see [Vector Databases: Embeddings, ANN Search, and RAG Applications](/articles/vector-databases-embeddings-ann-search-and-rag-applications).
+
+## References & Further Reading
+
+This article synthesizes standard GNN concepts and does not cite a specific paper, model, or vendor by name. No specific framework is endorsed. For research, consult PyTorch Geometric, DGL, PyG documentation, "Graph Neural Networks: A Review" (Wu et al.), and literature on geometric deep learning.

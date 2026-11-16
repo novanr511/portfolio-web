@@ -1,0 +1,72 @@
+---
+title: "Federated Learning: Privacy-Preserving Distributed Machine Learning"
+description: "Federated learning trains models on decentralized data without sharing raw data. Learn FL architectures, aggregation, privacy, and system challenges."
+date: 2026-11-16
+tags:
+  - Federated Learning
+  - Privacy
+  - Distributed ML
+  - Machine Learning
+---
+
+Data stays local. The model travels.
+
+**Direct answer:** Federated Learning (FL) trains a shared model across decentralized devices (phones, hospitals, banks) without centralizing raw data. Clients compute local updates on their data; server aggregates updates (FedAvg) into a global model. FL enables collaborative ML while preserving data locality, addressing privacy, regulatory, and bandwidth constraints.
+
+## FL workflow
+
+1. **Initialization:** server sends global model to selected clients.
+2. **Local training:** each client trains on local data for E epochs.
+3. **Upload:** clients send model updates (weights/gradients) to server.
+4. **Aggregation:** server computes weighted average (FedAvg): w_{t+1} = Σ (n_k / n) w_k.
+5. **Repeat** until convergence.
+
+## FL architectures
+
+**Cross-device FL:** millions of devices (phones, IoT). High heterogeneity, unreliable connectivity, small per-client data. Google keyboard, Android keyboard prediction.
+
+**Cross-silo FL:** few organizations (hospitals, banks). Larger data, stable connectivity, legal agreements. Medical imaging, financial fraud detection.
+
+## Aggregation algorithms
+
+**FedAvg:** weighted average by data size. Simple, communication-efficient. Can diverge with high heterogeneity.
+
+**FedProx:** adds proximal term to local loss, constrains drift from global model.
+
+**SCAFFOLD:** control variates correct client drift. Better convergence for heterogeneous data.
+
+**FedNova:** normalizes local updates by effective steps. Handles varying local epochs.
+
+**Mime / MimeLite:** mimic centralized training with momentum/variance reduction.
+
+## Privacy enhancements
+
+FL alone ≠ privacy. Raw gradients can leak data (gradient inversion, membership inference).
+
+**Differential Privacy (DP):** add calibrated Gaussian noise to updates. DP-FedAvg, DP-SGD. Privacy budget (ε, δ) tradeoff.
+
+**Secure Aggregation (SecAgg):** cryptographic protocol (secret sharing) ensures server only sees aggregate, not individual updates. Combined with DP.
+
+**Homomorphic Encryption:** compute on encrypted updates. High overhead.
+
+**Local DP:** clients add noise before sending. Stronger privacy, higher noise.
+
+## System challenges
+
+- **Heterogeneity:** data (non-IID), compute (stragglers), network.
+- **Communication:** compression (quantization, sparsification, sketching).
+- **Client selection:** random, importance-based, incentive-aware.
+- **Dropout/resilience:** straggler handling, partial participation.
+
+## Evaluation
+
+- **Convergence:** global model accuracy vs communication rounds.
+- **Fairness:** per-client performance, demographic parity.
+- **Privacy budget:** ε, δ accounting (RDP, moments accountant).
+- **Communication cost:** bytes sent/received per round.
+
+For the related question of privacy in ML, see [Data Ethics: Responsible Use of Customer Data](/articles/data-ethics-responsible-use-of-customer-data) and AI governance, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale).
+
+## References & Further Reading
+
+This article synthesizes standard federated learning concepts and does not cite a specific paper, platform, or vendor by name. No specific framework is endorsed. For research, consult TensorFlow Federated, PySyft, Flower, FATE, and literature: "Advances and Open Problems in Federated Learning" (Kairouz et al., 2021), "Federated Learning" (Li et al.).

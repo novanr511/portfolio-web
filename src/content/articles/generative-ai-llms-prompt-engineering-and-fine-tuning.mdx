@@ -1,0 +1,78 @@
+---
+title: "Generative AI: LLMs, Prompt Engineering, and Fine-tuning"
+description: "Generative AI transforms how we build with language. Learn LLM fundamentals, prompt engineering patterns, and fine-tuning strategies for domain adaptation."
+date: 2026-11-16
+tags:
+  - Generative AI
+  - LLM
+  - Prompt Engineering
+  - Fine-tuning
+  - AI
+---
+
+Large language models are the new general-purpose computing primitive.
+
+**Direct answer:** Generative AI, powered by Large Language Models (LLMs), generates human-like text, code, and reasoning. Prompt engineering designs effective inputs; fine-tuning adapts pretrained models to specific domains. Understanding tokenization, context windows, and alignment is essential for building reliable LLM applications.
+
+## LLM fundamentals
+
+**Architecture:** decoder-only transformers (GPT, LLaMA, Mistral) trained with next-token prediction on massive corpora. Key components: tokenization (BPE/Unigram), positional embeddings, causal self-attention, feed-forward layers.
+
+**Training stages:**
+1. **Pretraining:** next-token prediction on trillion-token corpora. Learns world knowledge, syntax, reasoning patterns.
+2. **Supervised fine-tuning (SFT):** instruction-response pairs teach format following.
+3. **Alignment (RLHF/RLAIF):** reward modeling + PPO/DPO to align with human preferences.
+
+**Scaling laws:** loss decreases predictably with compute, data, and parameters (Chinchilla scaling).
+
+## Prompt engineering
+
+Prompt engineering designs inputs to elicit desired outputs without weight updates.
+
+**Core patterns:**
+- **Zero-shot:** task description only.
+- **Few-shot:** few input-output examples (in-context learning).
+- **Chain-of-thought (CoT):** "Let's think step by step" elicits reasoning.
+- **Self-consistency:** sample multiple CoT paths, majority vote.
+- **Tree-of-thoughts / Graph-of-thoughts:** structured reasoning search.
+- **RAG prompting:** inject retrieved context into prompt.
+
+**Best practices:** be specific, provide examples, separate instructions from data, use delimiters, specify output format (JSON, markdown), iterate empirically.
+
+## Fine-tuning strategies
+
+**Full fine-tuning:** update all weights. High compute, best adaptation. Use LoRA/QLoRA for efficiency.
+
+**Parameter-efficient fine-tuning (PEFT):**
+- **LoRA (Low-Rank Adaptation):** freeze base weights, inject low-rank adapters (A×B). Trainable params << base params.
+- **QLoRA:** 4-bit quantized base + LoRA. Fits larger models on consumer GPUs.
+- **Adapters / Prefix tuning / Prompt tuning:** lightweight modules or learned soft prompts.
+
+**When to fine-tune:**
+- Domain-specific terminology/style (legal, medical, code).
+- Consistent output format requirements.
+- Private/proprietary knowledge injection.
+- Latency/cost reduction via smaller distilled models.
+
+**Risks:** catastrophic forgetting, hallucination amplification, alignment degradation. Evaluate on held-out benchmarks.
+
+## RAG vs Fine-tuning
+
+| Need | Approach |
+|---|---|
+| Dynamic/private knowledge | RAG |
+| Style/format consistency | Fine-tuning |
+| Rapid iteration | RAG |
+| Deep domain expertise | Fine-tuning + RAG |
+
+## Safety and evaluation
+
+- **Benchmarks:** MMLU, GSM8K, HumanEval, MT-Bench, AlpacaEval.
+- **Red teaming:** adversarial prompts for safety, bias, PII leakage.
+- **Guardrails:** input/output filters, refusal patterns, citation requirements.
+
+For the related question of NLP fundamentals, see [NLP Fundamentals: Tokenization, Embeddings, and Transformers](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers) and AI governance, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale).
+
+## References & Further Reading
+
+This article synthesizes standard generative AI concepts and does not cite a specific model, vendor, or paper by name. No specific LLM or platform is endorsed. For research, consult Hugging Face Transformers, "Scaling Laws for Neural Language Models" (Kaplan et al.), "LoRA" (Hu et al., 2021), and "QLoRA" (Dettmers et al., 2023).

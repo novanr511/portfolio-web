@@ -1,0 +1,73 @@
+---
+title: "Causal Inference: Counterfactuals, DAGs, and Do-Calculus"
+description: "Causal inference answers 'what if' questions. Learn counterfactual reasoning, DAGs, do-calculus, and methods for estimating causal effects from observational data."
+date: 2026-11-16
+tags:
+  - Causal Inference
+  - Counterfactuals
+  - DAG
+  - Do-Calculus
+  - Statistics
+---
+
+Correlation is not causation. Causal inference tells the difference.
+
+**Direct answer:** Causal inference estimates the effect of an intervention (treatment) on an outcome, distinguishing causation from correlation. Tools: Directed Acyclic Graphs (DAGs) encode assumptions, do-calculus formalizes interventions, and estimation methods (matching, IPW, doubly robust, IV) compute causal effects from observational data. Causal reasoning is essential for decision-making, policy, and trustworthy AI.
+
+## The fundamental problem
+
+We observe Y_i(1) (treated) or Y_i(0) (control), never both. The individual causal effect Y_i(1) - Y_i(0) is never directly observed. Average Treatment Effect (ATE) = E[Y(1) - Y(0)] is the target.
+
+## DAGs: encoding causal assumptions
+
+A Directed Acyclic Graph encodes causal relationships: nodes = variables, edges = direct causal effects.
+
+**Key structures:**
+- **Confounder (backdoor):** common cause of treatment and outcome. Must adjust.
+- **Mediator:** on causal path. Adjusting blocks indirect effect.
+- **Collider:** common effect. Conditioning creates spurious association (collider bias).
+- **Instrumental variable:** affects treatment, not outcome except through treatment.
+
+**Backdoor criterion:** a set of variables blocks all backdoor paths from treatment to outcome. Adjusting for it yields unbiased causal effect.
+
+## Do-calculus: formalizing interventions
+
+Pearl's do-calculus formalizes P(Y | do(X)) — the distribution of Y if we intervene to set X = x.
+
+Three rules allow transforming interventional distributions to observational ones when graphical criteria are met. The backdoor adjustment formula: P(Y | do(X)) = Σ_Z P(Y | X, Z) P(Z) for Z satisfying backdoor criterion.
+
+## Estimation methods
+
+**Matching:** pair treated/control units with similar covariates (propensity score, Mahalanobis, coarsened exact matching). Reduces model dependence.
+
+**Inverse Probability Weighting (IPW):** weight units by inverse probability of treatment given covariates. Stabilized weights reduce variance.
+
+**Doubly Robust (AIPW):** combines outcome regression + IPW. Consistent if either model correct.
+
+**Instrumental Variables (IV):** use exogenous variation (instrument) to identify causal effect. Requires exclusion restriction, relevance, independence.
+
+**Regression Discontinuity (RD):** exploit arbitrary threshold. Local randomization at cutoff.
+
+**Difference-in-Differences (DiD):** compare treated/control before/after intervention. Requires parallel trends assumption.
+
+**Synthetic Control:** construct synthetic counterfactual from donor pool.
+
+## Common pitfalls
+
+- **Unmeasured confounding:** no method fixes unobserved confounders. Sensitivity analysis (E-value, Rosenbaum bounds) quantifies robustness.
+- **Collider bias:** conditioning on colliders induces spurious correlation.
+- **Post-treatment bias:** controlling for mediators blocks causal path.
+- **Model dependence:** parametric assumptions affect results. Use doubly robust, nonparametric methods.
+
+## Applications
+
+- **A/B testing:** gold standard (randomization = no confounding).
+- **Observational studies:** healthcare, economics, policy evaluation.
+- **ML fairness:** causal pathways for discrimination.
+- **Recommendation:** causal effect of recommending item X.
+
+For the related question of A/B testing, see [A/B Testing: Making Decisions with Experiments](/articles/ab-testing-making-decisions-with-experiments) and A/B testing for recsys, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
+
+## References & Further Reading
+
+This article synthesizes standard causal inference concepts and does not cite a specific paper, researcher, or framework by name. No specific method is endorsed. For research, consult "Causal Inference" (Hernán & Robins), "The Book of Why" (Pearl), "Causal Inference for Statistics, Social, and Biomedical Sciences" (Imbens & Rubin), and libraries: DoWhy, EconML, CausalML.

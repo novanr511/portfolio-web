@@ -1,0 +1,83 @@
+---
+title: "Anomaly Detection: Statistical, ML, and Deep Learning Approaches"
+description: "Anomaly detection identifies rare events that deviate from normal behavior. Learn statistical, ML, and deep learning methods for fraud, intrusion, and system monitoring."
+date: 2026-11-16
+tags:
+  - Anomaly Detection
+  - Machine Learning
+  - Outlier Detection
+  - Data Science
+---
+
+Anomalies are rare but costly. Detection prevents disasters.
+
+**Direct answer:** Anomaly detection identifies observations that deviate significantly from expected patterns. Methods span statistical (threshold, z-score, IQR), machine learning (Isolation Forest, One-Class SVM, LOF), and deep learning (autoencoders, GANs, predictive models). Choice depends on data type, label availability, interpretability needs, and latency constraints.
+
+## Problem formulation
+
+**Point anomalies:** individual points deviating from normal (fraudulent transaction, sensor spike).
+
+**Contextual anomalies:** normal globally, anomalous in context (high temp in winter, low traffic at noon).
+
+**Collective anomalies:** sequence deviates (DDoS attack, sensor drift, insider threat).
+
+## Statistical methods
+
+**Threshold-based:** fixed or adaptive thresholds on metric values.
+
+**Z-score / modified Z-score:** (x - median) / MAD. Robust to outliers.
+
+**IQR (Interquartile Range):** [Q1 - 1.5×IQR, Q3 + 1.5×IQR]. Non-parametric.
+
+**Moving average / EWMA:** for time series, detect deviations from rolling mean.
+
+**Control charts:** Shewhart, CUSUM, EWMA charts for statistical process control.
+
+**Strengths:** interpretable, fast, no training data needed.
+**Weaknesses:** univariate, static thresholds miss contextual anomalies.
+
+## Machine learning methods
+
+**Isolation Forest:** ensemble of random trees, isolates anomalies via short path lengths. Fast, handles high dimensions, no label needed.
+
+**One-Class SVM:** learns boundary enclosing normal data. Kernel trick for nonlinear boundaries. Sensitive to kernel choice, scales poorly.
+
+**Local Outlier Factor (LOF):** local density deviation. Good for local anomalies, O(n^2) memory.
+
+**Elliptic Envelope:** assumes Gaussian, fits robust covariance. Fast, but Gaussian assumption.
+
+**DBSCAN / HDBSCAN:** density-based clustering. Outliers = noise points.
+
+**Supervised (if labels exist):** XGBoost, LightGBM, neural nets with class weights / focal loss.
+
+## Deep learning methods
+
+**Autoencoders:** train to reconstruct normal data; high reconstruction error = anomaly. Variants: VAE (probabilistic), LSTM-AE (temporal), Conv-AE (spatial).
+
+**GAN-based:** GANomaly, f-AnoGAN. Generator learns normal manifold; discriminator detects anomalies.
+
+**Predictive models:** LSTM/Transformer predicts next step; high prediction error = anomaly.
+
+**One-class deep learning:** Deep SVDD, Deep SAD. Learn hypersphere enclosing normal data.
+
+## Evaluation metrics
+
+- **Precision / Recall / F1:** if labels exist.
+- **AUC-ROC / AUC-PR:** threshold-independent.
+- **Precision@K:** for ranking-based detection.
+- **FPR at fixed TPR:** operational requirement.
+- **Time-to-detect:** latency for streaming.
+
+## Practical considerations
+
+- **Imbalanced data:** anomalies << normal. Use precision-recall, not accuracy.
+- **Label scarcity:** semi-supervised / unsupervised methods essential.
+- **Concept drift:** retrain or use online learning.
+- **Explainability:** feature attribution for root cause analysis.
+- **Latency:** streaming vs batch, model complexity vs SLA.
+
+For the related question of model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) and time series forecasting, see [Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models).
+
+## References & Further Reading
+
+This article synthesizes standard anomaly detection concepts and does not cite a specific algorithm, library, or benchmark by name. No specific tool is endorsed. For research, consult scikit-learn, PyOD, PyODDS, PyCaret, and literature on anomaly detection and outlier analysis.
