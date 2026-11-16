@@ -11,7 +11,7 @@ tags:
 
 WordPress powers a massive fraction of the web, but its architectural flexibility can be a double-edged sword. Beneath its user-friendly administrative dashboard lies an intricate chain of web server rewrite rules, PHP execution hooks, database query loops, and template rendering engines.
 
-When an SEO issue occurs on WordPress—such as unexpected 404 errors on pagination, duplicate meta tags, or slow Time to First Byte (TTFB)—non-technical practitioners often resort to blunt workarounds like randomly toggling plugins. 
+When an SEO issue occurs on WordPress—such as unexpected 404 errors on pagination, duplicate meta tags, or slow Time to First Byte (TTFB)—non-technical practitioners often resort to blunt workarounds like randomly toggling plugins.
 
 Engineering effective solutions requires understanding the physical request lifecycle: **from the initial URI rewrite to the final rendered HTML stream**.
 
@@ -122,8 +122,8 @@ If poorly coded plugins store transient caches, error logs, or massive serialize
 
 **Inspection Query:**
 ```sql
-SELECT SUM(LENGTH(option_value)) / 1024 / 1024 AS autoload_size_mb 
-FROM wp_options 
+SELECT SUM(LENGTH(option_value)) / 1024 / 1024 AS autoload_size_mb
+FROM wp_options
 WHERE autoload = 'yes';
 ```
 If the result exceeds 1.5MB, query the largest individual options and update non-essential records to `autoload = 'no'`.
@@ -175,3 +175,9 @@ WordPress is an extensible web application framework. Treating it as a black box
 * **Eliminate Database TTFB Latency:** Audit autoloaded options in `wp_options` and deploy Redis object caching to maintain rapid crawler response times.
 
 To understand how web server architectures influence crawling performance, read [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer).
+
+## Further Reading
+
+- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
+- Google, 2026. [Google Crawler (User Agent) Overview](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers?hl=en) — How Google discovers, crawls, renders, and indexes pages.
+- Chrome DevTools, 2026. [Inspect network activity | Chrome DevTools](https://developer.chrome.com/docs/devtools/network?hl=en) — The reference for the panel most of the diagnostic recipes use.

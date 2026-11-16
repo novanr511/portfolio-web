@@ -79,7 +79,7 @@ If your origin server emits an HTTP header like:
 Vary: User-Agent, Cookie
 ```
 
-The CDN must maintain separate cached copies of the document for every unique `User-Agent` string and cookie permutation. Because Googlebot uses multiple user-agent variants (e.g., Googlebot Desktop vs Googlebot Smartphone), a `Vary: User-Agent` header forces redundant origin fetches. 
+The CDN must maintain separate cached copies of the document for every unique `User-Agent` string and cookie permutation. Because Googlebot uses multiple user-agent variants (e.g., Googlebot Desktop vs Googlebot Smartphone), a `Vary: User-Agent` header forces redundant origin fetches.
 
 **Engineering Rule:** Strictly limit `Vary` headers on cacheable public documents to `Vary: Accept-Encoding` (which allows the CDN to serve `br` vs `gzip` compression appropriately).
 
@@ -167,7 +167,7 @@ curl -s -i -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bo
 ### Key Headers to Analyze:
 
 ```http
-HTTP/2 200 
+HTTP/2 200
 date: Thu, 13 Nov 2026 14:40:00 GMT
 content-type: text/html; charset=UTF-8
 cache-control: public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400
@@ -192,3 +192,9 @@ Continue exploring server infrastructure and reliability:
 * **[Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin)** — Diagnosing upstream timeouts behind the CDN.
 * **[Website Uptime, 5xx Errors, and Crawl Reliability](/articles/website-uptime-5xx-errors-and-crawl-reliability)** — How server availability and 5xx thresholds govern search indexing.
 * **[DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works)** — Executing seamless DNS cutovers during CDN migrations.
+
+## Further Reading
+
+- R. Fielding, M. Nottingham, and J. Reschke, editors, 2022. [RFC 9111: HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111) — The normative cache-control, freshness, validation, and invalidation rules.
+- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
+- Google, 2026. [Google Crawler (User Agent) Overview](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers?hl=en) — How Google discovers, crawls, renders, and indexes pages.

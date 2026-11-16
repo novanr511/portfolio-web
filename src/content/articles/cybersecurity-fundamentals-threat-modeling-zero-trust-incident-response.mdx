@@ -1,0 +1,76 @@
+---
+title: "Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response"
+description: "Cybersecurity protects systems and data. Learn threat modeling, Zero Trust architecture, incident response lifecycle, and building a security program."
+date: 2026-11-16
+tags:
+  - Cybersecurity
+  - Threat Modeling
+  - Zero Trust
+  - Incident Response
+  - Security
+---
+
+Security is not a product. It is a process.
+
+**Direct answer:** Cybersecurity protects confidentiality, integrity, and availability (CIA triad) of systems and data. Core practices: threat modeling (identify risks), Zero Trust (never trust, always verify), incident response (detect, contain, recover), and continuous monitoring. Security is a shared responsibility across engineering, operations, and leadership.
+
+## Threat modeling
+
+**STRIDE:** Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege.
+
+**PASTA:** Process for Attack Simulation and Threat Analysis (7 stages).
+
+**Attack trees:** root goal → sub-goals → attack vectors.
+
+**Data flow diagrams:** trust boundaries, entry points, data stores, external entities.
+
+**MITRE ATT&CK:** adversary tactics, techniques, procedures (TTPs). Map detections to techniques.
+
+## Zero Trust architecture
+
+**Principles:** never trust, always verify; least privilege; assume breach; verify explicitly.
+
+**Components:**
+- **Identity:** strong auth (MFA, passwordless), conditional access, identity providers (Okta, Entra ID, Ping).
+- **Device:** compliance (MDM/EDR), health attestation, certificate-based auth.
+- **Network:** micro-segmentation, software-defined perimeter, no implicit trust zones.
+- **Application:** least privilege access, just-in-time (JIT) access, API security.
+- **Data:** classification, encryption (at rest/in transit), DLP, rights management.
+
+**Implementation:** start with identity + device, expand to network + data. Continuous verification, not one-time.
+
+## Incident response lifecycle (NIST SP 800-61)
+
+1. **Preparation:** IR plan, runbooks, playbooks, tools (SIEM, EDR, SOAR), training, tabletop exercises.
+2. **Detection & Analysis:** alert triage, enrichment, scoping, severity classification (SEV-1 to SEV-4).
+3. **Containment:** short-term (isolate), long-term (eradicate). Short-term: network isolation, account disable. Long-term: malware removal, patching.
+4. **Eradication:** remove artifacts, close vulnerabilities, rotate credentials.
+5. **Recovery:** restore from clean backups, verify integrity, monitor for re-infection.
+6. **Post-incident:** root cause analysis (5 Whys), lessons learned, update playbooks, update defenses.
+
+## Security program pillars
+
+- **Governance:** policies, standards, risk appetite, board reporting.
+- **Vulnerability management:** scanning (SAST, DAST, SCA, container, container), prioritization (EPSS, KEV), SLAs, patch management.
+- **Identity & access:** least privilege, PAM, JIT, certification campaigns.
+- **Data protection:** classification, encryption, DLP, key management (HSM, KMS).
+- **Security awareness:** phishing simulations, training, culture.
+- **Third-party risk:** vendor assessment, contractual security clauses, continuous monitoring.
+
+## Detection & response stack
+
+- **SIEM:** log aggregation, correlation, alerting (Splunk, Sentinel, Datadog, Elastic).
+- **EDR/XDR:** endpoint detection, behavioral analytics (CrowdStrike, SentinelOne, Defender).
+- **NDR:** network traffic analysis (ExtraHop, Corelight, Zeek).
+- **SOAR:** automation, playbooks (Splunk SOAR, Cortex XSOAR, Tines).
+- **Threat intel:** feeds (MITRE, AlienVault, MISP), TIP integration.
+
+For the related question of observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) and SRE, see [Site Reliability Engineering: SLOs, Error Budgets, Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response).
+
+## Further Reading
+
+- NIST, 2026. [SP 800-30 Rev. 1, Guide for Conducting Risk Assessments | CSRC](https://csrc.nist.gov/pubs/sp/800/30/r1/final) — The standard threat-modelling method.
+- NIST, 2020. [NIST SP 800-53: Security and Privacy Controls for Information Systems and Organizations](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) — The control catalogue behind most compliance programmes.
+- MITRE, 2026. [MITRE ATT&CK](https://attack.mitre.org/) — The adversary tactic and technique knowledge base used for detection engineering.
+- NIST, 2020. [Zero Trust Architecture](https://csrc.nist.gov/pubs/sp/800/207/final) — The official zero-trust architecture and its tenets.
+- OWASP Foundation, 2021. [OWASP Foundation](https://owasp.org/www-project-top-ten/) — The consensus web-application risk list.

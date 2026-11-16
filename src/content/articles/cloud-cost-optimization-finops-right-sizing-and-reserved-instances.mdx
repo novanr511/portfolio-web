@@ -1,0 +1,94 @@
+---
+title: "Cloud Cost Optimization: FinOps, Right-sizing, and Reserved Instances"
+description: "Cloud costs can spiral. Learn FinOps practices, right-sizing, reserved instances, savings plans, and building a cost-aware culture."
+date: 2026-11-16
+tags:
+  - FinOps
+  - Cloud Cost Optimization
+  - Right-sizing
+  - Reserved Instances
+  - Cloud Economics
+---
+
+Cloud bills are not inevitable. FinOps makes them manageable.
+
+**Direct answer:** FinOps (Financial Operations) brings financial accountability to cloud spending. Core practices: visibility (allocation, tagging), optimization (right-sizing, reserved instances, savings plans), and governance (budgets, alerts, chargeback/showback). The goal: maximize business value per cloud dollar, not minimize spend.
+
+## FinOps framework
+
+**Inform:** visibility, allocation, tagging, dashboards, anomaly detection.
+
+**Optimize:** rate optimization (RIs, Savings Plans, spot), usage optimization (right-sizing, scheduling, autoscaling), architecture optimization (serverless, managed services).
+
+**Operate:** budgets, forecasts, chargeback/showback, policy enforcement, continuous improvement.
+
+**Phases:** Crawl (visibility) → Walk (optimization) → Run (governance).
+
+## Visibility & allocation
+
+**Tagging strategy:** mandatory tags (environment, owner, cost center, project, application). Enforce via policy (Terraform, Cloud Custodian, CloudFormation Guard).
+
+**Allocation:** shared costs (support, networking, shared services) allocated proportionally (usage, headcount, revenue).
+
+**Dashboards:** daily/weekly/monthly spend by service, team, environment, project. Trend lines, variance vs budget.
+
+**Anomaly detection:** statistical (z-score, percentile), ML-based (Forecast, Cost Explorer). Alert on unexpected spikes.
+
+## Rate optimization
+
+**Reserved Instances (RI):** 1yr/3yr commitment, upfront/partial/no upfront. Standard (fixed), Convertible (flexible). Up to 72% off on-demand.
+
+**Savings Plans:** Compute (EC2, Fargate, Lambda), EC2 Instance, SageMaker. 1yr/3yr, flexible across instance family/region/OS. Up to 72% off.
+
+**Spot instances:** up to 90% off. Interruption risk (2-min notice). Use for fault-tolerant, stateless, batch, CI/CD. Spot Fleet, EC2 Fleet, Karpenter.
+
+**Committed Use Discounts (GCP), Reserved Instances (Azure), Savings Plans (AWS):** similar concepts.
+
+## Usage optimization
+
+**Right-sizing:** analyze utilization (CPU, memory, network, disk). Downsize over-provisioned. Tools: Compute Optimizer (AWS), Recommender (GCP), Advisor (Azure), third-party (CloudHealth, Cloudability, Vantage).
+
+**Scheduling:** stop dev/test environments nights/weekends. Instance Scheduler, EventBridge + Lambda, Cloud Custodian.
+
+**Autoscaling:** target tracking, step scaling, predictive scaling. Scale to zero for dev.
+
+**Storage optimization:** S3 Intelligent-Tiering, lifecycle policies (IA, Glacier, Deep Archive), EBS gp3 vs gp2, delete orphaned snapshots, enable compression/deduplication.
+
+**Network optimization:** VPC endpoints (Gateway/Interface), CloudFront, S3 Transfer Acceleration, reduce cross-AZ traffic.
+
+## Architecture optimization
+
+**Serverless:** Lambda, Fargate, Cloud Run, Cloud Functions. Pay per request, no idle cost.
+
+**Managed services:** RDS, Aurora, DynamoDB, CloudSQL, Firestore. Reduce ops burden, often cheaper than self-managed.
+
+**Containers:** Fargate, Cloud Run, ECS/EKS with Fargate, GKE Autopilot. Pay per pod, no node management.
+
+## Governance
+
+**Budgets:** monthly/quarterly by team, project, environment. Alerts at 50%, 75%, 90%, 100%.
+
+**Chargeback vs Showback:** chargeback (bill back), showback (visibility only). Chargeback drives behavior; showback builds awareness.
+
+**Policies:** enforce tags, block unapproved instance types, require approval for expensive resources (pCluster, Control Tower, Organization Policies).
+
+**Unit economics:** cost per transaction, cost per active user, cost per GB processed. Tie to business metrics.
+
+## FinOps culture
+
+**FinOps team:** practitioners (engineers, finance, product), not just finance.
+
+**Executive sponsorship:** CFO/CTO alignment.
+
+**Education:** certifications (FinOps Certified Practitioner), training, community (FinOps Foundation).
+
+**Continuous improvement:** monthly optimization reviews, quarterly strategy, annual contract negotiations.
+
+For the related question of cloud economics, see [How Cloud Computing Changed the Modern Economy](/articles/how-cloud-computing-changed-the-modern-economy) and data center electricity, see [Data Centre Electricity: Reading the IEA Forecasts Honestly](/articles/data-centre-electricity-reading-the-iea-forecasts-honestly).
+
+## Further Reading
+
+- FinOps Foundation, 2026. [The FinOps Foundation](https://www.finops.org/) — The cross-industry framework for managing cloud cost as an engineering discipline.
+- Amazon Web Services, 2026. [Cost Optimization (AWS Well-Architected Framework)](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Vendor primary documentation on right-sizing and commitment models.
+- Amazon Web Services, 2026. [Well-Architected Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Right-sizing, commitment discounts, and cost allocation in one framework.
+- Kubernetes Documentation, 2026. [Autoscaling](https://kubernetes.io/docs/concepts/workloads/autoscaling/) — The scheduling primitives that make per-workload demand and cost visible.

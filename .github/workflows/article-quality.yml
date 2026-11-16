@@ -1,0 +1,35 @@
+name: Article quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check MDX compiles
+        run: node scripts/check-mdx.mjs
+
+      - name: Check article quality gate
+        run: node scripts/check-articles.mjs
+
+      - name: Verify registered sources resolve
+        run: node scripts/verify-sources.mjs
+
+      - name: Check reading lists match the registry
+        run: node scripts/apply-further-reading.mjs --check
+
+      - name: Type check
+        run: npx tsc --noEmit

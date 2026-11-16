@@ -1,0 +1,103 @@
+---
+title: "Observability: Logging, Metrics, Tracing, Alerting"
+description: "Observability lets you understand system behavior. Learn the three pillars (logs, metrics, traces), alerting philosophy, SLOs, and tooling."
+date: 2026-11-16
+tags:
+  - Observability
+  - Logging
+  - Metrics
+  - Tracing
+  - Alerting
+---
+
+You cannot fix what you cannot see. Observability is the ability to ask arbitrary questions.
+
+**Direct answer:** Observability is the ability to understand a system's internal state from its external outputs. Three pillars: logs (structured, immutable events), metrics (aggregated numbers over time), traces (request flows across services). Alerting converts signals into actionable pages. SLOs (Service Level Objectives) define reliability targets; error budgets guide release decisions.
+
+## Logging
+
+**Structured logging:** JSON, consistent fields (`timestamp`, `level`, `message`, `trace_id`, `span_id`, `service`, `environment`).
+
+**Levels:** DEBUG, INFO, WARN, ERROR, CRITICAL. Use appropriately; DEBUG in prod only when needed.
+
+**Context:** enrich with request ID, user ID, tenant ID, correlation ID.
+
+**Sampling:** tail-based (keep errors, sample success), rate limiting.
+
+**Storage:** hot (recent, fast query), warm (compressed), cold (archived). Retention policies.
+
+**Tools:** ELK/EFK (Elasticsearch, Fluentd/Fluent Bit, Kibana), Loki + Grafana, Datadog, Splunk, CloudWatch, Axiom.
+
+## Metrics
+
+**Types:**
+- **Counter:** monotonically increasing (requests_total).
+- **Gauge:** instantaneous value (memory_usage, queue_size).
+- **Histogram:** distribution of values (latency buckets).
+- **Summary:** quantiles over sliding window (client-side quantiles).
+
+**RED method (request-driven):**
+- **Rate:** requests per second.
+- **Errors:** error rate (5xx / total).
+- **Duration:** latency distribution (p50, p95, p99).
+
+**USE method (resource-driven):**
+- **Utilization:** % busy.
+- **Saturation:** queue depth, contention.
+- **Errors:** error count.
+
+**Cardinality:** keep label cardinality low (avoid user_id, request_id as labels). Use exemplars for trace linkage.
+
+**Tools:** Prometheus + Grafana, Datadog, CloudWatch, Mimir, Thanos, VictoriaMetrics.
+
+## Distributed tracing
+
+**Span:** unit of work (operation name, start/end time, attributes, events, links).
+
+**Trace:** tree of spans (root + children). `trace_id` shared, `span_id` unique, `parent_span_id`.
+
+**Context propagation:** W3C Trace Context (`traceparent`, `tracestate`). Inject/extract at boundaries.
+
+**Sampling:** head-based (random, deterministic), tail-based (decide after trace complete). Target: 10–100% for errors, 0.1–1% for success.
+
+**Tools:** Jaeger, Zipkin, Tempo, X-Ray, Cloud Trace, Datadog APM, Honeycomb, Lightstep.
+
+## Alerting philosophy
+
+**Alert on symptoms, not causes.** Page on SLO breach (error budget burn), not CPU > 80%.
+
+**Alert categories:**
+- **Page (immediate):** SLO breach, SEV-1, data loss, security incident.
+- **Ticket (next business day):** capacity trend, config drift, deprecated API usage.
+- **Log (no action):** informational, debug.
+
+**Alert quality:** actionable (clear runbook), specific (which service, what threshold), routed (correct on-call).
+
+**Anti-patterns:** alert fatigue, flapping, noisy alerts, paging for warnings.
+
+## SLOs and error budgets
+
+**SLI (Service Level Indicator):** measurable (latency < 200ms, error rate < 0.1%).
+
+**SLO (Service Level Objective):** target (99.9% of requests < 200ms over 30 days).
+
+**Error budget:** 1 - SLO. 99.9% SLO = 0.1% error budget = 43.2 min/month downtime.
+
+**Burn rate:** how fast budget consumed. 1x = on track. 14.4x = 2% budget/hour = page.
+
+**Alerting on budget:** multi-window, multi-burn-rate (Google SRE workbook).
+
+## Tools ecosystem
+
+**OpenTelemetry (OTel):** vendor-neutral instrumentation (logs, metrics, traces). Auto-instrumentation (Java, Go, Python, Node, .NET). Collector for export.
+
+**Backends:** Prometheus/Grafana, Datadog, New Relic, Honeycomb, Lightstep, Grafana Cloud, Elastic, Loki, Tempo, Mimir.
+
+For the related question of SRE, see [Site Reliability Engineering: SLOs, Error Budgets, Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) and microservices, see [Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern).
+
+## Further Reading
+
+- OpenTelemetry, 2026. [OpenTelemetry Documentation](https://opentelemetry.io/docs/) — The vendor-neutral standard for traces, metrics, and logs.
+- OpenTelemetry, 2026. [OpenTelemetry Specification](https://opentelemetry.io/docs/specs/otel/) — The normative specification behind the SDKs.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.
+- Charity Majors, 2019. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — Symptom-based alerting and why paging on causes is usually wrong.

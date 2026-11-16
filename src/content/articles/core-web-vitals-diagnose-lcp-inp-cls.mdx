@@ -129,14 +129,14 @@ Total INP = Input Delay + Processing Duration + Presentation Delay
    async function handleHeavyFilter() {
      // Run first calculation
      filterDatasetPartOne();
-     
+
      // Yield control to let browser paint or handle input
      if ('scheduler' in window && 'yield' in scheduler) {
        await scheduler.yield();
      } else {
        await new Promise(resolve => setTimeout(resolve, 0));
      }
-     
+
      // Run second calculation
      filterDatasetPartTwo();
    }
@@ -187,3 +187,9 @@ Continue exploring infrastructure and performance diagnostics:
 * **[Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer)** — Isolating network waterfall latency before frontend paint.
 * **[Google Search Console for Technical SEO: A Diagnostic Workflow](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow)** — Navigating Search Console's Page Experience and Core Web Vitals reports.
 * **[JavaScript SEO: SSR, CSR, SSG, and ISR Explained](/articles/javascript-seo-ssr-csr-ssg-isr)** — Choosing rendering architectures that minimize main-thread execution overhead.
+
+## Further Reading
+
+- web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.
+- Chrome DevTools, 2026. [Inspect network activity | Chrome DevTools](https://developer.chrome.com/docs/devtools/network?hl=en) — The reference for the panel most of the diagnostic recipes use.

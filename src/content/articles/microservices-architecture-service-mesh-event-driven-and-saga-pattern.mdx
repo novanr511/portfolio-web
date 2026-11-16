@@ -1,0 +1,94 @@
+---
+title: "Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern"
+description: "Microservices decompose monoliths. Learn service decomposition, service mesh, event-driven architecture, saga pattern, and operational patterns."
+date: 2026-11-16
+tags:
+  - Microservices
+  - Service Mesh
+  - Event-Driven
+  - Saga Pattern
+  - Architecture
+---
+
+Microservices trade complexity for autonomy. The network is the computer.
+
+**Direct answer:** Microservices architecture decomposes a monolith into independently deployable services communicating over networks. Key patterns: service decomposition (bounded contexts), service mesh (Istio, Linkerd) for traffic/security/observability, event-driven architecture (Kafka, event sourcing), saga pattern (distributed transactions), and operational patterns (circuit breaker, bulkhead, retry).
+
+## Service decomposition
+
+**Bounded contexts (DDD):** align services with business capabilities. One team, one service, one database.
+
+**Decomposition strategies:**
+- **Strangler Fig:** incrementally extract from monolith.
+- **Domain-driven:** aggregate roots as service boundaries.
+- **Capability-based:** business capability mapping.
+
+**Database per service:** no shared database. Data duplication accepted; eventual consistency.
+
+**API contracts:** explicit, versioned, backward-compatible. Consumer-driven contracts (Pact).
+
+## Inter-service communication
+
+**Synchronous (RPC):** gRPC, REST. Temporal coupling. Use for queries, low-latency needs.
+
+**Asynchronous (messaging):** Kafka, RabbitMQ, NATS, Pulsar. Temporal decoupling. Event-driven.
+
+**Service mesh:** Istio, Linkerd, Consul Connect. Sidecar proxy (Envoy). Handles:
+- **Traffic:** routing, splitting, mirroring, fault injection.
+- **Security:** mTLS, authz, cert rotation.
+- **Observability:** metrics, traces, access logs.
+- **Resilience:** retries, timeouts, circuit breakers, fault injection.
+
+## Event-driven architecture
+
+**Event types:**
+- **Domain events:** fact that happened (`OrderPlaced`).
+- **Integration events:** cross-boundary (`OrderShipped`).
+- **Commands:** intent (`PlaceOrder`).
+
+**Event broker:** Kafka (log, replay, ordering), Pulsar (tiered storage), NATS (lightweight), EventBridge (serverless).
+
+**Patterns:**
+- **Event sourcing:** state = fold(events). Audit trail, temporal queries.
+- **CQRS:** separate read/write models. Optimized queries.
+- **Outbox pattern:** transactional outbox (DB + message) for reliability.
+
+## Saga pattern (distributed transactions)
+
+**Choreography:** events trigger next step. Decentralized, but implicit flow.
+
+**Orchestration:** central orchestrator directs participants. Centralized, explicit flow. Temporal, Camunda, Orkes, Conductor.
+
+**Compensation:** each step has compensating action (cancel, refund, release). Idempotency keys essential.
+
+**Timeouts & retries:** exponential backoff, dead letter queue, human escalation.
+
+## Operational patterns
+
+**Circuit breaker:** fail fast when downstream failing (Hystrix, Resilience4j, go-breaker).
+
+**Bulkhead:** isolate resources (thread pools, connections) per downstream.
+
+**Retry with backoff:** exponential + jitter. Idempotency required.
+
+**Timeouts:** per-operation, global. Configure per criticality.
+
+**Health checks:** liveness (process alive), readiness (can serve traffic), startup (long init).
+
+**Blue-green / Canary / Rolling:** deployment strategies. Feature flags (LaunchDarkly, Unleash).
+
+## Observability
+
+**Three pillars:** logs (structured), metrics (RED/USE), traces (distributed).
+
+**Correlation IDs:** propagate `traceparent` (W3C Trace Context).
+
+**SLO/SLI:** availability, latency, error rate. Error budget for release decisions.
+
+For the related question of API design, see [API Design: REST, GraphQL, gRPC, API Gateway, Rate Limiting](/articles/api-design-rest-graphql-grpc-api-gateway-rate-limiting) and observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting).
+
+## Further Reading
+
+- Martin Fowler, 2014. [Microservices](https://martinfowler.com/articles/microservices.html) — The characteristics and trade-offs that define the pattern.
+- CloudEvents, 2026. [CloudEvents](https://cloudevents.io/) — The vendor-neutral event envelope standard.
+- OASIS, 2012. [Advanced Message Queuing Protocol (AMQP) v1.0 - OASIS Open](https://www.oasis-open.org/standard/amqp) — The message-protocol standard behind most enterprise brokers.

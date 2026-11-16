@@ -1,0 +1,108 @@
+---
+title: "Site Reliability Engineering: SLOs, Error Budgets, Incident Response"
+description: "SRE applies software engineering to operations. Learn SLOs, error budgets, toil reduction, incident response, and building reliable systems at scale."
+date: 2026-11-16
+tags:
+  - SRE
+  - Site Reliability Engineering
+  - SLO
+  - Error Budget
+  - Incident Response
+---
+
+SRE is what happens when you ask a software engineer to design an operations team.
+
+**Direct answer:** Site Reliability Engineering (SRE) applies software engineering principles to operations. Core practices: define SLOs (Service Level Objectives), track error budgets, eliminate toil through automation, conduct blameless postmortems, and design for reliability from day one. SRE bridges the gap between development velocity and system reliability.
+
+## SRE principles
+
+- **Embrace risk:** 100% reliability is impossible. Define acceptable risk via SLOs.
+- **SLOs > SLAs:** SLOs are internal targets; SLAs are external contracts with penalties.
+- **Error budgets:** 1 - SLO = budget for innovation. Spend it on releases; pause when exhausted.
+- **Toil elimination:** manual, repetitive, no enduring value, scales linearly. Automate it.
+- **Automation > manual:** runbooks → scripts → self-service → platform.
+
+## Service Level Objectives (SLOs)
+
+**SLI (Service Level Indicator):** measurable metric (latency, availability, throughput, correctness, durability).
+
+**SLO:** target for SLI over a window (e.g., 99.9% requests < 200ms over 30 days).
+
+**Choosing SLIs:**
+- **User-facing:** latency, availability, correctness.
+- **Internal:** throughput, durability, freshness.
+
+**Window:** rolling 30 days (standard), 7 days (fast feedback), 90 days (strategic).
+
+**Multiple SLOs:** critical user journeys get tighter SLOs.
+
+## Error budgets
+
+**Error budget = 1 - SLO.** 99.9% SLO = 0.1% error budget = 43.2 min/month.
+
+**Burn rate:** how fast budget consumed.
+- **1x:** on track (consumes budget over window).
+- **2x:** half window left.
+- **14.4x:** 2%/hour = page (consumes monthly budget in 1 hour).
+
+**Multi-window, multi-burn-rate alerting (Google SRE workbook):**
+- Fast burn (5m, 1h): page.
+- Slow burn (6h, 1d, 3d): ticket.
+
+**Budget policies:** freeze deployments when budget < threshold, prioritize reliability work.
+
+## Toil elimination
+
+**Toil characteristics:** manual, repetitive, automatable, no enduring value, scales with system.
+
+**Examples:** manual deployments, manual scaling, manual ticket routing, manual certificate renewal, manual log rotation.
+
+**Automation ladder:**
+1. **Runbook:** documented steps.
+2. **Script:** executable runbook.
+3. **Self-service:** UI/CLI for common tasks.
+4. **Platform:** self-healing, auto-scaling, auto-remediation.
+
+**Measure toil:** % time spent on toil vs project work. Target: < 25% toil.
+
+## Incident response (SRE style)
+
+**Roles:** Incident Commander (IC), Communications Lead, Operations Lead, Scribe.
+
+**Phases:**
+1. **Detect:** alert fires, on-call paged.
+2. **Triage:** severity (SEV-1/2/3), impact assessment, IC assigned.
+3. **Mitigate:** stop bleeding (rollback, scale, failover, blocklist).
+4. **Resolve:** root cause fixed, service restored.
+5. **Postmortem:** blameless, timeline, root cause, action items, share widely.
+
+**Blameless postmortem:** focus on systems, not people. "What happened" not "who failed."
+
+**Action items:** specific, assigned, tracked, reviewed.
+
+## Reliability patterns
+
+**Capacity planning:** demand forecasting, headroom (20-30%), load testing.
+
+**Chaos engineering:** GameDays, fault injection (Chaos Mesh, Litmus, Gremlin). Hypothesis → experiment → learn.
+
+**Disaster recovery:** RTO (Recovery Time Objective), RPO (Recovery Point Objective). Backup/restore tested quarterly.
+
+**Release safety:** canary, progressive delivery, feature flags, automated rollback on SLO breach.
+
+## SRE team models
+
+- **Embedded:** SREs in product teams.
+- **Centralized:** platform SRE team, consulted by product teams.
+- **Hybrid:** platform SRE + embedded for critical services.
+
+**Staffing:** 1 SRE per ~8-12 developers (varies by maturity).
+
+For the related question of observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) and incident response, see [Crisis Management: PR Crises, Product Recalls, and Reputation Recovery](/articles/crisis-management-pr-crises-product-recalls-and-reputation-recovery).
+
+## Further Reading
+
+- Betsy Beyer et al., 2016. [Google SRE - Site Reliability Engineering book Google Index](https://sre.google/sre-book/table-of-contents/) — The book that defined SRE practice, including SLOs and error budgets.
+- Google, 2016. [Google SRE - Defining SLO: Service Level Objective Meaning](https://sre.google/sre-book/service-level-objectives/) — How to define SLIs and SLOs that are actually useful.
+- Principles of Chaos Engineering, 2026. [Principles of Chaos Engineering](https://principlesofchaos.org/) — The formalised practice of testing resilience by injecting failure.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.

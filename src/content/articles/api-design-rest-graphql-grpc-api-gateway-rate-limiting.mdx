@@ -1,0 +1,101 @@
+---
+title: "API Design: REST, GraphQL, gRPC, API Gateway, Rate Limiting"
+description: "APIs are the contracts between systems. Learn REST, GraphQL, gRPC design principles, API gateway patterns, rate limiting, and versioning strategies."
+date: 2026-11-16
+tags:
+  - API Design
+  - REST
+  - GraphQL
+  - gRPC
+  - API Gateway
+---
+
+APIs are the contracts between systems. Design them like products.
+
+**Direct answer:** API design defines how systems communicate. REST (resource-oriented, HTTP semantics), GraphQL (query flexibility, single endpoint), gRPC (high-performance, contract-first). API gateways provide routing, auth, rate limiting, observability. Versioning, pagination, error handling, and documentation determine developer experience and platform longevity.
+
+## RESTful design
+
+**Resources:** nouns, not verbs. `/users`, `/users/{id}/orders`.
+
+**HTTP methods:** GET (read), POST (create), PUT/PATCH (update), DELETE (delete).
+
+**Status codes:** 200/201/204 (success), 400 (client error), 401/403 (auth), 404 (not found), 409 (conflict), 422 (validation), 429 (rate limit), 5xx (server).
+
+**Idempotency:** GET, PUT, DELETE idempotent. POST not. Idempotency keys for POST.
+
+**Versioning:** URL (`/v1/`), header (`Accept: application/vnd.api.v1+json`), query param. Prefer URL for visibility.
+
+**Pagination:** cursor-based (opaque cursor) > offset/limit. `first`, `after`, `hasNextPage`.
+
+**Filtering/sorting:** `?filter[status]=active&sort=-created_at`.
+
+**HATEOAS:** links in responses for discoverability.
+
+## GraphQL
+
+**Schema-first:** SDL defines types, queries, mutations, subscriptions.
+
+**Queries:** client specifies exact fields. No over/under-fetching.
+
+**Mutations:** explicit input types, return payload with errors.
+
+**Subscriptions:** WebSocket, server-pushed updates.
+
+**N+1 problem:** DataLoader pattern (batching + caching).
+
+**Complexity:** query depth/cost analysis, query cost limits, persisted queries.
+
+**Federation:** schema stitching across services (Apollo Federation, GraphQL Mesh).
+
+## gRPC
+
+**Protocol:** HTTP/2, Protocol Buffers (protobuf). Binary, efficient, streaming.
+
+**Service definition:** `.proto` defines services, messages, RPC methods (unary, server-streaming, client-streaming, bidirectional).
+
+**Code generation:** `protoc` generates client/server stubs (Go, Java, Python, Node, etc.).
+
+**Interceptors:** auth, logging, metrics, retries, timeouts.
+
+**gRPC-Web / gRPC-Gateway:** browser support, REST/JSON transcoding.
+
+## API Gateway
+
+**Functions:** routing, auth (JWT, API key, mTLS), rate limiting, quotas, caching, transformation, logging, observability.
+
+**Patterns:**
+- **Backend for Frontend (BFF):** per-client API.
+- **Aggregator:** compose multiple services.
+- **Edge:** external traffic ingress.
+
+**Products:** Kong, Kong Gateway, Kong Konnect, Apigee, AWS API Gateway, Azure API Management, Kong Konnect, Traefik, Envoy, KrakenD, Tyk, Gloo.
+
+## Rate limiting & quotas
+
+**Algorithms:** token bucket (burst), leaky bucket (smooth), sliding window (accurate), fixed window (simple).
+
+**Dimensions:** per IP, per API key, per user, per tenant, per endpoint.
+
+**Response:** 429 + `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.
+
+**Distributed:** Redis-backed (token bucket, sliding window log), consistent hashing.
+
+## Error handling & observability
+
+**Error format:** RFC 7807 (Problem Details for HTTP APIs). `type`, `title`, `status`, `detail`, `instance`.
+
+**Logging:** structured (JSON), correlation IDs, request/response sampling.
+
+**Tracing:** OpenTelemetry, W3C Trace Context, distributed tracing.
+
+**Metrics:** RED (Rate, Errors, Duration), USE (Utilization, Saturation, Errors).
+
+For the related question of microservices, see [Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern) and observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting).
+
+## Further Reading
+
+- Google, 2026. [Google API Design Guide](https://cloud.google.com/apis/design) — Practical resource naming, pagination, and error-model conventions.
+- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
+- OWASP Foundation, 2023. [OWASP API Security Top 10 (2023)](https://owasp.org/API-Security/editions/2023/en/0x11-t10/) — Object-level authorisation and excessive data exposure are the two most common API findings.
+- Stripe, 2026. [Idempotent requests](https://docs.stripe.com/api/idempotent_requests) — First-party documentation of idempotency-key semantics in a payment API.
