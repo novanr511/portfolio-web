@@ -1,0 +1,87 @@
+---
+title: "API Design: The Contract Between Systems"
+description: "An API is a contract between systems. Learn how to design APIs that are stable, usable, and easy to evolve."
+date: 2026-11-16
+tags:
+  - Technology
+  - API
+  - Software Engineering
+  - Systems
+---
+
+An API is not just code. It is a promise.
+
+**Direct answer:** API design is the practice of defining how systems communicate with each other. A good API is stable, predictable, easy to use, and easy to evolve without breaking clients. API design decisions—naming, structure, versioning, error handling, documentation—determine whether integration is smooth or painful. Because APIs are contracts, changing them affects everyone who depends on them.
+
+## What an API is
+
+An API (Application Programming Interface) defines the rules for interaction between software systems. It specifies:
+
+- **Endpoints:** where requests go.
+- **Methods:** what actions are available (read, create, update, delete).
+- **Parameters:** what information must be sent.
+- **Responses:** what information comes back, and in what format.
+- **Errors:** what goes wrong and how it is communicated.
+
+The API hides internal complexity. Clients interact with the interface, not the implementation.
+
+## Principles of good API design
+
+**Clarity.** Names should be intuitive. `GET /users/123/orders` is clearer than `GET /fetchUserOrderData?id=123`.
+
+**Consistency.** Similar resources behave similarly. If one endpoint uses snake_case, all should. Error formats should be uniform.
+
+**Stability.** Clients build on the API. Breaking changes force clients to update, which costs time and trust. Changes should be backward compatible whenever possible.
+
+**Documentation.** An API without documentation is an API nobody uses. Examples, authentication details, rate limits, and error codes belong in docs.
+
+**Versioning.** When breaking changes are necessary, version the API (`/v1/`, `/v2/`) and support old versions for a defined period.
+
+## Common API styles
+
+**REST:** resource-oriented, uses HTTP methods and status codes. Most common for web APIs.
+
+**GraphQL:** clients request exactly the data they need. Reduces over-fetching but increases complexity.
+
+**gRPC:** high-performance, contract-first using Protocol Buffers. Common for internal service-to-service communication.
+
+**Webhooks:** server-to-client notifications for events. Useful for asynchronous updates.
+
+The style should match the use case, not the trend.
+
+## Versioning and evolution
+
+APIs evolve. Requirements change. Fields are added, removed, or renamed. The question is how to change without breaking clients:
+
+- **Additive changes** (new optional fields, new endpoints) are safe.
+- **Breaking changes** (removed fields, renamed endpoints, changed types) require versioning or migration.
+- **Deprecation policy:** announce changes, support old versions for a set period, then retire.
+
+The best APIs evolve without forcing clients to rewrite constantly.
+
+## Error handling
+
+Errors should be informative, consistent, and machine-readable. A good error response includes:
+
+- A machine-readable code.
+- A human-readable message.
+- What the client can do about it (retry, fix input, contact support).
+
+HTTP status codes should be used correctly: 400 for client errors, 500 for server errors, 200 for success.
+
+## Documentation as interface
+
+Documentation is part of the API. It should include:
+
+- Authentication and rate limits.
+- Endpoint reference with examples.
+- Error codes and meanings.
+- SDKs or client libraries where useful.
+
+Good documentation reduces support requests and integration time.
+
+For the related question of how systems communicate, see [How the Internet Actually Works: From DNS to Global Connectivity](/articles/how-the-internet-actually-works-from-dns-to-global-connectivity) and how operating systems manage resources, see [How Operating Systems Shape the Modern Computing Experience](/articles/how-operating-systems-shape-the-modern-computing-experience).
+
+## References & Further Reading
+
+This article synthesizes standard API design and software engineering concepts and does not cite a specific API, company, or standard by name as evidence. No specific technology or vendor is endorsed because no specific claim about one is made. For research on API design and integration, consult literature in software architecture, web services, and systems integration.
