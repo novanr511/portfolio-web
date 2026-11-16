@@ -1,61 +1,67 @@
 ---
 title: "Why AI Adoption Is Harder Than Building an AI Model"
-description: "Building an AI model is a technical problem. Getting an organization to use it reliably is an organizational problem. Learn why adoption failures are usually about workflow"
+description: "The model is the easy part. Read the evidence on why adoption stalls: uneven productivity gains, hidden technical debt, and the cost of verifying output."
 date: 2026-11-16
 tags:
   - AI
   - Adoption
-  - Organizational
-  - Productivity
+  - Machine Learning
+  - Leadership
 ---
 
-A company can train or fine-tune a capable AI model in weeks. Getting employees to use it, trust it, and integrate it into daily work often takes years—or never happens. The bottleneck is rarely model accuracy.
+Teams do not fail at AI because the model was hard. They fail because the model worked and the organisation did not change. That distinction sounds obvious until you look at the numbers, and the numbers are not what most people expect: adoption has been unusually fast, the measured productivity gains are real but small, and the largest measured effect so far is that experienced developers got *slower*.
 
-**Direct answer:** AI adoption is harder than AI model building because adoption is an organizational problem, not a technical one. It requires changing workflows, establishing trust in probabilistic outputs, aligning incentives, and redesigning roles around a tool that can be wrong with confidence. A model that is 95 % accurate can still fail in production if users do not know when to trust it, when to override it, or how to fit it into their existing tasks.
+**Direct answer:** Building a working model is the least risky part of AI adoption. What follows — deciding where the tool fits the workflow, measuring whether it actually helps, and paying for the surrounding system — is where the difficulty lives. Three bodies of evidence explain the gap: hidden technical debt makes production systems much larger than the model; measured productivity gains are unevenly distributed and currently small in aggregate; and where a tool's output must be verified by someone who already knows the answer, the verification cost can exceed the saving.
 
-## Technical success is not adoption success
+## The model is a small part of the system
 
-A model can be accurate on a test set and useless in practice. The test set does not capture:
+The clearest account of why AI projects stall after the model works comes from Sculley et al., whose paper is titled *Hidden Technical Debt in Machine Learning Systems*. Its argument is structural rather than technical: the model is a small, replaceable component inside a much larger system that includes data collection, feature extraction, serving infrastructure, configuration, and monitoring — and the parts that are easy to overlook are the parts that fail.
 
-- **Context the model lacks:** company-specific knowledge, unwritten rules, customer relationships.
-- **The cost of a false positive:** in some workflows, a wrong AI suggestion wastes more time than doing the task manually.
-- **The cost of a false negative:** failing to suggest something useful is invisible, so users may conclude the tool "does not work."
-- **Workflow interruption:** if using the AI takes longer than doing the task the old way, users revert.
+This reframes the plan. "Improve the model" is the lever with the shortest feedback loop and the least leverage on the outcome. The levers that determine whether the system works in production are unglamorous: can you serve it reliably, can you tell when it has degraded, can you roll it back, and does anyone own the pipeline when it breaks at 03:00.
 
-Accuracy is a prerequisite, not a guarantee. The real question is whether the model improves the outcome of the actual work process.
+The practical consequence is that adoption budgets are usually misallocated. Money goes into the modelling work because that is where the demo lives, and the funding for the parts that determine durability is left to be discovered later, when it is no longer optional.
 
-## Trust is asymmetric
+## Adoption has been fast — which is not the same as useful
 
-Users forgive a human colleague's mistake more readily than an AI's. A wrong suggestion from software feels like a betrayal of trust; once lost, trust is hard to regain. This asymmetry means AI tools face a higher bar: they must not only be right more often than wrong, they must be right consistently enough that users do not need to verify every output.
+The most surprising evidence for a company planning an AI rollout is how quickly the technology spread.
 
-But if users verify every output, the time savings disappear. The tool must reach a threshold of reliability where spot-checking replaces full review—and that threshold varies by task and by user risk tolerance.
+Brynjolfsson, Li and Raymond report the results of "a series of nationally representative U.S. surveys of generative AI use at work and at home". As of late 2024, "nearly 40 percent of the U.S. population age 18-64 uses generative AI". Among employed respondents, "23 percent had used generative AI for work at least once in the previous week, and 9 percent used it every work day". Relative to each technology's first mass-market product launch, "work adoption of generative AI has been as fast as the personal computer (PC), and overall adoption has been faster than either PCs or the internet". Generative AI and PCs also showed "very similar early adoption patterns by education, occupation, and other characteristics".
 
-## Workflow redesign is the hard part
+So the problem is not that people will not use it. On this evidence, adoption is close to the fastest of any general-purpose technology we have measured.
 
-Simply adding an AI button to existing software rarely works. The work process was built around human capabilities and limitations. Introducing AI changes who does what, when decisions are made, and how errors are caught.
+The problem is what the use is worth. The same paper reports that "Between 1 and 5 percent of all work hours are currently assisted by generative AI, and respondents report time savings equivalent to 1.4 percent of total work hours." The authors' conclusion is deliberately careful: this "suggests that substantial productivity gains from generative AI are possible" — the potential is there, but it has not been realised in the aggregate numbers yet. A 1.4% aggregate time saving, in a workforce where a third of people touch the tool weekly, is a small number, and it is the number an organisation's aggregate productivity will actually move by.
 
-Adoption requires:
+This is the gap that matters for adoption planning. The tool is everywhere; the measured value from it is thin. A rollout plan that treats ubiquity as proof of value will over-project.
 
-- **Redesigning the workflow:** where does AI fit, what does the human do, and how are handoffs managed?
-- **Defining oversight:** who reviews AI output, what happens when it is wrong, and how are errors caught before they reach customers?
-- **Redefining roles:** if AI drafts, humans edit; if AI codes, humans review. Job descriptions and performance metrics must follow.
-- **Aligning incentives:** if employees are measured on output volume, AI may help. If they are judged on personal expertise, AI may be seen as a threat.
+## Where the gains land, and where they do not
 
-None of these are model-tuning problems. They are management and organizational design problems.
+The other half of the picture is who benefits. In their customer-support study of 5,179 agents, the same research group found productivity measured by issues resolved per hour rose "by 14% on average, including a 34% improvement for novice and low-skilled workers but with minimal impact on experienced and highly skilled workers".
 
-## Incentives and fear
+The pattern is consistent with the trial evidence from METR, which points the other way for experienced practitioners. METR randomised sixteen experienced developers working in large open-source repositories — "averaging 22k+ stars and 1M+ lines of code" — to use AI coding tools, and measured 246 completed real issues. The result was that "When developers are allowed to use AI tools, they take 19% longer to complete issues — a significant slowdown that goes against developer beliefs and expert forecasts."
 
-Employees may rationally resist AI if they believe it will replace them, reduce their autonomy, or make their skills obsolete. A tool that is logically beneficial for the company can be personally threatening. Adoption succeeds when employees see AI as a capability that makes them more effective, not as a substitute that makes them redundant.
+Read that carefully, including the authors' own caveat: "You only had 16 developers, so these results will not generalize/replicate." Sixteen developers is a small sample; 246 issues gave the study enough power to reject the null of no effect. So the honest conclusion is not "AI slows developers down" but something narrower and more useful: *for a developer who already knows the codebase well, generating and reviewing an assistant's patch cost more than writing it directly*.
 
-This means adoption requires communication, training, and often changes to compensation and career paths. It is not a software rollout; it is a change management program.
+Put the two findings together and a coherent mechanism emerges. The tool is most valuable when the user does not already know the answer — it supplies knowledge or a starting point they lacked. It is least valuable, and possibly negative, when the user already holds a strong prior, because then the output still has to be read, checked, and corrected, and that cost does not vanish. The 34% gain for novice workers and the 19% slowdown for experienced ones are not contradictory findings; they are the same finding seen from two ends of the expertise distribution.
 
-## Start with the task, not the model
+That mechanism is an interpretation, and it should be treated as a hypothesis to test on your own team rather than a law. But it is a far more actionable hypothesis than "AI is a productivity tool" — it tells you to segment your users by prior knowledge before you roll anything out, and to expect the curve to be downward for your most senior people.
 
-Organizations that succeed with AI adoption usually start with a specific, well-defined task: drafting responses to common customer questions, summarizing meeting notes, generating test cases. They measure whether the task is completed faster or better, not whether the model is impressive.
+## A test you can run before you roll anything out
 
-They also keep humans in the loop. AI drafts; humans decide. AI suggests; humans verify. The model handles volume; the human handles judgment, context, and accountability.
+The failure mode to avoid is spending a year discovering which of your workflows the tool actually helps. That discovery can be done in weeks, and it belongs before the rollout rather than after it.
 
-For the related question of how AI changes software development economics, see [How AI Is Changing the Economics of Software Development](/articles/how-ai-is-changing-the-economics-of-software-development). For how AI models scale and where their limits are, see [Chinchilla and the Scaling Laws: Why "Just Make It Bigger" Stopped Being the Rule](/articles/chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule).
+1. **Segment by prior knowledge, not by seniority.** Use the heterogeneity finding directly. Run the same task with high-experience and low-experience users and compare. If the effect is flat, the tool is a training aid; if it is negative for the experts, restricting it to them is a decision to make deliberately.
+2. **Measure the baseline first.** If you do not know the current cycle time, error rate, or throughput, you cannot attribute a change to the tool. The METR design — randomised, on real work, with a pre-registered outcome — is a reasonable template.
+3. **Count the verification cost.** For tasks with a knowledgeable reviewer, time the review, not the generation. If review time equals or exceeds the time the tool claims to save, the workflow has not improved even if the output looks better.
+4. **Instrument the system, not just the model.** Latency, error rate, and a distribution-shift signal. Sculley et al.'s point is that these are the components that fail, and monitoring is not an optional extra in production.
+5. **Budget for the parts that are not the model.** Data pipelines, serving, evaluation, rollback. If the business case assumes the model is the cost, it is wrong by an order of magnitude.
+
+## What to actually do with this
+
+The useful conclusion is not pessimistic. Adoption is fast, which means the tools will be used whether or not your organisation designs for it; the interesting work is designing where they sit.
+
+That means segmenting your users by prior knowledge and expecting different results for each group; measuring outcomes rather than counting seats; and treating the non-model parts of the system as the actual project. The teams that get value from this wave will be the ones whose bottleneck is knowledge transfer — because that is where the measured 34% is — and not the ones whose bottleneck is expert execution speed.
+
+For the economic framing of the same question, see [The Economics of AI: Why Intelligence Is Becoming a Commodity](/articles/the-economics-of-ai-why-intelligence-is-becoming-a-commodity), and for the pipeline mechanics, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
 
 ## Further Reading
 

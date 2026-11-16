@@ -32,6 +32,9 @@ const normalise = (value) =>
 const keywords = (title) =>
   new Set(
     normalise(title)
+      // Document numbers and parenthetical qualifiers are not part of the
+      // work's name, so they must not drive the comparison.
+      .replace(/\brfc\s*\d+\b/g, " ")
       .replace(/[^a-z0-9 ]+/g, " ")
       .split(" ")
       .filter((word) => word.length > 2 && !["the", "and", "for", "with", "from"].includes(word)),
@@ -127,6 +130,7 @@ const entries = Object.entries(registry.sources);
 const update = process.argv.includes("--update");
 const failures = [];
 const updates = [];
+const observed = {};
 
 console.log(`Verifying ${entries.length} registry sources...\n`);
 
@@ -164,11 +168,34 @@ for (const [key, source, result] of results) {
     console.log(`FAIL  ${key}\n      ${source.url}\n      expected: ${expected}\n      actual:   ${result.title}`);
     continue;
   }
+  // Guard against a registry entry that points at a real page but is
+  // labelled as a different work: the stored title must still overlap the
+  // observed page title.
+  if (source.match && !titleMatches(source.title, result.title)) {
+    const stored = keywords(source.title);
+    const observed = keywords(result.title);
+    const overlap = stored.size === 0 ? 0 : [...stored].filter((w) => observed.has(w)).length / stored.size;
+    if (overlap < 0.4) {
+      failures.push({
+        key,
+        url: source.url,
+        reason: `label does not match the page\n      stored:  ${source.title}\n      page:    ${result.title}`,
+      });
+      console.log(`FAIL  ${key}\n      ${source.url}\n      stored:  ${source.title}\n      page:    ${result.title}`);
+      continue;
+    }
+  }
   console.log(`ok    ${key}`);
   if (update && result.title && result.title !== normalise(expected)) {
     updates.push([key, result.title]);
   }
+  if (result.title) observed[key] = result.title;
 }
+
+await writeFile(
+  join(root, "docs", "observed-source-titles.json"),
+  `${JSON.stringify(Object.fromEntries(Object.entries(observed).sort(([a], [b]) => a.localeCompare(b))), null, 2)}\n`,
+);
 
 if (update && updates.length > 0) {
   for (const [key, title] of updates) {

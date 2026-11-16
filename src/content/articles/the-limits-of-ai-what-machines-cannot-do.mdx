@@ -1,55 +1,77 @@
 ---
 title: "The Limits of AI: What Machines Cannot Do"
-description: "AI is powerful but not omnipotent. Learn the fundamental limitations of current AI and why human judgment remains essential."
+description: "AI's limits are measurable, not vibes. Read the controlled evidence on where AI slows skilled work, where gains are uneven, and how evaluation breaks."
 date: 2026-11-16
 tags:
   - AI
   - Limitations
   - Human Judgment
-  - Technology
+  - Machine Learning
 ---
 
-AI can do many things, but it cannot do everything.
+Most writing about AI's limits is either a reassurance ("the technology is still early") or a dismissal ("it is just pattern matching"). Neither helps someone deciding where to put a system in a workflow. The useful version of the argument is empirical: there are specific, documented places where AI systems fail, and in several of those places we can point at a measurement rather than an intuition.
 
-**Direct answer:** Current AI has fundamental limitations: it cannot understand context the way humans do, it cannot take responsibility for decisions, it struggles with novelty and true reasoning, and it cannot operate without data it was trained on. These limits mean AI works best as a tool that augments human judgment, not as a replacement for it. Knowing what AI cannot do is as important as knowing what it can.
+**Direct answer:** Current AI has measurable limits in four places. It can be *net negative* for experienced practitioners on tasks where they already have strong priors. Its measured gains are unevenly distributed, concentrated where the user lacks experience. It breaks at evaluation, because the same machinery that makes models flexible also makes leakage easy. And it does not carry responsibility, which is why deployment context — not model quality — is usually the binding constraint. None of these are permanent laws; they are measurements from 2025-era systems, and they should change as the systems change. What matters now is that they are specific enough to test against your own use case.
 
-## What AI cannot do
+## A measured slowdown, not a hypothetical one
 
-**Understand meaning.** AI manipulates patterns in data, not concepts. It can generate fluent text without understanding what the words refer to. It can recognize a cat in an image without knowing what a cat is.
+The most-cited evidence that AI can hurt skilled work comes from a randomised controlled trial by METR, and it is worth reporting precisely because the result runs against both developer intuition and expert prediction.
 
-**Take responsibility.** A model cannot be held accountable. If an AI makes a wrong medical recommendation, a bad loan decision, or a harmful content suggestion, a human must answer for it. Automation does not erase accountability.
+METR gave sixteen experienced developers AI coding tools and measured how long they took to complete real issues in open-source repositories they had contributed to for years — repositories averaging "22k+ stars and 1M+ lines of code". Across 246 completed issues, the headline finding was blunt: "When developers are allowed to use AI tools, they take 19% longer to complete issues — a significant slowdown that goes against developer beliefs and expert forecasts."
 
-**Handle true novelty.** AI generalizes from training data. When faced with a situation unlike anything it has seen—an unprecedented market event, a new kind of fraud, a novel scientific problem—it can fail in unpredictable ways.
+Read the caveat as carefully as the number. The authors' own limitation, recorded in the study, is that "You only had 16 developers, so these results will not generalize/replicate." Sixteen developers is a small sample; 246 issues is what gave the study enough statistical power to reject the null of no effect. The honest reading is: *for experienced developers working in unfamiliar-to-their-tools, large codebases they know well, AI assistance made them slower* — and the study does not claim that AI slows everyone down.
 
-**Reason reliably.** AI can mimic reasoning but often fails at multi-step logic, especially when steps must be chained precisely. It is better at pattern completion than logical deduction.
+That is still a far more useful input than "AI helps developers". A team deciding whether to mandate an AI coding tool for its senior engineers now has a concrete hypothesis to test rather than a vibe to argue about. The cost of the test is a randomised comparison on your own repository, with your own engineers, and your own tasks.
 
-**Operate without data.** AI needs examples to learn from. In domains with little data—rare diseases, niche languages, emerging markets—AI performance is weak or nonexistent.
+The mechanism is worth forming your own hypothesis about rather than taking one on faith. A plausible account is that with a strong prior, a developer can often write the change directly, while the assistant's output still has to be read, checked, and corrected — so the review cost can exceed the authoring saving. That is an interpretation, not a finding of the trial, and the study does not establish it.
 
-## Why these limits matter
+## Uneven gains: the effect depends on who uses it
 
-Businesses that treat AI as omnipotent make expensive mistakes:
+The second limit is that measured gains are not uniform, and averaging them hides the thing that matters.
 
-- Deploying customer-facing AI without human review.
-- Using AI for high-stakes decisions without understanding failure modes.
-- Assuming AI will solve problems with no historical data.
-- Removing human oversight to save costs.
+Brynjolfsson, Li and Raymond studied the staggered introduction of an AI-based conversational assistant across 5,179 customer-support agents. Their NBER abstract reports that access to the tool "increases productivity, as measured by issues resolved per hour, by 14% on average, including a 34% improvement for novice and low-skilled workers but with minimal impact on experienced and highly skilled workers". They also find that "AI assistance improves customer sentiment, increases employee retention, and may lead to worker learning", and describe "large heterogeneity in effects across workers".
 
-The result is not just technical failure; it is reputational, legal, and financial risk.
+This is a productivity *gain*, and it still demonstrates a limit: the tool did essentially nothing for the most experienced workers. So the question "is AI useful?" is unanswerable as stated, and the question "is AI useful for the population I actually have, on the tasks they actually do?" is the one with a number attached. A deployment plan that reports the 14% average to a team of senior specialists has quietly overstated what they will see.
 
-## Where humans remain essential
+## Evaluation is where models break silently
 
-Humans are better than AI at:
+The third limit is structural, and it is the one that most often turns a promising model into a disappointing one.
 
-- **Judgment in ambiguity.** Deciding when information is incomplete and stakes are high.
-- **Responsibility.** Owning outcomes and being answerable to customers, regulators, and stakeholders.
-- **Novelty.** Creating something that has no precedent.
-- **Values.** Deciding what should be done, not just what can be done.
+scikit-learn puts it plainly: "Data leakage occurs when information that would not be available at prediction time is used when building the model." The cause is not exotic — it is ordinary convenience. Scaling, imputing, or selecting features on the full dataset before splitting leaks test information into training. The remedy they prescribe is procedural: "Always split the data into train and test subsets first, particularly before any preprocessing steps."
 
-## The right framing
+The consequence is a specific failure signature: a validation score that looks excellent, and a production score that does not. Any claimed capability is only as credible as the split behind it.
 
-AI is not a mind. It is a statistical pattern-matcher applied to data. It is powerful within its domain and fragile outside it. The best systems combine AI's scale and speed with human judgment, context, and accountability.
+The deeper version of this problem is about coverage, not mechanics. Mitchell et al. argue that released models should be accompanied by documentation detailing "their performance characteristics", with benchmarked evaluation "in a variety of conditions, such as across different cultural, demographic, or phenotypic groups (e.g., race, geographic location, sex, Fitzpatrick skin type) and intersectional groups" relevant to the application. Their motivation is that models are already used "in areas such as law enforcement, medicine, education, and employment" — precisely the domains where an aggregate metric can hide a serious problem. The limit, then, is that "accuracy" is a summary statistic over a population you have not necessarily checked.
 
-For the related question of how AI changes work, see [Will AI Replace Jobs or Create an Entirely New Economy?](/articles/will-ai-replace-jobs-or-create-an-entirely-new-economy) and [The Future of Autonomous Businesses](/articles/the-future-of-autonomous-businesses).
+Gebru et al. make the dataset-side version of the same point: without a standardised process for documenting datasets, "which can lead to severe consequences in high stakes domains". A model inherits the provenance of its data whether or not anyone wrote it down.
+
+## Responsibility does not transfer to the model
+
+The fourth limit is not technical, and it is the one most often argued past.
+
+A model cannot be held accountable. When an automated system produces a wrong medical recommendation, a bad lending decision, or a harmful suggestion, somebody still answers for it. This is why the governance frameworks treat deployment context as a first-class concern rather than a compliance afterthought: NIST's AI Risk Management Framework is organised around governance, mapping, measurement, and management — it treats the *use* of a system as something to be assessed, not just the system's internals.
+
+The framework families above encode the same idea from different directions. A model card discloses "the context in which models are intended to be used" alongside the evaluation. A dataset datasheet documents "recommended uses" and the collection process, so a reader can tell whether the data was collected for this purpose at all. In other words, both documents are about the boundary between what a system does and what it is allowed to do.
+
+This matters commercially, not just ethically. Deploying a customer-facing system without review, using a model for a high-stakes decision without checking its behaviour on the subgroups that matter, or removing human oversight to save cost, converts a model limitation into a legal and reputational liability. The technical limits above are recoverable; a governance failure is not.
+
+## A decision test you can apply to your own use case
+
+Before deploying an AI capability, answer five questions and write the answers down:
+
+1. **Who is the population, and what is their prior experience?** Use the heterogeneity finding: the average effect is not the effect for your users. Predict the effect for your most experienced users separately.
+2. **Can you afford to be slower?** If the task is one where practitioners are already fast and already know their domain, a 19%-style slowdown is a plausible outcome, and the intervention should be optional rather than mandated.
+3. **What would leakage look like here, and have you closed it?** Split before every fit; confirm no feature or preprocessing step saw the evaluation fold.
+4. **Which subgroups does this decision touch, and have you measured each?** An aggregate metric is not an answer for a decision about a person.
+5. **Who is answerable for a wrong outcome, and where is the human in the loop?** If nobody can name the accountable owner, the deployment is not ready regardless of model quality.
+
+The wider question of how this reshapes work and labour markets is covered in [Will AI Replace Jobs or Create an Entirely New Economy?](/articles/will-ai-replace-jobs-or-create-an-entirely-new-economy) and [Why AI Adoption Is Harder Than Building an AI Model](/articles/why-ai-adoption-is-harder-than-building-an-ai-model).
+
+## What the limits do not say
+
+It is worth being precise about the negative claim. None of the evidence above shows that AI is a dead end, that the 19% slowdown generalises beyond sixteen developers, or that the heterogeneity in agent productivity is permanent. The 34% gain for novice and low-skilled workers is a large measured effect on a real population of 5,179 people.
+
+What the evidence does support is a more demanding way of working: treat AI capability as conditional on population and task, treat the evaluation split as load-bearing, and treat deployment context as part of the system's design rather than as compliance paperwork after the fact. The limits are not a reason to avoid the technology. They are the reason to stop describing it as uniform.
 
 ## Further Reading
 
