@@ -1,66 +1,69 @@
 ---
 title: "From Chatbots to Autonomous Systems: The Evolution of AI"
-description: "AI has evolved from simple rule-based chatbots to autonomous systems that plan and act. Learn the stages of this evolution and what each means for business."
+description: "The arc from learned control to tool use to runtime planning. Read what each step added, what it did not, and what is still missing."
 date: 2026-11-16
 tags:
   - AI
-  - Automation
-  - Systems
-  - Technology
+  - Agents
+  - Machine Learning
+  - Reinforcement Learning
 ---
 
-AI did not arrive fully formed. It evolved through distinct stages, each changing what machines can do and how businesses use them.
+The story of AI "becoming autonomous" is usually told as a straight line with a destination: chatbots answered questions, then models could use tools, then agents could plan, and eventually systems will run themselves. Read as a sequence of papers, the line is messier and more interesting, because each step added a specific capability and left a specific gap that the next step happened to address.
 
-**Direct answer:** AI evolved from rule-based chatbots that followed fixed scripts, to predictive models that classified and recommended, to generative models that create content, and now toward autonomous systems that plan, act, and iterate. Each stage expanded what AI can handle but also expanded what can go wrong. Understanding this evolution helps businesses choose the right tool for each problem.
+**Direct answer:** Three documented steps take you from a model that answers to a system that acts. Learned control policies gave the ability to act on raw sensory input without a hand-written policy. Self-supervised tool use gave the ability to delegate a capability the model is bad at to a program that is good at it. Runtime planning gave the ability to revise a course when reality does not match the expectation. Each step is a change in *what the system decides at runtime*, not in how clever the model is. The gaps left over are exactly where the next step had to come from.
 
-## Stage 1: Rule-based chatbots
+## Step one: learning to act from raw input
 
-Early chatbots followed decision trees: if the user says X, respond with Y. They worked for narrow, predictable tasks—order status, store hours, password reset. They failed at anything unexpected. The logic was transparent but brittle.
+The first step is not about language at all, and it is the foundation for everything that follows.
 
-Businesses used them for customer service deflection. The limitation was clear: they could not understand intent outside the script.
+Mnih et al. present "the first deep learning model to successfully learn control policies directly from high-dimensional sensory input using reinforcement learning". The architecture is deliberately plain: "a convolutional neural network, trained with a variant of Q-learning, whose input is raw pixels and whose output is a value function estimating future rewards". They applied it to seven Atari 2600 games "with no adjustment of the architecture or learning algorithm", and found it "outperforms all previous approaches on six of the games and surpasses a human expert on three of them".
 
-## Stage 2: Predictive models
+Two details in that sentence set the pattern for everything after. First, the same network learned seven different games without modification — the capability came from the learning procedure, not from per-task engineering. Second, the output was a *value function*, not a plan: the system estimated future reward, and the behaviour followed from the estimate rather than from a written rule.
 
-Machine learning models classified inputs and predicted outcomes: spam or not spam, likely to buy or not, fraud or legitimate. These systems learned from data rather than fixed rules. They handled ambiguity better but required labeled data and engineering expertise.
+The gap this left is obvious in hindsight. A learned policy can act, but it cannot consult anything. It has no way to ask a calculator, read a document, or check a fact. Everything it knows is in its weights.
 
-Businesses used them for lead scoring, fraud detection, and recommendation. The limitation: they made predictions but did not take action.
+## Step two: delegating what the model is bad at
 
-## Stage 3: Generative AI
+That gap is what the tool-use line addresses, and the framing in Schick et al. is the sharpest statement of it. Language models, they write, "exhibit remarkable abilities to solve new tasks from just a few examples or textual instructions, especially at scale. They also, paradoxically, struggle with basic functionality, such as arithmetic or factual lookup, where much simpler and smaller models excel."
 
-Large language models generate text, code, images, and audio. They can summarize, draft, translate, and explain. They handle open-ended tasks that rule-based systems and predictive models could not.
+The word "paradoxically" is doing real work: the same scale that makes a model good at open-ended tasks makes it bad at precise ones. Toolformer's answer is to have the model learn to call programs instead of trying to out-guess them. It is "a model trained to decide which APIs to call, when to call them, what arguments to pass, and how to best incorporate the results into future token prediction" — and the training is self-supervised, "requiring nothing more than a handful of demonstrations for each API".
 
-Businesses use them for content creation, coding assistance, and customer support drafting. The limitation: they can hallucinate, lack real-time knowledge, and need human review for high-stakes decisions.
+The tool set they used is worth studying because it is deliberately unglamorous: "a calculator, a Q&A system, two different search engines, a translation system, and a calendar". Every one is a capability a language model is measurably worse at than a dedicated implementation. The reported result is "substantially improved zero-shot performance across a variety of downstream tasks, often competitive with much larger models, without sacrificing its core language modeling abilities."
 
-## Stage 4: Autonomous systems
+What this step added: the ability to reach outside the weights. What it left open: the sequence of calls. A model that can call a calculator can still call it five times when once would do, or search for something it could have reasoned out.
 
-Autonomous systems combine generative AI with tools, memory, and planning. They can browse the web, run code, query databases, and execute multi-step workflows. They decide what to do next based on results, not just respond to prompts.
+## Step three: planning at runtime
 
-Businesses are beginning to use them for research, software development, and operations. The limitation: they can compound errors, act unpredictably, and create accountability gaps.
+The third step is the one usually called "agents", and its contribution is a representation of the plan itself.
 
-## What each stage means for business
+Yao et al. generate "both reasoning traces and task-specific actions in an interleaved manner", and explain why the interleaving matters: "reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information."
 
-| Stage | What it does | Best for | Main risk |
-|---|---|---|---|
-| Rule-based | Follows fixed scripts | Simple, predictable tasks | Brittle; breaks on novelty |
-| Predictive | Classifies and forecasts | Scoring, detection, recommendation | Needs data; no action |
-| Generative | Creates content and code | Drafting, summarizing, translating | Hallucination; needs review |
-| Autonomous | Plans and executes workflows | Multi-step research, operations | Error compounding; accountability |
+The measurable difference appears where the previous steps fail hardest. On question answering and fact verification, Yao et al. report that ReAct "overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API". The mechanism is specific: a reasoning-only chain compounds its own errors, because each step is conditioned on the previous wrong step. An interleaved action returns ground truth from outside, which breaks the compounding.
 
-Most businesses today operate between stages 2 and 3. Stage 4 is emerging but requires careful governance.
+So the progression is coherent. Learned policies could act but could not consult. Tool use could consult but could not revise. Interleaved reasoning and acting can both, because the reasoning trace is an inspectable representation of the plan that the model can rewrite mid-run.
 
-## Choosing the right stage
+## What the sequence does not tell you
 
-Do not use autonomous systems for tasks that need a chatbot. Do not use chatbots for tasks that need judgment. Match the tool to the task:
+Three cautions belong alongside the narrative.
 
-- **Predictable, high-volume:** rule-based or predictive.
-- **Open-ended content:** generative.
-- **Multi-step, tool-using:** autonomous—with human oversight.
+**The steps are not a ladder of generality.** The Atari work had nothing to do with language and everything to do with the idea that behaviour can be learned rather than written. The tool-use work depends on the tool set being small and well-documented. Neither is "more advanced" than the other; they solve different problems.
 
-## The trend that matters
+**The evaluation results are narrow.** "Surpasses a human expert on three of seven games" is a remarkable result and also a bounded one. "Substantially improved zero-shot performance across a variety of downstream tasks" is a generalisation claim about a set of tasks the authors chose. The lesson is about capability, not about reliability on your workload.
 
-The trend is not just more capable AI. It is AI that does more without human intervention. That creates opportunity and risk in equal measure. The businesses that thrive will be those that adopt each stage where it fits, and keep humans accountable for outcomes.
+**The hardest steps are the ones nobody writes papers about.** The pipeline around an agent — what it is allowed to do, what it is measured against, who answers when it is wrong — is engineering, and it does not get summarised in an abstract. It is also where the value of a system is decided. See [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale) and [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do) for that side.
 
-For the related question of AI's economic impact, see [The Economics of AI: Why Intelligence Is Becoming a Commodity](/articles/the-economics-of-ai-why-intelligence-is-becoming-a-commodity) and [Will AI Replace Jobs or Create an Entirely New Economy?](/articles/will-ai-replace-jobs-or-create-an-entirely-new-economy).
+## Reading the arc as a practitioner
+
+The useful way to use this history is as a checklist for your own system. Each step implies a question:
+
+1. **Can the system act on what it observes, or does it only classify?** If it only classifies, it is a model and it belongs behind a decision someone else makes.
+2. **Can it consult a capability it is worse at?** If not, it is burning accuracy on arithmetic and lookups. Integrate the tool.
+3. **Can it revise its plan when reality disagrees?** If not, it will act confidently on a stale assumption, and the failure compounds with every step.
+4. **Is its plan observable?** Reasoning traces are text, so they can be logged and reviewed. That is a debugging asset, not a presentation detail.
+5. **Who answers for it?** Not optional at any of these steps, and least optional at the last one.
+
+None of this requires the newest architecture. It requires knowing which of the three capabilities your workflow actually needs — and buying the narrowest one that does the job.
 
 ## Further Reading
 

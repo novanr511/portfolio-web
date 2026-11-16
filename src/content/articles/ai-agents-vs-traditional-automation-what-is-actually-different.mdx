@@ -1,67 +1,69 @@
 ---
-title: "AI Agents vs Traditional Automation: What Is Actually Different?"
-description: "Traditional automation follows a fixed path written by a programmer. An AI agent lets a model decide the path at runtime—that distinction changes what can go wrong and how to test"
-date: 2026-11-14
+title: "AI Agents vs Traditional Automation: What Is Actually Different"
+description: "An agent decides which action to take, when, and with what arguments. That is a different kind of machine, with different costs and failure modes."
+date: 2026-11-16
 tags:
   - AI
+  - Agents
   - Automation
-  - Systems
-  - Engineering
+  - Software Architecture
 ---
 
-"AI agent" has become a vendor label for everything from a chatbot to a cron job. The label is not the distinction. The distinction is who decides the sequence of actions.
+The distinction that matters is not that an agent uses a language model. Plenty of language-model applications are not agents, and plenty of agents use no language model at all. The distinction is about where the decision loop sits: in traditional automation, the programmer writes the sequence of steps and the machine executes it; in an agentic system, the model chooses the next step at runtime from the situation it observes.
 
-**Direct answer:** Traditional automation follows a fixed, human-written path from trigger to action. An AI agent uses a model to decide which actions to take, in what order, and whether to repeat—meaning the execution path is not fully determined in advance. The difference is not intelligence; it is delegation of control: the programmer decides in automation, the model decides at runtime in an agent.
+**Direct answer:** Traditional automation executes a path written in advance; an agent selects the next action at runtime, decides what arguments to pass, and decides how to use the result. The published evidence for agentic architectures describes exactly this selection capability, and it comes with a specific benefit — the ability to update a plan and handle exceptions — and a specific cost: the loop now depends on a probabilistic component whose failure modes are not compile-time errors. The honest way to choose between them is to ask whether the path can be specified in advance, not whether the task sounds sophisticated.
 
-## Traditional automation: the path is written in advance
+## What traditional automation actually is
 
-A traditional automated system is a directed graph built by a programmer. Trigger → condition → action → next condition → action. Every branch is enumerated. Every error case is (ideally) handled explicitly. The system does what it was told to do, no more and no less.
+A conventional workflow is a program that someone wrote. It branches on explicit conditions, and every branch was anticipated by the person who wrote it. This is not a weakness — it is the source of its properties. The behaviour is inspectable, the failure modes are bounded and enumerable, and the system does exactly what it was told to do, including exactly the wrong thing when the input is unexpected.
 
-Examples: a CI pipeline that runs tests on push, a marketing email sequence that sends after a delay, a thermostat that turns on heating below a set temperature. The logic is visible in the code or configuration. You can read it and predict the output for a given input.
+The economics of traditional automation follow from that. It is expensive to build when the path has many branches, because each branch has to be written, tested, and maintained. It is cheap to run. And it is brittle in exactly one way: when reality produces a case nobody anticipated, it does something defined rather than something sensible.
 
-This predictability is the strength and the limit. Traditional automation excels at well-defined, repetitive tasks where the correct response does not change with context. It breaks when the world presents a situation the programmer did not enumerate.
+Almost every internal tool, integration, and report-generation pipeline is in this category, and for a large fraction of them it is the right category.
 
-## AI agents: the path is decided at runtime
+## What an agent actually adds
 
-An AI agent wraps a model inside a loop. The model receives a goal, observes the environment, chooses an action, observes the result, and chooses again—possibly many times—until the goal is met or a stop condition fires. The sequence of actions is not written by a human; it emerges from the model's outputs.
+The mechanism is usually described loosely as "the model decides what to do". Two papers make it precise, and both are worth reading for the design details rather than the results.
 
-Examples: a coding assistant that reads a repository, plans a fix, edits files, runs tests, and iterates until tests pass; a customer-support agent that reads a ticket, queries a database, drafts a reply, and sends it. The path depends on the model's interpretation of the situation, not on a pre-written decision tree.
+Schick et al. describe Toolformer as "a model trained to decide which APIs to call, when to call them, what arguments to pass, and how to best incorporate the results into future token prediction". Four distinct decisions, all made at runtime, all learned rather than written. The training is self-supervised and needs "nothing more than a handful of demonstrations for each API", and the tools included were deliberately mundane: a calculator, a question-answering system, two search engines, a translation system, and a calendar. The reported effect is "substantially improved zero-shot performance across a variety of downstream tasks, often competitive with much larger models, without sacrificing its core language modeling abilities."
 
-The consequence: the same input can produce different paths across runs. The agent may skip a step, repeat one, or take one the programmer never imagined. That flexibility is also the risk.
+Yao et al. describe ReAct as generating "both reasoning traces and task-specific actions in an interleaved manner", and explain the division of labour: "reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information."
 
-## The distinction that matters
+That is the real difference, and it is narrower than the marketing suggests. The agent is not "autonomous" in the sense of acting without feedback. It maintains a plan in text, revises it when an action returns something unexpected, and continues. Traditional automation cannot revise a plan, because it has no representation of one.
 
-| | Traditional automation | AI agent |
-|---|---|---|
-| Who decides the next action | The programmer, in code | The model, at runtime |
-| Is the path fixed per input? | Yes | Generally no |
-| Can you read the full logic? | Yes, in the source | Partially; model internals are opaque |
-| What breaks? | Unhandled cases | Unexpected model behavior, drift, cost |
-| How do you test? | Unit tests, expected outputs | Evaluations, traces, guardrails |
+The measured benefit follows from exactly that. On question answering and fact verification, Yao et al. report that ReAct "overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API". The gain is not that the model knows more; it is that a checkable external source interrupts the chain where it would otherwise have compounded its own error.
 
-The table describes ideal types. Real systems often blend both: an agent that calls deterministic tools (automation) inside a model-driven loop (agent), or an automation script that calls a model for one step. The question to ask of any system labeled "agent" is: *which parts are fixed, and which parts does the model decide?*
+## The two things an agent is genuinely bad at
 
-## What changes when control shifts
+Two properties follow from the architecture, and both are documented rather than inferred.
 
-When a model decides the sequence, three engineering problems replace or amplify the old ones:
+**The agent cannot do what the tools do.** Schick et al. describe the paradox that motivates the whole approach: language models "paradoxically, struggle with basic functionality, such as arithmetic or factual lookup, where much simpler and smaller models excel". A calculator exists precisely because a language model is worse at arithmetic than a calculator. Any design that asks a model to do the thing a tool does well is wasting accuracy, latency, and money.
 
-**1. Non-determinism.** You cannot write a unit test that asserts "given input X, the system always produces output Y," because the model may choose a different path. You test distributions instead: across 100 runs, does the agent reach the goal within an acceptable cost and error rate?
+**The failure mode is not a crash.** A traditional program that meets an unexpected input takes a defined branch, logs, and stops. An agent that meets an unexpected input reasons, acts, and acts again — plausibly, expensively, and possibly in a direction that is hard to predict from the outside. This is why agentic systems need the governance scaffolding that the rest of this publication covers: the accountability cannot be assigned to the model, so it has to be assigned to a person with a documented boundary of permitted actions.
 
-**2. Tool misuse.** An agent with access to tools can call them in the wrong order, with wrong arguments, or too many times. A delete tool called repeatedly is not a bug in the tool; it is a consequence of the model deciding to call it. Guardrails (approval steps, rate limits, read-only modes) become part of the system design, not afterthoughts.
+## Choosing between them
 
-**3. Cost and latency.** Each model call costs money and time. An agent that loops ten times to solve a problem a script solves in one request is more expensive, not more capable. The comparison should be outcome per unit cost, not outcome alone.
+The decision is not "automation or agents". It is where in a workflow the decision loop belongs, and there are three useful placements.
 
-## When to use which
+**Keep the loop in code.** If the path can be enumerated — eight document types, six report formats, a fixed reconciliation — write the program. You get inspectability, deterministic cost, and testable behaviour for a fraction of the engineering effort. Reach for an agent only when the enumeration itself is the problem.
 
-Choose traditional automation when the task is well-defined, the correct response is stable, and predictability matters more than flexibility. Choose an AI agent when the task is ill-defined, context varies, and you are willing to trade determinism for the ability to handle novel situations.
+**Let the agent plan, keep the execution deterministic.** This is the pattern ReAct's evaluation demonstrates: the model decides *what* to look up and the tool performs a fixed operation. The model's uncertainty is confined to a decision that is cheap to check and easy to abandon.
 
-Most production systems should use both: automation for the reliable backbone, agents for the variable edges. A system that routes support tickets by keyword (automation) and drafts responses with a model (agent) gets the benefits of each without the risks of either.
+**Let the agent choose the tool.** This is Toolformer's design: the model selects among a small, well-documented set of APIs. The risk is contained because the set of actions is bounded by what you integrated. An agent with access to thirty tools has thirty ways to be wrong on every step, and its success rate compounds.
 
-## The honest boundary
+A useful discipline for the third pattern is to keep the action set small and each action auditable, and to make the agent's plan observable — the reasoning trace is text, which means it can be logged, reviewed, and shown to a human when the run goes wrong.
 
-An agent is not "automation that thinks." It is automation with a model in the control loop. That model can be wrong, can be inconsistent, and can be expensive. Labeling a fixed script an "agent" does not change its behavior; labeling an agent a "script" hides its risks. The engineering question is always the same: who decides, and what happens when they decide wrong?
+## A test to run before you build
 
-For the related question of how models scale and where their limits are, see [Chinchilla and the Scaling Laws: Why "Just Make It Bigger" Stopped Being the Rule](/articles/chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule).
+1. **Can a competent person enumerate the steps?** If yes, write the program. The agent version costs more and is harder to verify.
+2. **Where exactly is the uncertainty?** Name it. If it is in one step, put the model there and leave the rest as code.
+3. **What can the agent actually do?** List the tools. If the list is long, the compounding risk is real and you need tighter boundaries, not a better prompt.
+4. **What happens when it is wrong?** A refusal, a fallback, a page, a wrong-but-plausible action. The last of these is the one that needs a control.
+5. **What does it cost per run?** Token spend, latency, and the human review time are all part of the price, and the review time is usually the largest term.
+
+None of this argues against agents. It argues for using them where the deciding — not the doing — is genuinely hard, and keeping the machinery around them as ordinary, inspectable software.
+
+For how these systems are supervised, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale); for the capability questions underneath, see [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do).
 
 ## Further Reading
 
