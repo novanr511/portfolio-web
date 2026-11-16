@@ -1,77 +1,66 @@
 ---
-title: "Generative AI: LLMs, Prompt Engineering, and Fine-tuning"
-description: "Generative AI transforms how we build with language. Learn LLM fundamentals, prompt engineering patterns, and fine-tuning strategies for domain adaptation."
+title: "Generative AI: LLMs, Prompt Engineering, and Fine-Tuning"
+description: "Pretraining, prompting, and fine-tuning solve different problems. Read how each one works, what it costs, and when you actually need it."
 date: 2026-11-16
 tags:
   - Generative AI
   - LLM
-  - Prompt Engineering
   - Fine-tuning
-  - AI
+  - Prompt Engineering
 ---
 
-Large language models are the new general-purpose computing primitive.
+Three techniques get conflated because they all look like "making the model better at your task". They are not interchangeable, they cost very different amounts, and they fail in different ways. Pretraining creates the model's capability. Prompting steers it without changing its weights. Fine-tuning changes its weights — and, unless you need it for a specific reason, it is usually the most expensive answer to a problem that a better prompt would have solved.
 
-**Direct answer:** Generative AI, powered by Large Language Models (LLMs), generates human-like text, code, and reasoning. Prompt engineering designs effective inputs; fine-tuning adapts pretrained models to specific domains. Understanding tokenization, context windows, and alignment is essential for building reliable LLM applications.
+**Direct answer:** Pretraining produces a general model from raw text. Prompting specifies the task in the input and requires no training at all. Fine-tuning trains on examples so the behaviour generalises to unseen inputs of the same kind. Choose prompting first, because it is free and instant; fine-tune when the behaviour must be reliable across a large volume of inputs, the task is narrow enough to be learnable from examples, or the model's default behaviour is unacceptable for your domain; and expect a caveat that cuts across all three — a bigger model is not automatically a more obedient one.
 
-## LLM fundamentals
+## Pretraining: what the model becomes
 
-**Architecture:** decoder-only transformers (GPT, LLaMA, Mistral) trained with next-token prediction on massive corpora. Key components: tokenization (BPE/Unigram), positional embeddings, causal self-attention, feed-forward layers.
+The base model is built by predicting text. That sounds trivial, and the scale of what it produces is the first surprise.
 
-**Training stages:**
-1. **Pretraining:** next-token prediction on trillion-token corpora. Learns world knowledge, syntax, reasoning patterns.
-2. **Supervised fine-tuning (SFT):** instruction-response pairs teach format following.
-3. **Alignment (RLHF/RLAIF):** reward modeling + PPO/DPO to align with human preferences.
+Brown et al. trained GPT-3, "an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model". Their finding is not that the model was large, but that scale changed what the model could do without being trained for it: scaling "greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-state-of-the-art fine-tuning approaches".
 
-**Scaling laws:** loss decreases predictably with compute, data, and parameters (Chinchilla scaling).
+The comparison in their abstract is the one to hold onto. The dominant method before this was pretraining on a large corpus followed by fine-tuning on a specific task, and that method "still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples". A few-shot model, by contrast, performs "a new language task from only a few examples or from simple instructions — something which current NLP systems still largely struggle to do".
 
-## Prompt engineering
+So pretraining's contribution is a shift in the cost structure of adaptation. That shift is what made prompting a viable engineering practice rather than a demonstration trick.
 
-Prompt engineering designs inputs to elicit desired outputs without weight updates.
+## Prompting: the cheap path, and its failure mode
 
-**Core patterns:**
-- **Zero-shot:** task description only.
-- **Few-shot:** few input-output examples (in-context learning).
-- **Chain-of-thought (CoT):** "Let's think step by step" elicits reasoning.
-- **Self-consistency:** sample multiple CoT paths, majority vote.
-- **Tree-of-thoughts / Graph-of-thoughts:** structured reasoning search.
-- **RAG prompting:** inject retrieved context into prompt.
+Prompting specifies the task inside the input. It costs nothing to change, takes effect immediately, and requires no labels.
 
-**Best practices:** be specific, provide examples, separate instructions from data, use delimiters, specify output format (JSON, markdown), iterate empirically.
+That makes it the first thing to try, and the correct default in most cases. But the failure mode is specific and worth naming: a prompt steers the model; it does not change what the model is likely to do by default. Where the base model's prior behaviour conflicts with what you need — a specific output format it does not naturally produce, a domain vocabulary it has not seen, a behaviour that must be consistent across thousands of calls — a prompt can sometimes be coaxed into it and sometimes cannot.
 
-## Fine-tuning strategies
+The diagnostic question is whether the inconsistency is random or systematic. If outputs vary run to run for the same input, the fix is usually the prompt's instruction, the output format, or a temperature change. If the failure is consistent — it always truncates, always ignores the schema, always answers the wrong question — that is a capability or alignment gap, and prompting alone will not close it.
 
-**Full fine-tuning:** update all weights. High compute, best adaptation. Use LoRA/QLoRA for efficiency.
+## Alignment: size does not produce obedience
 
-**Parameter-efficient fine-tuning (PEFT):**
-- **LoRA (Low-Rank Adaptation):** freeze base weights, inject low-rank adapters (A×B). Trainable params &lt;&lt; base params.
-- **QLoRA:** 4-bit quantized base + LoRA. Fits larger models on consumer GPUs.
-- **Adapters / Prefix tuning / Prompt tuning:** lightweight modules or learned soft prompts.
+The single most useful sentence in the instruction-tuning literature comes from Ouyang et al.: "Making language models bigger does not inherently make them better at following a user's intent." Their examples of what a bigger model still does are "untruthful, toxic, or simply not helpful to the user", and they name the condition directly: "these models are not aligned with their users".
 
-**When to fine-tune:**
-- Domain-specific terminology/style (legal, medical, code).
-- Consistent output format requirements.
-- Private/proprietary knowledge injection.
-- Latency/cost reduction via smaller distilled models.
+Their method, InstructGPT, is worth describing because the sequence is what most teams skip. It starts with "a set of labeler-written prompts and prompts submitted through the OpenAI API", from which they "collect a dataset of labeler demonstrations of the desired model behavior" and "fine-tune GPT-3 using supervised learning". Then they "collect a dataset of rankings of model outputs, which we use to further fine-tune this supervised model using reinforcement learning from human feedback".
 
-**Risks:** catastrophic forgetting, hallucination amplification, alignment degradation. Evaluate on held-out benchmarks.
+Note the ordering. Demonstrations first, then rankings, then reinforcement learning. The supervised stage teaches the *shape* of the desired behaviour and is cheap to produce; the ranking stage teaches the *preference* between outputs, and needs comparison rather than absolute judgement, which is a much cheaper thing to ask of a human. The result is that a 1.3B-parameter InstructGPT model was preferred by human raters over the 175B GPT-3, which is the clearest evidence in the literature that size and usefulness are separate axes.
 
-## RAG vs Fine-tuning
+This is also why "just use a bigger model" fails as a strategy for a specific application. A bigger base model can be harder to steer, needs more alignment work, and costs more per call.
 
-| Need | Approach |
-|---|---|
-| Dynamic/private knowledge | RAG |
-| Style/format consistency | Fine-tuning |
-| Rapid iteration | RAG |
-| Deep domain expertise | Fine-tuning + RAG |
+## Fine-tuning: when it is the right answer
 
-## Safety and evaluation
+Fine-tuning trains the model's weights on your examples. Hu et al. frame the problem it solves: as you pretrain larger models, "full fine-tuning, which retrains all model parameters, becomes less feasible", because using GPT-3 175B as an example, "deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive".
 
-- **Benchmarks:** MMLU, GSM8K, HumanEval, MT-Bench, AlpacaEval.
-- **Red teaming:** adversarial prompts for safety, bias, PII leakage.
-- **Guardrails:** input/output filters, refusal patterns, citation requirements.
+Their method, LoRA, "freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks". The measured result is large: "Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times", while "performs on-par or better than fine-tuning in model quality on RoBERTa" datasets.
 
-For the related question of NLP fundamentals, see [NLP Fundamentals: Tokenization, Embeddings, and Transformers](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers) and AI governance, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale).
+That last clause matters more than the parameter count. Parameter-efficient fine-tuning is not a compromise on quality; it is a different allocation of the same budget, and in the reported comparisons it is at least as good. The practical benefit is operational: adapters are small enough to version, swap, and serve per customer, where a full checkpoint per customer is not.
+
+The cost that does not disappear is the training data. Fine-tuning requires examples, and their quality determines the result. A thousand examples of the behaviour you want, in the format you want, is the real input.
+
+## Choosing, with the decision in the right order
+
+1. **Start with prompting.** It is free and instant, and a surprising share of "we need fine-tuning" requests are solved by a clearer instruction and a specified output format.
+2. **Diagnose whether the failure is systematic.** Random variation → prompt, sampling parameters, or retrieval. Consistent failure → capability gap, which fine-tuning may not fix either.
+3. **Fine-tune when the behaviour must be reliable at volume**, when the task is narrow and learnable from examples, or when the domain vocabulary is absent from the base model's priors.
+4. **If you fine-tune, use a parameter-efficient method.** LoRA's numbers say the full-checkpoint approach is a cost, not a requirement.
+5. **Keep the base model's caveat in view.** Ouyang et al. show that alignment is a separate training problem from scale, and a large model that is misaligned is a large, expensive, misaligned model.
+6. **Re-evaluate the baseline honestly.** Liu et al. found BERT "was significantly undertrained, and can match or exceed the performance of every model published after it", and they "raise questions about the source of recently reported improvements". Tune the simple option before you buy the complex one.
+
+For how these models behave once they are in production, see [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation); for the limits that no amount of tuning removes, see [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do).
 
 ## Further Reading
 

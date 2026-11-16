@@ -1,56 +1,75 @@
 ---
 title: "NLP Fundamentals: Tokenization, Embeddings, and Transformers"
-description: "Natural language processing turns text into machine-readable representations. Learn tokenization strategies, embedding methods, and transformer architectures."
+description: "How text becomes vectors, why subword units won, and what the transformer changed. Read the mechanism behind each layer of the stack."
 date: 2026-11-16
 tags:
   - NLP
-  - Natural Language Processing
   - Transformers
   - Embeddings
+  - Machine Learning
 ---
 
-Text is unstructured. NLP makes it computable.
+Most introductions to NLP present the stack as a menu: tokenisation, embeddings, transformers, and a large language model at the end. Each layer is usually described by what it is. The more useful description is what each layer *fixes* about the layer below it, because the history of this field is a series of problems being solved in order.
 
-**Direct answer:** NLP (Natural Language Processing) converts human language into structured representations that machines can process. The pipeline: tokenization breaks text into units, embeddings map tokens to dense vectors, and transformers model contextual relationships. Modern NLP is dominated by transformer architectures (BERT, GPT, T5) that capture bidirectional context and enable transfer learning.
+**Direct answer:** Text has to become numbers, and each step solves a specific failure of the previous one. Subword tokenisation solves the open-vocabulary problem — a fixed word vocabulary cannot represent every word, and splitting rare words into smaller units can. Embeddings solve the discreteness problem — vectors can be compared by arithmetic rather than equality. The transformer solves the sequencing problem — earlier architectures processed tokens in order, so each one waited for the previous one. And the large-scale pretraining-plus-fine-tuning pipeline solves the labelling problem — it starts from raw text and needs labelled examples only at the end.
 
-## Tokenization: from text to tokens
+## Layer one: tokenisation, and the open-vocabulary problem
 
-**Word-level:** split on whitespace and punctuation. Large vocabulary, OOV (out-of-vocabulary) issues.
+Neural models operate on a fixed vocabulary of discrete tokens. Translation, however, is "an open-vocabulary problem": any input may contain a word the model has never seen.
 
-**Subword:** Byte Pair Encoding (BPE), WordPiece, Unigram. Splits rare words into known subwords. Used by BERT (WordPiece), GPT (BPE), T5 (SentencePiece). Balances vocabulary size and OOV rate.
+Sennrich et al. describe the approach that became standard: making the model "capable of open-vocabulary translation by encoding rare and unknown words as sequences of subword units". The intuition behind it is worth stating because it generalises beyond translation: "various word classes are translatable via smaller units than words" — names by character copying or transliteration, compounds by compositional translation, and cognates and loanwords by phonological and morphological transformations. In other words, a rare word is not a mystery to be looked up but a structure that can be assembled from parts that are not rare.
 
-**Character-level:** no OOV, but longer sequences, harder to learn long-range dependencies.
+Their method was byte pair encoding, and they discuss "the suitability of different word segmentation techniques, including simple character n-gram models and a segmentation based on the byte pair encoding compression algorithm". The compression framing is the memorable part: the vocabulary is built by repeatedly merging the most frequent adjacent pair, so the units are whatever the corpus treats as atomic.
 
-**SentencePiece / BPE:** unsupervised segmentation, language-agnostic. Standard for multilingual models.
+Kudo and Richardson built the tooling that made this practical and, importantly, language-independent. Their SentencePiece is "a language-independent subword tokenizer and detokenizer designed for Neural-based text processing". The limitation it removes is stated precisely: "existing subword segmentation tools assume that the input is pre-tokenized into word sequences", whereas SentencePiece "can train subword models directly from raw sentences, which allows us to make a purely end-to-end and language independent system". They validated it on English-Japanese machine translation and "find that it is possible to achieve comparable accuracy to direct subword training from raw sentences".
 
-## Embeddings: from tokens to vectors
+That last point is the one to keep. Tokenisation is often treated as plumbing that a practitioner inherits. It is a modelling decision, and a language without whitespace or with rich morphology changes the result.
 
-**Static embeddings:** Word2Vec, GloVe, FastText. Fixed vector per token. FastText handles OOV via subword n-grams. Context-independent (same vector for "bank" in "river bank" and "bank account").
+## Layer two: embeddings, and the discreteness problem
 
-**Contextual embeddings:** ELMo, BERT, RoBERTa, GPT. Vector depends on surrounding context. "Bank" has different vectors in different sentences. Produced by transformer encoders/decoders.
+A token id is a label, not a meaning. Two tokens never compare, and the distance between them carries no information. Embeddings replace the label with a vector, so that similarity is arithmetic.
 
-**Sentence embeddings:** Sentence-BERT, Universal Sentence Encoder. Fixed-size vector for entire sentence/paragraph. Used for semantic similarity, clustering, retrieval.
+The first generation of embeddings were static: one vector per word type, learned from co-occurrence. Their weakness was polysemy — the same vector for "bank" in "river bank" and "bank account", because the model had no way to know which sense was meant.
 
-## Transformer architecture
+Contextual embeddings fix this by making the vector depend on the sentence. BERT, the model that made the approach standard, was designed to "pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers". The word "bidirectional" is the mechanism and the source of the gain: an earlier left-to-right model could only use context before the token, so the representation of a token was necessarily incomplete.
 
-**Attention mechanism:** scaled dot-product attention computes weighted sum of values based on query-key compatibility. Multi-head attention runs multiple attention heads in parallel.
+The other thing BERT changed was the shape of the downstream work. The pre-trained BERT model "can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications". The reported results were "new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7%".
 
-**Encoder-decoder:** encoder processes input sequence; decoder generates output autoregressively (translation, summarization).
+A useful caution comes from the replication study. RoBERTa found that "BERT was significantly undertrained, and can match or exceed the performance of every model published after it", and that "hyperparameter choices have significant impact on the final results". The authors go on to "raise questions about the source of recently reported improvements". That is worth remembering whenever a leaderboard entry appears: part of what looks like an architectural advance may be a better-tuned earlier one.
 
-**Encoder-only (BERT-style):** bidirectional context. Pretrained with masked language modeling (MLM) and next sentence prediction. Fine-tuned for classification, NER, QA.
+## Layer three: the transformer, and the sequencing problem
 
-**Decoder-only (GPT-style):** causal/unidirectional attention. Pretrained with next-token prediction. Generates text. Foundation for LLMs.
+Before 2017, the dominant sequence models were recurrent or convolutional, "based on complex recurrent or convolutional neural networks in an encoder-decoder configuration", and — critically — they processed tokens sequentially. Every token waited for its predecessor. That is why they were hard to parallelise and why long contexts were expensive.
 
-**Encoder-decoder (T5, BART):** sequence-to-sequence. Pretrained with denoising objectives. Used for translation, summarization, question answering.
+Vaswani et al. removed the recurrence: a network "based solely on attention mechanisms, dispensing with recurrence and convolutions entirely". The benefit they measured was both quality and cost: 28.4 BLEU on WMT 2014 English-to-German, "improving over the existing best results, including ensembles by over 2 BLEU", and a single-model state-of-the-art 41.8 BLEU on English-to-French "after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature".
 
-## Practical considerations
+The important engineering consequence is not the benchmark. It is that removing the sequential dependency made training parallelisable, and parallelisability is what made scale affordable — and scale is what made the rest of this stack possible.
 
-- **Pretraining vs fine-tuning:** massive corpora pretraining, then task-specific fine-tuning on labeled data.
-- **Tokenization alignment:** ensure tokenizer matches pretrained model.
-- **Sequence length limits:** BERT 512, GPT-3 2048, newer models 32k–128k+. Use sliding windows or hierarchical encoding for long docs.
-- **Efficiency:** distillation, quantization, LoRA, adapters, quantization-aware training for deployment.
+## Layer four: making embeddings usable at scale
 
-For the related question of deep learning basics, see [Deep Learning Basics: Neural Networks, Backpropagation, and Practical Use Cases](/articles/deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+One more piece of engineering deserves attention because it connects this article to retrieval, RAG, and vector databases.
+
+BERT-style encoders are not usable for semantic search directly. As Reimers and Gurevych explain, sentence-pair models "require that both sentences are fed into the network, which causes a massive computational overhead: Finding the most similar pair in a collection of 10,000 sentences requires about 50 million inference computations (~65 hours) with BERT". The construction of BERT "makes it unsuitable for semantic similarity search as well as for unsupervised tasks like clustering".
+
+Their fix is architectural. Sentence-BERT uses "siamese and triplet network structures to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity", which "reduces the effort for finding the most similar pair from 65 hours with BERT / RoBERTa to about 5 seconds with SBERT, while maintaining the accuracy from BERT".
+
+That is a 47,000-fold reduction in compute for the same answer, and it is what makes the modern retrieval stack possible at all. Note what it costs: each sentence must be embedded independently, so the embedding can no longer depend on the query it will be compared with. The architecture trades expressiveness for throughput, and that trade is the right one when you are searching ten million candidates.
+
+## The layer you did not expect: the label
+
+The final step is what made the whole thing usable. GPT-3 is described as "an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model", and its central finding is about labels: scaling "greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches". The contrast drawn in the abstract is that fine-tuning "still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples", whereas "humans can generally perform a new language task from only a few examples or from simple instructions".
+
+That is the transition from a research model to a tool: a task becomes a prompt rather than a labelled dataset.
+
+## How to check a stack you did not build
+
+1. **What is the vocabulary, and how were out-of-vocabulary words handled?** If the answer is "there are none", the system will fail on names, identifiers, and morphology it was not shown.
+2. **Are the embeddings contextual or static?** If static, the system cannot distinguish senses, and no amount of prompt engineering will fix it.
+3. **Is the encoder bi-encoder or cross-encoder?** A cross-encoder gives better ranking and cannot serve retrieval at scale; a bi-encoder gives worse ranking and can. This is the single most consequential architectural choice in a retrieval system.
+4. **How many labels does a new task need?** If the answer is thousands, the pipeline is not leveraging pretraining the way it could.
+5. **Was the baseline tuned as carefully as the new model?** The RoBERTa replication result makes this a mandatory question, not a courtesy.
+
+For what this stack can and cannot do, see [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do); for the retrieval layer it enables, see [Vector Databases: Embeddings, ANN Search, and RAG Applications](/articles/vector-databases-embeddings-ann-search-and-rag-applications).
 
 ## Further Reading
 
