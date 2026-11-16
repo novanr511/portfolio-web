@@ -1,0 +1,72 @@
+---
+title: "Feature Engineering: Turning Raw Data into Predictive Signals"
+description: "Feature engineering transforms raw data into meaningful inputs for models. Learn techniques for tabular, text, time series, and categorical data."
+date: 2026-11-16
+tags:
+  - Feature Engineering
+  - Machine Learning
+  - Data Preprocessing
+  - Data Science
+---
+
+Models are only as good as their features.
+
+**Direct answer:** Feature engineering is the process of transforming raw data into meaningful input representations that improve model performance. It bridges domain knowledge and algorithmic requirements. Good features often matter more than model choice; a simple model with great features beats a complex model with poor features.
+
+## Types of features
+
+**Numerical:** scaling (standardization, min-max, robust), binning, log/power transforms for skewed distributions, interaction terms (multiplication, division, ratios).
+
+**Categorical:** one-hot encoding (low cardinality), target encoding / mean encoding (high cardinality), frequency encoding, hashing trick, embedding layers (for neural nets).
+
+**Datetime:** extract components (hour, day, month, quarter, weekday, is_weekend), cyclical encoding (sin/cos for hour/month), time since last event, rolling window statistics.
+
+**Text:** TF-IDF, n-grams, word/character n-grams, count vectorizer, sentence embeddings (BERT, SentenceTransformers), topic modeling (LDA).
+
+**Images:** raw pixels, pretrained embeddings (ResNet, EfficientNet, CLIP), handcrafted features (HOG, SIFT - legacy).
+
+**Graph/relational:** node degree, PageRank, community membership, path lengths, neighborhood aggregation.
+
+## Techniques by data type
+
+**Tabular:**
+- Handle missing: impute (median, mode, KNN, iterative) or indicator columns.
+- Outliers: winsorize, clip, or model robustly (tree-based).
+- Target encoding with smoothing for high-cardinality categoricals.
+- Feature interactions: polynomial features, domain-specific ratios.
+
+**Time series:**
+- Lag features (t-1, t-7, t-30).
+- Rolling statistics (mean, std, min, max over windows).
+- Expanding window features.
+- Seasonal decomposition residuals.
+
+**Text:**
+- Preprocessing: lowercasing, stopword removal, lemmatization.
+- TF-IDF with n-gram range (1,2) or (1,3).
+- Subword tokenization for transformer models.
+- Domain-specific dictionaries for specialized vocabulary.
+
+## Feature selection and dimensionality reduction
+
+- **Filter methods:** correlation with target, mutual information, chi-squared, ANOVA F-value.
+- **Wrapper methods:** recursive feature elimination (RFE), forward/backward selection.
+- **Embedded methods:** tree-based feature importance, L1 regularization (Lasso), gradient boosting importance.
+- **Dimensionality reduction:** PCA, Truncated SVD, UMAP, t-SNE (for visualization).
+
+## Common pitfalls
+
+- **Data leakage:** using future information (target leakage, feature leakage from future timestamps).
+- **Over-engineering:** creating thousands of features without validation; increases overfitting risk.
+- **Ignoring domain knowledge:** purely automated features miss domain-specific signals.
+- **Inconsistent train/serve:** feature computation must match exactly at inference.
+
+## Automation
+
+Tools like Featuretools (automated feature engineering for relational data), tsfresh (time series), and Feature-engine automate repetitive steps. But domain-informed features usually outperform purely automated ones.
+
+For the related question of MLOps pipelines, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+
+## References & Further Reading
+
+This article synthesizes standard feature engineering practices and does not cite a specific library, dataset, or paper by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult Feature-engine, Featuretools, tsfresh documentation, and literature on feature engineering and applied machine learning.

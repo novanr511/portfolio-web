@@ -1,0 +1,75 @@
+---
+title: "Model Monitoring: Detecting Drift, Bias, and Performance Degradation"
+description: "Models decay in production. Learn how to monitor data drift, concept drift, bias, and performance to keep ML systems reliable."
+date: 2026-11-16
+tags:
+  - MLOps
+  - Model Monitoring
+  - Data Drift
+  - Concept Drift
+  - ML Reliability
+---
+
+A model deployed is a model decaying.
+
+**Direct answer:** Model monitoring tracks whether a deployed ML system continues to perform as expected. It detects data drift (input distribution shift), concept drift (relationship between features and target changes), prediction drift (output distribution shift), bias/fairness violations, and infrastructure issues. Without monitoring, silent failures erode business value silently.
+
+## Types of drift
+
+**Data drift (covariate shift):** input feature distribution P(X) changes. Example: user demographics shift, sensor calibration drifts, new product categories appear. Detected via statistical tests (KS test, PSI, chi-square) on feature distributions.
+
+**Concept drift (prior probability shift):** P(Y|X) changes. The relationship between features and target evolves. Example: fraud patterns change, user preferences shift, economic conditions alter purchasing behavior. Detected via performance decay on labeled data or proxy metrics.
+
+**Label drift (prior probability shift):** P(Y) changes. Class distribution shifts. Example: fraud rate drops from 1% to 0.1%.
+
+**Prediction drift:** output distribution P(Ŷ) changes. Often an early warning signal. Monitor prediction histograms, mean prediction, class proportions.
+
+## Detection methods
+
+**Statistical tests:**
+- **PSI (Population Stability Index):** bins feature values, compares bin proportions between reference and current. PSI > 0.25 = significant drift.
+- **KS test / KS statistic:** compares cumulative distributions.
+- **Chi-square / Jensen-Shannon divergence:** for categorical features.
+- **Wasserstein distance / Earth Mover's Distance:** for continuous distributions.
+
+**ML-based detectors:** train a classifier to distinguish reference vs current data; AUC > 0.55 indicates drift.
+
+**Performance monitoring:** track ground-truth metrics (accuracy, F1, AUC) when labels available. For delayed labels, use proxy metrics (prediction confidence, feature drift as proxy).
+
+## Bias and fairness monitoring
+
+Track disparate impact across protected attributes (gender, race, age):
+
+- **Demographic parity:** equal positive rate across groups.
+- **Equal opportunity:** equal true positive rate.
+- **Equalized odds:** equal TPR and FPR.
+- **Calibration:** predicted probabilities match observed frequencies per group.
+
+Monitor these metrics per slice; alert on threshold breaches.
+
+## Infrastructure and operational monitoring
+
+- **Latency:** p50, p95, p99 inference latency.
+- **Error rates:** 5xx, timeouts, OOM, model exceptions.
+- **Throughput:** requests per second, queue depth.
+- **Resource utilization:** GPU/CPU memory, CPU utilization.
+
+## Monitoring architecture
+
+- **Logging:** structured logs for every prediction (features, prediction, latency, metadata).
+- **Aggregation:** periodic (hourly/daily) aggregation of drift metrics, performance metrics.
+- **Alerting:** threshold-based (PSI > 0.25, accuracy drop > 5%), anomaly detection on metric time series.
+- **Dashboards:** per-model, per-slice, per-environment.
+- **Retraining triggers:** automated or manual based on drift severity and performance decay.
+
+## When to retrain
+
+- **Scheduled:** weekly/monthly for high-velocity domains.
+- **Triggered:** drift threshold breached, performance below threshold.
+- **Continuous:** online learning (rare, complex).
+
+For the related question of MLOps pipelines, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
+
+## References & Further Reading
+
+This article synthesizes standard model monitoring concepts and does not cite a specific vendor, tool, or paper by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult Evidently AI, WhyLabs, Arize, Fiddler, Prometheus/Grafana, and literature on ML monitoring and drift detection.

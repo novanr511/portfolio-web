@@ -1,0 +1,57 @@
+---
+title: "NLP Fundamentals: Tokenization, Embeddings, and Transformers"
+description: "Natural language processing turns text into machine-readable representations. Learn tokenization strategies, embedding methods, and transformer architectures."
+date: 2026-11-16
+tags:
+  - NLP
+  - Natural Language Processing
+  - Transformers
+  - Embeddings
+---
+
+Text is unstructured. NLP makes it computable.
+
+**Direct answer:** NLP (Natural Language Processing) converts human language into structured representations that machines can process. The pipeline: tokenization breaks text into units, embeddings map tokens to dense vectors, and transformers model contextual relationships. Modern NLP is dominated by transformer architectures (BERT, GPT, T5) that capture bidirectional context and enable transfer learning.
+
+## Tokenization: from text to tokens
+
+**Word-level:** split on whitespace and punctuation. Large vocabulary, OOV (out-of-vocabulary) issues.
+
+**Subword:** Byte Pair Encoding (BPE), WordPiece, Unigram. Splits rare words into known subwords. Used by BERT (WordPiece), GPT (BPE), T5 (SentencePiece). Balances vocabulary size and OOV rate.
+
+**Character-level:** no OOV, but longer sequences, harder to learn long-range dependencies.
+
+**SentencePiece / BPE:** unsupervised segmentation, language-agnostic. Standard for multilingual models.
+
+## Embeddings: from tokens to vectors
+
+**Static embeddings:** Word2Vec, GloVe, FastText. Fixed vector per token. FastText handles OOV via subword n-grams. Context-independent (same vector for "bank" in "river bank" and "bank account").
+
+**Contextual embeddings:** ELMo, BERT, RoBERTa, GPT. Vector depends on surrounding context. "Bank" has different vectors in different sentences. Produced by transformer encoders/decoders.
+
+**Sentence embeddings:** Sentence-BERT, Universal Sentence Encoder. Fixed-size vector for entire sentence/paragraph. Used for semantic similarity, clustering, retrieval.
+
+## Transformer architecture
+
+**Attention mechanism:** scaled dot-product attention computes weighted sum of values based on query-key compatibility. Multi-head attention runs multiple attention heads in parallel.
+
+**Encoder-decoder:** encoder processes input sequence; decoder generates output autoregressively (translation, summarization).
+
+**Encoder-only (BERT-style):** bidirectional context. Pretrained with masked language modeling (MLM) and next sentence prediction. Fine-tuned for classification, NER, QA.
+
+**Decoder-only (GPT-style):** causal/unidirectional attention. Pretrained with next-token prediction. Generates text. Foundation for LLMs.
+
+**Encoder-decoder (T5, BART):** sequence-to-sequence. Pretrained with denoising objectives. Used for translation, summarization, question answering.
+
+## Practical considerations
+
+- **Pretraining vs fine-tuning:** massive corpora pretraining, then task-specific fine-tuning on labeled data.
+- **Tokenization alignment:** ensure tokenizer matches pretrained model.
+- **Sequence length limits:** BERT 512, GPT-3 2048, newer models 32k–128k+. Use sliding windows or hierarchical encoding for long docs.
+- **Efficiency:** distillation, quantization, LoRA, adapters, quantization-aware training for deployment.
+
+For the related question of deep learning basics, see [Deep Learning Basics: Neural Networks, Backpropagation, and Practical Use Cases](/articles/deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+
+## References & Further Reading
+
+This article synthesizes standard NLP concepts and does not cite a specific model, paper, or vendor by name. No specific model or framework is endorsed because no specific claim about one is made. For research on NLP and transformers, consult the Hugging Face Transformers documentation, "Attention Is All You Need" (Vaswani et al., 2017), and literature on NLP and deep learning.

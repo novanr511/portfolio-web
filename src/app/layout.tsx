@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -62,6 +63,10 @@ export const viewport: Viewport = {
  */
 const themeInitScript = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`;
 
+const gtmInitScript = `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -72,6 +77,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <Script id="gtm-init" strategy="afterInteractive">
+          {gtmInitScript}
+        </Script>
+        <Script
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-5C6D2KTN"
+          strategy="afterInteractive"
+        />
         {/* Keep scroll-reveal content visible when JS is unavailable */}
         <noscript>
           <style>{`.reveal{opacity:1;translate:0 0}`}</style>

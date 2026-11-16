@@ -1,0 +1,92 @@
+---
+title: "Data Pipelines: Airflow, Prefect, and Orchestrating ETL at Scale"
+description: "Data pipelines move and transform data reliably. Learn orchestration patterns, Airflow vs Prefect, and production-grade ETL patterns."
+date: 2026-11-16
+tags:
+  - Data Engineering
+  - Data Pipelines
+  - Airflow
+  - Prefect
+  - ETL
+---
+
+Data doesn't move itself. Pipelines do.
+
+**Direct answer:** Data pipelines orchestrate the extraction, transformation, and loading (ETL/ELT) of data from sources to destinations. Modern orchestration tools (Airflow, Prefect, Dagster) manage dependencies, retries, scheduling, and observability. Production pipelines require idempotency, idempotent writes, exactly-once semantics, backfill support, and observability.
+
+## Orchestration concepts
+
+**DAG (Directed Acyclic Graph):** tasks as nodes, dependencies as edges. No cycles. Execution follows topological order.
+
+**Operators / Tasks:** atomic units of work (Python function, SQL query, dbt model, Spark job, API call).
+
+**Dependencies:** upstream → downstream. Trigger rules (all_success, all_failed, one_success, all_done).
+
+**Scheduling:** cron-based, event-driven (dataset updates, API webhooks), manual trigger.
+
+**Backfill / catchup:** re-run historical intervals. Requires idempotent tasks.
+
+## Airflow vs Prefect vs Dagster
+
+| Feature | Airflow | Prefect | Dagster |
+|---|---|---|---|
+| Paradigm | DAG-centric, Python operators | Python-native, dynamic workflows | Asset-centric, software-defined assets |
+| Deployment | Heavyweight (Celery/K8s executor) | Lightweight (Prefect Cloud/server) | Hybrid (Dagster Cloud/Open Source) |
+| Dynamic workflows | Limited (SubDAG, TaskGroup) | Native (mapping, flow-of-flows) | Native (partitioned assets) |
+| UI/Monitoring | Mature, rich | Modern, clean | Asset lineage, catalog |
+| Testing | Unit test DAGs | pytest-native | Built-in asset checks |
+| Community | Largest, mature | Growing fast | Growing, strong typing |
+
+## ETL vs ELT
+
+**ETL (Extract → Transform → Load):** transform in-flight (Spark, Python), load clean data. Traditional, compute on pipeline side.
+
+**ELT (Extract → Load → Transform):** load raw to warehouse (Snowflake, BigQuery, Redshift), transform in SQL (dbt). Modern, leverages warehouse compute.
+
+**Hybrid:** EL for raw ingestion, T in warehouse (dbt), ML features in Python.
+
+## Production patterns
+
+**Idempotency:** re-running a task produces same result. Use upserts (MERGE), primary keys, deterministic transforms.
+
+**Exactly-once / at-least-once:** transactional sinks, idempotent writes, deduplication keys.
+
+**Partitioning:** by date, tenant, region. Enables partition-level backfill and pruning.
+
+**Incremental processing:** process only new/changed data (watermarks, CDC, incremental dbt models).
+
+**Data quality checks:** schema validation, row counts, null checks, distribution checks (Great Expectations, dbt tests, Soda).
+
+**Observability:** task duration, success/failure, row counts, data freshness (data lineage).
+
+## Airflow vs Prefect code comparison
+
+**Airflow (DAG):**
+```python
+with DAG('etl_daily', schedule='@daily') as dag:
+    extract = PythonOperator(task_id='extract', python_callable=extract_fn)
+    transform = PythonOperator(task_id='transform', python_callable=transform_fn)
+    load = PythonOperator(task_id='load', python_callable=load_fn)
+    extract >> transform >> load
+```
+
+**Prefect (Flow):**
+```python
+@flow
+def etl_daily():
+    data = extract()
+    transformed = transform(data)
+    load(transformed)
+```
+
+## Choosing an orchestrator
+
+- **Airflow:** mature, large community, heavy infra, good for static DAGs.
+- **Prefect:** Pythonic, dynamic, lightweight, great for modern stacks.
+- **Dagster:** asset-centric, strong typing, great for data mesh / platform teams.
+
+For the related question of feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+
+## References & Further Reading
+
+This article synthesizes standard data engineering concepts and does not cite a specific vendor, tool, or version by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult Airflow, Prefect, Dagster, dbt documentation, and literature on data engineering and pipeline orchestration.

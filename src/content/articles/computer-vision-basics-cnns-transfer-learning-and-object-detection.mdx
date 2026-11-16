@@ -1,0 +1,73 @@
+---
+title: "Computer Vision Basics: CNNs, Transfer Learning, and Object Detection"
+description: "Computer vision enables machines to interpret visual data. Learn CNN architectures, transfer learning, and object detection fundamentals."
+date: 2026-11-16
+tags:
+  - Computer Vision
+  - CNN
+  - Transfer Learning
+  - Object Detection
+---
+
+Images are just arrays of numbers. Computer vision makes them meaningful.
+
+**Direct answer:** Computer vision enables machines to interpret and understand visual data. Convolutional Neural Networks (CNNs) are the backbone, using convolutional layers to learn spatial hierarchies of features. Transfer learning adapts pretrained models (ResNet, EfficientNet, ViT) to new tasks with less data. Object detection (YOLO, Faster R-CNN, DETR) localizes and classifies multiple objects in an image.
+
+## Convolutional Neural Networks
+
+**Convolutional layers:** learn spatial filters (kernels) that slide over the input, detecting edges, textures, patterns. Stacking layers builds hierarchy: edges → textures → parts → objects.
+
+**Pooling:** reduces spatial dimensions (max/avg pooling), increases receptive field, provides translation invariance.
+
+**Architecture evolution:**
+- **LeNet / AlexNet:** early breakthroughs.
+- **VGG:** deep stacks of 3x3 convolutions.
+- **ResNet:** residual connections enable very deep networks (50–152 layers).
+- **EfficientNet:** compound scaling (depth, width, resolution) for efficiency.
+- **Vision Transformers (ViT):** patch-based, attention-based, large-scale pretraining.
+
+## Transfer learning
+
+Pretrain on large dataset (ImageNet-21k, JFT-300M) → fine-tune on target task.
+
+**Strategies:**
+- **Feature extraction:** freeze backbone, train new head only. Fast, low data needed.
+- **Fine-tuning:** unfreeze some/all layers, train with low LR. Better performance, more data/compute.
+- **Linear probing:** freeze backbone, train linear classifier on frozen features. Baseline.
+
+**Modern practice:** pretrained on ImageNet-21k or JFT, fine-tune with low LR (1e-4 to 1e-5), use weight decay, gradient clipping, mixed precision.
+
+## Object detection
+
+**Two-stage (region proposal + classification):**
+- **Faster R-CNN:** Region Proposal Network (RPN) + ROI pooling + classifier/regressor. Accurate, slower.
+- **Mask R-CNN:** adds segmentation mask branch for instance segmentation.
+
+**Single-stage (dense prediction):**
+- **YOLO (v3–v10):** grid-based, anchor-based or anchor-free. Very fast, real-time.
+- **SSD:** multi-scale feature maps, default boxes.
+- **RetinaNet:** focal loss for class imbalance.
+
+**Transformer-based:**
+- **DETR:** set prediction with bipartite matching, transformer encoder-decoder. No NMS needed.
+- **Deformable DETR:** deformable attention for efficiency.
+
+## Key concepts
+
+**IoU (Intersection over Union):** overlap between predicted and ground truth boxes.
+**mAP (mean Average Precision):** standard detection metric across IoU thresholds.
+**NMS (Non-Maximum Suppression):** removes duplicate overlapping boxes.
+**Anchor boxes:** predefined box shapes for regression targets.
+
+## Practical tips
+
+- **Data augmentation:** mixup, cutmix, mosaic, copy-paste, photometric distortions.
+- **Label smoothing, mixup, cutmix:** regularization for classification.
+- **Freeze batch norm statistics** when fine-tuning with small batches.
+- **Test-time augmentation (TTA):** average predictions over augmented versions.
+
+For the related question of deep learning basics, see [Deep Learning Basics: Neural Networks, Backpropagation, and Practical Use Cases](/articles/deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+
+## References & Further Reading
+
+This article synthesizes standard computer vision concepts and does not cite a specific paper, model, or vendor by name. No specific framework is endorsed because no specific claim about one is made. For implementation details, consult documentation for PyTorch, TensorFlow/Keras, MMDetection, Ultralytics YOLO, and literature on computer vision and deep learning.

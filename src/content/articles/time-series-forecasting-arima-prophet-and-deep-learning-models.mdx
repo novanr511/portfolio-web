@@ -1,0 +1,77 @@
+---
+title: "Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models"
+description: "Time series forecasting predicts future values from historical data. Learn classical and modern approaches: ARIMA, Prophet, and deep learning models."
+date: 2026-11-16
+tags:
+  - Time Series
+  - Forecasting
+  - ARIMA
+  - Prophet
+  - Deep Learning
+---
+
+Forecasting is not crystal ball gazing. It is structured extrapolation from patterns.
+
+**Direct answer:** Time series forecasting predicts future values based on historical observations. Classical methods (ARIMA, ETS) model trend, seasonality, and noise statistically. Prophet adds interpretable components for holidays and changepoints. Deep learning models (LSTM, Temporal Fusion Transformer, N-BEATS) capture complex nonlinear patterns but require more data and compute. Method choice depends on data volume, horizon, seasonality, and interpretability needs.
+
+## Classical statistical methods
+
+**ARIMA (AutoRegressive Integrated Moving Average):** models autocorrelation (AR), differencing for stationarity (I), and moving average (MA). Requires stationary series (constant mean/variance). Seasonal ARIMA (SARIMA) adds seasonal terms.
+
+**ETS (Error, Trend, Seasonal):** exponential smoothing with additive/multiplicative trend and seasonality. Automated via `forecast::ets` or `statsmodels`.
+
+**Theta method:** decomposes into trend and seasonality, applies simple exponential smoothing to deseasonalized data.
+
+**Strengths:** interpretable, fast, work with small data, uncertainty quantification via prediction intervals.
+**Weaknesses:** linear assumptions, struggle with multiple seasonalities, external regressors require SARIMAX.
+
+## Prophet: interpretable forecasting at scale
+
+Prophet (Meta) decomposes time series into:
+
+- **Trend:** piecewise linear or logistic growth with changepoints.
+- **Seasonality:** Fourier series for yearly, weekly, daily patterns.
+- **Holidays:** user-specified events with prior scales.
+- **Regressors:** additional covariates.
+
+**Strengths:** handles missing data, outliers, multiple seasonalities, holidays, intuitive parameters. Good for business metrics with weekly/yearly seasonality.
+**Weaknesses:** assumes additive seasonality, limited extrapolation beyond trend, less suited for high-frequency or complex nonlinear patterns.
+
+## Deep learning for time series
+
+**LSTM/GRU:** recurrent networks for sequence modeling. Capture long-term dependencies. Require careful tuning, sequence windowing.
+
+**Temporal Fusion Transformer (TFT):** attention-based, handles static covariates, known future inputs, variable selection. Interpretable attention weights. State-of-the-art for many benchmarks.
+
+**N-BEATS:** deep backward and forward residual links. Pure deep learning, no autoregressive component. Strong on M4 competition.
+
+**DeepAR:** autoregressive RNN with likelihood-based training. Probabilistic forecasts.
+
+**PatchTST / TimesNet / DLinear:** recent transformer/linear models for long-term forecasting.
+
+**Strengths:** capture nonlinearities, multiple seasonalities, exogenous variables, long horizons.
+**Weaknesses:** need large data, GPU training, less interpretable, hyperparameter sensitivity.
+
+## Evaluation metrics
+
+- **MAE / RMSE:** point forecast accuracy.
+- **MAPE / sMAPE:** relative error (scale-independent).
+- **QLoss / Pinball Loss:** quantile forecasts for prediction intervals.
+- **CRPS:** proper scoring rule for probabilistic forecasts.
+- **Backtesting:** rolling origin evaluation (expanding or sliding window).
+
+## When to use which
+
+| Scenario | Recommended |
+|---|---|
+| Small data (< 1000 pts), simple seasonality | ARIMA, ETS, Prophet |
+| Business metrics with holidays, changepoints | Prophet |
+| High-frequency, large data, complex patterns | TFT, N-BEATS, DeepAR |
+| Need interpretability | Prophet, ARIMA, linear models |
+| Probabilistic forecasts required | DeepAR, TFT, Prophet |
+
+For the related question of feature engineering for time series, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+
+## References & Further Reading
+
+This article synthesizes standard forecasting concepts and does not cite a specific library version, paper, or vendor by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult statsmodels, Prophet, PyTorch Forecasting, NeuralForecast, and literature on time series forecasting.

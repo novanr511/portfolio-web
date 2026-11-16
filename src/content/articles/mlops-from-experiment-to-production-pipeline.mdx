@@ -1,0 +1,64 @@
+---
+title: "MLOps: From Experiment to Production Pipeline"
+description: "MLOps bridges the gap between ML experimentation and production deployment. Learn the key components: versioning, CI/CD, monitoring, and automation."
+date: 2026-11-16
+tags:
+  - MLOps
+  - Machine Learning Engineering
+  - ML Pipeline
+  - Production ML
+---
+
+A model in a notebook is not a product. MLOps makes it one.
+
+**Direct answer:** MLOps (Machine Learning Operations) is the practice of applying DevOps principles to machine learning workflows. It covers the end-to-end lifecycle: data versioning, model training, validation, deployment, monitoring, and retraining. Without MLOps, models stall in notebooks; with MLOps, they become reliable, scalable products.
+
+## The MLOps lifecycle
+
+MLOps extends the traditional ML workflow with operational rigor:
+
+1. **Data versioning:** track datasets alongside code (DVC, Delta Lake).
+2. **Experiment tracking:** log parameters, metrics, artifacts (MLflow, Weights & Biases).
+3. **Model registry:** version models, promote from staging to production (MLflow Model Registry, Vertex AI).
+4. **CI/CD for ML:** automated testing, building Docker images, deploying to staging/production (GitHub Actions, GitLab CI, Kubeflow).
+5. **Deployment:** batch, real-time API, edge, or streaming inference.
+6. **Monitoring:** track data drift, concept drift, latency, error rates.
+7. **Retraining:** automated or scheduled retraining triggers.
+
+## Key components
+
+**Version control for data and models:** Code is in Git; data and models need their own versioning. Tools like DVC, Delta Lake, or LakeFS track data lineage alongside Git commits.
+
+**Experiment tracking:** Every run logs parameters, metrics, and artifacts. MLflow, Weights & Biases, and ClearML provide UI and APIs to compare runs.
+
+**Model registry:** A centralized store for model versions with stages (staging, production, archived). Supports rollback and audit trails.
+
+**Continuous integration/continuous deployment:** Automate linting, unit tests, integration tests, Docker build, and deployment to Kubernetes, Vertex AI, SageMaker, or serverless endpoints.
+
+**Feature stores:** Centralize feature definitions and computation (Feast, Tecton, Hopsworks). Ensures training/serving consistency.
+
+**Monitoring and alerting:** Track prediction latency, error rates, data drift (input distribution shift), concept drift (label distribution shift), and model performance decay.
+
+## CI/CD for ML vs traditional CI/CD
+
+| Aspect | Traditional CI/CD | ML CI/CD |
+|---|---|---|
+| Artifact | Binary / Docker image | Model + Docker image + data schema |
+| Tests | Unit, integration, contract | Unit + data validation + model quality gates |
+| Deployment | Promote binary | Promote model version + retrain pipeline |
+| Rollback | Redeploy previous binary | Rollback model version + feature store version |
+
+## When to invest in MLOps
+
+- **Multiple models in production** or planned.
+- **Team size > 2 ML engineers** or cross-functional team.
+- **Regulatory requirements** for audit trails and reproducibility.
+- **Frequent retraining** needed (weekly/daily).
+
+Start small: version data, track experiments, containerize inference. Add CI/CD and monitoring as the system matures.
+
+For the related question of model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) and feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
+
+## References & Further Reading
+
+This article synthesizes standard MLOps practices and does not cite a specific vendor, tool, or platform by name as evidence. No specific tool is endorsed because no specific claim about one is made. For implementation patterns, consult the MLOps Community, Google's ML Pipeline Best Practices, and AWS/Azure/GCP ML documentation.

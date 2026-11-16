@@ -1,0 +1,89 @@
+---
+title: "Model Explainability: SHAP, LIME, and Interpreting Black Boxes"
+description: "Model explainability reveals why models predict. Learn SHAP, LIME, feature importance, and when to use each method."
+date: 2026-11-16
+tags:
+  - Explainable AI
+  - SHAP
+  - LIME
+  - Model Interpretability
+  - Responsible AI
+---
+
+A model that cannot explain itself is a risk.
+
+**Direct answer:** Model explainability (XAI) provides human-understandable reasons for model predictions. Global methods explain overall model behavior; local methods explain individual predictions. SHAP (SHapley Additive exPlanations) provides theoretically grounded, consistent attributions. LIME (Local Interpretable Model-agnostic Explanations) approximates local behavior with interpretable surrogates. Choose based on model type, audience, and regulatory requirements.
+
+## Global vs local interpretability
+
+**Global:** how does the model behave overall? Feature importance, partial dependence plots (PDP), accumulated local effects (ALE), permutation importance.
+
+**Local:** why this prediction for this instance? SHAP, LIME, counterfactuals, anchors.
+
+**Cohort:** behavior on subgroups. Slice-based analysis.
+
+## SHAP: Shapley Additive exPlanations
+
+SHAP values are based on Shapley values from game theory: fairly distribute the "payout" (prediction minus baseline) among features.
+
+**Properties:** local accuracy (sum of SHAP = prediction - baseline), missingness (missing features get 0), consistency (if feature contribution increases, SHAP increases).
+
+**Variants:**
+- **TreeSHAP:** exact, fast for tree models (XGBoost, LightGBM, CatBoost, sklearn).
+- **KernelSHAP:** model-agnostic, samples coalitions, slower.
+- **DeepSHAP:** combines DeepLIFT with Shapley for deep learning.
+- **LinearSHAP:** exact for linear models.
+
+**Outputs:** feature importance (mean |SHAP|), summary plots (beeswarm, bar), dependence plots, force plots (local), waterfall plots.
+
+## LIME: Local Interpretable Model-agnostic Explanations
+
+LIME approximates model behavior locally with an interpretable model (linear model, decision tree).
+
+**Process:**
+1. Perturb input around instance (sample nearby points).
+2. Get model predictions for perturbed samples.
+3. Weight samples by proximity to original instance.
+4. Fit weighted interpretable model (sparse linear model).
+5. Coefficients = local feature importance.
+
+**Strengths:** model-agnostic, works on text/images/tabular, fast for single explanations.
+**Weaknesses:** unstable (sampling variance), linear approximation may not capture nonlinear local behavior, hyperparameter sensitive (kernel width, samples).
+
+## Other methods
+
+**Permutation importance:** shuffle feature, measure performance drop. Global, model-agnostic.
+
+**Partial Dependence Plot (PDP):** average prediction as feature varies. Shows marginal effect.
+
+**Accumulated Local Effects (ALE):** unbiased PDP for correlated features.
+
+**Counterfactuals:** "what minimal change flips the prediction?" Actionable for users.
+
+**Anchors:** high-precision rules that locally anchor prediction.
+
+**Integrated Gradients / DeepLIFT / Grad-CAM:** gradient-based attribution for deep learning.
+
+## Choosing a method
+
+| Need | Recommended |
+|---|---|
+| Tree models, global + local | TreeSHAP |
+| Any model, quick local | LIME |
+| Deep learning | Integrated Gradients, DeepSHAP, Grad-CAM |
+| Global feature importance | Permutation importance, SHAP summary |
+| Regulatory / audit | SHAP (theoretical guarantees) |
+| Actionable user explanations | Counterfactuals, Anchors |
+
+## Common pitfalls
+
+- **Correlation vs causation:** high SHAP ≠ causal.
+- **Correlated features:** SHAP splits importance; use ALE or grouped SHAP.
+- **Baseline choice:** SHAP depends on reference value (mean, median, or specific instance).
+- **Over-reliance on local explanations:** local fidelity ≠ global truth.
+
+For the related question of model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+
+## References & Further Reading
+
+This article synthesizes standard explainable AI concepts and does not cite a specific paper, library, or benchmark by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult SHAP, LIME, InterpretML, Alibi, Captum documentation, and literature on explainable AI and responsible ML.

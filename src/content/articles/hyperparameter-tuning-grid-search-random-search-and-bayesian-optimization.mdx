@@ -1,0 +1,66 @@
+---
+title: "Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization"
+description: "Hyperparameter tuning finds the best model configuration. Learn grid search, random search, Bayesian optimization, and when to use each."
+date: 2026-11-16
+tags:
+  - Hyperparameter Tuning
+  - Machine Learning
+  - Optimization
+  - ML Engineering
+---
+
+Default hyperparameters rarely win competitions. Tuning finds the edge.
+
+**Direct answer:** Hyperparameter tuning searches the configuration space of a model to maximize a validation metric. Grid search exhaustively evaluates a predefined grid; random search samples randomly; Bayesian optimization builds a probabilistic surrogate model to guide search. The choice depends on search space dimensionality, budget, and whether evaluations are expensive.
+
+## Hyperparameters vs parameters
+
+**Parameters:** learned from data (weights, biases, coefficients). Estimated during training.
+
+**Hyperparameters:** set before training, control the learning process. Examples:
+- **Tree-based:** n_estimators, max_depth, min_samples_split, learning_rate.
+- **Neural networks:** learning_rate, batch_size, hidden_layers, dropout, weight_decay.
+- **SVM:** C, kernel, gamma.
+- **KNN:** n_neighbors, distance_metric.
+
+## Search strategies
+
+**Grid search:** exhaustively evaluates all combinations in a predefined grid. Guarantees finding the best in the grid, but grows exponentially with dimensions (curse of dimensionality). Use when space is small (≤ 3–4 dimensions, few values each).
+
+**Random search:** samples random combinations from defined distributions. More efficient than grid for high-dimensional spaces; can find good regions faster. Proven to outperform grid for same budget when only few hyperparameters matter.
+
+**Bayesian optimization:** builds a probabilistic surrogate model (Gaussian Process, Tree-structured Parzen Estimator/TPE, Random Forest) of the objective function. Uses acquisition function (Expected Improvement, Upper Confidence Bound) to balance exploration vs exploitation. Efficient for expensive evaluations (e.g., deep learning training). Tools: Optuna, Hyperopt, Scikit-Optimize, Ax, Ray Tune.
+
+**Evolutionary / genetic algorithms:** population-based, mutation/crossover. Useful for complex, non-differentiable spaces.
+
+**Hyperband / ASHA (Asynchronous Successive Halving):** multi-fidelity: run many configs with small budget, promote promising ones. Early stopping for unpromising configs. Used in Ray Tune, Optuna.
+
+## Practical workflow
+
+1. **Define search space:** distributions for each hyperparameter (log-uniform for LR, categorical for optimizer, int for depth).
+2. **Choose budget:** total trials or time budget.
+3. **Choose strategy:** random for quick exploration, Bayesian for expensive models, Hyperband for many cheap trials.
+4. **Cross-validation:** use stratified k-fold or time-series split for reliable estimates.
+5. **Early stopping:** integrate with training (pruning in Optuna, Hyperband).
+6. **Final training:** retrain best config on full train+val data.
+
+## Common pitfalls
+
+- **Data leakage in CV:** using test data in CV folds or feature engineering before split.
+- **Overfitting to validation set:** too many trials on same validation set; use nested CV or holdout test set.
+- **Ignoring compute budget:** Bayesian optimization overhead may not pay off for cheap models.
+- **Ignoring interactions:** some hyperparameters interact (LR × batch size); joint search needed.
+
+## Tools
+
+- **Optuna:** TPE, CMA-ES, Hyperband, pruning, distributed.
+- **Hyperopt:** TPE, parallelizable via MongoDB.
+- **Ray Tune:** distributed, Hyperband/ASHA, integrates with PyTorch/TensorFlow.
+- **Optuna + MLflow / Weights & Biases:** tracking + optimization.
+- **Scikit-Optimize:** GP-based, simple API.
+
+For the related question of MLOps pipelines, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
+
+## References & Further Reading
+
+This article synthesizes standard hyperparameter optimization concepts and does not cite a specific library version, paper, or benchmark by name. No specific tool is endorsed because no specific claim about one is made. For implementation details, consult Optuna, Hyperopt, Ray Tune, Scikit-Optimize documentation, and literature on hyperparameter optimization and AutoML.
