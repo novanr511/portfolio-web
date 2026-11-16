@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
@@ -52,39 +53,59 @@ export default function AboutPage() {
         </Reveal>
 
         <Reveal delay={80}>
-          <div className="mt-8 max-w-2xl space-y-5 text-[16px] leading-relaxed text-muted">
-            <p>
-              I&apos;m {site.author.name}, based in {site.location}. I&apos;ve
-              been building for the web since 2020 — starting as a freelance
-              WordPress developer, then working with studios, law firms, and
-              startups, alongside technical support and SEO roles at
-              Niagahoster and the Ministry of Health of Indonesia.
-            </p>
-            <p>
-              That SEO work quietly changed how I think: rankings are just
-              measurement, content, and engineering discipline compounded over
-              time. At some point the most interesting part of the job stopped
-              being the framework and started being the data — so I made the
-              transition deliberate. I&apos;m now learning data science and
-              applied AI in public, building retrieval-augmented systems,
-              training classical ML models, and writing about everything that
-              breaks along the way.{" "}
-              <Link
-                href="/articles"
-                transitionTypes={["nav-forward"]}
-                className="font-medium text-accent hover:underline"
-              >
-                The articles
-              </Link>{" "}
-              are that learning process, distilled.
-            </p>
-            <p>
-              My conviction is that the best AI engineers come from exactly
-              this path: people who have shipped production web software, who
-              understand how search and measurement actually work, and who now
-              aim that discipline at a stack that badly needs it. Lifelong
-              learning is the whole method — the rest is just repertoire.
-            </p>
+          <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_290px] lg:items-start lg:gap-14">
+            <div className="order-last max-w-2xl space-y-5 text-[16px] leading-relaxed text-muted lg:order-first">
+              <p>
+                I&apos;m {site.author.name}, based in {site.location}.
+                I&apos;ve been building for the web since 2020 — starting as a
+                freelance WordPress developer, then working with studios, law
+                firms, and startups, alongside technical support and SEO roles
+                at Niagahoster and the Ministry of Health of Indonesia.
+              </p>
+              <p>
+                That SEO work quietly changed how I think: rankings are just
+                measurement, content, and engineering discipline compounded
+                over time. At some point the most interesting part of the job
+                stopped being the framework and started being the data — so I
+                made the transition deliberate. I&apos;m now learning data
+                science and applied AI in public, building retrieval-augmented
+                systems, training classical ML models, and writing about
+                everything that breaks along the way.{" "}
+                <Link
+                  href="/articles"
+                  transitionTypes={["nav-forward"]}
+                  className="font-medium text-accent hover:underline"
+                >
+                  The articles
+                </Link>{" "}
+                are that learning process, distilled.
+              </p>
+              <p>
+                My conviction is that the best AI engineers come from exactly
+                this path: people who have shipped production web software, who
+                understand how search and measurement actually work, and who
+                now aim that discipline at a stack that badly needs it.
+                Lifelong learning is the whole method — the rest is just
+                repertoire.
+              </p>
+            </div>
+
+            <div className="order-first lg:order-last">
+              <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+                <Image
+                  src="/novandri-portrait.jpg"
+                  alt={`Portrait of ${site.author.name}`}
+                  width={374}
+                  height={472}
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 290px"
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+              <p className="mt-3 text-[12px] text-muted">
+                {site.author.name} — {site.location}
+              </p>
+            </div>
           </div>
         </Reveal>
 
