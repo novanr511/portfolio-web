@@ -1,98 +1,98 @@
 ---
 title: "Technical Writing: Documentation, API Docs, and Developer Experience"
-description: "Technical writing enables users and developers. Learn documentation types, API documentation, developer experience, and building a docs-as-code pipeline."
+description: "Documentation is part of the product, not a description of it. Read the audience-first method, a README worked example, and why docs go stale."
 date: 2026-11-16
 tags:
   - Technical Writing
   - Documentation
-  - API Documentation
   - Developer Experience
-  - Docs as Code
+  - API Design
 ---
 
-Good documentation is the difference between adoption and abandonment.
+Developers often treat documentation as the thing they write after the code is finished. Users experience it as the thing that determines whether the code is usable. A technically excellent library with unclear documentation has a higher real cost than a mediocre one with a good guide, because the user pays the difference in time and confusion.
 
-**Direct answer:** Technical writing creates documentation that helps users and developers understand, adopt, and troubleshoot products. Types: conceptual (guides, tutorials), reference (API, CLI), task-based (how-to), troubleshooting. Docs-as-code treats documentation like software: version control, CI/CD, review, testing, automation. Developer Experience (DX) measures how easily developers succeed with your product.
+**Direct answer:** Technical writing is the practice of helping a specific reader complete a specific task with the minimum of avoidable friction. The Write the Docs guide is explicitly "a living, breathing guide" that "gathers the collective wisdom" of the documentation community, and GitHub's README documentation defines what a repository README should convey. The boundary: documentation cannot compensate for a broken product, and it decays unless someone owns its upkeep.
 
-## Documentation types
+## Start with the reader's task
 
-**Getting started / Quickstart:** 5-min path to first success. Prerequisites, install, hello world, next steps.
+Four questions produce a useful document:
 
-**Guides / Tutorials:** task-oriented, step-by-step, learning goal. "How to build X."
+1. **Who is reading?** A newcomer, a returning user, and a contributor need different documents.
+2. **What are they trying to do?** "Understand the system" is not a task; "make the first API call successfully" is.
+3. **What do they already know?** Explaining HTTP to an experienced backend developer wastes their time; failing to explain it to a newcomer blocks them.
+4. **How will they know they succeeded?** A doc that ends without a verifiable outcome leaves the reader unsure.
 
-**Conceptual / Explanatory:** why, not how. Architecture, concepts, design decisions, trade-offs.
+The Write the Docs guide organises its material around exactly this kind of practical division — getting started, approaches, markup, tools, and API documentation. Its framing as a "living" guide is itself a lesson: documentation is maintained, not delivered.
 
-**Reference / API docs:** exhaustive, machine-readable (OpenAPI/Swagger), auto-generated from code. Endpoints, parameters, responses, errors, examples.
+## The layers of a documentation set
 
-**How-to / Task-based:** solve specific problem. "How to configure X." Prerequisites, steps, verification, troubleshooting.
+A complete set usually has four layers, each with a distinct job:
 
-**Troubleshooting / FAQ:** symptoms, causes, solutions. Searchable, structured.
+**The README** answers "what is this and how do I start?" GitHub's documentation describes the README as the file that introduces a repository, which is why it is the first thing a visitor sees.
 
-**Changelog / Release notes:** version, date, added/changed/deprecated/removed/fixed/security. Keep a changelog.
+**The quickstart** gets a user to one successful result with the shortest possible path. It should not explain every option; it should produce a working outcome.
 
-## API documentation
+**The reference** documents the full surface — endpoints, parameters, return values, errors. It is searched, not read linearly, so precision and consistency matter more than narrative flow.
 
-**OpenAPI / Swagger:** machine-readable contract. Generate client SDKs, server stubs, docs.
+**The explanation** covers concepts, trade-offs, and why the system is designed as it is. This is the layer most often missing, and the one that lets a user solve a problem the docs did not anticipate.
 
-**Interactive docs:** Swagger UI, Redoc, Scalar, Stoplight. Try-it-out, auth, examples.
+Conflating these layers produces the familiar document that begins with a history of the project, continues through a configuration reference, and never tells the reader how to make the first call.
 
-**Essential elements:**
-- Authentication (API key, OAuth, JWT).
-- Base URL, versioning.
-- Endpoints: method, path, params, request/response schemas, examples.
-- Error codes: codes, messages, remediation.
-- Rate limits, pagination, versioning.
-- SDKs: install, quickstart, common operations.
+## A worked example of a README
 
-**Tools:** Stoplight, Redocly, Scalar, Mintlify, ReadMe, Postman, SwaggerHub, Redoc.
+The following structure is illustrative, not a quoted template.
 
-## Docs-as-code
+Suppose a small Python library has a README with five sections. Test each against the reader's first five minutes:
 
-**Workflow:** write in Markdown/MDX → Git → CI (lint, link check, spell check, build) → preview deploy → merge → production deploy.
+1. **One-sentence description** — names the problem and the audience. A visitor should know in five seconds whether to keep reading.
+2. **Install command** — copy-pasteable, with the supported Python version stated. An unpinned or unversioned instruction fails on a different environment.
+3. **Ten-line example** — produces a visible result. If the example needs credentials, a test account or a clearly labelled mock must be provided.
+4. **Links** — to the quickstart, reference, and explanation, so the reader can choose the next step.
+5. **Constraints** — known limitations and the licence. Hiding a limitation in a later page costs the reader trust when they discover it after integrating.
 
-**Tools:** MkDocs, Docusaurus, VitePress, Astro Starlight, Nextra, GitBook, Notion (export), Hugo, Jekyll.
+Now audit for friction:
 
-**CI checks:** markdownlint, vale (prose lint), linkcheck, spellcheck, broken anchor check, build verification.
+- If a new user must edit three files before the example runs, the example is not a quickstart.
+- If the install command works only on one operating system, the environment assumption must be stated.
+- If the README says "see the docs" without a path, the reader's task has been abandoned.
 
-**Versioning:** versioned docs (Git tags, branches). `latest` + versioned paths (`/v1/`, `/v2/`).
+The measure is time-to-first-success. A ten-line example that runs is worth more than three pages of architecture description, because it converts a reader into a user who now has a reason to learn more.
 
-**Localization:** i18n (Crowdin, Lokalise, Transifex). Separate repos or branches per locale.
+## Style is a tool for reducing effort
 
-## Developer Experience (DX)
+The Microsoft Writing Style Guide is referenced here as a mature example of an institutional style guide. Its value is not a set of arbitrary rules; it is the principle behind them — consistent terms, short sentences, and a clear distinction between tasks and concepts.
 
-**DX = UX for developers.** Friction points: onboarding, auth, errors, debugging, upgrades.
+Three rules transfer widely:
 
-**Onboarding:** 5-min quickstart, interactive sandbox, copy-paste examples, SDK install.
+- **Use the same word for the same thing.** Switching between "workspace", "project", and "environment" for one concept forces the reader to maintain a mental dictionary.
+- **Put the action first.** "Click Save to store the configuration" is easier to follow than a paragraph that arrives at the action at the end.
+- **State the precondition before the step.** An instruction that assumes a running service fails silently for a reader who does not have one.
 
-**Auth:** simple (API key), standard (OAuth 2.0/OIDC), granular scopes, short-lived tokens, refresh.
+Style guides are not substitutes for thinking about the reader. They encode past decisions so that a team does not re-litigate them on every page.
 
-**Errors:** actionable (what, why, how to fix), error codes, correlation IDs, links to docs.
+## What documentation cannot do
 
-**Debugging:** request/response logging, replay, sandbox mode, mock server.
+Three limits matter.
 
-**SDKs:** idiomatic (language conventions), typed (TypeScript, Go, Rust), tested, versioned.
+**It goes stale faster than code changes.** A refactor that renames a parameter invalidates every example that uses it. Without a docs check in CI or a named owner, the reference drifts away from the implementation, and stale documentation is worse than none because it is confidently wrong.
 
-**Feedback loops:** in-docs feedback widget, GitHub Issues, Discord/Slack, NPS.
+**It cannot fix a confusing interface.** If a function's behaviour is surprising, adding a paragraph explaining the surprise documents a design problem. The better fix is often in the API.
 
-## Content strategy
+**More is not always better.** A long tutorial can bury the answer a returning user needs. Separate the layers rather than extending one document indefinitely.
 
-**Audience analysis:** who (dev, PM, ops), skill level, goals, context.
+The counterargument — that good code is self-documenting — is true only for a reader with the context to read it. Documentation supplies the context the code cannot carry.
 
-**Information architecture:** logical grouping, consistent naming, searchable, scannable.
+## A decision test
 
-**Style guide:** voice (direct, concise, active), terminology glossary, formatting conventions (code, UI elements, placeholders).
+1. **Name the reader and their task** before writing a line.
+2. **Separate README, quickstart, reference, and explanation** so each has one job.
+3. **Test the quickstart** in a clean environment with a new user if possible.
+4. **State versions and assumptions** in every install instruction.
+5. **Use consistent terms** and define them at first use.
+6. **End with a verifiable outcome** so the reader knows they succeeded.
+7. **Assign an owner** and a review trigger tied to code changes.
 
-**Accessibility:** alt text, heading hierarchy, color contrast, keyboard navigation, screen reader tested.
-
-## Measuring docs quality
-
-**Quantitative:** page views, time on page, search queries (zero-results), CTA conversion, API docs usage.
-
-**Qualitative:** feedback widget (👍/👎 + comment), support ticket deflection, NPS, usability testing.
-
-**KPIs:** time-to-first-success, docs-driven support reduction, onboarding completion rate.
-
-For the related question of API design, see [API Design: REST, GraphQL, gRPC, API Gateway, Rate Limiting](/articles/api-design-rest-graphql-grpc-api-gateway-rate-limiting) and developer experience, see [How to Build a Technical Portfolio That Demonstrates Real Skills](/articles/how-to-build-a-technical-portfolio-that-demonstrates-real-skills).
+For the repository-level artifact, see [Personal Branding](/articles/personal-branding-building-your-professional-reputation); for the maintenance context, see [Technical Debt](/articles/technical-debt-the-hidden-cost-of-shortcuts).
 
 ## Further Reading
 

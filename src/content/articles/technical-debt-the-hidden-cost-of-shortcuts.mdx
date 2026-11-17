@@ -1,68 +1,99 @@
 ---
 title: "Technical Debt: The Hidden Cost of Shortcuts"
-description: "Technical debt is the cost of choosing speed over quality. Learn how it accumulates, why it matters, and how to manage it."
+description: "Technical debt is a metaphor for future cost, not a synonym for bad code. Read how interest accrues, a payoff worked example, and when taking debt is rational."
 date: 2026-11-16
 tags:
-  - Technology
-  - Software Engineering
   - Technical Debt
-  - Systems
+  - Software Engineering
+  - Architecture
+  - MLOps
 ---
 
-Technical debt is not a bug. It is a choice—and every choice has interest.
+Technical debt is one of the most used and least examined metaphors in software. It is often invoked to justify a rewrite, which misses the point of a financial analogy: debt can be prudent or reckless, and the question is whether the interest is being paid knowingly. A codebase with "debt" is not automatically in crisis; a team that does not know its interest rate is.
 
-**Direct answer:** Technical debt is the implied cost of future rework caused by choosing an expedient solution now instead of a better, slower approach. Like financial debt, it provides immediate benefit (speed) but requires ongoing payment (maintenance, complexity, slower future work). Technical debt is not inherently bad; unmanaged technical debt is. The skill is knowing when to take it on, tracking it, and paying it down before it compounds.
+**Direct answer:** Martin Fowler describes technical debt as "a metaphor, coined by Ward Cunningham, that frames how to think about dealing with this cruft, thinking of it like a financial debt". The central mechanism is interest: "The extra effort that it takes to add new features is the interest paid on the debt." The boundary is that the metaphor has limits — software debt has no maturity date or market price, so the discipline lies in measuring the interest, not in assigning a notional principal.
 
-## What technical debt is
+## What counts as debt
 
-The term was coined by Ward Cunningham to describe the trade-off between shipping quickly and building well. When a team ships code that works but is not clean, well-tested, or well-designed, they create debt. The system functions, but future changes take longer because the code is harder to understand, modify, and extend.
+Fowler's usage distinguishes deficiencies in internal quality that make future change harder from simple mess. Three categories are useful:
 
-Technical debt appears in many forms:
+**Deliberate and understood.** A team ships a known shortcut to meet a deadline, records it, and plans to address it. This is prudent debt — a conscious trade of future effort for present speed.
 
-- **Code debt:** duplicated logic, unclear naming, missing tests, inconsistent style.
-- **Design debt:** architecture that no longer fits the current scale or complexity.
-- **Infrastructure debt:** outdated servers, manual deployments, no monitoring.
-- **Documentation debt:** outdated or missing READMEs, architecture decisions, API specs.
-- **Dependency debt:** old libraries, frameworks, or operating systems with known vulnerabilities.
+**Inadvertent.** The team did not know a better design at the time, or the system's requirements changed. The code was reasonable when written and is now a constraint.
 
-## Why debt accumulates
+**Reckless.** The team knowingly created a dangerous condition with no plan to fix it. This is the case the metaphor is meant to condemn, and it is not the same as the first two.
 
-Teams take on technical debt for rational reasons:
+The distinction matters because "remove all technical debt" is not a coherent goal. A startup that spends a year perfecting internals before learning whether anyone wants the product has avoided debt by choosing a different failure.
 
-- **Speed to market.** A startup needs to validate demand before building perfect infrastructure.
-- **Deadline pressure.** A commitment to a customer or event requires shipping on time.
-- **Learning.** The team does not yet know the best design; building something messy first reveals what the right design should be.
-- **Resource constraints.** Not enough time, people, or expertise to do it right now.
+## Where ML systems concentrate it
 
-The problem is not taking on debt. The problem is forgetting it exists.
+Sculley et al.'s paper "Hidden Technical Debt in Machine Learning Systems" is a sharp application of the idea. The authors write that "using the software engineering framework of technical debt, we find it is common to incur massive ongoing maintenance costs in real-world ML systems". Their risk factors include "boundary erosion, entanglement, hidden feedback loops, undeclared consumers, data dependencies, configuration issues, changes in the external world, and a variety of system-level anti-patterns".
 
-## Interest compounds
+Two of these are especially easy to miss:
 
-Financial debt charges interest. Technical debt charges interest in the form of slower development:
+**Undeclared consumers.** Another system reads a model's output without the model team knowing. A change that seems local breaks a downstream process — the debt is the invisible dependency, not the code.
 
-- Adding a feature takes longer because the codebase is tangled.
-- Bugs take longer to find and fix.
-- New engineers take longer to onboard.
-- Fear of changing code leads to working around it, adding more complexity.
+**Hidden feedback loops.** A model's output influences the data it later trains on. A recommendation changes what users click, and the click data trains the next version. The system is now part of its own environment, and a past evaluation no longer describes the present.
 
-At some point, the interest payment consumes most of the team's capacity. This is the "debt spiral": so much time is spent managing debt that no capacity remains to pay it down.
+This is why "the model is only 5% of the system" is more than a slogan in ML: the surrounding plumbing is where the debt accrues.
 
-## Managing technical debt
+## A worked example of interest
 
-1. **Make it visible.** Track debt in a backlog or registry. Document what it is, where it is, and what it costs.
-2. **Pay it deliberately.** Allocate capacity (e.g., 10–20% of sprint time) to refactoring, testing, and infrastructure improvements.
-3. **Avoid hidden debt.** Do not let debt accumulate silently. If a shortcut is taken, record it.
-4. **Pay down before scaling.** A system that works for 100 users may collapse at 10,000. Address foundational debt before growth.
-5. **Know when not to pay.** Not all debt needs repayment. Debt in code that will be replaced soon is cheaper to leave alone.
+The following numbers are hypothetical and illustrative.
 
-## The strategic view
+A team estimates that a new feature would take 3 days in the current codebase and 1 day after a 10-day cleanup. They ship the feature on the old design. Six months later, two more features touch the same area, each taking 3 days instead of 1. A year later, a bug fix takes 2 days instead of half a day because the tangled logic is hard to reason about.
 
-Technical debt is a tool, not a failure. Used intentionally, it buys time and speed. Used carelessly, it kills velocity. The mark of a mature engineering organization is not zero debt; it is conscious debt management—knowing what debt exists, what it costs, and when it will be repaid.
+Cumulative extra effort:
 
-For the related question of how software economics differ from traditional models, see [Why Some SaaS Businesses Have Better Economics Than Traditional Businesses](/articles/why-some-saas-businesses-have-better-economics-than-traditional-businesses) and how software development economics are changing, see [How AI Is Changing the Economics of Software Development](/articles/how-ai-is-changing-the-economics-of-software-development).
+- Features: 2 × 2 days = 4 days.
+- Bug fix: 1.5 days.
+- Total interest paid so far: 5.5 days.
+
+The cleanup still costs 10 days. On these numbers it has not paid back yet, and a rewrite would be unjustified. But the interest is recurring: if four more features touch the area in the next year, another 8 days accrue, and the cleanup becomes roughly break-even.
+
+Three observations follow:
+
+1. **Interest is measured per change**, not as a lump sum. The right question is not "how bad is the code?" but "how much extra does each change cost?"
+2. **A rewrite has its own costs and risks**, including new bugs and a period of reduced delivery. It is an investment, not a reset button.
+3. **The decision should be revisited.** A cleanup that was unjustified at month six may be justified at month eighteen, because the remaining useful life and the change frequency have changed.
+
+A practical tactic is to record the estimate at the moment the shortcut is taken — "this will cost two extra days on each future change in this area" — so that the interest is visible when the bill arrives.
+
+## When debt is the right choice
+
+Three conditions make a shortcut rational:
+
+**The information is perishable.** If the product may change direction in three months, investing in a durable design for a feature that may be deleted is a poor use of time.
+
+**The interest is bounded.** A shortcut in a rarely changed module with a small surface area costs little. A shortcut at a boundary used by every team is a different proposition.
+
+**There is a repayment plan.** The team records the debt, knows what would trigger repayment, and has a place in the backlog where it competes on equal terms with features.
+
+The counterargument — that all debt should be repaid immediately — is a recipe for perpetual refactoring. A system with zero debt is usually a system that stopped changing.
+
+## What the metaphor hides
+
+**No objective principal.** Unlike a loan, technical debt has no agreed amount. Two engineers can look at the same code and estimate wildly different cleanup costs, which makes the financial language less precise than it sounds.
+
+**Some "debt" is just unfamiliarity.** Code a team does not understand feels like debt, but it may be correct and well-designed. The distinction matters: rewriting understood code because it is unfamiliar destroys value.
+
+**Repayment can be misallocated.** Teams sometimes choose the ugliest file rather than the highest-interest one. The visible mess is not necessarily the expensive one.
+
+## A decision test
+
+1. **Name the specific shortcut** and what it makes harder — vague "debt" cannot be managed.
+2. **Estimate the interest per change** and record the estimate at the time the shortcut is taken.
+3. **Count how often the area changes** to project the accumulating cost.
+4. **Classify the debt** as deliberate, inadvertent, or reckless and act accordingly.
+5. **Include undeclared consumers** in the blast radius of any change.
+6. **Compare the cleanup against its own cost and risk**, not against an ideal of perfect code.
+7. **Revisit the decision** when change frequency or remaining lifetime changes.
+
+For the maintenance discipline that keeps debt visible, see [Technical Writing](/articles/technical-writing-documentation-api-docs-and-developer-experience); for the ML-specific context, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline).
 
 ## Further Reading
 
 - Martin Fowler, 2012. [Technical Debt](https://martinfowler.com/bliki/TechnicalDebt.html) — Why postponing work is a debt with interest, and how to decide when to pay it.
+- Ward Cunningham, 1992. [The WyCash Portfolio Management System](https://c2.com/doc/oopsla92.html) — The original OOPSLA 1992 experience report in which Cunningham introduced the debt metaphor for software development.
 - Ward Cunningham, 1992. [Technical Debt](https://martinfowler.com/bliki/TechnicalDebt.html) — The concept Fowler popularised, and the practical argument for paying it down deliberately.
 - D. Sculley et al., 2015. [Hidden Technical Debt in Machine Learning Systems](https://proceedings.neurips.cc/paper_files/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html) — Why production ML fails for organisational reasons rather than algorithmic ones.
