@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 181 tracked articles — 181 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 183 tracked articles — 183 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -195,6 +195,8 @@
 | **P-189** | Missing Data: When Dropping Rows Changes the Answer | Data, Analytics & Decision Science | Analysis / Decision Guide | `Ready` | `src/content/articles/missing-data-when-dropping-rows-changes-the-answer.mdx` | 2026-11-17 | New article: 1,341 words. pandas sentinels, drop vs univariate/multivariate imputation from scikit-learn, leakage rule; labeled worked bias example (complete-case mean 50k vs full-sample 47k); decision test. Four new sources verified. |
 | **P-190** | Human in the Loop by Design: Overrides, Escalation, and Failure States | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/human-in-the-loop-by-design.mdx` | 2026-11-17 | New article: 1,366 words. NIST AI RMF, Microsoft CHI human-AI guidelines and model cards; labeled review-budget worked example with automation-bias and fatigue limits; normal/escalation/failure states; decision test. One new source verified. |
 | **P-191** | Build, Buy, or Integrate: A Decision Framework for Software Capabilities | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/build-buy-or-integrate-decision-framework.mdx` | 2026-11-17 | New article: 1,351 words. Control/maintenance/switching-cost frame using AWS Well-Architected, OpenSSF and O*NET; labeled three-year cost example; compliance as a floor; decision test. No new sources. |
+| **P-192** | Reading Financial Statements Without an Accounting Background | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/reading-financial-statements-without-an-accounting-background.mdx` | 2026-11-17 | New article: 1,331 words. Three statements and the accounting equation; labeled worked profit-versus-cash example (200k profit, -80k operating cash); notes-reading guide; decision test. Four new sources verified. |
+| **P-193** | Technical Interviews That Test Systems Thinking, Not Recall | Career, Productivity & Professional Development | Analysis / Decision Guide | `Ready` | `src/content/articles/technical-interviews-that-test-systems-thinking.mdx` | 2026-11-17 | New article: 1,256 words. Structured interviewing from Google re:Work, task grounding from O*NET; worked four-candidate rubric; failure modes and limits; decision test. One new source verified. |
 
 ---
 
@@ -217,6 +219,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AP (New article titles, cluster 5 — 2026-11-17):** Two new articles drafted. *Reading Financial Statements* uses stable secondary references for statement structure with a clearly labeled hypothetical example; *Technical Interviews* uses Google re:Work and O*NET. Both close with a decision test. Five new sources added; all 222 verify.
 - **Batch AO (New article titles, cluster 4 — 2026-11-17):** Two new articles drafted. *Human in the Loop by Design* anchors on NIST AI RMF, the Microsoft CHI guidelines and model cards; *Build, Buy, or Integrate* on AWS Well-Architected, OpenSSF and O*NET. Both use labeled hypothetical worked examples and close with a decision test. One new source added; all 217 verify.
 - **Batch AN (New article titles, cluster 3 — 2026-11-17):** Two new statistics articles drafted. *Confidence Intervals and p-values* uses NIST and the ASA statement; *Missing Data* uses pandas, scikit-learn and the leakage guidance. Both use labeled hypothetical worked examples and close with a decision test. Four new sources added; all 216 verify. The GDPR registry URL was switched to a stable HTML rendering after EUR-Lex began returning empty titles to automated checks.
 - **Batch AM (New article titles, cluster 2 — 2026-11-17):** Two new titles drafted from the gap-analysis shortlist. *Database Indexes and Query Plans* is built on official PostgreSQL documentation; *Prompt Injection in LLM Applications* on OWASP LLM01:2025, the indirect prompt injection paper and NIST AI 100-2e2025. Both use labeled hypothetical worked examples and end with a decision test. Five new sources added; all 212 verify. No duplicate title, slug or context introduced.

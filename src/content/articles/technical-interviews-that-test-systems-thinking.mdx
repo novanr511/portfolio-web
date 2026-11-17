@@ -1,0 +1,108 @@
+---
+title: "Technical Interviews That Test Systems Thinking, Not Recall"
+description: "Recall questions are easy to grade and weak predictors. Read how to design an interview that reveals how a candidate reasons about trade-offs."
+date: 2026-11-17
+tags:
+  - Hiring
+  - Interviews
+  - Engineering
+  - Career
+---
+
+An interview that asks a candidate to recite the difference between two data structures can be graded in seconds and often tells you very little about how they will work. The reason is not that recall is useless; it is that the job rarely consists of answering isolated recall questions. The useful signal is how someone decomposes an unfamiliar problem, states assumptions, and reasons about the consequences of a choice.
+
+**Direct answer:** Design the interview around a realistic decision with no single right answer, score it against a written rubric, and use the same core questions for every candidate. Google's re:Work guidance presents structured interviews as a "proven framework" for hiring, and O*NET describes occupations by tasks and skills rather than by trivia. The boundary: a structured process improves the quality of the evidence, not the interviewer's ability to interpret it — and no interview format predicts job performance with certainty.
+
+## Why structure matters
+
+re:Work describes effective hiring as laying "a strong foundation to ensure you recruit and onboard the right talent", and offers "proven frameworks for job requirements, interviews, and more". The word that matters is *frameworks*: a repeated process with defined questions and scoring.
+
+Unstructured interviews feel better to the interviewer and perform worse. They drift toward similar candidates, are easily influenced by first impressions, and produce evidence that cannot be compared across applicants. A structured interview does not make the interviewer brilliant; it makes the comparison meaningful.
+
+Three properties define it:
+
+1. **The same core questions** for every candidate, so answers are comparable.
+2. **A rubric written in advance**, describing what a strong answer contains, so scoring happens before hindsight sets in.
+3. **Evidence-based follow-ups** tied to the candidate's own answer, not a fixed script that ignores what they said.
+
+## What to ask
+
+A systems-thinking question has four features: an unfamiliar but plausible scenario, incomplete information, several defensible solutions, and consequences that differ by choice.
+
+For example: *a service that handles 5,000 requests a second is migrated to a new region, and latency doubles for a subset of users. How would you investigate it?*
+
+There is no single correct answer. A strong response tends to show:
+
+- **A boundary.** The candidate asks what changed besides location — data volume, network path, cache configuration — rather than assuming the cause.
+- **Decomposition.** They separate client, network, edge, service, and storage layers and say which evidence would distinguish them.
+- **Measurement.** They propose looking at percentiles rather than averages, and at the affected subset rather than the aggregate.
+- **Trade-offs.** They state what they would change first and what risk that change carries.
+
+A weak response jumps straight to a favourite tool, proposes a rewrite without diagnosis, or treats the aggregate metric as the whole story. The rubric should name these differences before the interviews begin.
+
+O*NET's occupation records are useful here for grounding: its "detailed descriptions of the world of work" include tasks, skills, and work context. Base the scenario on tasks the role actually contains, not on an abstract ideal of what engineers do.
+
+## A worked example of a scoring rubric
+
+The following rubric is hypothetical and illustrative.
+
+Suppose four candidates answer the latency question. Score each dimension 0–2:
+
+| Candidate | Boundary | Decomposition | Measurement | Trade-offs | Total |
+| --- | --- | --- | --- | --- | --- |
+| A | 2 | 2 | 1 | 1 | 6 |
+| B | 1 | 1 | 0 | 0 | 2 |
+| C | 2 | 1 | 2 | 2 | 7 |
+| D | 0 | 1 | 1 | 0 | 2 |
+
+Three lessons follow from the shape of the scores:
+
+1. **Total rank is not the whole story.** C scores highest overall but weak on decomposition. Whether that matters depends on the role: a senior hire may need it, while a strong mid-level hire may not. The rubric should state the weighting in advance.
+2. **A low score on one dimension can be diagnostic.** D's zero on boundary-setting suggests a tendency to assume the framing is correct. That is specific feedback, unlike "weak candidate".
+3. **The interview produces evidence, not a verdict.** A score of 2 does not guarantee performance; it records that the candidate demonstrated a behaviour in one setting. Pair it with work samples and references.
+
+The discipline is in writing the rubric before hearing any answers. A rubric drafted afterwards will be shaped by the interviews you liked, which defeats its purpose.
+
+## Common failure modes in interview design
+
+Four patterns reliably weaken the signal:
+
+**Trivia disguised as rigour.** "What is the time complexity of this algorithm?" can be answered from memory and grades recall. If the job requires choosing a data structure under constraints, ask about the constraints instead.
+
+**The puzzle with a trick.** A question whose answer depends on a clever insight measures whether the candidate has seen that puzzle. It does not measure how they approach unfamiliar work.
+
+**Unstructured conversation.** "Tell me about a project you're proud of" feels informative and produces answers that cannot be compared across candidates. If you use it, score it against the same rubric as everything else.
+
+**One interviewer, one impression.** A single interviewer's note is a data point with unknown bias. Two independent scores before discussion, followed by a short calibration conversation, produce better evidence than a consensus reached quickly.
+
+The corrective is always the same: write down what you are testing, write down what a good answer looks like, and gather the same evidence from every candidate.
+
+## What the interview cannot establish
+
+Three limits deserve clear statement.
+
+**Performance in an interview is not performance on the job.** The setting is artificial, the stakes are asymmetric, and some people interview better than they work. A structured process reduces noise; it does not eliminate it.
+
+**Systems thinking is not the only skill.** A role may depend on domain knowledge, collaboration, or operational judgement that this format does not test. Using one exercise for every quality is a category error.
+
+**Interviewers need calibration.** Two interviewers using the same rubric can score differently until they compare examples. Calibration sessions where interviewers score the same sample answer are the practical remedy.
+
+The counterargument — that candidates cannot demonstrate systems thinking without a whiteboard exercise — is fair. A take-home design task or a review of past work can provide similar evidence and may suit candidates who perform poorly under time pressure. The format is a means, not the point.
+
+## A decision test
+
+1. **Derive the questions from the role's tasks**, using O*NET-style task descriptions as a check.
+2. **Write the rubric before the first interview** and share it with the panel.
+3. **Use the same core questions** for every candidate, with evidence-based follow-ups.
+4. **Score each dimension separately** before discussing the total.
+5. **Calibrate the panel** on a shared sample answer.
+6. **Combine the interview with work samples** rather than treating it as decisive.
+7. **Review your hires** against their interview scores to learn which dimensions actually predicted success.
+
+For the role definition, see [Engineering Management](/articles/engineering-management-hiring-culture-metrics-and-career-ladders); for the skill signal in a portfolio, see [Technical Portfolio](/articles/how-to-build-a-technical-portfolio-that-demonstrates-real-skills).
+
+## Further Reading
+
+- Google re:Work, 2026. [Google re:Work - Hiring](https://rework.withgoogle.com/intl/en/subjects/hiring) — Research-based guidance on job requirements, interviews and structured hiring practices.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.
+- Google, 2026. [Google re:Work](https://rework.withgoogle.com/) — A large company's published people practices, including hiring and growth frameworks.
