@@ -1,0 +1,104 @@
+---
+title: "Long Context Windows: What a 1M-Token Window Actually Buys You"
+description: "A million-token window is now standard. Read what it enables, what it costs, and why the model may still miss the fact you put in the middle."
+date: 2026-11-17
+tags:
+  - LLM
+  - AI
+  - RAG
+  - Architecture
+---
+
+A 1M-token context window sounds like a solution to retrieval: stop chunking documents, put everything in the prompt, and ask the model. The published specs now make that possible — Google lists 1M tokens across Gemini 4, and OpenAI lists 1.05M for GPT-6 models. But capacity is not the same as reliable use, and a prompt that fits is not necessarily a prompt that works.
+
+**Direct answer:** A long context window lets a model consider a whole codebase, a long contract set, or a multi-document corpus in one pass without a retrieval step. The caution comes from Liu et al.'s "Lost in the Middle" study: performance "can degrade significantly when changing the position of relevant information", meaning models "do not robustly make use of information in long input contexts". The boundary: long context is useful when the material is bounded, cross-referenced, and affordable; it is not a replacement for retrieval when the corpus is large, the query is repeated, or the cost per request matters.
+
+## What a long window changes
+
+Three things become possible:
+
+**Whole-artifact reasoning.** A 1M-token window can hold a substantial codebase or a complete document set. The model can follow references between files or sections that a chunked retrieval system would separate.
+
+**No retrieval stage for bounded corpora.** If everything fits, there is no embedding index, no chunking strategy, and no risk that retrieval drops the relevant chunk. That removes an entire class of engineering work.
+
+**Long multi-turn sessions.** Conversations and agent traces can carry more history before compaction, which matters for tasks where earlier decisions constrain later ones.
+
+Each benefit has a boundary. "Everything fits" must be true for your actual corpus, not for a sample; documents grow. A removed retrieval stage removes its failures but also its filtering, so the model now sees everything, including the irrelevant parts.
+
+## The position problem
+
+The "Lost in the Middle" paper studied multi-document question answering and key-value retrieval. Its finding was not that long context fails, but that *where* the relevant information sits changes performance. Information at the beginning or end of a long input is used more reliably than information in the middle.
+
+Three implications follow:
+
+- **Ordering is a design variable.** Putting the most important material at the start or end is a cheap intervention, not a hack — it is a response to a measured behaviour.
+- **A single successful test is weak evidence.** If you test a question with the relevant passage in one position, you have not established that the system works when the passage moves.
+- **Retrieval still has a role.** A retriever that narrows the context to a few relevant passages sidesteps the position problem by shortening the haystack.
+
+The study is from 2023 and models have improved since. The correct response is to treat it as a reason to *test position sensitivity*, not as a permanent law.
+
+## A worked example of context versus retrieval
+
+The following uses the published $10 per million input-token list price for GPT-6 Astra and a hypothetical query pattern. It is a cost comparison, not a quality claim.
+
+**Option A — put everything in the prompt.** A corpus of 800,000 tokens is sent with each question. At $10 per million input tokens, one question costs 0.8 × $10 = **$8.00**. A thousand questions cost **$8,000**.
+
+**Option B — retrieve first.** A retriever selects 8 chunks of about 500 tokens, plus a 1,000-token instruction and question: roughly 5,000 input tokens. One question costs 0.005 × $10 = **$0.05**. A thousand questions cost **$50**.
+
+The ratio is about 160× on input tokens. Three qualifications matter:
+
+1. **Option B has costs the calculation omits.** Embedding the corpus, running the index, and maintaining it are real expenses, though they are amortised across queries. A corpus re-embedded on every change can erase the saving.
+2. **Option A is competitive when queries are rare.** For a one-off analysis of a bounded corpus, paying $8 for a thorough pass can be cheaper than building retrieval infrastructure.
+3. **Quality decides, not cost.** If Option A answers correctly on cross-document questions that Option B's retriever misses, the more expensive option may be the right one. The test is a labelled evaluation set, not the price.
+
+The practical decision is a hybrid: use retrieval for the common, narrow questions and a long-context pass for the rare questions that need the whole corpus. That requires a way to decide which kind of question you have — which is itself a classification task.
+
+## Testing position sensitivity
+
+A practical test takes an afternoon and produces evidence you can reuse:
+
+1. **Build twenty questions** whose answers are in a specific passage of your corpus, drawn from real work.
+2. **Place the passage at the beginning, middle, and end** of otherwise identical prompts. Use the same wording and the same surrounding material.
+3. **Score correctness per position**, not just overall. A 95% average that falls to 70% in the middle is the finding the average hides.
+4. **Add distractors** — similar passages with conflicting details — because real corpora contain them and the clean test will flatter the system.
+5. **Repeat after a model update.** Position behaviour is a property of the model, not of your prompt alone.
+
+The result is a decision input: if the middle position is weak, either reorder the prompt so critical material sits at the edges, or move to retrieval so the relevant passage is short and prominent. Without this test, a long-context design rests on an assumption about model behaviour that nobody has checked on your data.
+
+## When long context is the right tool
+
+Three conditions favour it:
+
+**The corpus is bounded and stable.** A single codebase or a fixed contract set fits without frequent re-upload, and the cost of sending it is acceptable at the query volume.
+
+**The task needs cross-references.** Questions that depend on a definition in one file and an exception in another benefit from seeing both at once.
+
+**The queries are infrequent and high-value.** A legal review done a few times a week can afford a full-corpus prompt; a customer-facing support bot cannot.
+
+## What the window does not guarantee
+
+**Capacity is not attention.** A model can accept 1M tokens and still fail to use a specific fact in the middle. Test position sensitivity with the relevant material moved around.
+
+**Cost scales with the window.** Every request pays for the whole prompt. A large context is a recurring operating cost, not a one-time setup cost.
+
+**More context can hurt.** Irrelevant material competes for attention and can degrade answers. Sending the whole corpus when a page would do is not thoroughness; it is noise.
+
+The counterargument — that models will get better at using long contexts — is plausible. The response is the same as elsewhere: design so the system still works when the model is wrong, and re-evaluate when it changes.
+
+## A decision test
+
+1. **Measure your corpus size** in tokens, and check that it genuinely fits.
+2. **Estimate the cost per query** at your real volume, using published prices with a date.
+3. **Test position sensitivity** by moving the relevant passage through the context.
+4. **Compare answer quality** against a retrieval baseline on a labelled set.
+5. **Choose a hybrid** when narrow and cross-document questions coexist.
+6. **Put critical material at the edges** when using long prompts.
+7. **Re-test after a model update**, since context behaviour can change.
+
+For the retrieval alternative, see [Retrieval-Augmented Generation](/articles/rag-explained); for the model options, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026).
+
+## Further Reading
+
+- Google, 2026. [Models - Gemini API | Google AI Studio](https://ai.google.dev/gemini-api/docs/models) — The Gemini 4 family (Carbon, Argon, Hydrogen), 1M-token context and multimodal inputs including audio, video and PDF.
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.
+- Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, Percy Liang, 2023. [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) — The finding that model performance degrades when relevant information changes position in a long context, and that models do not robustly use long inputs.

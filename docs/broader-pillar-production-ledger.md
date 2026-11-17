@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 188 tracked articles — 188 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 190 tracked articles — 190 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -202,6 +202,8 @@
 | **P-196** | Credit Spreads: What Corporate Bond Yields Add to the Risk-Free Rate | Markets, Economics & Emerging Industries | Analysis / Decision Guide | `Ready` | `src/content/articles/credit-spreads-what-corporate-yields-add.mdx` | 2026-11-17 | New article: 1,384 words. Spread = risky yield minus benchmark; worked price example separating rate from credit moves (both to a 7% yield); three causes of widening; decision test. Two new sources verified. |
 | **P-197** | LLM Model Landscape 2026: Comparing Flagships Without Benchmark Theatre | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/llm-model-landscape-2026.mdx` | 2026-11-17 | New article: 1,321 words. Current published specs from Anthropic, OpenAI and Google model docs (Claude 5 family, GPT-6 tiers with prices, Gemini 4 family); worked routing-cost example ($200 vs $40 vs $88 blended); decision test. Four new sources verified. |
 | **P-198** | What LLMs Actually Solve in the Real World: A Task Taxonomy | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/llm-real-world-problem-taxonomy.mdx` | 2026-11-17 | New article: 1,272 words. Six task types with Anthropic use-case guides, NBER adoption figures and the METR caution; labeled support-workflow example (75 to 44 agents with frictions); decision test. One new source verified. |
+| **P-199** | Long Context Windows: What a 1M-Token Window Actually Buys You | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/long-context-windows-what-they-buy.mdx` | 2026-11-17 | New article: 1,358 words. 1M-token specs from Google/OpenAI, Lost in the Middle position finding, worked $8 vs $0.05 per-query cost example, position-sensitivity test; decision test. One new source verified. |
+| **P-200** | Mixture of Experts: Why Sparse Models Changed AI Economics | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/mixture-of-experts-explained.mdx` | 2026-11-17 | New article: 1,282 words. Router/expert mechanism from Mixtral, Switch and DeepSeek-V3; 671B/37B worked active-parameter example (18x), load-balance and memory caveats; decision test. Four new sources verified. |
 
 ---
 
@@ -224,6 +226,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AT (Expanded AI focus, cluster 2 — 2026-11-17):** Two architecture articles drafted. *Long Context Windows* uses official model specs and the Lost in the Middle paper; *Mixture of Experts* uses Mixtral, Switch Transformer and DeepSeek-V3 papers. Both include labeled worked examples and position/load-balance tests. Four new sources added; all 235 verify.
 - **Batch AS (Expanded AI focus — 2026-11-17):** First two articles from the expanded shortlist requested by the owner, centred on the current LLM landscape and real-world task types. All claims about 2026 model lineups were taken from official provider documentation fetched and title-verified; the registry gained four new sources and now holds 231. No duplicate title, slug or context introduced.
 - **Batch AR (New article titles, final cluster — 2026-11-17):** The ninth and final title from the gap-analysis shortlist drafted: *Credit Spreads*, using FRED, investor-education material and secondary references for spread and rating structure. All nine titles from the shortlist are now drafted with labeled hypothetical worked examples and decision tests. Two new sources added; all 227 verify.
 - **Batch AQ (New article titles, cluster 6 — 2026-11-17):** Two retail articles drafted. *Retail Media Networks* uses IAB and a secondary industry overview; *Returns and Reverse Logistics* uses a reverse-logistics overview with dated Census channel data. Both use labeled hypothetical worked examples and close with a decision test. Three new sources added; all 225 verify.
