@@ -1,0 +1,93 @@
+---
+title: "Database Indexes and Query Plans: Why the Same Query Gets Slow"
+description: "An index is not a promise of speed. Read when the planner ignores it, how to read EXPLAIN, and the write cost you pay for every index."
+date: 2026-11-17
+tags:
+  - Databases
+  - Performance
+  - SQL
+  - Query Optimization
+---
+
+A query that used to return in milliseconds suddenly takes seconds, and the obvious response is to add an index. Sometimes that fixes it. Often the index already existed and the planner chose not to use it — because the table grew, the statistics went stale, or the query started returning a large fraction of the rows. The index is an input to a decision, not a guarantee.
+
+**Direct answer:** An index lets the database find rows without scanning the whole table, but the query planner chooses between an index scan and a sequential scan based on estimated cost. PostgreSQL's documentation states that the planner "will use the index in queries when it thinks doing so would be more efficient than a sequential table scan" — and that you "might have to run the ANALYZE command regularly to update statistics to allow the query planner to make educated decisions". The boundary: indexes add overhead to writes, and an index that matches the wrong column order or predicate can be ignored entirely.
+
+## What an index actually buys
+
+The documentation gives the clearest example. If a table has many rows and a query returns "perhaps zero or one", scanning every row is "clearly an inefficient method". With an index on the queried column, "it can use a more efficient method for locating matching rows".
+
+Two consequences follow from that framing:
+
+**Selectivity drives the choice.** A query returning a tiny fraction of rows benefits from an index. A query returning most of the table often does not — reading the index and then fetching rows can cost more than a sequential scan, which reads blocks in order. There is no fixed row count at which an index becomes worthwhile; it depends on the table, the storage, and the query.
+
+**The planner decides, not you.** "Once an index is created, no further intervention is required: the system will update the index when the table is modified, and it will use the index in queries when it thinks doing so would be more efficient." Adding an index does not force its use. If the planner estimates that a sequential scan is cheaper, it will ignore the index.
+
+This is why "we have an index" and "the query uses an index" are different claims. The second requires looking at the plan.
+
+## Reading the plan
+
+PostgreSQL's documentation is direct about the method: "PostgreSQL devises a query plan for each query it receives. Choosing the right plan to match the query structure and the properties of the data is absolutely critical for good performance", and "you can use the EXPLAIN command to see what query plan the planner creates for any query".
+
+The output is a tree of nodes. The documentation notes that "the very first line (the summary line for the topmost node) has the estimated total execution cost for the plan; it is this number that the planner seeks to minimize". The numbers in parentheses are, "left to right: estimated start-up cost, estimated total cost, estimated number of rows output by this plan node".
+
+Three practical rules:
+
+1. **Compare estimates to actuals with `EXPLAIN ANALYZE`.** The plain `EXPLAIN` shows what the planner *thinks*. `EXPLAIN ANALYZE` runs the query and reports what actually happened. A large gap between estimated and actual rows is the most common sign of stale statistics.
+2. **Treat costs as relative, not absolute.** The docs warn that estimated costs "might vary slightly because ANALYZE's statistics are random samples rather than exact, and because costs are inherently somewhat platform-dependent". Compare two plans on the same system, not a number against a universal threshold.
+3. **Look for the expensive node, not the first node.** A plan's top line is a summary; the bottleneck is usually a specific scan, join, or sort deeper in the tree.
+
+## A worked example of a planner decision
+
+The following numbers are hypothetical and illustrative.
+
+Suppose an `orders` table has 2 million rows. A query filters on `status = 'shipped'`, and there is a B-tree index on `status`.
+
+**Case A — shipped orders are 0.5% of the table.** The planner estimates 10,000 matching rows. Using the index means traversing the tree and fetching 10,000 rows; a sequential scan means reading all 2 million. The index is almost certainly chosen.
+
+**Case B — shipped orders are 60% of the table.** The planner estimates 1.2 million matching rows. Fetching that many rows through the index involves substantial random I/O, so a sequential scan — which reads blocks in order — is likely cheaper. The same index is ignored.
+
+**Case C — statistics are stale.** The `status` distribution changed after a bulk update, but `ANALYZE` has not run. The planner estimates 10,000 rows when the real count is 1.2 million and chooses an index scan. `EXPLAIN ANALYZE` shows an estimated 10,000 rows against an actual 1.2 million — the gap is the diagnosis. Running `ANALYZE` updates the statistics and the plan changes back to a sequential scan.
+
+Three actions follow:
+
+1. **Check the estimate/actual gap first**, before changing indexes. Stale statistics are cheaper to fix than a schema change.
+2. **Index for the query's selectivity**, not just for the column name. An index on a two-value column with a skewed distribution may help one value and hurt the other.
+3. **Consider multicolumn indexes** when queries filter on several columns together. The order of columns matters because a B-tree can use a leading column efficiently; the documentation covers multicolumn indexes and their interaction with `ORDER BY`.
+
+## The write cost is real
+
+The documentation notes that indexes "can also benefit UPDATE and DELETE commands with search conditions" — but the same passage states that an index "adds overhead to data manipulation operations". Every insert, update, or delete must maintain every index on the table.
+
+That overhead is invisible during a read benchmark and visible during a bulk load. Three implications matter:
+
+- **An unused index is pure cost.** If no query uses it, it slows every write for nothing. Retire indexes that the planner never selects.
+- **Index creation itself has operational effects.** By default PostgreSQL allows reads to continue during index creation, but writes "are blocked until the index build is finished". Concurrent builds are possible with caveats, which the docs cover separately.
+- **More indexes are not more safety.** They are more structures to maintain, and a planner with many overlapping indexes may choose poorly if statistics are stale.
+
+## Where the guidance stops
+
+Three limits deserve clear statement.
+
+**The planner is not perfect.** It works from estimates and a cost model. A plan that is reasonable on average can be wrong for a specific query with an unusual data distribution, which is why `EXPLAIN ANALYZE` exists.
+
+**Index advice is not portable.** A rule that holds for PostgreSQL's B-tree planner may not transfer to another database with a different storage engine, cost model, or index types. Name the system before quoting a threshold.
+
+**A fast index scan can still be the wrong fix.** If a query returns too much data, the answer may be pagination, a different query shape, or a materialised result rather than a better index. The plan tells you what is happening; it does not tell you what the application should be asking for.
+
+## A decision test
+
+1. **Get the plan** with `EXPLAIN`, then the actuals with `EXPLAIN ANALYZE`.
+2. **Compare estimated and actual row counts**; if they diverge sharply, run `ANALYZE` before changing anything.
+3. **Identify the expensive node** rather than reading only the summary line.
+4. **Check the selectivity** of the predicate — a small result set favours an index, a large one often does not.
+5. **Check column order** for multicolumn indexes against the query's predicates and `ORDER BY`.
+6. **Audit existing indexes** for ones the planner never uses and remove the dead weight.
+7. **Account for write overhead** before adding an index to a write-heavy table.
+
+For the operational side, see [Observability](/articles/observability-logging-metrics-tracing-alerting); for the data-modelling context, see [Data Pipelines](/articles/data-pipelines-airflow-prefect-and-orchestrating-etl-at-scale).
+
+## Further Reading
+
+- PostgreSQL Global Development Group, 2026. [PostgreSQL: Documentation: 18: 11.1. Introduction](https://www.postgresql.org/docs/current/indexes-intro.html) — How indexes work, why the planner may prefer a sequential scan, the ANALYZE/statistics requirement, and the write overhead of indexes.
+- PostgreSQL Global Development Group, 2026. [PostgreSQL: Documentation: 18: 14.1. Using EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html) — Reading query plans: estimated costs and rows, EXPLAIN ANALYZE actuals, and the caveats about statistics and platform-dependent costs.

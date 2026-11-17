@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 175 tracked articles — 175 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 177 tracked articles — 177 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -189,6 +189,8 @@
 | **P-183** | Web3 & Blockchain: Smart Contracts, DeFi, and Tokenomics | Technology & The Digital World | Deep Dive | `Ready` | `src/content/articles/web3-blockchain-smart-contracts-defi-and-tokenomics.mdx` | 2026-11-17 | Rewritten to 1,654 words with a worked constant-product AMM example and verified sources (Ethereum and Uniswap whitepapers, IPFS, Bitcoin whitepaper). Promote — sources re-checked. |
 | **P-184** | Passkeys and WebAuthn: What Passwordless Authentication Actually Verifies | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/passkeys-webauthn-what-passwordless-authentication-verifies.mdx` | 2026-11-17 | New article: 1,496 words. Mechanism of registration/authentication ceremonies, origin scoping and attestation from FIDO Alliance and WebAuthn Guide; NIST 800-63B AAL framing; labeled hypothetical recovery-cost worked example; limitation and decision test. Six new sources verified. |
 | **P-185** | Kubernetes Requests and Limits: Why Pods Get Evicted Under Load | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/kubernetes-requests-and-limits-why-pods-get-evicted.mdx` | 2026-11-17 | New article: 1,477 words. Requests vs limits, CPU throttling vs OOM kills, QoS classes and node-pressure eviction from official Kubernetes docs; labeled hypothetical node example; PDB caveat; decision test. Six new sources verified. |
+| **P-186** | Database Indexes and Query Plans: Why the Same Query Gets Slow | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/database-indexes-and-query-plans.mdx` | 2026-11-17 | New article: 1,378 words. Planner choice, selectivity, EXPLAIN/EXPLAIN ANALYZE and write overhead from official PostgreSQL docs; labeled hypothetical selectivity/stale-statistics example; decision test. Two new sources verified. |
+| **P-187** | Prompt Injection in LLM Applications: A Threat Model, Not a Patch | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/prompt-injection-llm-applications-threat-model.mdx` | 2026-11-17 | New article: 1,314 words. Direct/indirect split from OWASP LLM01:2025, Greshake et al. and NIST AI 100-2e2025; labeled refund-tool worked example; tool-boundary defences; decision test. Three new sources verified. |
 
 ---
 
@@ -211,6 +213,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AM (New article titles, cluster 2 — 2026-11-17):** Two new titles drafted from the gap-analysis shortlist. *Database Indexes and Query Plans* is built on official PostgreSQL documentation; *Prompt Injection in LLM Applications* on OWASP LLM01:2025, the indirect prompt injection paper and NIST AI 100-2e2025. Both use labeled hypothetical worked examples and end with a decision test. Five new sources added; all 212 verify. No duplicate title, slug or context introduced.
 - **Batch AL (New article titles from gap analysis — 2026-11-17):** Two new titles drafted from a corpus-wide gap audit that checked all 206 articles for duplicate titles, slugs and discussion context. *Passkeys and WebAuthn* and *Kubernetes Requests and Limits* were written at decision-guide scope with verified primary sources (FIDO Alliance, WebAuthn Guide, NIST SP 800-63B, and three official Kubernetes documentation pages). Six new sources were added to the registry; all 207 verify. No duplicate title, slug or context was introduced.
 
 - **Batch A (Pillar expansion, run 1 — 2026-11-14):** P-01, P-02, P-03, P-04, P-05, P-06 drafted in a single session at the owner's explicit request for five drafts. This exceeds the master prompt's default of two full articles per run; the owner's instruction took precedence, and the quality gates were applied per article rather than per batch. Sources were fetched directly from publishers (rfc-editor.org, IETF datatracker, Chrome/Certificate Transparency policy pages, gstatic CT log list, arXiv, IEA PDFs, OSI, Zenodo) because the web search tool was returning HTTP 402 throughout the session.
