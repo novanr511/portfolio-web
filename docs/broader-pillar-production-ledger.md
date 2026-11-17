@@ -316,3 +316,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 ## High-traffic title articles (B-series)
 
 - **2026-11-17:** All 50 reserved high-intent titles (B-001–B-050) have been written into full articles and the `PLANNED TITLE` markers removed. Coverage: 20 AI/LLM, 20 marketing/branding, 10 finance. Each article uses the established depth pattern — specific opening, bounded direct answer, mechanism, a labeled worked example, stated limits, a decision test, and a verified reading list. The registry was extended with primary and secondary sources actually fetched (provider docs, IETF RFCs, OWASP/NIST, arXiv papers, Wikipedia overviews, Investor.gov/FRED/Damodaran). `docs/high-traffic-title-backlog.md` remains the intent-pattern record; keyword volume was not available and is not claimed.
+
+## Reserved title bank — N-series complete
+
+- **2026-11-17:** All 100 reserved N-series titles (N-001–N-100) have been written into full articles and the `PLANNED TITLE` markers removed. Coverage spans model internals, agents, serving, alignment, AI in business functions, marketing, brand, and finance. Each article follows the publication standard: specific opening, bounded direct answer, mechanism, labeled worked example, stated limits, decision test, and a verified reading list. The registry grew to 314 sources, all title-verified. Duplicate guard reports zero collisions across 1000 files. T-series (613 titles) remain reserved placeholders.
