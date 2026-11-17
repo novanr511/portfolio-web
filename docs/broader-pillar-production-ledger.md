@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 198 tracked articles — 198 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 200 tracked articles — 200 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -212,6 +212,8 @@
 | **P-206** | Influencer Marketing Measurement: Codes vs Holdouts | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/influencer-marketing-measurement.mdx` | 2026-11-17 | New article: 1,198 words. Attributed vs incremental sales from code/link tracking; labeled worked example (400 attributed vs 80 incremental purchases); measurement-design ladder; decision test. Two new sources verified. |
 | **P-207** | Category Design: Create a Market Instead of Competing | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/category-design-create-a-market.mdx` | 2026-11-17 | New article: 1,256 words. Product-category and blue-ocean framing with Porter fit argument; hypothetical monitoring-to-prevention frame with three viability tests; adoption signals; decision test. Three new sources verified. |
 | **P-208** | Brand Consistency Across Channels: What Must Match | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/brand-consistency-across-channels.mdx` | 2026-11-17 | New article: 1,267 words. Promise/voice/identifiers frame with brand-management and marketing-communications overviews; hypothetical six-touchpoint audit; ownership patterns; decision test. Two new sources verified. |
+| **P-209** | Working Capital: The Cash Constraint Growth Companies Miss | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/working-capital-management-growth.mdx` | 2026-11-17 | New article: 1,180 words. Cash conversion cycle from working-capital references; worked growth example (55-day cycle, 2.75m to 4.125m tied up) with three levers; financing options; decision test. Three new sources verified. |
+| **P-210** | Cost of Capital for Private Companies: A Practical Estimate | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/cost-of-capital-private-companies.mdx` | 2026-11-17 | New article: 1,191 words. WACC components from Wikipedia and Damodaran; worked private-company estimate (9.85%) with size-premium sensitivity; uses of the estimate; decision test. Three new sources verified. |
 
 ---
 
@@ -234,6 +236,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AY (Expanded focus, cluster 7 — 2026-11-17):** Two finance articles drafted. *Working Capital* and *Cost of Capital for Private Companies* use secondary references plus Damodaran data, each with a labeled worked calculation and sensitivity analysis. Five new sources added; all 257 verify.
 - **Batch AX (Expanded focus, cluster 6 — 2026-11-17):** Two brand and strategy articles drafted. *Category Design* uses blue-ocean and product-category overviews with Porter; *Brand Consistency* uses brand-management and communications overviews. Both include labeled worked audits and decision tests. Four new sources added; all 252 verify.
 - **Batch AW (Expanded focus, cluster 5 — 2026-11-17):** Two marketing articles drafted. *Email Deliverability* is built on IETF RFCs and a provider guideline; *Influencer Marketing Measurement* on secondary overviews with an explicit attribution-versus-incrementality frame. Both include labeled worked examples and decision tests. Six new sources added; all 248 verify.
 - **Batch AV (Expanded focus, cluster 4 — 2026-11-17):** Two articles drafted across the owner-requested themes. *AI Readiness Assessment* uses NIST, OECD.AI and O*NET; *Demand Generation vs Lead Generation* opens the marketing expansion using secondary overviews with clearly stated limits. Both include labeled worked examples and decision tests. Three new sources added; all 242 verify.
