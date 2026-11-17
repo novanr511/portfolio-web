@@ -1,91 +1,69 @@
 ---
 title: "Building a Recommendation Engine with Python: End-to-End Pipeline"
-description: "Learn how to build a Python recommendation engine from data ingestion to model serving, including collaborative filtering and evaluation."
+description: "A recommender is a pipeline, not a model. Read the stages from event logging to serving and where each one quietly fails."
 date: 2026-11-16
 tags:
+  - Recommender Systems
   - Python
-  - Recommendation Engine
-  - Data Science
   - Machine Learning
+  - MLOps
 ---
 
-A recommendation engine is code that turns data into suggestions.
+Tutorials on building a recommender usually start with a matrix and end with a ranked list, which is a fair description of the model and a poor description of the system. A production recommender is an event pipeline, a training job, a serving path, and a measurement loop — and most of the failures happen at the boundaries between those pieces.
 
-**Direct answer:** Building a recommendation engine with Python involves five stages: data ingestion and preprocessing, interaction matrix construction, model training (collaborative or content-based), candidate generation and ranking, and evaluation. Python's ecosystem—pandas, scikit-learn, implicit, Surprise, and FastAPI—makes this pipeline accessible for small teams and prototypes.
+**Direct answer:** The pipeline runs from event capture through dataset construction, model training, offline evaluation, serving, and online measurement. The critical design decisions are made at the seams: what counts as an interaction, how the training snapshot is built, whether the serving code computes features identically to training, and whether the evaluation split matches the time at which predictions happen. Python is the glue; the correctness lives in those definitions.
 
-## Stage 1: Data ingestion and preprocessing
+## Stage one: what is an interaction
 
-Start with interaction data: user_id, item_id, timestamp, and implicit or explicit signals (clicks, ratings, purchases). Clean the data:
+Everything downstream depends on how an interaction is defined, and the definition is a business decision disguised as a data field.
 
-- Remove duplicate interactions.
-- Handle missing values.
-- Filter out bots or test accounts.
-- Convert timestamps to datetime.
+A click is not a purchase; a purchase is not a retained customer. A model trained on clicks learns what attracts attention, and a model trained on purchases learns what creates value. The choice determines the whole system, and mixing them without weighting produces a ranker that optimises the easy signal.
 
-Use pandas to load and manipulate the data. Store interactions in a sparse matrix format (scipy.sparse) because most user-item pairs are empty.
+The underlying unit is an event. scikit-learn's pipelines assume structured rows; event systems produce a stream that has to be reduced to training examples. The logging has to capture more than the positive event — the candidate set, the position, the time, and the context — because without them you cannot correct for position bias or reconstruct the decision later. This is the same principle as event instrumentation in analytics: what you did not record cannot be analysed.
 
-## Stage 2: Interaction matrix
+## Stage two: building the training snapshot
 
-Construct a user-item matrix where rows are users, columns are items, and cells are interaction values (rating, count, or binary). For implicit feedback, treat absence of interaction as unknown, not negative.
+The off-by-one errors that quietly destroy recommenders happen here.
 
-Use pandas to load and manipulate the data. Store interactions in a sparse matrix format (scipy.sparse) because most user-item pairs are empty.
+For each training example, every feature must have been knowable at the prediction moment. A user's "average purchase value" computed over all their history including the target purchase is a leak. A rolling statistic whose window ends after the prediction timestamp is a leak. A target-encoded item category computed on the full dataset is a leak.
 
-Example with implicit:
-```python
-from scipy.sparse import csr_matrix
-import pandas as pd
+scikit-learn's guidance states the rule generally — "data leakage occurs when information that would not be available at prediction time is used when building the model" — and prescribes splitting before preprocessing. For a recommender this has to be implemented as a time-aware snapshot: take the state of the world as it was at time $t$, compute features from events strictly before $t$, and predict the outcome after $t$.
 
-df = pd.read_csv("interactions.csv")
-user_ids = df["user_id"].unique()
-item_ids = df["item_id"].unique()
-user_to_idx = {u: i for i, u in enumerate(user_ids)}
-item_to_idx = {i: j for j, i in enumerate(item_ids)}
+The split also needs to match deployment. scikit-learn's `TimeSeriesSplit` builds expanding folds in which training precedes testing — an early fold trains on indices 0–5 and tests on 6–7, a later fold on 0–7 testing on 8–9 — and supports a `gap` for late-arriving labels. Random splits are wrong for interaction data that accumulates over time.
 
-rows = df["user_id"].map(user_to_idx)
-cols = df["item_id"].map(item_to_idx)
-data = df["interaction_value"]
+## Stage three: model and ranking
 
-matrix = csr_matrix((data, (rows, cols)), shape=(len(user_ids), len(item_ids)))
-```
+The model stage is the one tutorials emphasise, and in a well-built system it is often the smallest part.
 
-## Stage 3: Model training
+A reasonable progression is: a popularity baseline, a content-based model using item attributes, a collaborative model using interactions, and only then a hybrid or neural model such as the approaches represented by NGCF and DeepFM. Each step has to beat the previous one on the same time-aware evaluation, or it is added complexity without evidence.
 
-Choose based on your data:
+DeepFM is built to learn "both low- and high-order feature interactions" end to end, and NGCF encodes the interaction graph in the embedding process. Both can improve ranking, and both require enough data to learn their additional structure — which is why the simpler baselines come first.
 
-- **Item-based collaborative filtering:** `implicit` or `surprise` libraries. Compute item similarity (cosine, Pearson) from the interaction matrix.
-- **Matrix factorization:** Alternating Least Squares (ALS) or Singular Value Decomposition (SVD) to latent-factor representations.
-- **Content-based:** TF-IDF or embeddings over item descriptions; cosine similarity between item vectors.
+## Stage four: serving without drift
 
-Train on historical data, hold out a test set for evaluation.
+A model trained correctly can still behave wrongly in production if the features are computed differently at serving time. This is the most common operational failure in recommender systems and the hardest to see, because both paths produce plausible numbers.
 
-## Stage 4: Candidate generation and ranking
+The fix is structural: share the feature computation code between training and serving, or generate the serving features from the same pipeline rather than reimplementing them in another language. A feature store is one way of enforcing this; disciplined code sharing is another. What does not work is hoping the two implementations agree.
 
-For a target user:
+Serving also needs a fallback. When the model is unavailable, the system must return something sensible — popularity, editorial selection, or the previous ranking — and the fallback should be logged so the measurement does not silently mix two systems.
 
-1. **Generate candidates:** items similar to items the user interacted with (item-based) or items liked by similar users (user-based).
-2. **Score:** predicted rating or affinity score from the model.
-4. **Filter:** remove items the user already interacted with.
-5. **Rank:** sort by score, return top-K.
+## Stage five: measurement closes the loop
 
-For production, serve via FastAPI or similar, with caching for frequent users.
+Offline metrics are a filter, not a decision. A recommender that wins offline can lose online because of position bias, interference between users, or a feedback loop that amplifies early clicks.
 
-## Stage 5: Evaluation
+The online test has to log the candidate set and the position, randomise at a unit that matches the intervention, and run long enough to see retained behaviour. CUPED is relevant to the statistical side: it "utilizes data from the pre-experiment period to reduce metric variability" and reports about a 50% variance reduction on Bing, which is often the difference between detecting a modest ranking improvement and not.
 
-Split data by time (train on past, test on future) to simulate real deployment. Compute:
+## A build order that avoids rework
 
-- **Precision@K:** relevant items in top-K / K.
-- **Recall@K:** relevant items in top-K / total relevant items.
-- **NDCG:** ranking quality, rewarding relevant items at top positions.
+1. **Define the interaction and write it down.** Everything else depends on it.
+2. **Instrument the events** — candidate set, position, context, time, outcome.
+3. **Build a time-aware snapshot builder** and test it on known leakage cases.
+4. **Implement the baselines first** and record their scores.
+5. **Add complexity only when the evaluation improves**, with the same split and metric.
+6. **Share the feature code with serving** and verify with a parity test.
+7. **Run an online experiment with position logging** before claiming the model works.
 
-Avoid random splits for time-series data; they leak future information into training.
-
-## Common pitfalls
-
-- **Popularity bias:** the model keeps recommending the same blockbuster items. Add diversity or re-ranking.
-- **Cold start:** new users or items have no interactions. Use content features or default recommendations.
-- **Feedback loops:** recommendations influence what users see, which influences future data. Monitor and intervene.
-
-For the related question of evaluating recommendation systems, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias) and how systems influence buying, see [How Recommendation Systems Influence What We Buy](/articles/how-recommendation-systems-influence-what-we-buy).
+For the experiment design, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias); for the model families, see [Deep Learning for Recommendations](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
 
 ## Further Reading
 

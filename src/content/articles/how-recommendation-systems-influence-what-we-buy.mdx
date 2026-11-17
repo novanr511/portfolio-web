@@ -1,76 +1,59 @@
 ---
 title: "How Recommendation Systems Influence What We Buy"
-description: "Recommendation systems shape what we see, buy, and watch. Learn how they work, where they help, and where they manipulate."
+description: "Recommendations do not only reflect taste; they shape it. Read the mechanisms and the evidence about choice, attention, and bias."
 date: 2026-11-16
 tags:
-  - Data
-  - Machine Learning
+  - Recommender Systems
   - Consumer Behavior
-  - Recommendation Systems
+  - Psychology
+  - Product
 ---
 
-What you see online is rarely neutral. It is chosen.
+A recommendation system is often described as a mirror of preferences, and the metaphor is partly true — it is trained on behaviour — and partly misleading, because the output changes the behaviour that trains it. The system is not merely finding what you would have chosen; it is participating in the choice.
 
-**Direct answer:** Recommendation systems predict what a user will want to see, buy, or watch based on behavior, preferences, and context. They shape demand by deciding which products, content, or options are shown prominently. They can help users discover relevant items, but they can also narrow choices, reinforce biases, and prioritize the platform's interests over the user's. Understanding how they work is the first step to using them consciously.
+**Direct answer:** Recommenders influence purchasing through three mechanisms: they change the choice set by deciding what is visible, they shape attention through ranking and position, and they create feedback loops in which early exposure becomes evidence of preference. The consequence is that a system optimised purely for immediate clicks can narrow what a person sees and reinforce their past behaviour, and the effect is measurable at the level of the marketplace, not only the individual session.
 
-## How recommendation systems work
+## The choice set is the first lever
 
-Most systems use one or more of these approaches:
+A purchase happens among the options a person actually encounters. A recommender decides that set, which means it has power before any persuasion occurs.
 
-**Collaborative filtering.** "People like you also liked this." It finds users with similar behavior and recommends items they liked. It works well with enough data but struggles with new users and new items (the cold-start problem).
+This is the same mechanism that makes distribution strategically important: a customer cannot choose an item that was never shown to them, and no amount of product quality fixes absence from the consideration set. A recommender is distribution at the level of the individual session, and its most consequential decision is which items get the chance to be considered.
 
-**Content-based filtering.** "You liked action movies, so here are other action movies." It recommends items similar to ones the user has liked, based on attributes like genre, category, or keywords.
+The effect compounds. An item that receives exposure accumulates interactions, which makes it more likely to be recommended again. An item that never receives exposure never accumulates the evidence needed to be recommended. The system therefore has a systematic bias toward its own past, which is why new items are structurally disadvantaged and why a deliberate exploration policy is a design requirement rather than an experiment.
 
-**Hybrid systems.** Combine collaborative and content-based approaches to offset each approach's weaknesses.
+## Attention and position
 
-**Ranking models.** Modern systems often use machine learning models that score thousands of candidate items and rank them by predicted relevance, click probability, or purchase probability.
+Ranking is an attention mechanism. Users scan from the top, so a higher position attracts clicks independent of relevance, and the recommendation system's ordering therefore shapes what gets examined and what gets bought.
 
-The output is not neutral. It is a ranking optimized for an objective.
+This has two consequences that are easy to conflate. The first is measurement: a click on a top-ranked item is partly a click caused by position, and any model evaluation that does not log and adjust for position will misattribute it. The second is behavioural: if the system learns from those clicks without correcting for the position that produced them, it will reinforce its own ordering, and the feedback loop will make the ranking increasingly self-confirming.
 
-## What the system optimizes for
+The research on ranking and click-through reflects this. DeepFM's work is motivated by the need to learn "sophisticated feature interactions behind user behaviours" in order to maximise CTR, which is a genuine advance in modelling the signal — and it also illustrates why CTR alone is an incomplete objective for a system that shapes attention.
 
-Recommendation systems are built to maximize an objective, which may or may not align with the user's goals:
+## Feedback loops and the narrowing of choice
 
-- **Click-through rate:** keeps users clicking, which may favor sensational or familiar content.
-- **Conversion rate:** prioritizes items likely to be bought, which may favor high-margin or sponsored items.
-- **Retention:** keeps users coming back, which may favor addictive or habitual content.
-- **Revenue:** prioritizes items that generate the most profit, not the best fit.
+The most consequential effect is temporal. A user clicks an item, the system recommends similar items, the user clicks those, and the system's estimate of their preferences becomes more confident. The loop is a sensible use of evidence and it has a side effect: the range of items the user is shown can narrow over time, which reduces the chance of discovering a different preference.
 
-A system optimizing for revenue may show a more expensive item over a better cheaper one. A system optimizing for engagement may show outrage or outrage-adjacent content because it performs well.
+This is the recommenders-as-filter-bubble argument in its precise form. It does not require any intent to manipulate; it follows from optimising immediate engagement on a system that also controls exposure. The practical response is to include diversity and exploration as explicit objectives, and to measure longer-term outcomes — catalogue coverage, discovery of new categories, retained usage — rather than only the click metrics that drive the loop.
 
-## Where recommendations help
+## The psychological layer
 
-- **Discovery.** Users find products, music, or articles they would not have found themselves.
-- **Efficiency.** Less time searching, more time consuming or buying.
-- **Personalization.** Experiences adapt to individual preferences rather than one-size-fits-all.
-- **Inventory visibility.** Sellers reach buyers they could not reach otherwise.
+Kahneman's work on judgment and decision-making under uncertainty explains why users are susceptible to the choice architecture a recommender creates. The Nobel lecture is the primary source for the underlying research, and the relevant idea here is that preferences are often constructed in the moment rather than retrieved from a stable store.
 
-## Where recommendations manipulate
+If preferences are partly constructed, then the ordering and framing of options genuinely change what people choose, and the recommendation system is not discovering a fixed truth about the user. It is participating in the construction. That is a descriptive claim, not a moral one — but it changes what a responsible system should measure.
 
-- **Filter bubbles.** Users see more of what they already like, reducing exposure to diverse views or products.
-- **Choice architecture.** Default options and prominent placement steer decisions without users realizing.
-- **Sponsored content.** Paid placements look like organic recommendations.
-- **Addiction.** Systems optimized for time-on-site may encourage compulsive use.
+For designers, the implication is practical: the system's effect on outcomes should be evaluated with the same care as its predictions. A/B tests with a horizon long enough to capture repeat behaviour are the right instrument, and the metrics should include whether users discovered anything outside their established pattern.
 
-The influence is real even when users believe they are choosing freely.
+## What a responsible system measures
 
-## What users and businesses can do
+- **Exposure diversity:** the share of the catalogue that receives impressions, not just clicks.
+- **New-item discovery:** whether new items can escape the cold start in a reasonable time.
+- **Long-term satisfaction:** repeat usage and retained value, not only immediate engagement.
+- **Segmented effects:** whether some users are experiencing a narrowing of choice that others are not.
+- **Counterfactual outcomes:** what would have happened under a different ranking, measured with a controlled experiment rather than inferred from the model.
 
-Users can:
+None of these is achieved by changing the model architecture alone. They are objectives and constraints on the system, and they belong in the ranking configuration and the evaluation design.
 
-- **Be aware** that recommendations are curated, not neutral.
-- **Use search and direct navigation** when they want specific items, not suggested ones.
-- **Check multiple sources** before important purchases.
-- **Adjust privacy and recommendation settings** where available.
-
-Businesses can:
-
-- **Be transparent** about what is sponsored versus organic.
-- **Optimize for user value, not just platform metrics.**
-- **Offer sorting and filtering** so users are not locked into one ranking.
-- **Measure long-term outcomes** (retention, satisfaction, refunds), not just short-term clicks.
-
-For the related question of how data changes marketing decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and why people buy beyond need, see [Why People Buy Products They Don't Actually Need](/articles/why-people-buy-products-they-dont-actually-need).
+For the modelling side, see [Deep Learning for Recommendations](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings); for the experiment design, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
 
 ## Further Reading
 
