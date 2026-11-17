@@ -1,0 +1,96 @@
+---
+title: "Human in the Loop by Design: Overrides, Escalation, and Failure States"
+description: "A human in the loop is a claim about the interface, not a label on the workflow. Read what makes an override real and when review becomes theatre."
+date: 2026-11-17
+tags:
+  - AI Safety
+  - Human-AI Interaction
+  - Governance
+  - Product Design
+---
+
+Most AI systems that claim to keep a "human in the loop" have a human who clicks **Approve** on a suggestion. Whether that person can actually change the outcome is a different question. If the review takes longer than doing the task manually, if the reviewer cannot see why the model decided what it did, or if nobody has the authority to override, the human is a rubber stamp — and the system has a single point of failure disguised as a safeguard.
+
+**Direct answer:** Human oversight is an interface property: it exists when a named person can understand the system's output, reject or change it within the time available, and escalate when conditions fall outside the system's competence. NIST's AI Risk Management Framework is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems"; the Microsoft guidelines for human-AI interaction add concrete interface requirements such as making system limits clear and supporting efficient correction. The boundary: a human in the loop reduces some failure modes and introduces others — reviewers tire, defer to confident systems, and can be overwhelmed by volume.
+
+## What the guidelines actually require
+
+The Microsoft CHI 2019 guidelines for human-AI interaction are useful because they turn a slogan into observable interface properties. Three are directly relevant:
+
+**Make clear how well the system can do what it can do.** A reviewer needs to know the system's limits before deciding whether to trust an output. An unqualified confidence score presented as a percentage is not the same as a statement of the conditions under which the model was evaluated.
+
+**Support efficient correction.** If rejecting a suggestion takes more effort than completing the task, the reviewer will stop rejecting. The interface must make the common correction cheap.
+
+**Show the system's behaviour over time and how it changes.** A deployed model that has been retrained is a different system, and a reviewer who learned its habits last quarter may be trusting behaviour that no longer exists.
+
+NIST's framework supplies the process layer. Its voluntary status matters: it is a structure for producing evidence about trustworthiness, not a certification. Model cards add the documentation layer, requiring intended use and "benchmarked evaluation in a variety of conditions" so the reviewer can see where the evaluation does and does not apply.
+
+Together these give a testable definition: a human is in the loop when the person has the *information* to judge, the *time* to act, and the *authority* to change the result.
+
+## Two ways review fails
+
+**Automation bias.** People tend to defer to automated recommendations, especially under time pressure and when the system appears authoritative. A reviewer who sees a confident suggestion and a green checkmark has a strong incentive to accept it, because rejecting requires justification and accepting does not.
+
+**Review fatigue.** A system that generates hundreds of alerts a day will train its reviewers to skim them. This is the same failure mode as a monitoring system with a high false-positive rate: an alert that is routinely ignored has zero value. The volume of review is a design constraint, not an implementation detail.
+
+Both failures get worse when the interface hides uncertainty. A model card that states the system was evaluated on one population cannot help a reviewer working on a different one unless that limitation is surfaced at the point of decision.
+
+## A worked example of a review budget
+
+The following numbers are hypothetical and illustrative.
+
+A support organisation uses an AI system to draft replies. Each draft takes the model seconds to produce, and a human reviews before sending. The team has 10 reviewers working 6 productive hours a day.
+
+- **Review cost:** assume 90 seconds of genuine review per reply — reading the draft, checking the customer's account, and correcting errors. One reviewer handles 40 replies an hour, 240 a day; the team handles 2,400 a day.
+- **Arrival volume:** 3,000 replies a day. The team is short 600 reviews, so the queue grows and reviewers are told to "prioritise speed".
+- **Effective review time falls** to 45 seconds as a result. Throughput reaches 4,800 capacity, so the queue clears — but at 45 seconds, a reviewer cannot check the account properly. The human is now a formality.
+
+Three design changes alter the outcome:
+
+1. **Reduce what reaches review.** Let the system auto-send only the categories where it has measured high accuracy and low impact; route the rest. This changes the review rate rather than rushing the reviewer.
+2. **Make correction cheaper than rejection.** If the tool offers a one-click fix for the common error, the 90 seconds can cover a real check plus a fast edit. The Microsoft guideline on efficient correction applies here.
+3. **Give the reviewer authority and a stop condition.** A reviewer who sees a category the system handles badly must be able to pause automation for that category, with a documented owner for the decision.
+
+The arithmetic shows why "add a human" is not a control by itself. The control is the *budget* — the volume, time, and authority that make review meaningful.
+
+## Designing the three states
+
+A usable oversight design defines three states explicitly:
+
+**Normal** — the system operates within its evaluated conditions; the reviewer sees a concise summary and can accept, edit, or reject. The common path should be fast.
+
+**Escalation** — an input falls outside the evaluated population, the model's confidence is low, or the impact is high. The task goes to a person with the relevant authority and enough context to decide without the model's framing.
+
+**Failure** — the system is known to be degraded, retrained, or unavailable. The workflow falls back to a human-only path, and the reason is logged.
+
+What matters is that these states are *defined before deployment*. A team discovering its escalation path during an incident has no oversight design; it has an accident with a person standing nearby.
+
+## What oversight cannot guarantee
+
+Three limits deserve clear statement.
+
+**Humans also fail.** Reviewers get tired, biased, and distracted. The question is not whether the human is perfect but whether the combination is better than either alone, which requires measuring the combined system's error rate.
+
+**Review at scale is expensive.** If meaningful review costs 90 seconds per decision and the system makes thousands of decisions a day, full review may be economically impossible. The honest answer is to restrict autonomous action to the cases where review is affordable and impact is low.
+
+**Authority is organisational.** A reviewer who is not permitted to stop the system cannot serve as a control. The stop condition and the person who owns it have to be named in the process, not assumed in the UI.
+
+The counterargument — that oversight slows everything down — is true and beside the point. The purpose of a control is to change the outcome when the system is wrong; if a control never changes anything, it was not a control.
+
+## A decision test
+
+1. **Name the reviewer** and the authority they hold, including the ability to stop the system.
+2. **State what the reviewer can see** about the model's limits and the conditions of its evaluation.
+3. **Budget the review time** against the arriving volume, as in the worked example.
+4. **Make correction cheaper than rejection** for the common error.
+5. **Define the escalation and failure states** before deployment, with an owner for each.
+6. **Measure the combined system's error rate**, not just the model's or the reviewer's in isolation.
+7. **Document the limits** in a model card that travels with the deployed system.
+
+For the governance framework, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale); for the documentation artefact, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## Further Reading
+
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.
+- Margaret Mitchell et al., 2019. [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) — The reporting template used to document intended use, evaluation, and limitations.
+- Saleema Amershi et al. (Microsoft Research), 2019. [Guidelines for Human-AI Interaction - Microsoft Research](https://www.microsoft.com/en-us/research/publication/guidelines-for-human-ai-interaction/) — The CHI 2019 guidelines for human-AI interaction, including making system limits clear, supporting efficient correction and explaining system behaviour.

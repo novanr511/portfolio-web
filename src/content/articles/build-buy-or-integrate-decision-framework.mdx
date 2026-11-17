@@ -1,0 +1,104 @@
+---
+title: "Build, Buy, or Integrate: A Decision Framework for Software Capabilities"
+description: "The build-versus-buy choice is really about control, maintenance capacity, and switching cost. Read the decision test and a worked cost example."
+date: 2026-11-17
+tags:
+  - Strategy
+  - Software Engineering
+  - Procurement
+  - Architecture
+---
+
+Teams usually frame a new capability as "build it or buy it". That framing hides the third and often best option: integrate an existing component rather than adopting a whole product. It also hides the real question, which is not which option is cheaper today but which one you can still afford to own in three years.
+
+**Direct answer:** Choose based on three variables: how much control the capability needs, what maintenance capacity your team actually has, and what it would cost to switch later. AWS's Well-Architected cost-optimization pillar frames the goal as delivering outcomes "at the lowest appropriate price point while meeting its functional requirements and your performance, reliability, security, and sustainability standards" — the qualifier is the whole decision. The boundary: a capability that is strategic to your business deserves different treatment from a commodity utility, and the same tool can be the right answer for one team and the wrong one for another.
+
+## The three options are different contracts
+
+**Build** means owning the code, the deployment, and the maintenance. You gain control over behaviour and data, and you take on the full lifecycle: patches, on-call, documentation, and the cost of every future change.
+
+**Buy** means paying a vendor for a working product and, usually, support. You gain speed and an accountable party, and you take on licensing cost, integration work, and dependence on the vendor's roadmap and pricing.
+
+**Integrate** means composing an existing library, service, or open component into your own system. You gain most of the speed of buying with more control over how it is used, and you still own the integration and the dependency's health. OpenSSF's best-practice work exists partly because widely used components are critical infrastructure that need active maintenance, not because code being visible makes it free.
+
+The options are not points on a single price line. They differ in *who owns the lifecycle* and *where the switching cost sits*.
+
+## Control is a specific question
+
+"Control" is too vague to decide anything. Break it into three:
+
+**Can you change the behaviour?** If the capability must encode a rule that is unique to your business and likely to change, owning the logic matters. A vendor's configuration options have a boundary, and crossing it means a feature request on someone else's roadmap.
+
+**Can you inspect the failure?** When the system behaves unexpectedly, can you see why? Opaque services make diagnosis dependent on the vendor's support process, which may be slow or unavailable in an incident.
+
+**Can you carry the data with you?** If you leave, can you export the data and the logic in a usable form? A capability with high switching cost is a strategic commitment, whether or not anyone called it one.
+
+O*NET's occupation records are a useful reminder that the skills to operate a capability are part of the cost. A tool that requires scarce skills your team does not have is not "bought"; it is rented with an unfunded training obligation.
+
+## A worked example of three-year cost
+
+The following numbers are hypothetical and illustrative.
+
+A team needs a workflow engine. Three options:
+
+| Option | Year-one cost | Annual ongoing | Switching cost at year 3 |
+| --- | --- | --- | --- |
+| Build | 120,000 engineering | 40,000 maintenance | 0 — your code |
+| Buy | 30,000 licence + 20,000 integration | 30,000 licence | 80,000 migration |
+| Integrate | 20,000 integration | 15,000 dependency upkeep | 30,000 replacement |
+
+Three-year totals:
+
+- **Build:** 120,000 + 2 × 40,000 = **200,000**.
+- **Buy:** 30,000 + 20,000 + 2 × 30,000 + 80,000 (if switching at year 3) = **190,000**.
+- **Integrate:** 20,000 + 2 × 15,000 + 30,000 = **80,000**.
+
+On these assumptions, integration wins clearly — but the result depends on three assumptions the team does not control fully:
+
+1. **Maintenance estimates.** Build's 40,000 a year assumes the engine stays relevant. If requirements grow, that number rises; if the engine becomes a differentiator, the build option gains strategic value the table cannot show.
+2. **Vendor pricing.** Buy's licence may increase at renewal, and the 80,000 migration cost is an estimate made *before* three years of data and logic accumulate in the product. Both tend to be underestimated.
+3. **Dependency health.** Integrate's low upkeep assumes the component stays maintained. If its maintainers stop, the 30,000 replacement cost could arrive in year one instead.
+
+The method matters more than the numbers: put the full lifecycle and a switching cost in the same table, then ask which assumption would change the answer. A decision that flips on a single uncertain input is a decision to research, not one to make on a spreadsheet.
+
+## What integration requires in practice
+
+Choosing to integrate shifts work rather than removing it. Three responsibilities remain with your team:
+
+**Own the contract.** The boundary between your system and the component — what it accepts, what it guarantees, and how it fails — has to be explicit. A dependency whose behaviour is assumed rather than specified becomes impossible to replace, because nobody knows what the rest of the system relies on.
+
+**Pin and track the version.** An unpinned dependency can change under you, and a pinned one eventually needs upgrading. A visible changelog and a scheduled review turn that from an emergency into maintenance; the "Keep a Changelog" convention exists precisely so consumers can see what changed and decide when to move.
+
+**Keep an exit path.** Record which interfaces the component satisfies and what a replacement would need to provide. This is the practical form of the switching cost in the worked example: a cost you have measured is a cost you can plan for, while an unmeasured one only appears at the worst possible moment.
+
+These are the same disciplines that apply to owning code, which is why integration is not a way to avoid engineering — it is a way to spend engineering on different things.
+
+## What the framework misses
+
+Three limits matter.
+
+**A capability can change category.** A commodity utility today can become a strategic differentiator after a product decision. Revisit the classification when the strategy changes, not only when the contract renews.
+
+**Compliance and security are constraints, not line items.** A vendor that cannot meet a regulatory obligation removes the buy option regardless of cost. The AWS framing's "meeting your ... security ... standards" is a floor, not a trade-off to be priced.
+
+**The team is part of the calculation.** A small team with no capacity for maintenance should not build, however attractive control sounds. A large team with deep expertise in the domain may find that building is cheaper than the table suggests because the marginal engineering cost is low.
+
+The counterargument to integration — that dependencies are a risk — is correct. The response is to evaluate maintainer health and keep an exit path, not to assume that owning every line of code is safer.
+
+## A decision test
+
+1. **Classify the capability** as commodity, supporting, or strategic, and state who benefits if it changes.
+2. **Name the control you need** — behaviour, diagnosis, or data portability — and check which option actually provides it.
+3. **Price the full lifecycle** — build, run, maintain, and exit — using the same period for all options.
+4. **Check maintenance capacity** against the team's real skills and workload, not its aspirational ones.
+5. **Treat compliance and security as floors** that remove options rather than add cost.
+6. **Assess dependency or vendor health** with evidence, including what happens if support ends.
+7. **Set a review date** tied to a change in strategy, scale, or the supplier, not a fixed calendar.
+
+For the licensing dimension, see [Open Source vs Proprietary Software](/articles/open-source-vs-proprietary-software-who-really-wins); for the cost discipline, see [Cloud Cost Optimization](/articles/cloud-cost-optimization-finops-right-sizing-and-reserved-instances).
+
+## Further Reading
+
+- Amazon Web Services, 2026. [Cost Optimization (AWS Well-Architected Framework)](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Vendor primary documentation on right-sizing and commitment models.
+- OpenSSF, 2026. [OpenSSF Scorecard and Best Practices](https://best.openssf.org/) — Concrete supply-chain security baselines for open-source dependencies.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.
