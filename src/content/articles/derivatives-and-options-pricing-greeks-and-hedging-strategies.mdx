@@ -1,83 +1,97 @@
 ---
 title: "Derivatives and Options: Pricing, Greeks, and Hedging Strategies"
-description: "Derivatives derive value from underlying assets. Learn option pricing, Greeks, volatility surfaces, and hedging strategies for risk management."
+description: "An option is a right, not an obligation. Read how it is priced, what the Greeks measure, and why hedging removes one risk by taking another."
 date: 2026-11-16
 tags:
-  - Derivatives
   - Options
-  - Greeks
+  - Derivatives
   - Hedging
-  - Volatility
+  - Finance
 ---
 
-Derivatives derive value from something else. They transfer, hedge, or speculate on risk.
+Options are usually introduced as a way to speculate with leverage, and that is one legitimate use. Their original and arguably more important function is insurance: a right that limits downside while preserving upside. The two uses are the same instrument, which is why the risk language around options is unusually important — and unusually directive.
 
-**Direct answer:** Derivatives are contracts whose value derives from an underlying asset (stock, bond, commodity, rate, index). Options give the right (not obligation) to buy (call) or sell (put) at a strike price by expiration. Pricing models (Black-Scholes, binomial, Monte Carlo) and Greeks (Delta, Gamma, Vega, Theta, Rho) quantify risk. Hedging uses derivatives to offset portfolio exposures.
+**Direct answer:** An option gives its holder a right, not an obligation, to buy or sell an underlying asset at a specified price on or before a specified date. Its price has two parts — intrinsic value and time value — and the sensitivities to price, time, volatility, and rates are named the Greeks. The Options Industry Council, the educational body of the OCC, states the governing condition without euphemism: "Options involve risk and are not suitable for all investors", and "prior to buying or selling an option, a person must receive a copy of Characteristics and Risks of Standardized Options". Hedging with options does not remove risk; it exchanges an uncertain outcome for a known cost.
 
-## Option fundamentals
+## What the instrument actually is
 
-**Call option:** right to buy at strike K by expiry T.
-**Put option:** right to sell at strike K by expiry T.
-**American:** exercisable any time before expiry.
-**European:** exercisable only at expiry.
-**Moneyness:** ITM (in-the-money), ATM, OTM.
-**Intrinsic value:** max(S-K,0) for call, max(K-S,0) for put.
-**Time value:** premium - intrinsic value.
+A call gives the holder the right to buy; a put gives the holder the right to sell. The agreed price is the strike, and the last day on which the right can be exercised is expiration. The option writer takes the opposite side and has an obligation, which is why the writer receives a premium.
 
-## Black-Scholes-Merton model
+The asymmetry is the whole point. A buyer's maximum loss is the premium paid, while the upside depends on how far the underlying moves. A writer's maximum gain is the premium received, while the downside can be very large. That is why the same contract can be a conservative hedge for one party and a risky position for the other, and why "buying options" and "selling options" must never be discussed as the same activity.
 
-Assumes: lognormal returns, constant volatility, no dividends, frictionless markets, risk-free rate constant.
+The OIC's education catalogue reflects the structure of the subject — it covers "What is an Option?", "Options Basics", "Leverage", "Risk", "Exercising Options", and "Implied Volatility", and it has offered educational resources about "the risks and potential benefits of exchange-listed options" since 1992. The order is instructive: risk is a core topic, not a disclaimer at the end.
 
-Formula (call): C = S₀N(d₁) - Ke^(-rT)N(d₂)
-d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)
-d₂ = d₁ - σ√T
+## How the price is built
 
-**Assumptions often violated:** volatility smile/skew, fat tails, jump diffusion, stochastic volatility.
+An option's premium is conventionally decomposed into:
 
-## The Greeks
+**Intrinsic value** — what the option would be worth if exercised immediately. A call with a strike below the current price is in the money by the difference; a call with a strike above it has zero intrinsic value.
 
-| Greek | Measures | Formula (Call) | Interpretation |
-|---|---|---|---|
-| **Delta (Δ)** | ∂V/∂S | N(d₁) | Price sensitivity to underlying. Hedge ratio. |
-| **Gamma (Γ)** | ∂²V/∂S² | φ(d₁)/(Sσ√T) | Convexity. Delta stability. |
-| **Vega (ν)** | ∂V/∂σ | Sφ(d₁)√T | Volatility sensitivity. |
-| **Theta (Θ)** | ∂V/∂T | -Sφ(d₁)σ/(2√T) - rKe^(-rT)N(d₂) | Time decay. |
-| **Rho (ρ)** | ∂V/∂r | TKe^(-rT)N(d₂) | Interest rate sensitivity. |
+**Time value** — everything else. It reflects the probability that the option will become profitable before expiration, and it decays as expiration approaches.
 
-**Portfolio Greeks:** sum of position Greeks. Delta-neutral: Σ Δᵢ × qtyᵢ = 0.
+The main inputs to a theoretical price are the underlying price, the strike, time to expiration, the risk-free rate, expected dividends, and volatility. Volatility is the input that makes option pricing distinctive: it is the only one that is not directly observable at the time of the trade, and it is the one that frequently dominates the price of an option that is far from the money.
 
-## Volatility surfaces
+This is why two people can disagree about an option's fairness while agreeing on every observable fact. The disagreement is about future volatility, and the market's estimate is embedded in implied volatility — a forward-looking number that is itself a subject of study rather than a measurement.
 
-Implied volatility varies by strike and expiry: **vol smile** (U-shape for equities), **vol skew** (puts > calls for equities), **term structure** (vol by tenor). SABR, Heston, local vol, stochastic vol models fit surfaces.
+## The Greeks are the sensitivity map
 
-## Hedging strategies
+The Greeks name the partial derivatives of the option price with respect to the main inputs, and they are the language of risk management:
 
-**Delta hedging:** dynamically rebalance to maintain Δ=0. Continuous in theory, discrete in practice → gamma/theta costs.
+- **Delta** measures the change in the option price for a small change in the underlying. It is also a rough proxy for the probability of finishing in the money, which is why the OIC's catalogue lists "Delta Effect" as a subject.
+- **Gamma** measures the change in delta. It is highest when the option is near the money and near expiration, which is where a hedge can stop working quickly.
+- **Theta** measures the change in price as time passes — the decay of time value. For a buyer, theta is usually negative; the option loses value each day if nothing else changes.
+- **Vega** measures sensitivity to implied volatility. An option can make money from a volatility change even when the underlying barely moves.
+- **Rho** measures sensitivity to the risk-free rate, typically a smaller effect for short-dated contracts.
 
-**Delta-gamma hedging:** add options to neutralize gamma.
+The important property is that these sensitivities change continuously. A hedge that is neutral today is not neutral tomorrow, because gamma and theta change with price and time. Hedging is therefore a process of rebalancing, not a one-time purchase.
 
-**Vega hedging:** use options to offset vega exposure.
+## Hedging exchanges risk
 
-**Static hedging:** replicate exotic payoff with vanilla options (static replication).
+A portfolio holder who buys protective puts is paying a premium to cap the downside. The trade-off is explicit and knowable: the maximum cost is the premium, and the protection lasts only until expiration. If the market rises, the puts expire worthless and the holder has paid for insurance that was not needed — which is exactly how insurance is supposed to work.
 
-**Delta-one products:** futures, forwards, swaps, ETFs. Delta ≈ 1.
+A covered call — selling a call against shares you own — caps upside in exchange for premium income. It reduces the pain of a flat or slightly falling market and gives up part of a rising one. Neither strategy is "conservative" in the abstract; each is a different claim about what the holder wants to give up.
 
-## Exotic options
+The mistake most often made is to treat a hedge as a profit centre. A hedge that loses money on a rising market is not a failed hedge; it is the cost of the protection that was bought. Evaluating it as a standalone trade encourages the holder to remove protection at exactly the wrong time.
 
-- **Barrier:** knock-in/out at barrier level.
-- **Asian:** average price payoff.
-- **Lookback:** payoff on min/max.
-- **Binary/Digital:** fixed payout if ITM.
-- **Compound:** option on option.
+## A worked example of the trade-off
 
-## Applications
+Suppose a fund holds shares worth 1,000 units and wants protection against a fall over the next quarter. A three-month protective put with a strike 10% below the current price costs 30 units.
 
-- **Portfolio insurance:** protective puts, collars.
-- **Covered calls:** income generation.
-- **Dispersion trading:** index vs single-stock vol.
-- **Volatility trading:** long/short vol, variance swaps.
+- If the shares fall 25%, the puts are worth roughly 150 at expiration. The portfolio loses 250 on the shares and gains 150 on the puts, so the net loss is 100 units before the premium — 130 including it. Without the hedge, the loss would have been 250.
+- If the shares are unchanged, the puts expire worthless. The portfolio has paid 30 units for insurance that was not needed.
+- If the shares rise 15%, the puts expire worthless and the portfolio gains 150, minus the 30 premium. The hedge cost 30 units of upside.
 
-For the related question of portfolio construction, see [Corporate Finance Essentials: Capital Structure, WACC, and Investment Decisions](/articles/corporate-finance-essentials-capital-structure-wacc-and-investment-decisions) and risk management, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+Three properties of the instrument are visible in that arithmetic. The maximum cost is known at entry; the protection is bounded in both magnitude and time; and the "insurance" loses money in the majority of outcomes if the underlying does not fall. None of that makes the hedge wrong — it makes the hedge a decision about which outcomes you are willing to pay to avoid.
+
+The Greeks tell you how that shape evolves. Near the strike and close to expiration, delta changes quickly, gamma rises, and the hedge stops being a static position. A fund that bought protection once and never rebalanced would find its coverage changing as the underlying moved, which is why hedging is a process.
+
+## Model risk and the limit of theory
+
+Theoretical pricing models produce a number, and the number depends on inputs and assumptions. Three limitations matter in practice:
+
+**Volatility is unobservable.** The input that most affects an out-of-the-money option's price is a forecast. Two traders using the same model and the same observable data can produce materially different prices because they disagree about future volatility.
+
+**Markets are not continuous.** Models assume trading can occur smoothly and hedges can be rebalanced continuously. In a fast market, gaps appear, bid-ask spreads widen, and the hedge cannot be adjusted at the assumed price.
+
+**The model is not the contract.** Exchange-listed options have standardized terms, and the OCC's *Characteristics and Risks of Standardized Options* exists because those terms — exercise, assignment, settlement — create risks that a pricing formula does not capture. A theoretically fair price is not the same as an executable, well-understood position.
+
+For a practitioner, the conclusion is narrow: use the model to understand sensitivity, not to declare that a price is right. The risk document declares the things the model omits.
+
+## Why the disclosure is not a formality
+
+The OCC requirement that an investor receive *Characteristics and Risks of Standardized Options* before trading exists because the instrument's asymmetry is genuinely dangerous. Leverage amplifies both directions; assignment can occur when least expected; liquidity in a specific strike can be thin; and the writer's obligation is not capped in the way a buyer's loss is.
+
+A practical sequence before any options position:
+
+1. **State the objective precisely** — protection, income, or a directional view. Different objectives imply different structures and different failure modes.
+2. **Identify the maximum loss** before entering. For a buyer it is the premium; for a writer it can be far larger than the premium received.
+3. **Check the Greeks at entry and under stress.** What happens to the hedge if the underlying moves ten percent and volatility rises?
+4. **Check liquidity** — bid-ask spread and open interest at the chosen strike. A theoretical price is not an executable one.
+5. **Set the horizon.** Theta works continuously, and a view that takes longer to play out than the option's life will fail for reasons unrelated to the view.
+6. **Read the official risk document.** The requirement exists because the risks are hard to intuit from the payoff diagram.
+7. **Size the premium as a cost you can lose entirely.**
+
+For the broader pricing environment, see [Interest Rates and Their Effect on Technology Companies](/articles/interest-rates-and-their-effect-on-technology-companies); for the valuation framework these instruments reference, see [Corporate Finance Essentials](/articles/corporate-finance-essentials-capital-structure-wacc-and-investment-decisions).
 
 ## Further Reading
 
