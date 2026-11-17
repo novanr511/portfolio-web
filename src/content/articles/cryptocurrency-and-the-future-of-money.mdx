@@ -1,65 +1,96 @@
 ---
 title: "Cryptocurrency and the Future of Money"
-description: "Cryptocurrency challenges traditional finance with decentralized, programmable money. Learn what it is, what it promises, and where the risks remain."
+description: "Cryptocurrencies solve a specific coordination problem with specific trade-offs. Read the consensus mechanism, the confirmation maths, and what regulators actually say."
 date: 2026-11-16
 tags:
   - Cryptocurrency
-  - Markets
-  - Finance
-  - Technology
+  - Blockchain
+  - Economics
+  - Regulation
 ---
 
-Money is being reprogrammed.
+Cryptocurrency is usually discussed as a price chart or a cultural argument. Both obscure the more interesting question: what problem does the technology solve, and what does it cost to solve it? The answer is precise — it allows parties who do not trust one another to agree on a shared record without a central operator — and the costs are equally precise: probabilistic settlement, energy use, and a regulatory position that is still being written.
 
-**Direct answer:** Cryptocurrency is digital, decentralized money secured by cryptography and recorded on distributed ledgers. It promises faster, cheaper, censorship-resistant transfers and programmable finance without intermediaries. But it faces volatility, regulatory uncertainty, security risks, and scalability challenges. Cryptocurrency may reshape parts of the financial system, but it is not a replacement for traditional money—yet.
+**Direct answer:** A cryptocurrency is a digital asset whose ownership and transfer are recorded on a distributed ledger and secured by cryptography and a consensus mechanism. The UK's Financial Conduct Authority defines cryptoassets as "cryptographically secured digital representations of value or contractual rights that use some type of distributed ledger technology (DLT) and can be transferred, stored or traded electronically". The boundary matters: this describes a mechanism for agreement, not a claim that every token is useful money, a good investment, or free of intermediary risk.
 
-## What cryptocurrency is
+## The problem being solved
 
-Cryptocurrency uses cryptography to secure transactions and control the creation of new units. Unlike traditional money issued by central banks, cryptocurrencies typically run on decentralized networks where no single entity controls the ledger. Transactions are verified by network participants and recorded in a shared, append-only record (blockchain or similar structure).
+In a conventional payment system, a bank maintains the ledger and decides whether a transaction is valid. That works because participants trust the bank and because a legal framework backs it. The difficulty appears when participants do not share a trusted operator and still need to prevent the same unit from being spent twice — the double-spending problem.
 
-Key properties:
+Nakamoto's Bitcoin whitepaper, *Bitcoin: A Peer-to-Peer Electronic Cash System*, proposes a solution: a public timestamped record of transactions, ordered by a proof-of-work process in which participants compete to extend the chain. Nodes reject invalid transactions, so an attacker cannot create value from nothing; the most they can do is try to reverse a transaction they themselves made.
 
-- **Decentralization:** no central issuer or administrator.
-- **Pseudonymity:** transactions are linked to addresses, not real identities.
-- **Programmability:** money can carry rules (smart contracts) that execute automatically.
-- **Global reach:** transfers can cross borders without traditional intermediaries.
+Three properties follow from the design:
 
-## What cryptocurrency promises
+- **No central ledger operator.** Agreement emerges from the rule that the longest valid chain wins.
+- **Probabilistic finality.** A transaction is never absolutely final; confidence grows as more blocks are added after it.
+- **Costly agreement.** Proof-of-work consumes energy and hardware precisely to make rewriting history expensive.
 
-- **Lower transaction costs:** no intermediary fees for some transfers.
-- **Faster settlement:** minutes or seconds instead of days for cross-border payments.
-- **Financial access:** anyone with internet can participate, without a bank account.
-- **Programmable money:** automatic payments, escrow, and conditional transfers.
-- **Censorship resistance:** transactions cannot be easily blocked by a single authority.
+Ethereum's whitepaper extends the idea from a ledger of transfers to a platform for "smart contracts" — programs deployed to the blockchain that execute when conditions are met. The practical shift is from a shared record of *what was paid* to a shared record of *what was executed*, which is why most current activity in the sector concerns applications rather than payments alone.
 
-## The risks and limitations
+## A worked example of confirmation risk
 
-**Volatility.** Cryptocurrency prices fluctuate wildly, making them poor stores of value and unreliable units of account for everyday commerce.
+The whitepaper's Section 11 gives a formula that turns "how long should I wait?" into a calculation. It models the race between an honest chain and an attacker's chain as a binomial random walk and defines:
 
-**Regulatory uncertainty.** Governments are still determining how to classify, tax, and regulate cryptocurrency. Rules vary by country and change quickly.
+- **p** = probability an honest node finds the next block
+- **q** = probability the attacker finds the next block
+- **q_z** = probability the attacker ever catches up from z blocks behind
 
-**Security.** Users are responsible for their own keys. Lost keys mean lost funds. Exchanges and wallets have been hacked. There is no customer support to reverse a transaction.
+The result is: q_z = 1 if p ≤ q, otherwise q_z = (q/p)^z. The paper notes that "the probability drops exponentially as the number of blocks the attacker has to catch up with increases".
 
-**Scalability.** Popular networks can become slow and expensive during high demand.
+The following numbers are hypothetical and illustrative, using the whitepaper's formula. Suppose an attacker controls 10% of the network's block-finding power, so q = 0.1 and p = 0.9. Then q/p ≈ 0.111:
 
-**Illicit use.** Pseudonymity enables legitimate privacy but also fraud, money laundering, and ransomware.
+| Confirmations (z) | Approximate probability attacker catches up |
+| --- | --- |
+| 1 | ~11% |
+| 3 | ~0.14% |
+| 6 | ~0.002% |
 
-## Where it fits today
+This is why a six-confirmation convention exists: it is a chosen risk threshold, not a law of nature. Change the assumption — an attacker with 30% of the hash power gives q/p ≈ 0.43, and six confirmations leave roughly 0.6% catch-up probability — and the same convention becomes much weaker.
 
-Cryptocurrency is used for:
+The honest limitation is that the formula is a model. It assumes an attacker who cannot rewrite arbitrary transactions, that block discovery is memoryless, and that hash power can be treated as a fixed share. Real networks involve fees, reorganisations, and concentrated mining power. The calculation is valuable because it makes the risk *explicit and parameterised*, not because it predicts an attack.
 
-- **Speculation and investment:** buying and holding as an asset class.
-- **Remittances:** sending money across borders where traditional channels are expensive.
-- **Programmable finance:** decentralized finance (DeFi) applications for lending, borrowing, and trading.
-- **Store of value:** some view certain cryptocurrencies as digital gold, though this is debated.
+## What regulators actually say
 
-It is less used for everyday purchases because of volatility, speed, and merchant acceptance.
+Regulation is where the "future of money" claim meets the present. The FCA's page on its cryptoasset work, last updated 30 June 2026, states that its aims are to ensure "consumers are protected, market integrity is upheld, and competition works in the interest of consumers". It describes different token categories — including e-money tokens that meet the definition of e-money under the Electronic Money Regulations — rather than treating all cryptoassets alike.
 
-## The future is uncertain
+A concrete development: on 30 June 2026 the FCA published final rules and guidance that "will apply to all cryptoasset firms who have been granted permission to operate under FSMA on or after 25 October 2027". The direction is toward bringing firms into a permissioned framework, not toward endorsing tokens as investments.
 
-Cryptocurrency may become part of the financial infrastructure, remain a niche asset, or be superseded by central bank digital currencies (CBDCs) and other innovations. The underlying technology—distributed ledgers, cryptographic security, programmable money—is likely to influence finance regardless of which currencies survive.
+For a reader, this has two implications. First, regulatory status is jurisdiction-specific and changes; a claim that was accurate in one year may not be in the next. Second, "regulated firm" and "regulated asset" are different claims. A platform being supervised does not make the assets it lists safe or suitable.
 
-For the related question of how financial markets react to technology, see [How Financial Markets React to Technological Disruption]—this publication does not yet have that article, so treat it as a planned topic rather than a published link. For how money and markets work more broadly, see [How Energy Markets Actually Work](/articles/how-energy-markets-actually-work).
+## Where the technology is genuinely useful
+
+Three cases survive scrutiny better than the general hype:
+
+**Settlement without a shared operator** — parties who cannot agree on a trusted intermediary can still agree on a record. The cost is latency and fees, so this matters most where trust is genuinely absent.
+
+**Programmable agreements** — smart contracts can enforce terms without a party manually executing them, useful when the rules are clear and the inputs are verifiable.
+
+**Asset representation** — a token can represent a claim on something else, which can simplify transfer and settlement. The value depends entirely on the credibility of the underlying claim and the legal framework around it.
+
+In each case the question is the same: does this need a shared, adversarial-proof ledger, or would a database with an owner do? Most applications do not need the former, and using it anyway imports cost without benefit.
+
+## The limitations that decide the answer
+
+**No cash flow to value.** Unlike a share, a token does not entitle the holder to a company's earnings. Investor.gov's broad framing is useful here: returns on investments come "from an increase in the asset's value or from an asset's interest or dividend payments", and "all investments involve risk". For a non-income asset, the return depends on someone else paying more later.
+
+**Volatility is a property, not a bug.** A system whose supply is fixed or rule-based cannot expand to absorb demand shocks the way a central bank can. That is a feature for those who want a predictable monetary rule and a source of instability for those who need a stable unit of account.
+
+**Intermediaries return.** Exchanges, custodians, wallet providers, and stablecoin issuers reintroduce the trust that the protocol removed. A "decentralised" asset held on a centralised exchange is only as safe as that exchange.
+
+**Energy and concentration.** Proof-of-work security is paid for in electricity, and mining power can concentrate. These are design trade-offs of the mechanism, not public-relations problems.
+
+## A decision test
+
+For a reader deciding whether a crypto claim is credible:
+
+1. **Name the coordination problem** the token solves, and ask whether a trusted intermediary could solve it more cheaply.
+2. **Separate the protocol from the intermediaries** you would actually deal with.
+3. **Check the regulatory position** in your jurisdiction and the date it was stated.
+4. **Ask what produces the return** — a claim on cash flow, a fee, or a greater fool.
+5. **Treat a settlement convention as a risk threshold**, not a guarantee; the whitepaper's own formula makes that explicit.
+6. **Do not treat a price increase as evidence of usefulness.**
+
+For the market context, see [Stock Market Fundamentals](/articles/stock-market-fundamentals-valuation-indices-and-market-mechanics); for a comparison with another asset class that produces no cash flow, see [Commodity Markets](/articles/commodity-markets-oil-gold-and-price-discovery).
 
 ## Further Reading
 

@@ -1,79 +1,90 @@
 ---
 title: "Fixed Income Markets: Bonds, Yields, and Duration Risk"
-description: "Fixed income provides income and diversification. Learn bond mechanics, yield curves, duration, convexity, and credit risk."
+description: "Bond prices move inversely to yields because the coupon is fixed. Read the mechanism, a priced worked example, and the three risks that are often conflated."
 date: 2026-11-16
 tags:
   - Fixed Income
   - Bonds
-  - Yield Curve
-  - Duration
-  - Credit Risk
+  - Markets
+  - Risk Management
 ---
 
-Bonds are loans. Understanding their math is essential for portfolio construction.
+A bond looks simple: lend money, receive interest, get the principal back. The subtlety is that the interest payments are usually fixed in nominal terms while the market's required return changes every day. That mismatch is the entire source of bond price risk, and it is quantifiable.
 
-**Direct answer:** Fixed income markets trade debt securities that promise fixed or floating cash flows. Key concepts: price-yield inverse relationship, duration (interest rate sensitivity), convexity, credit spreads, and yield curve dynamics. Bonds provide income, capital preservation, and diversification against equity risk.
+**Direct answer:** A bond is a debt obligation — Investor.gov describes it as "like an IOU", where the buyer lends money and the issuer makes "a legal commitment to pay interest on the principal and, in most cases, to return the principal when the bond comes due". Because "with a fixed coupon rate, the coupon payments stay the same regardless of changes in market interest rates", the price must adjust when yields move: price and yield move in opposite directions. Duration measures how much.
 
-## Bond mechanics
+## The mechanism
 
-**Price-yield relationship:** price and yield move inversely. When yields rise, prices fall.
+Three quantities define a plain bond.
 
-**Coupon:** periodic interest payment (fixed or floating).
+**Face value** is the amount repaid at maturity. **Coupon** is the periodic interest payment, set as a rate on the face value. **Maturity** is the date the principal is due.
 
-**Yield to Maturity (YTM):** internal rate of return if held to maturity, assuming reinvestment at YTM.
+The bond's price is the present value of all future cash flows — coupons plus principal — discounted at the market's required yield. This is not an accounting convention; it is the arithmetic of why a bond trading below par offers a yield above its coupon.
 
-**Current yield:** annual coupon / current price.
+When market yields rise, a fixed coupon becomes less attractive, so the price must fall to bring the effective yield in line. When yields fall, the fixed coupon becomes more valuable and the price rises. The mechanism is mathematical, not sentimental.
 
-**Clean vs dirty price:** clean excludes accrued interest; dirty = clean + accrued.
+Investor.gov draws a useful distinction from equities: a bondholder does not own the company and "will receive only the interest and principal on the bond, no matter how profitable the company becomes". In bankruptcy, bond investors "have priority over shareholders in claims on the company's assets". That is the trade-off: limited upside, but a prior claim.
 
-## Duration and convexity
+## A worked example of price and duration
 
-**Macaulay duration:** weighted average time to receive cash flows (years).
+The following calculation uses hypothetical numbers to show the mechanism. Consider a bond with face value 1,000, a 5% annual coupon paid once a year, and five years to maturity. The annual coupon is therefore 50.
 
-**Modified duration:** percentage price change for 1% yield change. %ΔP ≈ -ModDur × Δy.
+**Case 1 — market yield equals the coupon (5%).** The bond trades at par, 1,000, because the discounted cash flows exactly match the coupon rate.
 
-**Convexity:** curvature of price-yield relationship. Positive convexity = price rises more than duration predicts when yields fall, falls less when yields rise.
+**Case 2 — yield rises to 6%.** Discounting the five coupons and the principal at 6%:
 
-**Key insight:** long-duration bonds have higher interest rate risk. Portfolio managers match duration to liabilities (immunization).
+- Present value of coupons: 50 × [1 − (1.06)^−5] / 0.06 ≈ 50 × 4.212 ≈ 210.6
+- Present value of principal: 1,000 / (1.06)^5 ≈ 747.3
+- Price ≈ 957.9 — a fall of about 4.2%.
 
-## Yield curve
+**Case 3 — yield falls to 4%.** Discounting at 4%:
 
-**Term structure:** yields across maturities. Shapes: normal (upward), inverted, flat, humped.
+- Present value of coupons: 50 × [1 − (1.04)^−5] / 0.04 ≈ 50 × 4.452 ≈ 222.6
+- Present value of principal: 1,000 / (1.04)^5 ≈ 821.9
+- Price ≈ 1,044.5 — a rise of about 4.5%.
 
-**Theories:** expectations hypothesis, liquidity preference, market segmentation.
+The asymmetry is real: the price rise from a 1% yield fall is slightly larger than the fall from a 1% yield rise. That curvature is convexity, and it matters more for long-duration bonds.
 
-**Inversion:** short rates > long rates. Historically predicts recession (lead time 6-24 months).
+**Duration** summarises the sensitivity. For this bond, modified duration is roughly 4.3 years, which gives the rule of thumb: a 1 percentage-point yield move changes the price by about 4.3%. The exact calculation above produced 4.2% for a rise — close enough to show that duration is a linear approximation of a curved relationship.
 
-**Key rates:** 2s10s spread, 3m10y spread, Fed funds rate.
+The practical consequence: a fund holding bonds with seven-year duration will see roughly a 7% price swing for a 1% yield move, before any income is counted. Calling such a fund "low risk" because it holds bonds is misleading.
 
-## Credit risk and spreads
+## Three risks that get conflated
 
-**Investment grade (IG):** BBB- and above (S&P/Fitch), Baa3+ (Moody's). Lower default risk.
+**Interest-rate risk** is the price sensitivity just described. It applies even to a government bond with no default risk.
 
-**High yield (HY) / Junk:** below IG. Higher yield compensates default risk.
+**Credit risk** is the chance the issuer fails to pay. Investor.gov's point about priority in bankruptcy is the relevant boundary: bondholders rank ahead of shareholders but behind other claimants, and recovery can be far below face value. A high yield may be compensation for credit risk, not a free lunch.
 
-**Spreads:** credit spread = corporate yield - risk-free (Treasury) yield. Wider = more risk.
+**Inflation risk** is the erosion of purchasing power. A nominal coupon of 5% is not a 5% real return if inflation is higher. This is why real-return instruments and inflation-linked bonds exist, and why a nominal yield alone is an incomplete measure of attractiveness.
 
-**CDS (Credit Default Swaps):** insurance against default. Spread = annual premium.
+Liquidity is a fourth, quieter risk: some bonds trade rarely, so the quoted price may not be achievable in size. A valuation model does not guarantee an executable price.
 
-**Ratings:** AAA → D. Watch for fallen angels (IG→HY) and rising stars (HY→IG).
+## Where the data comes from
 
-## Bond types
+Yield levels and the shape of the yield curve are observable. FRED, the Federal Reserve Bank of St. Louis database, publishes dated series for Treasury yields and many other economic variables, with release histories that let a reader check what was known at a given date. That discipline matters because a yield cited without a date and a series identifier is not reproducible.
 
-- **Government:** Treasuries (risk-free benchmark), TIPS (inflation-linked), Agency (GSE).
-- **Municipal:** tax-exempt interest. GO (full faith) vs Revenue (project-backed).
-- **Corporate:** IG, HY, convertible, callable, putable.
-- **Securitized:** MBS, ABS, CMBS, CLO. Prepayment risk, tranching.
-- **International:** sovereign, emerging market (EM), currency risk.
+The yield curve — yields across maturities — carries information about expectations and term premia, but it is not a forecast by itself. An inverted curve has preceded recessions, which is an empirical regularity, not a causal law; treating it as a trigger for a specific trade overstates what the data supports.
 
-## Portfolio construction
+## What the model leaves out
 
-- **Barbell:** short + long maturities, avoid middle.
-- **Bullet:** concentrate at target duration.
-- **Ladder:** equal weights across maturities.
-- **Core-plus:** core IG + satellite HY/EM.
+Three limitations should temper confidence in the arithmetic.
 
-For the related question of equity vs fixed income allocation, see [Understanding Unit Economics: CAC, LTV, Churn, and Contribution Margin](/articles/understanding-unit-economics-cac-ltv-churn-contribution-margin) and how rates affect tech, see [Interest Rates and Their Effect on Technology Companies](/articles/interest-rates-and-their-effect-on-technology-companies).
+**The discount rate is not directly observable.** The yield to maturity is a model input inferred from the price, and it assumes coupons are reinvested at the same rate — which may not happen.
+
+**Credit spreads are not constant.** The worked example discounted every cash flow at one rate. A corporate bond's cash flows carry default risk that varies with the issuer and the cycle, so a single yield compresses several risks into one number.
+
+**Convexity and optionality matter.** Callable bonds can be redeemed early, which caps the price rise when yields fall. For such bonds, duration computed on a plain-vanilla assumption misstates the risk.
+
+## A decision test
+
+1. **Separate the three risks** — rate, credit, and inflation — and ask which one you are being paid to take.
+2. **Check the duration** of any fixed-income holding and ask what a 1% yield move would do to its value.
+3. **Verify the coupon type** — fixed or floating — because it determines where the price risk sits.
+4. **Use dated yield data** from a primary source such as FRED rather than an undated quote.
+5. **Distinguish government from credit risk** and look at the issuer's ability to pay, not just the yield on offer.
+6. **Match maturity to the liability** the portfolio is meant to fund; otherwise a "safe" bond can still be the wrong instrument.
+
+For the broader market context, see [Central Banking](/articles/central-banking-monetary-policy-inflation-targeting-and-financial-stability); for portfolio construction, see [Personal Finance for Professionals](/articles/personal-finance-for-professionals-managing-income-saving-and-investing).
 
 ## Further Reading
 
