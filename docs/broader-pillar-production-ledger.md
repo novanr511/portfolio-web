@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 190 tracked articles — 190 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 192 tracked articles — 192 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -204,6 +204,8 @@
 | **P-198** | What LLMs Actually Solve in the Real World: A Task Taxonomy | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/llm-real-world-problem-taxonomy.mdx` | 2026-11-17 | New article: 1,272 words. Six task types with Anthropic use-case guides, NBER adoption figures and the METR caution; labeled support-workflow example (75 to 44 agents with frictions); decision test. One new source verified. |
 | **P-199** | Long Context Windows: What a 1M-Token Window Actually Buys You | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/long-context-windows-what-they-buy.mdx` | 2026-11-17 | New article: 1,358 words. 1M-token specs from Google/OpenAI, Lost in the Middle position finding, worked $8 vs $0.05 per-query cost example, position-sensitivity test; decision test. One new source verified. |
 | **P-200** | Mixture of Experts: Why Sparse Models Changed AI Economics | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/mixture-of-experts-explained.mdx` | 2026-11-17 | New article: 1,282 words. Router/expert mechanism from Mixtral, Switch and DeepSeek-V3; 671B/37B worked active-parameter example (18x), load-balance and memory caveats; decision test. Four new sources verified. |
+| **P-201** | Routing Between LLMs: Cut Cost Without Losing Quality | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/routing-between-llms.mdx` | 2026-11-17 | New article: 1,366 words. FrugalGPT three strategies, RouteLLM 2x cost claim, worked $45k to $19.8k routing example with misroute/router/evaluation costs; decision test. Three new sources verified. |
+| **P-202** | AI Integration Into an Existing Business: A Practical Sequence | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/ai-integration-blueprint-businesses.mdx` | 2026-11-17 | New article: 1,224 words. NIST AI RMF wrapper, cloud building blocks as catalogue not plan; seven-step sequence; labeled invoice pilot (500 to 220 hours with frictions); decision test. Three new sources verified. |
 
 ---
 
@@ -226,6 +228,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AU (Expanded AI focus, cluster 3 — 2026-11-17):** Two implementation articles drafted. *Routing Between LLMs* uses FrugalGPT, RouteLLM and published tier prices; *AI Integration Blueprint* uses NIST AI RMF and cloud-vendor catalogues treated as claims. Both include labeled worked examples and decision tests. Four new sources added; all 239 verify.
 - **Batch AT (Expanded AI focus, cluster 2 — 2026-11-17):** Two architecture articles drafted. *Long Context Windows* uses official model specs and the Lost in the Middle paper; *Mixture of Experts* uses Mixtral, Switch Transformer and DeepSeek-V3 papers. Both include labeled worked examples and position/load-balance tests. Four new sources added; all 235 verify.
 - **Batch AS (Expanded AI focus — 2026-11-17):** First two articles from the expanded shortlist requested by the owner, centred on the current LLM landscape and real-world task types. All claims about 2026 model lineups were taken from official provider documentation fetched and title-verified; the registry gained four new sources and now holds 231. No duplicate title, slug or context introduced.
 - **Batch AR (New article titles, final cluster — 2026-11-17):** The ninth and final title from the gap-analysis shortlist drafted: *Credit Spreads*, using FRED, investor-education material and secondary references for spread and rating structure. All nine titles from the shortlist are now drafted with labeled hypothetical worked examples and decision tests. Two new sources added; all 227 verify.

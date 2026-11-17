@@ -1,0 +1,104 @@
+---
+title: "AI Integration Into an Existing Business: A Practical Sequence"
+description: "AI projects fail at the handoff between a demo and a workflow. Read a sequence that starts with the decision, not the model, and a worked pilot example."
+date: 2026-11-17
+tags:
+  - AI
+  - Business
+  - Implementation
+  - Operations
+---
+
+Most AI integration efforts begin with a capability: a model that can summarise, an agent that can act, an assistant that can answer. The organisation then looks for a place to put it. That order is backwards. A capability looking for a use case produces a demo that impresses and a deployment that nobody's workflow depends on.
+
+**Direct answer:** Start with a decision that is currently slow, expensive, or inconsistent; define what better looks like; then choose the smallest capability that changes that decision and measure it. NIST's AI Risk Management Framework is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems". Cloud providers document the building blocks — AWS's generative-AI hub and Google Cloud's AI architecture resources — but a catalogue of building blocks is not an integration plan. The boundary: the hard part is the workflow and the measurement, not the model call.
+
+## Why the sequence matters
+
+An AI capability changes a task only when three things align:
+
+**The task is real.** Someone currently spends time on it, and the cost of that time is known. "We should use AI for knowledge management" is not a task.
+
+**The output is checkable.** A task whose result can be compared against a baseline — correct routing, extracted field, accepted draft — can be improved. A task whose quality is a matter of taste is harder.
+
+**The workflow can absorb it.** If the output arrives in a form the existing process ignores, nothing changes. Integration work is the work of making the output usable.
+
+Starting from the model skips all three. Starting from the decision forces them into the open.
+
+## The seven-step sequence
+
+**1. Name the decision.** Choose one decision made repeatedly — routing a ticket, approving an invoice, prioritising a lead — and state who makes it and what it costs today.
+
+**2. Set the baseline and the failure cost.** Measure current time, error rate, and the consequence of a wrong answer. Without a baseline, an improvement cannot be demonstrated.
+
+**3. Map the inputs.** List what the decision needs and where it lives. This is where many projects discover that the required data is split across systems or simply not recorded — a problem no model solves.
+
+**4. Pick the smallest capability.** Choose between classification, extraction, drafting, or conversation based on the task, not on what is fashionable. A classifier is easier to evaluate than an agent.
+
+**5. Design the human step.** Define who reviews, what they see, and when they can override. The "human in the loop" design problem is decided here, not after deployment.
+
+**6. Pilot on one queue.** Pick a narrow slice with high volume and recoverable errors. A pilot that covers everything at once produces an average that hides where the system works.
+
+**7. Measure and decide.** Compare against the baseline with a held-out set. Decide explicitly whether to extend, change, or stop. "It seems useful" is not a decision record.
+
+NIST's framework is the governance wrapper around these steps: govern, map, measure, manage. Its voluntary status is worth stating — it is a structure for evidence, not a certification of safety.
+
+## A worked example of a pilot decision
+
+The following numbers are hypothetical and illustrative.
+
+A finance team processes 2,000 invoices a month. A specialist takes 15 minutes per invoice to code it against the correct cost centre — 500 hours a month. An error rate of 3% causes rework averaging 30 minutes.
+
+A proposed AI pilot extracts the cost centre from the invoice and proposes a code, with a human confirming.
+
+- **Automated share:** assume the system is confident on 70% of invoices, needing 3 minutes of confirmation rather than 15. Time: 1,400 × 3 = 70 hours.
+- **Remaining 30%:** 600 × 15 = 150 hours.
+- **Total:** 220 hours, a saving of 280 hours a month.
+
+Now add the frictions:
+
+1. **Extraction errors on the automated share.** If 4% of the 1,400 are wrong and caught only later, 56 invoices need correction. At 30 minutes each, add 28 hours. Net saving: 252 hours.
+2. **Integration work.** Connecting the extraction output to the accounting system costs 120 engineering hours once. At 252 saved hours a month, payback is about two weeks of the team's time — but only if the integration holds.
+3. **Data availability.** If the invoices are scanned images of varying quality, extraction confidence may be lower than assumed, shrinking the automated share. The pilot must measure this before extrapolating.
+
+Three decisions follow:
+
+- **Run the pilot on clean invoices first.** Extending to poor scans later is a separate experiment.
+- **Keep the confirmation step.** Removing it would save 70 hours but move errors downstream, where they cost more.
+- **Record the decision.** The baseline, the assumptions, and the measured result should be written down so the next review does not restart from opinions.
+
+## What cloud building blocks do and do not provide
+
+AWS's generative-AI hub and Google Cloud's AI architecture resources document real capabilities — model access, agents, data services, evaluation tooling. They are useful for answering *how* to build a component once you know *which* component the task needs.
+
+They do not tell you which decision in your business should change, whether your data supports it, or whether the workflow will adopt the output. Treat vendor material as a catalogue of options and a statement of what the vendor sells; treat your own baseline and pilot as the evidence.
+
+The counterargument — that waiting for a perfect plan means moving too slowly — is legitimate. The sequence above is compatible with a fast pilot: steps one through five can be completed in a short workshop, and step six is deliberately narrow. The point is to be fast on the right question.
+
+## Where integration fails
+
+**The data is not there.** A decision that depends on information nobody records cannot be automated; it can only be guessed.
+
+**The review is theatre.** A confirmation step that takes as long as the original task saves nothing. The worked example only works because confirmation is 3 minutes, not 15.
+
+**The pilot never ends.** A system left in pilot mode indefinitely produces no accountability. Set the review date before starting.
+
+**The model changes underneath.** A vendor update can alter behaviour. Re-run the evaluation after a model change, not on a calendar alone.
+
+## A decision test
+
+1. **Name one recurring decision** and its current cost.
+2. **Write the baseline** — time, error rate, and failure cost.
+3. **Check input availability** before selecting a model.
+4. **Choose the smallest capability** that changes the decision.
+5. **Design the human step** with a real override.
+6. **Pick a narrow pilot** with recoverable errors.
+7. **Measure against the baseline** and record the decision to extend or stop.
+
+For the task-level view, see [What LLMs Actually Solve](/articles/llm-real-world-problem-taxonomy); for the oversight design, see [Human in the Loop by Design](/articles/human-in-the-loop-by-design).
+
+## Further Reading
+
+- Amazon Web Services, 2026. [Generative AI on AWS – Generative AI, LLMs, and Foundation Models – AWS](https://aws.amazon.com/ai/generative-ai/) — A vendor hub for generative-AI products, solutions and resources; treated here as a statement of available building blocks rather than independent evidence.
+- Google Cloud, 2026. [AI and machine learning resources | Cloud Architecture Center | Google Cloud Documentation](https://cloud.google.com/architecture/ai-ml) — Cloud architecture resources for AI and ML, including the Well-Architected framing, used as a primary source for implementation structure.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

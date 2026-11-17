@@ -1,0 +1,102 @@
+---
+title: "Routing Between LLMs: Cut Cost Without Losing Quality"
+description: "Not every query needs the flagship model. Read the three cost strategies, the routing evidence, and a worked example with the failure modes."
+date: 2026-11-17
+tags:
+  - LLM
+  - AI
+  - Cost Optimization
+  - Architecture
+---
+
+A single-model policy treats every request as equally hard. In practice, most application traffic is easy: classify this ticket, extract this field, draft a short reply. A small share is genuinely difficult. Routing sends the easy work to a cheaper model and the hard work to a stronger one — and the published research suggests the saving can be large without giving up answer quality.
+
+**Direct answer:** FrugalGPT identifies three strategies for reducing LLM inference cost — "prompt adaptation, LLM approximation, and LLM cascade" — and describes its cascade as learning "which combinations of LLMs to use for different queries in order to reduce cost and improve accuracy". RouteLLM trains routers that "dynamically select between a stronger and a weaker LLM during inference", reporting cost reductions "by over 2 times in certain cases—without compromising the quality of responses". The boundary: the savings depend on your traffic having a real easy/hard split, and the router itself makes mistakes.
+
+## The three strategies
+
+**Prompt adaptation** reduces the tokens you send — shorter instructions, fewer examples, better compression. It is the cheapest intervention because it changes no infrastructure.
+
+**LLM approximation** substitutes a cheaper model for an expensive one on the assumption that it is good enough for the task. This is the simplest form of routing: one model for everything, chosen at the design stage.
+
+**LLM cascade** sends a query through a sequence or a selection of models, using the cheaper ones first and escalating when confidence is low. FrugalGPT's version learns the combination from data rather than fixed rules.
+
+RouteLLM's contribution is to learn the selection from preference data — comparisons of which model answered better — rather than hand-writing rules about query types. The reported result is a cost reduction of over 2× in some cases, with response quality maintained on the benchmarks studied.
+
+Two cautions about that number: it is a research result on public benchmarks, and "in certain cases" is doing real work in the sentence. Your traffic mix may not contain the same easy/hard distribution.
+
+## Why routing can work at all
+
+The premise is that model capability is not needed uniformly. A query asking "what is the return policy?" may be answered correctly by a small, cheap model, while one asking a developer to find a concurrency bug across ten files may need a frontier reasoner. If the application could always use the small model, routing would be pointless; if it always needed the frontier model, routing would add cost for nothing.
+
+Three conditions make routing valuable:
+
+1. **A measurable quality gap.** An evaluation must show that the cheaper model is adequate on a subset of queries. Vendor descriptions like "near-flagship performance" are not that evidence.
+2. **A cost gap at your volumes.** Published prices make this concrete: OpenAI lists GPT-6 Astra at $10/$50 per million input/output tokens and GPT-6.1 Sol at $2/$10 — a 5× list-price difference.
+3. **An identifiable subset.** The router needs features it can use — query length, task type, domain, or a small classifier's output — to decide which tier to call.
+
+## A worked example of routing economics
+
+The following combines published list prices with a hypothetical workload.
+
+A product handles 1 million queries a month, averaging 2,000 input and 500 output tokens each.
+
+**All flagship (Astra):** input = 1M × 2,000 × $10/M = $20,000; output = 1M × 500 × $50/M = $25,000; total **$45,000/month**.
+
+**All cheap tier (Sol):** input = 1M × 2,000 × $2/M = $4,000; output = 1M × 500 × $10/M = $5,000; total **$9,000/month**.
+
+**Route 70% to Sol, 30% to Astra:** 0.7 × $9,000 + 0.3 × $45,000 = $6,300 + $13,500 = **$19,800/month**. Saving: $25,200, or 56%.
+
+Now add the failure modes:
+
+1. **Misrouting cost.** If 5% of queries sent to Sol actually needed Astra and are re-run after a failed answer, the re-run adds 50,000 × Astra's per-query cost. Per query Astra costs $0.045, so re-runs add about $2,250 — small here, but the *user experience* cost of a wrong first answer may be larger than the token cost.
+2. **Router cost.** A classifier that inspects every query consumes tokens itself. At a few hundred tokens per query on a cheap model, that is a modest but nonzero line item.
+3. **Evaluation cost.** The labelled set that justifies the 70/30 split has to be built and maintained. This is a fixed cost that matters most at low volume.
+
+Three decisions follow:
+
+- **Measure the split**, do not assume it. A 50/50 split changes the blended cost substantially.
+- **Make escalation cheap.** If a failed cheap answer can be re-run automatically without user-visible delay, misrouting is recoverable.
+- **Re-evaluate after model updates.** A cheaper model that improves may take a larger share; one that regresses may force a change.
+
+## Building the evaluation that justifies routing
+
+The 70/30 split in the worked example is only as good as the evidence behind it. A defensible evaluation has four properties:
+
+**It uses your traffic.** Public benchmarks tell you what a model can do on someone else's questions. Sample real queries from your logs, with the sensitive fields removed, and label which ones the cheap tier handles acceptably.
+
+**It includes the failure modes.** Add queries that are ambiguous, adversarial, or outside the normal distribution. A router trained only on clean traffic will misroute precisely the cases where the cost of a mistake is highest.
+
+**It scores the whole pipeline.** Measure end-to-end correctness after escalation, not just the router's accuracy. A router that is 95% correct but sends the hardest 5% to a model that also fails is worse than one that routes more conservatively.
+
+**It is re-run on change.** Keep the labelled set and the scoring script so that a model update, a price change, or a new query type triggers a fresh decision rather than a debate.
+
+This is the same discipline as any other engineering measurement: the routing layer is a component whose behaviour must be verified, not a trick that is set once and trusted.
+
+## What routing does not solve
+
+**Bad prompts stay bad.** Routing changes which model sees a prompt, not the prompt's quality. Prompt adaptation is a separate lever.
+
+**The router can be wrong.** A classifier trained on last quarter's traffic may misroute new query types. RouteLLM's preference-based approach is more adaptive than fixed rules, but it still learns from past comparisons.
+
+**Quality metrics can be gamed.** If the router optimises a proxy — say, response length or confidence — it may select models that score well on the proxy and poorly on the task. The evaluation must measure what the business cares about.
+
+The counterargument — that models are getting cheaper, so routing will stop mattering — is partly true and misses the scale effect. Even large price reductions leave a ratio between tiers, and at high volume the ratio determines the bill.
+
+## A decision test
+
+1. **Establish the price ratio** from published rates, with a date.
+2. **Build a labelled evaluation set** covering your real query types.
+3. **Measure which queries the cheap tier handles acceptably**, and at what rate.
+4. **Choose a routing signal** — query features or a trained router — and state why.
+5. **Compute blended cost** with the split and re-run rate explicit, as in the worked example.
+6. **Make escalation transparent** to the user where a wrong first answer has a cost.
+7. **Re-run the evaluation** when either model changes.
+
+For the model options, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026); for the broader architecture, see [AI Integration Into an Existing Business](/articles/ai-integration-blueprint-businesses).
+
+## Further Reading
+
+- Lingjiao Chen, Matei Zaharia, James Zou, 2023. [FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance](https://arxiv.org/abs/2305.05176) — Three cost-reduction strategies (prompt adaptation, LLM approximation, LLM cascade) and the FrugalGPT cascade that learns model combinations per query.
+- Isaac Ong et al., 2024. [RouteLLM: Learning to Route LLMs with Preference Data](https://arxiv.org/abs/2406.18665) — Routers that dynamically choose between a stronger and weaker LLM at inference, reporting cost reductions of over 2x in some cases without quality loss.
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.
