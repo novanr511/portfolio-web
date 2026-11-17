@@ -1,10 +1,89 @@
 ---
 title: "Context Engineering: Designing What the Model Sees, Not Just the Prompt"
-description: "Reserved title for a future NOVANDRI article: Context Engineering: Designing What the Model Sees, Not Just the Prompt."
+description: "Prompt engineering shapes instructions. Context engineering shapes everything else the model reads. Read the difference and a worked assembly."
 date: 2026-11-17
 tags:
-  - Planned
+  - LLM
+  - Agents
   - AI
+  - Architecture
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A team can spend a week refining a system prompt and still get unreliable agent behaviour, because the prompt is only a small part of what the model actually reads. The retrieved documents, tool definitions, conversation history, and output of previous steps all occupy the same context window — and all compete for attention.
+
+**Direct answer:** Context engineering is the discipline of assembling everything a model sees — instructions, retrieved knowledge, tool schemas, history, and intermediate results — so the right information is available and the wrong information is not. Anthropic's engineering article distinguishes it from prompt engineering and argues that context is a scarce resource in capable agents. The boundary: a well-assembled context improves the conditions for a good answer; it does not supply knowledge or judgement the model lacks.
+
+## Why the distinction matters
+
+Prompt engineering asks: how should I phrase the instruction? Context engineering asks: what should be in the window at the moment the model decides?
+
+Three differences follow:
+
+**The unit is dynamic.** A prompt is fixed text. An agent's context changes at every step as tools return results and new history accumulates. A static prompt cannot control what a dynamic context contains.
+
+**Relevance is a scarce resource.** A long context includes the answer and a great deal else. The "Lost in the Middle" finding shows that position affects whether information is used, which means assembly order is part of the design.
+
+**Failure is often upstream.** When an agent gives a wrong answer, the cause may be that retrieval returned the wrong passage or that an old tool result is still in the window. Rewording the prompt does not fix either.
+
+Anthropic's article frames context engineering around agents specifically, because agents generate their own context over multiple steps. The same principle applies to any application with retrieval or multi-turn state.
+
+## The parts of a context
+
+Five components typically occupy the window:
+
+1. **System instructions** — the rules and boundaries, kept short and stable.
+2. **Tool definitions** — what the model can call, with schemas and descriptions.
+3. **Retrieved knowledge** — passages selected for this specific decision.
+4. **Conversation or task history** — prior turns and intermediate results.
+5. **The current request** — the user's input and any immediate context.
+
+Each component has a cost in tokens and a cost in attention. The design question is what each one contributes relative to what it displaces.
+
+## A worked assembly
+
+The following is hypothetical and illustrative.
+
+A support agent handles a refund request. Its context budget is 8,000 tokens.
+
+**Step 1 — instructions (400 tokens).** Scope, refusal wording, and the priority rules. Stable across requests.
+
+**Step 2 — tool definitions (600 tokens).** Three tools: order lookup, policy lookup, refund request. Each with a tight schema and a one-line description of when to use it.
+
+**Step 3 — retrieved policy (1,200 tokens).** The refund policy section matching the order type, placed immediately before the request rather than buried after a long history.
+
+**Step 4 — task history (900 tokens).** A compressed summary of earlier turns: order identified, customer stated the reason, policy section retrieved. Verbatim history is replaced by a structured state with the key facts.
+
+**Step 5 — current request (200 tokens).** "The item arrived damaged; I'd like a refund."
+
+Three decisions follow:
+
+1. **Compression is deliberate.** History is summarised into named fields, not truncated randomly. The facts the decision needs survive; pleasantries do not.
+2. **Retrieved material is positioned near the decision.** The policy sits close to the request, which addresses the position sensitivity documented in the retrieval literature.
+3. **Tools are few and specific.** Three well-described tools beat fifteen ambiguous ones, because the model must choose among them at every step.
+
+## What context engineering cannot do
+
+**It cannot create missing knowledge.** If the retrieved passage does not contain the answer, arranging it better does not help. Retrieval quality is a separate system, as the RAG article explains.
+
+**It cannot guarantee attention.** Even well-positioned information can be ignored. Evaluation on your own cases is the evidence, which the evaluation article covers.
+
+**It cannot remove the need for boundaries.** Tool permissions and refusal paths still have to be enforced outside the model. The security checklist explains why.
+
+The counterargument — that larger context windows make this unnecessary — is wrong in direction. A larger window lets you include more, which increases the need to decide what belongs. Capacity is not selection.
+
+## A decision test
+
+1. **List every component** that enters the model's window.
+2. **Measure each component's token cost** and what it displaces.
+3. **Place decision-relevant material near the decision.**
+4. **Compress history into structured state**, not raw transcript.
+5. **Keep tool definitions few and specific.**
+6. **Evaluate on your own cases** after any assembly change.
+7. **Treat the context as dynamic** and re-check it at each agent step.
+
+For the system instructions, see [System Prompts](/articles/how-to-write-a-system-prompt-that-actually-works); for the long-window trade-off, see [Long Context Windows](/articles/long-context-windows-what-they-buy).
+
+## Further Reading
+
+- Anthropic, 2025. [Effective context engineering for AI agents \ Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — The distinction between context engineering and prompt engineering, and why context is a scarce resource in agents.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

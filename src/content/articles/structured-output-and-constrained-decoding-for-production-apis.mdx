@@ -1,10 +1,107 @@
 ---
 title: "Structured Output and Constrained Decoding for Production APIs"
-description: "Reserved title for a future NOVANDRI article: Structured Output and Constrained Decoding for Production APIs."
+description: "A JSON schema turns a model's output into data. Read how constrained decoding works, a worked example, and where validation still belongs."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - LLM
+  - APIs
+  - Engineering
+  - Data
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Parsing free-form model output with regular expressions is a fragile way to build software. A stray sentence, a code fence, or a trailing comment breaks the parser. Structured output solves this by constraining generation to a schema, so the result is valid data by construction rather than by hope.
+
+**Direct answer:** Structured output constrains a model's generation to a defined schema — typically JSON — using constrained decoding or schema-guided sampling. OpenAI's structured-outputs guide is the primary reference for the mechanism. The boundary: a valid shape does not mean a correct value — the model can fill a valid field with a wrong fact — so schema validation and semantic checks are different layers.
+
+## How constrained decoding works
+
+A language model emits tokens one at a time, each chosen from a probability distribution over the vocabulary. Constrained decoding restricts that distribution at every step to tokens that could still produce a valid instance of the schema. If the schema says the next field is an integer, tokens that would start a string are excluded.
+
+Three consequences follow:
+
+**Validity is mechanical.** The output conforms to the schema, so parsing cannot fail for format reasons. That removes an entire class of error handling.
+
+**The schema is part of the interface.** Field names, types, required properties, and enums become a contract between the model and your application. Changing them changes the system.
+
+**Constraints cost some freedom.** A tight schema can prevent the model from expressing a legitimate edge case. An enum that omits "unknown" forces a wrong choice.
+
+## A worked example
+
+The following is hypothetical and illustrative.
+
+An invoice extractor returns a structured object:
+
+```
+{
+  "vendor": "string",
+  "invoice_date": "YYYY-MM-DD",
+  "total": "number",
+  "currency": ["USD","EUR","GBP"],
+  "line_items": [
+    { "description": "string", "amount": "number" }
+  ]
+}
+```
+
+Three checks make this production-safe:
+
+1. **Schema validation is still run.** Even when generation is constrained, validate on receipt. A provider update or a different model may behave differently, and a validation failure should be handled explicitly.
+2. **Values need semantic checks.** The `total` should equal the sum of `line_items`. A model can produce a perfectly valid object whose numbers do not reconcile. This is a business rule, not a format rule.
+3. **The enum has an escape.** If a currency outside the three appears, the model must have an `other` option or a clear failure path. Otherwise it will choose a wrong value to satisfy the schema.
+
+Three decisions follow:
+
+- **Keep the schema minimal** — every field is a decision the model must make.
+- **Validate twice** — format on receipt, meaning against the source data.
+- **Define the failure path** for values the schema cannot represent.
+
+## Where structured output fits
+
+**Extraction** — turning text into records, as the document-processing article covers.
+
+**Classification** — returning a label from a defined set, which makes the output directly usable.
+
+**Tool calls** — most tool interfaces are structured output in disguise: the model produces arguments that must fit a schema.
+
+**Routing decisions** — a structured decision with a reason field can be logged and audited.
+
+In each case the gain is the same: the output becomes data that downstream code can handle without a parsing layer built on guesswork.
+
+## Versioning the contract
+
+A schema is an interface, and interfaces change. Three practices keep changes from breaking consumers:
+
+**Treat fields as a contract.** Adding an optional field is usually safe; removing or renaming one is a breaking change for anything that reads the output. Record which version of the schema produced a stored result.
+
+**Keep raw input with the result.** When a value is disputed, the original text lets a reviewer decide whether the model extracted it correctly or the schema forced a wrong choice. Without the source, a structured record is unfalsifiable.
+
+**Test schema changes on past cases.** Before changing a field, re-run a labelled set through the new schema and compare. A change that looks harmless in the abstract may reduce accuracy on a specific class of input.
+
+These habits matter more when several services consume the output. A schema used by one function can be changed with a deploy; one used by a pipeline needs a migration plan.
+
+## What structured output cannot do
+
+**It cannot make the model right.** A valid field can contain a wrong value, which is why semantic checks exist.
+
+**It cannot replace retrieval.** The model still needs the information. Structured output only controls how it answers.
+
+**It cannot fix a badly designed schema.** A schema with twenty loosely defined fields produces twenty plausible but untrustworthy values. Start with the decision the output supports and work backwards.
+
+The counterargument — that free text is more expressive — is fair for exploratory tasks. For a production API, expressiveness is less valuable than a contract your code can rely on.
+
+## A decision test
+
+1. **Define the downstream decision** the output must support.
+2. **Design the smallest schema** that serves it.
+3. **Include an escape value** for cases the schema cannot represent.
+4. **Validate format on receipt**, even when generation is constrained.
+5. **Check semantic rules** — totals, dates, cross-field consistency.
+6. **Log the raw source** beside the structured result for audit.
+7. **Re-test after a model change**, since behaviour can shift.
+
+For the API context, see [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems); for extraction use cases, see [AI for Document Processing](/articles/ai-for-document-processing-classification-extraction-redaction).
+
+## Further Reading
+
+- OpenAI, 2026. [Structured model outputs | OpenAI API](https://platform.openai.com/docs/guides/structured-outputs) — The official guide to constrained decoding and schema-enforced model outputs.
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.

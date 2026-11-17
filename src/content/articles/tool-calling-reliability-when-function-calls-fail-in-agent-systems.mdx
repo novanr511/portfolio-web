@@ -1,10 +1,79 @@
 ---
 title: "Tool Calling Reliability: When Function Calls Fail in Agent Systems"
-description: "Reserved title for a future NOVANDRI article: Tool Calling Reliability: When Function Calls Fail in Agent Systems."
+description: "An agent is only as reliable as its tool calls. Read the four failure modes, a worked retry design, and why the tool is the boundary."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - Agents
+  - LLM
+  - Engineering
+  - Reliability
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Tool calling is the moment an agent stops describing an action and performs one. That is also where most agent incidents happen: the wrong tool is chosen, the arguments are malformed, the call succeeds but the effect is wrong, or the model retries an action that already completed. A demo that calls one tool once does not exercise any of those cases.
+
+**Direct answer:** Tool-calling reliability comes from tight tool definitions, validation at the tool boundary, idempotency for retried actions, and logging that records which arguments were used. Anthropic's tool-use documentation covers how tools are defined and called, and the Toolformer paper is the origin point for models learning when to call an API. The boundary: the model chooses a call, but the tool must authorise and validate it — reliability cannot depend on the model always deciding correctly.
+
+## Four failure modes
+
+**Wrong tool.** The model calls the search tool when it should call the account lookup. Clear, distinct descriptions reduce this; overlapping tools increase it.
+
+**Malformed arguments.** A required field is missing or a value has the wrong type. A schema and validation on receipt catch this, as the structured-output article explains.
+
+**Wrong effect.** The call is well-formed but the decision behind it is wrong — a refund issued without policy grounds. Authorisation rules inside the tool are the control, not the prompt.
+
+**Duplicate execution.** The first call succeeded, the response was lost, and the model retries. The action happens twice. Idempotency keys are the standard remedy, which the idempotency article covers in an API context.
+
+## A worked retry design
+
+The following is hypothetical and illustrative.
+
+An agent requests a refund with a tool that accepts an order ID and an amount. A transient network error causes the response to be lost after the server has processed the request.
+
+Three designs change the outcome:
+
+1. **No protection.** The model retries with the same arguments. Two refunds are issued. This is the failure mode that makes agents expensive in production.
+2. **Client-generated idempotency key.** The agent includes a unique key derived from the order ID and the attempt's purpose. The server records the key and returns the original result on a retry. One refund is issued.
+3. **Server-side check.** Independently, the tool checks whether a refund already exists for that order and refuses a duplicate. This is a second layer that works even if the key is mishandled.
+
+Three lessons follow:
+
+- **Retries are normal**, so duplicate handling is required by design, not as an edge case.
+- **Two layers are better than one** — an idempotency key and a business rule check.
+- **The model does not need to know** how the tool prevents duplication. That is an implementation detail of the boundary.
+
+## Designing tools for reliability
+
+**Make tools few and distinct.** Six tools with clear boundaries beat twenty with overlapping descriptions. The model must choose among them at every step, and ambiguity compounds.
+
+**Describe when not to use a tool.** A description that says "use for refunds up to 200, not for billing disputes" prevents a whole class of wrong calls.
+
+**Return structured, small results.** A tool that dumps a full database row into the context consumes attention and invites the model to misread it. Return the fields the decision needs.
+
+**Log arguments and results.** An incident should be reconstructible without reading the model's reasoning. The tool log is the audit trail, which the governance checklist requires.
+
+## What tool calling cannot guarantee
+
+**It cannot make the model's decision correct.** A well-formed call can serve a wrong goal. Authorisation and limits belong in the tool.
+
+**It cannot prevent adversarial misuse.** A poisoned document can instruct the agent to call a tool improperly. The security checklist treats the tool boundary as the control.
+
+**It cannot remove monitoring.** A sudden spike in a tool's use is a signal that something has changed in the inputs or the model. The observability article covers the alerting discipline.
+
+The counterargument — that a careful prompt prevents bad calls — is wrong in direction. A prompt reduces the frequency; a tool boundary limits the damage when it fails.
+
+## A decision test
+
+1. **List every tool** and the decision it serves.
+2. **Check descriptions are distinct** and state when not to use each tool.
+3. **Validate arguments** on receipt against a schema.
+4. **Add idempotency** to any action that can be retried.
+5. **Enforce authorisation inside the tool**, not in the prompt.
+6. **Return minimal structured results.**
+7. **Log arguments and outcomes** with an owner for alerts.
+
+For the security boundary, see [Prompt Injection in LLM Applications](/articles/prompt-injection-llm-applications-threat-model); for the wider agent design, see [From LangChain to LangGraph](/articles/langchain-to-langgraph).
+
+## Further Reading
+
+- Anthropic, 2026. [Tool use with Claude - Claude Platform Docs](https://docs.anthropic.com/en/docs/build-with-claude/tool-use/overview) — How client tools are defined, called and validated in an agent loop.
+- Timo Schick et al., 2023. [Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761) — Self-supervised training for API use, and the cost of tool calls.
