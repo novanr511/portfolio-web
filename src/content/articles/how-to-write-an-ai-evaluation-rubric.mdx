@@ -1,10 +1,96 @@
 ---
 title: "How to Write an AI Evaluation Rubric"
-description: "Reserved high-intent title for a future NOVANDRI article: How to Write an AI Evaluation Rubric."
+description: "A rubric turns 'looks good' into a score someone can reproduce. Read the dimensions, a worked example, and how to keep judges consistent."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Evaluation
+  - Quality
+  - Measurement
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Most AI evaluation arguments fail because the participants mean different things by "good". One reviewer values completeness, another values brevity, and neither has written down the rule. A rubric is the instrument that makes the judgement explicit and repeatable.
+
+**Direct answer:** A rubric defines the dimensions being scored, what each score level means, and the evidence required for each level. HELM's multi-metric approach — measuring accuracy, calibration, robustness and other properties separately — is the principle at scale; Anthropic's prompt guidance makes success criteria a prerequisite to any prompt work. The boundary: a rubric makes judgement consistent, not correct — a badly chosen dimension will be measured consistently and still mislead.
+
+## Four dimensions to score separately
+
+Combining everything into one number hides trade-offs. Four dimensions cover most generation tasks:
+
+**Correctness.** Are the claims supported by the supplied evidence? For extraction, is the value right?
+
+**Completeness.** Does the answer cover the parts of the question that matter? A correct but partial answer fails here.
+
+**Groundedness.** Does the answer stay within the provided sources, and does it say when evidence is absent? This is distinct from correctness — a fluent answer can be wrong and ungrounded at once.
+
+**Presentation.** Is the output in the required format, length, and tone? Important for integration, and the least important of the four for truth.
+
+Scoring these separately lets a team see that a prompt improved presentation while worsening groundedness, which a single score would conceal.
+
+## Writing the levels
+
+Each dimension needs anchor descriptions for the score levels. A three-point scale is enough to start:
+
+- **2 — meets the requirement.** Correctness: all claims are supported by the cited source.
+- **1 — partially meets.** One claim is unsupported or ambiguous.
+- **0 — fails.** A core claim is contradicted by the source, or no source is provided.
+
+The anchors matter more than the number of levels. A five-point scale with vague anchors produces more noise, not more precision.
+
+## A worked rubric for a support answer
+
+The following is hypothetical and illustrative.
+
+A support assistant answers questions from a policy handbook. A reviewer scores one answer per dimension:
+
+| Dimension | Score | Evidence |
+| --- | --- | --- |
+| Correctness | 2 | The refund window (14 days) matches Section 7. |
+| Completeness | 1 | It omits that customs duties are excluded. |
+| Groundedness | 2 | Section 7 is cited and supports the claim. |
+| Presentation | 2 | Two sentences, required format, no speculation. |
+
+Total: 7/8. The decision is not "ship it" — completeness failed on a detail that matters to customers. The rubric shows *which* dimension to fix, which is the point.
+
+Three lessons follow:
+
+1. **A total can hide a failure.** Set a minimum per dimension, not only a total threshold.
+2. **The evidence column is part of the rubric.** A score without the reason cannot be audited or discussed.
+3. **Partial scores are informative.** "One missing detail" is a different problem from "no citation", and each points to a different fix.
+
+## Keeping judges consistent
+
+Two reviewers using the same rubric will still diverge until they calibrate. Three practices help:
+
+**Score a sample together.** Have both reviewers score ten answers, then compare. Most disagreements come from different interpretations of an anchor, which a shared session fixes quickly.
+
+**Keep the rubric with the test set.** Anchors that live in a document nobody opens will drift. Put them next to the examples they score.
+
+**Distinguish the judge from the system.** If an LLM scores answers, validate it against human scores on a sample. A judge that rewards length will inflate presentation and penalise concise correct answers. HELM's point about measuring beyond accuracy applies to judges too.
+
+## What a rubric cannot do
+
+**It cannot define what matters.** Choosing dimensions is a product decision. A rubric that omits groundedness will happily reward fluent fabrication.
+
+**It cannot remove subjectivity.** Anchors reduce disagreement; they do not eliminate judgement. A human should still review the cases near the threshold.
+
+**It stays valid only for one task.** A rubric for support answers is wrong for code generation. Reuse the structure, not the dimensions.
+
+The counterargument — that a rubric is bureaucratic overhead — is fair for a single experiment. It earns its cost when a team evaluates after every change, because reproducibility is otherwise impossible.
+
+## A decision test
+
+1. **Choose dimensions that reflect the failure modes** you have observed.
+2. **Write anchor descriptions** for each score level.
+3. **Require an evidence note** for every score.
+4. **Set a minimum per dimension**, not only a total.
+5. **Calibrate reviewers** on a shared sample.
+6. **Validate an automated judge** against human scores.
+7. **Revise the rubric** when the task or the failure modes change.
+
+For the broader harness, see [Evaluating LLM Applications](/articles/evaluating-llm-applications); for the multi-metric precedent, see [LLM Benchmarks Explained](/articles/llm-benchmarks-explained-without-the-hype).
+
+## References & Further Reading
+
+- Percy Liang et al., 2022. [Holistic Evaluation of Language Models](https://arxiv.org/abs/2211.09110) — The multi-metric approach and the case for measuring properties beyond accuracy.
+- Anthropic. [Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Success criteria and empirical testing before prompt work.

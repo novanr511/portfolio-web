@@ -1,10 +1,90 @@
 ---
 title: "How to Automate Reporting with AI"
-description: "Reserved high-intent title for a future NOVANDRI article: How to Automate Reporting with AI."
+description: "Automating a report means automating its checks too. Read the four layers of a reporting pipeline, a worked example, and what breaks."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Reporting
+  - Analytics
+  - Operations
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A report that writes itself is only useful if someone can trust the numbers. Most reporting automation focuses on the prose — generating the summary — while the data gathering and validation remain manual. That is the wrong half of the problem, because errors in a report are usually wrong numbers, not wrong sentences.
+
+**Direct answer:** Automate reporting in four layers: data collection, validation, narrative generation, and review. Anthropic's use-case guides cover extraction and summarisation patterns, and cloud architecture resources describe the implementation structures available. The boundary: a model can draft the narrative from verified data, but it cannot certify that the data is correct — validation needs rules and, for high-impact reports, a person.
+
+## Four layers
+
+**1. Collection.** Pull the numbers from defined sources on a schedule. The source and the extraction query should be recorded so a reader can reproduce the figure.
+
+**2. Validation.** Check the numbers before they enter a narrative. Row counts, totals, and comparisons with prior periods catch most errors. A validation failure should stop the report, not produce a caveat in the prose.
+
+**3. Narrative.** Generate the commentary from the validated numbers. Ask the model to use the supplied values verbatim and to cite the metric name, not to compute or recall figures.
+
+**4. Review.** A person signs off on high-impact reports. The reviewer should see the validation results alongside the narrative, not only the final text.
+
+The layers are ordered. Automating the narrative before the validation produces a faster way to distribute wrong numbers.
+
+## A worked example of a weekly report
+
+The following is hypothetical and illustrative.
+
+A team produces a weekly sales report: revenue, order count, average order value, and the top five products. Currently an analyst spends four hours collecting and writing it.
+
+**Collection automation.** Scheduled queries pull the four metrics from the warehouse. Each figure is stored with its source query and timestamp.
+
+**Validation.** Three checks run before narrative generation:
+- The row count for the week matches the prior week within a stated tolerance.
+- Revenue equals the sum of the product-level revenue.
+- Average order value equals revenue divided by orders.
+
+If any check fails, the report is marked BLOCKED and no narrative is generated.
+
+**Narrative.** The model receives the validated figures and a fixed instruction: use the supplied numbers only, state the comparison with last week, and do not speculate about causes. It produces three paragraphs.
+
+**Review.** The analyst checks the validation status and reads the narrative. Sign-off takes 20 minutes instead of four hours.
+
+Three frictions decide whether this works:
+
+1. **A validation rule that always passes.** If the tolerance is too wide, the check provides false comfort. Set it from historical variation, not convenience.
+2. **Narrative drift.** The model may add causal claims ("revenue rose because of the campaign") that the data does not support. The instruction must forbid unsupported causes, and review must catch violations.
+3. **Source changes.** If the warehouse schema changes, collection may silently return partial data. The row-count check exists for this reason.
+
+Three conclusions follow:
+
+- **The saving comes from collection and drafting, not from removing review.**
+- **Validation is the control that makes the narrative trustworthy.**
+- **A blocked report is a success** — it means the system caught a problem before distribution.
+
+## What to automate first
+
+Choose the layer with the clearest baseline and the most repetitive work. Collection is usually first because it has a defined output. Validation is second because it protects everything downstream. Narrative is third, after the numbers are trustworthy. Review is last to change, and often should remain human.
+
+The reporting-automation article's companion topic, AI for Spreadsheets, covers the lower-tech version of the same discipline. The principle is identical: propose, check, then apply.
+
+## What automation does not guarantee
+
+**It does not make data correct.** Sources change, definitions drift, and late-arriving records alter prior periods. Validation catches some of this, not all.
+
+**It does not remove accountability.** Someone must own the report and the decision to distribute it. A generated narrative with no owner is an orphan.
+
+**It does not save time if review expands.** If reviewers now spend an hour checking a narrative they no longer understand, the net gain shrinks. Measure the whole cycle.
+
+The counterargument — that dashboards have replaced reports — is true in some organisations and irrelevant to others. A narrative still matters when a decision depends on interpreting a change, which is why the report survives even where the data is visualised.
+
+## A decision test
+
+1. **Define the metrics and their source queries** before automating anything.
+2. **Build validation rules** with tolerances based on historical variation.
+3. **Stop the report on a failed check** rather than adding caveats.
+4. **Feed only validated numbers** to the narrative generator.
+5. **Forbid unsupported causes** in the instruction.
+6. **Keep human sign-off** for high-impact reports.
+7. **Measure the full cycle time**, including review.
+
+For the architecture context, see [AI Integration Into an Existing Business](/articles/ai-integration-blueprint-businesses); for the data layer, see [Data Pipelines](/articles/data-pipelines-airflow-prefect-and-orchestrating-etl-at-scale).
+
+## References & Further Reading
+
+- Anthropic. [Guides to common use cases](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Extraction and summarisation patterns used in reporting workflows.
+- Google Cloud. [AI and machine learning resources](https://cloud.google.com/architecture/ai-ml) — Cloud architecture resources for AI implementations.

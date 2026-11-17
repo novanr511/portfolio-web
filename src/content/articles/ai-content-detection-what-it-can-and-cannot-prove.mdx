@@ -1,10 +1,86 @@
 ---
 title: "AI Content Detection: What It Can and Cannot Prove"
-description: "Reserved high-intent title for a future NOVANDRI article: AI Content Detection: What It Can and Cannot Prove."
+description: "Detectors produce probabilities, not verdicts. Read the research on reliability, the watermark alternative, and why detection is a weak control."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Detection
+  - Trust
+  - Policy
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A teacher submits a student essay to a detector and receives "98% AI-generated". The number looks like evidence. It is not a probability that the student used AI — it is the output of a classifier that can be wrong in both directions, and the research on reliability explains why.
+
+**Direct answer:** Research on AI-text detection found that detectors are not reliably robust to attacks and can produce false positives, especially for non-native writing. Watermarking offers a different property: a statistical signal embedded at generation time, which can prove origin only if the provider applied it and the text was not substantially edited. The boundary: neither detection nor watermarking establishes authorship or quality, and neither should be the sole basis for a consequential decision.
+
+## What detectors actually measure
+
+A detector is a classifier trained to distinguish text from a reference distribution. It looks for statistical patterns — predictability, token choice, sentence structure — and outputs a score. Three limitations follow:
+
+**The score is not a probability of guilt.** A "98%" output means the classifier placed the text far from its human-written reference. It does not mean there is a 2% chance of a human writing it.
+
+**Distribution shift breaks it.** Text from a domain or author unlike the training reference can be flagged. Research on detection reliability documents false positives and the effect of adversarial paraphrasing.
+
+**Attacks degrade it.** Simple edits — paraphrasing, adding errors, translation — can move text across the classifier's boundary. A detector that fails under trivial modification is a weak control.
+
+The paper *Can AI-Generated Text be Reliably Detected?* is the clearest reference for these limits. It is not an argument that detection is impossible in every setting; it is an argument that reliability has been overstated.
+
+## What watermarking offers
+
+A watermark embeds a statistical pattern in generated text, as described in *A Watermark for Large Language Models*. Three properties distinguish it from detection:
+
+**It is applied at generation.** The provider must cooperate, and the text must carry the signal from the start.
+
+**It supports a statistical test.** A verifier can test whether the pattern is present, with a false-positive rate that can be stated. That is more defensible than a classifier's confidence.
+
+**It is fragile to editing.** Rewriting, heavy paraphrasing, or mixing human and generated text can remove the signal. Absence of a watermark does not prove human authorship.
+
+Watermarking is therefore useful for a narrow question — did this text come from a provider that watermarks? — and not for the broader question of who wrote it.
+
+## A worked example of a policy decision
+
+The following is hypothetical and illustrative.
+
+A university considers using a detector to flag AI-assisted essays. It runs a trial on 1,000 known essays: 500 human-written, 500 generated.
+
+- The detector flags 480 of the generated essays correctly — 96% true positives.
+- It also flags 50 of the human essays — a 10% false-positive rate.
+
+Three consequences follow:
+
+1. **Base rates dominate.** If only 5% of submissions are actually AI-generated, the vast majority of flags are false positives. In a class of 1,000, that is roughly 50 true cases and 95 false ones.
+2. **The cost is asymmetric.** A false accusation damages a student and consumes appeal time. A missed case is a policy violation that may never be detected. The threshold should reflect that asymmetry, which means being far more conservative than "flag when score > 0.5".
+3. **A score alone is not a process.** Any flag must lead to a human review that considers evidence beyond the detector — drafts, writing history, an oral explanation. The detector is a prompt for investigation, not a verdict.
+
+Three decisions follow:
+
+- **Do not use a detector as automated evidence.** Use it to prioritise review, with a stated false-positive rate.
+- **Publish the limitation** so students and staff know what the tool can establish.
+- **Prefer process controls** — drafting history, in-class writing, clear policies — which are more reliable than detection.
+
+## What neither approach proves
+
+**Not quality.** AI-generated text can be accurate or wrong; human text can be brilliant or plagiarised. Detection says nothing about either.
+
+**Not intent.** A student may have used a tool for spelling and not for ideas. A score cannot distinguish the two.
+
+**Not authorship in a legal sense.** Ownership and responsibility are legal and institutional questions. A statistical test is not a determination.
+
+The counterargument — that doing nothing is worse — is fair. The response is not to rely on a weak detector but to combine process controls, transparent policy, and human judgement, with the detector as one weak signal among several.
+
+## A decision test
+
+1. **State the question** you want the tool to answer — origin, quality, or intent.
+2. **Check whether the tool actually answers it.** Detection answers neither quality nor intent.
+3. **Measure false positives on your population**, not on the vendor's demo set.
+4. **Account for the base rate** of the behaviour you are looking for.
+5. **Set a conservative threshold** reflecting the cost of a false accusation.
+6. **Require human review** with evidence beyond the score.
+7. **Prefer process controls** where the stakes are high.
+
+For the security context, see [Prompt Injection in LLM Applications](/articles/prompt-injection-llm-applications-threat-model); for the policy side, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale).
+
+## References & Further Reading
+
+- Sadasivan et al., 2023. [Can AI-Generated Text be Reliably Detected?](https://arxiv.org/abs/2303.11156) — The limits of detectors, including false positives and adversarial attacks.
+- John Kirchenbauer et al., 2023. [A Watermark for Large Language Models](https://arxiv.org/abs/2301.10226) — The statistical watermarking method and its scope.

@@ -1,10 +1,92 @@
 ---
 title: "Best Open-Weight Language Models in 2026"
-description: "Reserved high-intent title for a future NOVANDRI article: Best Open-Weight Language Models in 2026."
+description: "Open weight means inspectable and self-hostable, not free of cost. Read how to compare the current options without a leaderboard."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - LLM
+  - Open Source
+  - AI
+  - Infrastructure
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+"Best open-weight model" is a question that cannot be answered in the abstract. The right model depends on the hardware you have, the task you need to run, and whether you value inspectability more than convenience. A published leaderboard ranks models on someone else's tasks under someone else's conditions, which is why the benchmarks article treats such ranks as shortlists rather than decisions.
+
+**Direct answer:** Two well-documented open-weight families illustrate the current design space: DeepSeek-V3, with 671B total and 37B parameters activated per token, and Mixtral 8x7B, a sparse mixture of experts whose router selects two experts per token at each layer. The boundary: open weights remove licensing friction and allow self-hosting, but they do not remove compute, memory, or operational cost — and a paper's evaluation is not proof of performance on your workload.
+
+## What open weight changes
+
+Open weights give you the model parameters. That enables three things:
+
+**Inspection.** You can examine architecture and, within limits, behaviour. This is valuable for research and for regulated settings where a black box is unacceptable.
+
+**Self-hosting.** You can run the model on your own infrastructure, which matters for data residency and latency control. The cost and complexity of doing so are real, as the GPU article shows.
+
+**Modification.** You can fine-tune or adapt the model without a vendor's permission. The LoRA and PEFT article covers the practical method.
+
+What it does not give you is a support contract, guaranteed uptime, or freedom from hardware limits. A 671B-parameter model, even with only 37B active per token, still needs all its weights resident somewhere.
+
+## Two designs worth comparing
+
+**DeepSeek-V3.** The technical report describes a sparse model with 671B total parameters and 37B activated per token, using Multi-head Latent Attention and an auxiliary-loss-free load-balancing strategy. Those choices target inference efficiency and training stability — the operational problems that sparse models create.
+
+**Mixtral 8x7B.** The paper describes a sparse mixture of experts where "for every token, at each layer, a router network selects two experts to process the current state and combine their outputs". The mechanism is simpler than DeepSeek's design, which makes it a useful reference point for understanding sparsity.
+
+The mixture-of-experts article explains why these designs matter: they buy capacity without proportional per-token compute. It also explains what they cost — memory, communication, and routing complexity.
+
+## A worked selection example
+
+The following is hypothetical and illustrative.
+
+A team wants to self-host a model for document extraction. It has a machine with 80 GB of accelerator memory and needs roughly 500 requests a day.
+
+**Check 1 — memory.** A dense 70B model in a low-precision format may fit with careful quantisation. A 671B sparse model does not fit on 80 GB without sharding across multiple devices, regardless of its 37B active parameters. The hardware decides before the benchmark matters.
+
+**Check 2 — task fit.** Document extraction is closer to classification and structured output than to open-ended reasoning. A smaller model fine-tuned for the task may outperform a larger general model on the specific metric, as the task-taxonomy article argues.
+
+**Check 3 — operational capacity.** Does the team have someone who can maintain a distributed serving stack? If not, the operational cost exceeds the licence saving.
+
+Three conclusions follow:
+
+- **The largest open model is rarely the right first choice.** Fit and task dominate.
+- **Active parameters are not memory footprint.** A sparse model's total size determines where it can run.
+- **Small, task-specific open models often win on cost per useful answer.** The cost estimator shows how volume changes the arithmetic.
+
+## What the evaluation should contain
+
+A defensible comparison includes four things:
+
+**Task-level results on your data.** Public benchmarks measure other distributions. A labelled set from your own work is the only direct evidence.
+
+**Memory and latency on your hardware.** Published specs describe architecture, not your deployment. Measure tokens per second and time to first token on the actual machine.
+
+**Operational effort.** Estimate the engineering hours for setup, monitoring, and upgrades. This is a fixed cost that favours managed services at low volume.
+
+**Licence terms.** "Open weight" does not mean identical terms. Read the model licence, especially for commercial use. The open-source licence article explains why the distinction matters.
+
+## What an open-weight claim does not guarantee
+
+**Reproducibility of results.** Weights can be downloaded; the training data and exact procedure often cannot. A paper's evaluation is a report, not a reproduction.
+
+**Safety guarantees.** An open model can be modified to remove safeguards. That is a property of openness, and it shifts responsibility to the deployer.
+
+**Longevity.** A model may be superseded quickly. The migration cost belongs in the decision.
+
+The counterargument — that closed models are always easier — is fair for small teams. Open weights trade operational burden for control, and that trade is only attractive when control is worth something specific.
+
+## A decision test
+
+1. **State why open weight matters** for your case — inspection, residency, or modification.
+2. **Check total parameter size against available memory**, not active parameters.
+3. **Test on a labelled set from your own work.**
+4. **Measure latency and throughput on your hardware.**
+5. **Estimate operational effort** with a named owner.
+6. **Read the licence** for commercial terms.
+7. **Plan the exit** — what happens when the model is superseded.
+
+For the architecture, see [Mixture of Experts](/articles/mixture-of-experts-explained); for the hardware, see [Why GPU Computing Is Becoming a Strategic Resource](/articles/why-gpu-computing-is-becoming-a-strategic-resource).
+
+## References & Further Reading
+
+- DeepSeek-AI, 2024. [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437) — 671B total and 37B active parameters, and the design choices behind them.
+- Albert Q. Jiang et al., 2024. [Mixtral of Experts](https://arxiv.org/abs/2401.04088) — The sparse mixture-of-experts design and two-expert routing.
+- OpenAI. [Models](https://platform.openai.com/docs/models) — A closed-model reference point for the build-versus-host decision.
