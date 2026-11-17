@@ -1,91 +1,91 @@
 ---
 title: "Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern"
-description: "Microservices decompose monoliths. Learn service decomposition, service mesh, event-driven architecture, saga pattern, and operational patterns."
+description: "Microservices buy independent deployment by adding distributed-systems problems. Read the actual trade-off, the patterns that manage it, and a decision test."
 date: 2026-11-16
 tags:
   - Microservices
-  - Service Mesh
-  - Event-Driven
-  - Saga Pattern
   - Architecture
+  - Distributed Systems
+  - DevOps
 ---
 
-Microservices trade complexity for autonomy. The network is the computer.
+Microservices are often described as "small services", which misses the point. The size is incidental; the goal is independent change. A team should be able to deploy its service without coordinating a release with every other team. Everything else in the architecture — service mesh, events, sagas — exists to manage the consequences of that independence.
 
-**Direct answer:** Microservices architecture decomposes a monolith into independently deployable services communicating over networks. Key patterns: service decomposition (bounded contexts), service mesh (Istio, Linkerd) for traffic/security/observability, event-driven architecture (Kafka, event sourcing), saga pattern (distributed transactions), and operational patterns (circuit breaker, bulkhead, retry).
+**Direct answer:** Martin Fowler and James Lewis observe that "there is no precise definition" of microservice architecture, but identify common characteristics: "organization around business capability, automated deployment, intelligence in the endpoints, and decentralized control of languages and data". The boundary is explicit in their article's section title, "Synchronous calls considered harmful": splitting a system into services does not make the distributed problems disappear, it makes them visible. The patterns in the title are answers to those problems, not decorations.
 
-## Service decomposition
+## What independence costs
 
-**Bounded contexts (DDD):** align services with business capabilities. One team, one service, one database.
+A monolith has one deployment pipeline, one database, and in-process function calls. A microservice system has many pipelines, separate data stores, and network calls that can fail, stall, or return stale data.
 
-**Decomposition strategies:**
-- **Strangler Fig:** incrementally extract from monolith.
-- **Domain-driven:** aggregate roots as service boundaries.
-- **Capability-based:** business capability mapping.
+Four consequences follow:
 
-**Database per service:** no shared database. Data duplication accepted; eventual consistency.
+**Failure becomes partial.** A dependency can be down while your service is healthy. The circuit-breaker pattern that Fowler's article discusses as "production ready code" exists so that a failing dependency does not occupy your threads indefinitely.
 
-**API contracts:** explicit, versioned, backward-compatible. Consumer-driven contracts (Pact).
+**Data becomes distributed.** "Decentralized control of languages and data" means each service owns its data. A transaction that once touched one database now spans several, and the atomic guarantee is gone.
 
-## Inter-service communication
+**Calls become expensive.** A remote call is orders of magnitude slower than a function call and can fail in ways a function call cannot. Fowler's "intelligence in the endpoints" means services handle their own logic, but it also means each hop has a cost.
 
-**Synchronous (RPC):** gRPC, REST. Temporal coupling. Use for queries, low-latency needs.
+**Operations become a product.** Automated deployment, monitoring, and tracing are prerequisites, not extras. A team without them will find that its "independent" services are coupled through a shared, manual release process.
 
-**Asynchronous (messaging):** Kafka, RabbitMQ, NATS, Pulsar. Temporal decoupling. Event-driven.
+## The three patterns and the problems they solve
 
-**Service mesh:** Istio, Linkerd, Consul Connect. Sidecar proxy (Envoy). Handles:
-- **Traffic:** routing, splitting, mirroring, fault injection.
-- **Security:** mTLS, authz, cert rotation.
-- **Observability:** metrics, traces, access logs.
-- **Resilience:** retries, timeouts, circuit breakers, fault injection.
+**Service mesh** moves cross-cutting communication concerns — service discovery, retries, encryption, telemetry — out of application code into a dedicated infrastructure layer. The benefit is consistency: every service gets the same behaviour without each team implementing it. The cost is another component to operate and a new place for latency to hide.
 
-## Event-driven architecture
+**Event-driven communication** replaces a direct call with a published event. The producer does not need to know who consumes it, which decouples teams in time as well as deployment. CloudEvents, the CNCF specification, exists to make event descriptions portable across platforms. The trade-off is that delivery becomes asynchronous and eventually consistent: the consumer may react seconds later, or not at all, and the producer needs a way to detect that.
 
-**Event types:**
-- **Domain events:** fact that happened (`OrderPlaced`).
-- **Integration events:** cross-boundary (`OrderShipped`).
-- **Commands:** intent (`PlaceOrder`).
+**Saga pattern** addresses the lost transaction. A saga is a sequence of local transactions, each with a compensating action. If step three fails, the system runs the compensations for steps two and one rather than rolling back a distributed transaction that never existed. The hard part is designing compensations that are genuinely reversible — a sent email is not.
 
-**Event broker:** Kafka (log, replay, ordering), Pulsar (tiered storage), NATS (lightweight), EventBridge (serverless).
+AMQP, the OASIS standard for message queuing, is one substrate for reliable event transport. It provides the protocol, not the business semantics; deciding what an event *means* remains an application concern.
 
-**Patterns:**
-- **Event sourcing:** state = fold(events). Audit trail, temporal queries.
-- **CQRS:** separate read/write models. Optimized queries.
-- **Outbox pattern:** transactional outbox (DB + message) for reliability.
+## A worked example of a call chain
 
-## Saga pattern (distributed transactions)
+Suppose an order request passes through five services: API gateway → orders → payments → inventory → notifications. Each network hop has a median latency of 20 ms and a 0.5% chance of failure.
 
-**Choreography:** events trigger next step. Decentralized, but implicit flow.
+- **Serial chain latency:** 5 × 20 ms = 100 ms, before any business logic. Add a database query of 10 ms at each of orders, payments, and inventory, and the total is 130 ms.
+- **Success probability:** (0.995)^5 ≈ 97.5%. Roughly one request in forty fails because of an infrastructure hop, even if every service is correct.
 
-**Orchestration:** central orchestrator directs participants. Centralized, explicit flow. Temporal, Camunda, Orkes, Conductor.
+Two design changes alter this:
 
-**Compensation:** each step has compensating action (cancel, refund, release). Idempotency keys essential.
+1. **Parallelise independent calls.** If inventory and payments do not depend on each other, calling them together reduces the network portion from 40 ms to 20 ms — a 15% improvement on the 130 ms total.
+2. **Publish notifications as an event.** Removing the synchronous notification hop cuts 20 ms and one failure point. The user's confirmation no longer waits for the email system.
 
-**Timeouts & retries:** exponential backoff, dead letter queue, human escalation.
+The numbers are hypothetical, but the method is not: a call chain should be measured in hops and failure probabilities, not described as "a simple microservice architecture".
 
-## Operational patterns
+The same arithmetic applies to retries. A retry with exponential backoff improves the chance of success but increases latency and can amplify an outage when many clients retry at once — which is why a circuit breaker and jitter matter.
 
-**Circuit breaker:** fail fast when downstream failing (Hystrix, Resilience4j, go-breaker).
+## The database-per-service decision
 
-**Bulkhead:** isolate resources (thread pools, connections) per downstream.
+The most consequential architectural choice is rarely the framework or the mesh; it is whether each service owns its data. Fowler's "decentralized control of languages and data" is a real characteristic, but it comes with a cost that teams often discover late.
 
-**Retry with backoff:** exponential + jitter. Idempotency required.
+Consider two services: orders and inventory. If they share a database, a single transaction can reserve stock and create an order atomically. That is simple, and it couples the two services at the storage layer: a schema change requires coordination, and neither can be deployed or scaled independently without considering the other.
 
-**Timeouts:** per-operation, global. Configure per criticality.
+If each owns its data, the order service must ask inventory to reserve stock, and the request can fail after the order record is created. The saga pattern handles this with a compensating action, but the application now has to define what "cancelled" means, how long a reservation lasts, and what happens if the compensation itself fails. These are business rules that the shared database made implicit.
 
-**Health checks:** liveness (process alive), readiness (can serve traffic), startup (long init).
+The decision therefore turns on a question about the domain, not technology: are these two capabilities genuinely independent, with separate owners and separate scaling needs? If not, a shared database with clear module boundaries is a reasonable choice, and calling the result "not a microservice" is a semantic objection rather than an engineering argument.
 
-**Blue-green / Canary / Rolling:** deployment strategies. Feature flags (LaunchDarkly, Unleash).
+## What the pattern literature does not solve
 
-## Observability
+Three limits are worth stating plainly.
 
-**Three pillars:** logs (structured), metrics (RED/USE), traces (distributed).
+**Events do not remove coupling.** They change its form. A consumer that depends on the exact shape of a producer's event is coupled to that producer, and a schema change becomes a distributed migration. Contract discipline is still required.
 
-**Correlation IDs:** propagate `traceparent` (W3C Trace Context).
+**Sagas are not transactions.** A compensation is a new action, not an undo. If the compensating action fails, the system is in an intermediate state that needs a human or a retry policy. The design question is what state is acceptable during a failure, not whether failure can be eliminated.
 
-**SLO/SLI:** availability, latency, error rate. Error budget for release decisions.
+**The monolith is a legitimate comparator.** Fowler's article is a description of a style, not a recommendation that every system adopt it. A well-structured monolith can have independent modules and clear boundaries; the decision to distribute should be driven by a real need for independent deployment or scaling, not by fashion.
 
-For the related question of API design, see [API Design: REST, GraphQL, gRPC, API Gateway, Rate Limiting](/articles/api-design-rest-graphql-grpc-api-gateway-rate-limiting) and observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting).
+The strongest argument against premature decomposition is operational: a small team that splits into ten services inherits ten deployment pipelines, ten dashboards, and ten on-call surfaces before it has the traffic to justify any of them.
+
+## A decision test
+
+1. **Identify why you need independent deployment or scaling** before splitting a system.
+2. **Draw the call chain** and count hops and failure points, as in the worked example.
+3. **Choose synchronous calls only** where an immediate answer is genuinely required; Fowler's warning is worth taking literally.
+4. **Use events for decoupling**, with explicit schema ownership and delivery monitoring.
+5. **Design compensations** for every saga step and define the acceptable intermediate state.
+6. **Adopt a service mesh** only when the cross-cutting concerns are real and repeated.
+7. **Compare against a modular monolith** and state what distribution buys you.
+
+For the operational prerequisites, see [Observability](/articles/observability-logging-metrics-tracing-alerting) and [DevOps](/articles/devops-bridging-development-and-operations).
 
 ## Further Reading
 

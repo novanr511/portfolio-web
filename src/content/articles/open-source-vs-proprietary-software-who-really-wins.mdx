@@ -1,56 +1,99 @@
 ---
 title: "Open Source vs Proprietary Software: Who Really Wins?"
-description: "Open source and proprietary software represent two different models for building and distributing technology. Learn the trade-offs and when each makes sense."
+description: "The choice between open and proprietary software is about control, cost, and maintenance capacity. Read the licence mechanism, the security argument, and a TCO worked example."
 date: 2026-11-16
 tags:
   - Open Source
-  - Software
-  - Licensing
+  - Software Licensing
+  - Security
   - Strategy
 ---
 
-Open source and proprietary software are not enemies. They are different business and engineering models.
+The open-source versus proprietary debate is usually conducted as a moral contest. A more useful framing is contractual: who has the right to inspect, modify, and redistribute the software, and who is responsible when it breaks? Those questions have precise answers in licences and in the economics of maintenance.
 
-**Direct answer:** Open source software makes source code publicly available for anyone to view, modify, and distribute. Proprietary software keeps source code closed and restricts use through licenses. Neither is universally better; the right choice depends on cost, control, support, and strategic goals. Open source wins on flexibility and community; proprietary wins on accountability and commercial support.
+**Direct answer:** Open-source software grants users rights to use, study, modify, and distribute the code under a licence; proprietary software retains those rights with the vendor. SPDX provides a standard list of licences and identifiers, and the Open Source Security Foundation publishes "materials" for developing secure software. The boundary is that a licence grants rights, not capacity: a team without the skills or time to maintain a dependency gains little from being allowed to read its source.
 
-## What open source means
+## What the licence actually changes
 
-Open source software is defined by the Open Source Definition: free redistribution, access to source code, derived works, no discrimination against persons or fields of endeavor, and technology neutrality. Examples include Linux, Apache, MySQL, Python, and thousands of libraries used by virtually every software company.
+SPDX exists because licence names are ambiguous — similar names, different terms. Its licence list gives software a standard identifier, which makes automated compliance possible. A claim that a component is "open source" is not enough; the specific licence determines what you may do with it.
 
-Open source does not mean free of cost. It means free of restrictions on use and modification. Companies often pay for open source through support contracts, hosting, or internal engineering time.
+Two broad categories matter in practice:
 
-## What proprietary software means
+**Permissive licences** allow reuse with minimal obligations, typically retaining the copyright notice. They are easy to adopt in commercial products.
 
-Proprietary software is owned by a company or individual. Users get a license to use it, usually with restrictions: no reverse engineering, no redistribution, no modification. Examples include Microsoft Office, Adobe Creative Cloud, and most commercial enterprise software.
+**Copyleft licences** require derivative works to be distributed under the same terms. They protect the openness of the commons but create obligations when code is combined and distributed.
 
-Proprietary software comes with a vendor: someone to call when it breaks, someone accountable for security patches, someone who owns the roadmap.
+The important point is that "open" does not mean "no obligations". It means the obligations are stated in a licence you can read, rather than in a contract whose terms change at the vendor's discretion.
 
-## The trade-offs
+Proprietary software's advantage is the converse: a single party is accountable for the product, provides support, and can invest in a coherent roadmap. That is a real service, not merely rent-seeking, and a team that dismisses it pays in integration work instead.
 
-| Factor | Open Source | Proprietary |
-|---|---|---|
-| Cost | Usually no license fee; cost in engineering time | License or subscription fee |
-| Control | You can modify and fork | Vendor controls the roadmap |
-| Support | Community or paid third-party | Vendor support contract |
-| Security | Public code can be audited by anyone | Vendor is responsible for patches |
-| Lock-in | Lower; you own the code you modify | Higher; vendor can change terms or prices |
+## The security argument, stated fairly
 
-## Who really wins?
+The OpenSSF Best Practices Working Group publishes guidance including secure coding, vulnerability management, and material on "Software Component Updates" and "The Memory Safety Continuum". The organisation's existence reflects a genuine insight: widely used open-source components are critical infrastructure, and their maintainers need support.
 
-Neither side wins universally. The winner depends on context:
+The common claim "many eyes make all bugs shallow" is too strong. It depends on there being eyes, with the skills and incentive to look. A widely used library with one unpaid maintainer is a concentration of risk, not a distributed defence. The supply-chain incidents of recent years are precisely about trusted components becoming attack vectors.
 
-- **Open source wins** when you need flexibility, want to avoid vendor lock-in, have engineering capacity to maintain the software, or want to benefit from community innovation.
-- **Proprietary wins** when you need a single throat to choke, lack internal engineering resources, need guaranteed SLAs, or are buying software that is not your core competency.
+A fair comparison:
 
-Most modern businesses use both. They run Linux (open source) on servers and buy Salesforce (proprietary) for CRM. The question is not which model is better, but which model fits each part of the business.
+- Proprietary code can be audited by the vendor and patched on a schedule, but users cannot verify the fix or continue it if the vendor discontinues support.
+- Open code can be audited by anyone and forked if abandoned, but the audit happens only if someone does it.
 
-## The hybrid reality
+Neither is inherently safer. The deciding factors are the maintainer's responsiveness, the transparency of the vulnerability process, and the organisation's ability to apply patches quickly.
 
-The line between open source and proprietary is blurring. Open core models offer a free open source version with paid proprietary features. Some companies open source their software but sell hosted versions. Others release proprietary software with source available for inspection but not modification.
+## A worked example of total cost
 
-The strategy is what matters: know what you own, what you rent, and where your leverage sits.
+The following numbers are hypothetical and illustrative. Suppose a team needs a component it will use for three years.
 
-For the related question of how software licensing affects business decisions, see [Open Source Is a License Term, Not a Vibe: Reading OSD, OSAID, and BSL](/articles/open-source-is-a-license-term-not-a-vibe) and [Why Every Business Is Becoming a Software Company](/articles/why-every-business-is-becoming-a-software-company).
+**Proprietary option:** 40,000 per year in licence fees, with vendor support and upgrades included. Three-year cost: 120,000. Internal integration: 200 engineer-hours at 100 per hour = 20,000. Total: 140,000.
+
+**Open-source option:** No licence fee. Internal integration: 400 hours = 40,000. Ongoing maintenance — tracking upstream changes, applying patches, fixing a bug the team needs — 150 hours per year = 45,000 over three years. Total: 85,000.
+
+On these assumptions, open source is cheaper by 55,000. But the result is sensitive to two inputs the team does not control perfectly:
+
+1. **Maintenance load.** If upstream becomes inactive and the team must take over the component, maintenance could double to 300 hours per year, adding 45,000 and erasing the saving.
+2. **Vendor price changes.** If the proprietary vendor raises fees or drops support at renewal, the 120,000 figure is not fixed.
+
+The point is not that one option always wins. It is that "free" and "expensive" are claims about licence fees, while the decision depends on the full cost of ownership, including the team's capacity to maintain what it adopts.
+
+A third option often outperforms both: pay a vendor for support around an open-source component. This converts some maintenance risk into a contract while preserving the ability to inspect and fork.
+
+## How to evaluate maintainer health
+
+If open source shifts cost toward maintenance, the first question is whether maintenance will actually be available. Four signals are more informative than a star count.
+
+**Response time to issues and security reports.** A project that answers vulnerabilities within days is a different risk from one where reports sit for months. The answer matters more than a policy statement, because a policy does not tell you whether anyone is doing the work.
+
+**Bus factor.** How many people could make a release tomorrow? A dependency maintained by one person is a key-person risk, whatever its licence says. A fork is a theoretical option, not a practical one if nobody in your team has ever built the project.
+
+**Release cadence and deprecation practice.** A project that ships regularly and announces breaking changes in advance lets you plan. One that goes quiet for two years and then changes its API is expensive to depend on, even if the code is excellent.
+
+**Your own contribution path.** Can you get a small fix merged? If not, you are a consumer of someone else's schedule, and the "you can modify it" right exists only on paper. Submitting one trivial patch before adopting a component is a cheap way to learn how the project treats outsiders.
+
+These signals also apply to proprietary vendors, with a difference: a vendor's neglect is visible in support tickets and renewal conversations, while an open-source project's decline requires someone to notice the absence of activity. Neither option removes the need for a dependency review — it changes what you review.
+
+## What the framing leaves out
+
+Three qualifications matter.
+
+**Ecosystem effects.** A widely adopted open source project accumulates integrations, documentation, and a hiring pool. A proprietary tool may be technically superior and still lose because the surrounding ecosystem is smaller. This is a network effect, not a verdict on quality.
+
+**Strategic control.** For a component at the core of a business, the ability to inspect and modify it is an option on the future. For a commodity utility, that option has little value. The same licence means different things in the two positions.
+
+**Contribution is not free.** "Joining the community" costs engineering time. A team that depends on a project but never contributes may find its needs ignored; a team that contributes gains influence and early warning of changes.
+
+The strongest counterargument to "just use open source" is that maintenance capacity is unevenly distributed. A small team may rationally choose a proprietary service precisely because it cannot afford to own the software's lifecycle, even if it could read the source.
+
+## A decision test
+
+1. **Identify the exact licence** of every component and record its SPDX identifier.
+2. **Estimate the full lifecycle cost** — integration, maintenance, upgrades, exit — not just the licence fee.
+3. **Assess maintainer health** for open dependencies: activity, responsiveness, bus factor.
+4. **Ask what happens if the vendor disappears** or the upstream project stalls.
+5. **Decide where control is strategic** and where it is merely desirable.
+6. **Consider paid support** around open source as a third option.
+7. **Budget for contribution** if the dependency is important to you.
+
+For the security dimension, see [Cybersecurity Fundamentals](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response); for the build-versus-buy context, see [Technical Debt](/articles/technical-debt-the-hidden-cost-of-shortcuts).
 
 ## Further Reading
 

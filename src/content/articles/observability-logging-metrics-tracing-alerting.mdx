@@ -1,99 +1,99 @@
 ---
 title: "Observability: Logging, Metrics, Tracing, Alerting"
-description: "Observability lets you understand system behavior. Learn the three pillars (logs, metrics, traces), alerting philosophy, SLOs, and tooling."
+description: "Observability is the ability to ask new questions of a running system. Read the three signals, the error-budget arithmetic behind good alerts, and what tooling cannot fix."
 date: 2026-11-16
 tags:
   - Observability
-  - Logging
-  - Metrics
-  - Tracing
-  - Alerting
+  - SRE
+  - Monitoring
+  - DevOps
 ---
 
-You cannot fix what you cannot see. Observability is the ability to ask arbitrary questions.
+Monitoring tells you when a known thing breaks. Observability is the stronger property: being able to investigate a problem you did not predict, using evidence the system emitted before anyone knew it mattered. The difference is not a product category. It is whether the data you kept is sufficient to reconstruct an unfamiliar failure.
 
-**Direct answer:** Observability is the ability to understand a system's internal state from its external outputs. Three pillars: logs (structured, immutable events), metrics (aggregated numbers over time), traces (request flows across services). Alerting converts signals into actionable pages. SLOs (Service Level Objectives) define reliability targets; error budgets guide release decisions.
+**Direct answer:** OpenTelemetry organises telemetry into three signals — traces, metrics, and logs — each answering a different question. Alerting should be derived from service-level objectives rather than raw thresholds: the Google SRE workbook says the goal is "to be notified for a significant event: an event that consumes a large fraction of the error budget", so that teams "respond to problems before [they] consume too much of your error budget". The boundary is that signals and alerts only help if someone owns the response.
 
-## Logging
+## The three signals
 
-**Structured logging:** JSON, consistent fields (`timestamp`, `level`, `message`, `trace_id`, `span_id`, `service`, `environment`).
+**Traces** follow a request through the services it touches. They answer "where did the time go?" and "which call failed?" A trace is a tree of spans, and its value is the causal structure: a 2-second request is unhelpful until you see that 1.8 seconds were spent in one database call.
 
-**Levels:** DEBUG, INFO, WARN, ERROR, CRITICAL. Use appropriately; DEBUG in prod only when needed.
+**Metrics** are numeric measurements over time — request rate, error rate, latency distributions. They are cheap to store and excellent for detecting that something changed. They are weaker at explaining why, because aggregation discards the individual events that carried the cause.
 
-**Context:** enrich with request ID, user ID, tenant ID, correlation ID.
+**Logs** are discrete records of events. They carry the detail that metrics lack, but an unstructured log line is hard to query at scale. The practical discipline is to make logs structured and to include the identifiers that let them be correlated with traces.
 
-**Sampling:** tail-based (keep errors, sample success), rate limiting.
+OpenTelemetry's role is to standardise how these signals are produced and correlated, so that a service emits data in a form any backend can consume. The protocol is the easy part; deciding which attributes to attach — the ones you will wish you had during an incident — is the design work.
 
-**Storage:** hot (recent, fast query), warm (compressed), cold (archived). Retention policies.
+## Why alerting is a budget problem
 
-**Tools:** ELK/EFK (Elasticsearch, Fluentd/Fluent Bit, Kibana), Loki + Grafana, Datadog, Splunk, CloudWatch, Axiom.
+An alert that fires on every 5xx spike is easy to write and useless in practice. It produces noise during small, self-correcting blips and trains responders to ignore it. The SRE approach starts from a service-level objective (SLO) and the error budget it implies.
 
-## Metrics
+**A worked example.** Suppose an API has an SLO of 99.9% successful requests per 30-day window. The error budget is 0.1% of requests. If the service handles 1 million requests in that window, the budget is 1,000 failed requests; in time terms at a steady rate, roughly 43 minutes of full outage per month.
 
-**Types:**
-- **Counter:** monotonically increasing (requests_total).
-- **Gauge:** instantaneous value (memory_usage, queue_size).
-- **Histogram:** distribution of values (latency buckets).
-- **Summary:** quantiles over sliding window (client-side quantiles).
+Now design alerts from burn rate — how fast the budget is being consumed:
 
-**RED method (request-driven):**
-- **Rate:** requests per second.
-- **Errors:** error rate (5xx / total).
-- **Duration:** latency distribution (p50, p95, p99).
+- A **fast burn** alert: 14.4× the acceptable error rate sustained for 1 hour consumes about 2% of the monthly budget. That warrants a page, because at that rate the budget would be exhausted in about 50 hours.
+- A **slow burn** alert: 6× for 6 hours consumes about 5% of the budget. That warrants a ticket, not a page.
 
-**USE method (resource-driven):**
-- **Utilization:** % busy.
-- **Saturation:** queue depth, contention.
-- **Errors:** error count.
+The arithmetic is the point. A 30-second spike at 50× is less serious than 6 hours at 6×, even though the instantaneous error rate is higher, because the second event consumes more of the budget. The SRE workbook's warning that "long detection times can negatively impact the error budget" follows directly.
 
-**Cardinality:** keep label cardinality low (avoid user_id, request_id as labels). Use exemplars for trace linkage.
+Three cautions apply:
 
-**Tools:** Prometheus + Grafana, Datadog, CloudWatch, Mimir, Thanos, VictoriaMetrics.
+- **Low-traffic services break the arithmetic.** A few failures in a quiet period produce enormous error percentages. The SRE workbook explicitly discusses "low-traffic services and error budget alerting" as a sensitive case.
+- **Symptoms beat causes for paging.** Alert on what users experience — latency, errors, availability — not on CPU. A high CPU with healthy responses is not an incident.
+- **Every alert needs an action.** If the responder cannot do anything on receipt, it is a notification, not an alert.
 
-## Distributed tracing
+## Instrumentation is a design decision
 
-**Span:** unit of work (operation name, start/end time, attributes, events, links).
+Teams often ask which tool to buy before deciding what to measure. The more useful question is: during a failure, what would you need to know?
 
-**Trace:** tree of spans (root + children). `trace_id` shared, `span_id` unique, `parent_span_id`.
+For a web service, a reasonable starting set includes:
 
-**Context propagation:** W3C Trace Context (`traceparent`, `tracestate`). Inject/extract at boundaries.
+1. **The four golden signals** — latency, traffic, errors, and saturation — as metrics with labelled dimensions.
+2. **Trace context propagated across services**, so a single request can be followed end to end.
+3. **Structured logs** with request IDs and the key attributes needed to filter an incident.
+4. **SLOs derived from user experience**, with alerts from the error budget rather than fixed thresholds.
+5. **A retention policy** that keeps high-value data long enough to investigate slow-burn problems.
 
-**Sampling:** head-based (random, deterministic), tail-based (decide after trace complete). Target: 10–100% for errors, 0.1–1% for success.
+The fifth item is where observability programmes usually fail. Detailed traces are expensive, so teams sample aggressively — and then cannot find the one request that explains an incident, because it was discarded. Sampling should be decided with the failure modes in mind, not only the storage bill.
 
-**Tools:** Jaeger, Zipkin, Tempo, X-Ray, Cloud Trace, Datadog APM, Honeycomb, Lightstep.
+## The debugging loop
 
-## Alerting philosophy
+Observability pays off in a specific rhythm, and it is worth making that rhythm explicit rather than hoping it emerges during an incident.
 
-**Alert on symptoms, not causes.** Page on SLO breach (error budget burn), not CPU > 80%.
+**Notice the symptom.** A metric derived from an SLO fires: error rate above the burn-rate threshold, or latency above the user-experienced target. The alert should name the affected user journey, not an internal component.
 
-**Alert categories:**
-- **Page (immediate):** SLO breach, SEV-1, data loss, security incident.
-- **Ticket (next business day):** capacity trend, config drift, deprecated API usage.
-- **Log (no action):** informational, debug.
+**Form a hypothesis.** "If the new cache key is wrong, misses should rise in one segment and the extra calls should appear as a new downstream span." A hypothesis is useful because it tells you which data to query and what would disprove it.
 
-**Alert quality:** actionable (clear runbook), specific (which service, what threshold), routed (correct on-call).
+**Test against the signals.** Check the metric for the segment, find a representative trace, and read the logs correlated with that trace ID. Each signal answers a different part of the hypothesis; using only one is how investigations stall.
 
-**Anti-patterns:** alert fatigue, flapping, noisy alerts, paging for warnings.
+**Confirm and act.** If the data supports the hypothesis, mitigate first and investigate the root cause later. If it does not, discard the hypothesis and form another — but write down what was ruled out, so the next responder does not repeat the work.
 
-## SLOs and error budgets
+This loop is why the three signals must be correlated. A trace without the relevant log line tells you where the time went but not why; a log without the trace context tells you something happened but not to which request. OpenTelemetry's common identifiers are the mechanism that makes the loop possible.
 
-**SLI (Service Level Indicator):** measurable (latency < 200ms, error rate < 0.1%).
+A game day — deliberately injecting a fault and running this loop — is the only reliable way to find out whether your instrumentation is sufficient. An incident is a poor time to discover that the attribute you needed was never emitted.
 
-**SLO (Service Level Objective):** target (99.9% of requests < 200ms over 30 days).
+## What tooling cannot fix
 
-**Error budget:** 1 - SLO. 99.9% SLO = 0.1% error budget = 43.2 min/month downtime.
+Three limitations are structural.
 
-**Burn rate:** how fast budget consumed. 1x = on track. 14.4x = 2% budget/hour = page.
+**Unobservable states stay unobservable.** If the system never emits a particular attribute, no backend can reconstruct it after the fact. Instrumentation has to anticipate the questions you will want to ask, which is partly a matter of humility about what can go wrong.
 
-**Alerting on budget:** multi-window, multi-burn-rate (Google SRE workbook).
+**More data is not more understanding.** A team that adds dashboards without a model of the system will produce noise. Observability requires hypotheses — "if the cache is cold, latency should rise in this segment" — that the data can confirm or refute.
 
-## Tools ecosystem
+**Alerts require ownership.** An alert with no named responder is an email. The hardest part of alerting is organisational: deciding who is on call, what counts as significant, and when to escalate.
 
-**OpenTelemetry (OTel):** vendor-neutral instrumentation (logs, metrics, traces). Auto-instrumentation (Java, Go, Python, Node, .NET). Collector for export.
+The counterargument to a heavy observability investment — that it is expensive and most incidents are simple — is fair for small systems. But the cost is a function of scale and criticality, and a team should increase instrumentation as the cost of an undiagnosed incident rises, not when a vendor recommends it.
 
-**Backends:** Prometheus/Grafana, Datadog, New Relic, Honeycomb, Lightstep, Grafana Cloud, Elastic, Loki, Tempo, Mimir.
+## A decision test
 
-For the related question of SRE, see [Site Reliability Engineering: SLOs, Error Budgets, Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) and microservices, see [Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern).
+1. **Define the symptom** a user would notice and make it an SLI.
+2. **Derive the error budget** from the SLO and alert on its burn rate.
+3. **Emit traces, metrics, and logs** with shared identifiers so they can be correlated.
+4. **Alert on symptoms**, with a defined action for every page.
+5. **Test the investigation path** by running a game day: can you find the cause of an injected fault from the emitted data?
+6. **Review retention** against the longest detection window you care about.
+
+For the architecture that creates these problems, see [Microservices Architecture](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern); for the response process, see [Site Reliability Engineering](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response).
 
 ## Further Reading
 

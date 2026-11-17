@@ -1,54 +1,99 @@
 ---
 title: "The Hidden Infrastructure Behind Every Digital Platform"
-description: "Every app, website, and digital service runs on layers of infrastructure most users never see. Learn what holds up the digital world."
+description: "A page load depends on DNS, HTTP semantics, and a transport protocol most users never see. Read what each layer guarantees — and where the latency actually goes."
 date: 2026-11-16
 tags:
   - Infrastructure
-  - Internet
-  - Systems
-  - Technology
+  - Networking
+  - DNS
+  - HTTP
 ---
 
-Every tap, click, and swipe rests on invisible infrastructure.
+A digital product appears simple at the surface: a URL, a page, a response. Underneath, a name has to become an address, a connection has to be established, and a request has to be interpreted according to rules written decades before the application existed. Those layers are hidden until they fail, and then they are all that matters.
 
-**Direct answer:** Every digital platform—social networks, marketplaces, streaming services, enterprise software—runs on layers of infrastructure that users never see: data centers, networks, content delivery networks, domain systems, and orchestration layers. This infrastructure determines whether a service is fast, available, and secure. Understanding it is essential for anyone who builds, buys, or relies on digital platforms.
+**Direct answer:** The visible web rests on a stack of standardised protocols. DNS maps names to addresses; HTTP defines the semantics of requests and responses; the transport carries the bytes, with HTTP/3 mapping HTTP semantics over QUIC. RFC 9110 describes HTTP as "a stateless application-level protocol for distributed, collaborative, hypertext information systems", and RFC 9114 states that "HTTP/3 supports the same semantics over a new transport protocol: QUIC". The boundary: knowing the protocols explains what *can* happen, not what a particular deployment actually does.
 
-## The layers most users never see
+## Name resolution: DNS
 
-When a user opens an app, the request travels through:
+RFC 1035, published in November 1987, specifies the implementation of the Domain Name System. A resolver translates a human-readable name into the data needed to connect — typically an IP address — by querying a hierarchy of servers and caching the results.
 
-- **Device and network:** the phone, Wi-Fi or cellular, local ISP.
-- **DNS:** translating a domain name into an IP address.
-- **Content delivery network (CDN):** caching content closer to the user.
-- **Load balancer:** distributing traffic across servers.
-- **Application servers:** running the business logic.
-- **Databases:** storing and retrieving data.
-- **Object storage:** holding files, images, videos.
-- **Monitoring and alerting:** detecting failures before users do.
+Caching is what makes the system usable at scale, and it is also where most confusion lives. A DNS answer has a time-to-live; once it expires, the resolver asks again. A change to a record therefore propagates gradually, and an old address can persist in caches long after the authoritative source has changed. This is why a migration plan includes a TTL reduction before the switch, not just the switch itself.
 
-Each layer can fail, slow down, or be attacked. Platform reliability depends on all of them working together.
+Three properties matter operationally:
 
-## Data centers and cloud
+- **DNS is a distributed database with caches**, not a live directory. "It has been updated" and "everyone sees the update" are different claims.
+- **Resolution is a dependency.** If DNS fails, services that already have an address may keep working while new connections cannot start — a failure mode that looks like a partial outage.
+- **Names are an abstraction layer.** A name can be moved to a different machine without changing the application, which is why it is a control point for failover and load balancing.
 
-Most platforms run in data centers: buildings filled with servers, cooling, power, and network connections. Many businesses no longer build their own; they rent capacity from cloud providers (AWS, Azure, Google Cloud, and others). Cloud turns infrastructure into an on-demand service, but it also concentrates dependence on a few providers.
+## Request and response: HTTP semantics
 
-## Content delivery and the edge
+RFC 9110 defines the shared vocabulary of HTTP: methods, status codes, headers, and the notion of a resource and its representation. The protocol is stateless — each request is independent — which is why applications build sessions on top of it.
 
-A user in Jakarta accessing a server in Virginia experiences latency. CDNs solve this by caching static content (images, video, JavaScript) at edge locations close to users. The closer the content, the faster it loads. CDNs also protect against traffic spikes and some attacks.
+Two distinctions in the specification prevent a great deal of confusion:
 
-## Databases and state
+**A resource is not its representation.** The same resource can be served as HTML or JSON. A client asking for a different representation is not asking for different data.
 
-Platforms are not just code; they are state. Databases track users, orders, content, and relationships. Choosing the right database—relational, document, graph, key-value—affects performance, cost, and scalability. Replication and backups determine whether data survives a failure.
+**Status codes describe the outcome of the protocol request**, not the business outcome. A `200 OK` means the request was processed; it does not mean the data was useful, the operation succeeded semantically, or a search engine indexed the page. Confusing these is the source of many bad operational assumptions.
 
-## Observability: knowing what is happening
+RFC 9114 adds the transport evolution. QUIC offers "stream multiplexing, per-stream flow control, and low-latency connection establishment", and HTTP/3 maps the same HTTP semantics onto it. The important phrase is "the same semantics": a change of transport does not change what a request means, only how the bytes move. That is why an application can adopt HTTP/3 without rewriting its API.
 
-Modern platforms generate terabytes of logs, metrics, and traces. Observability tools collect and analyze this data so engineers can answer: Is the service slow? Is it failing? Why? Without observability, teams operate blind.
+## A worked example of a page load
 
-## The hidden cost of convenience
+The following is an illustrative latency budget, not a measurement. Suppose a user loads a page from the other side of the world:
 
-Users see a simple app. Behind it are hundreds of engineering decisions: which region to deploy in, how many servers to run, how to replicate data, how to secure connections. Each decision trades off cost, performance, and risk.
+| Step | Approximate time |
+| --- | --- |
+| DNS resolution (cached) | ~1 ms |
+| DNS resolution (uncached) | ~50–100 ms |
+| TCP/TLS handshake (legacy) | ~150 ms |
+| QUIC handshake (1-RTT) | ~75 ms |
+| Server processing | ~40 ms |
+| Content download | ~100 ms |
 
-For the related question of how content reaches users, see [How the Internet Actually Works: From DNS to Global Connectivity](/articles/how-the-internet-actually-works-from-dns-to-global-connectivity) and [The Evolution of Web Browsers and the Future of the Internet](/articles/the-evolution-of-web-browsers-and-the-future-of-the-internet). For how infrastructure affects business operations, see [Why Every Business Is Becoming a Software Company](/articles/why-every-business-is-becoming-a-software-company).
+Two observations follow.
+
+First, **the handshake matters**. On a high-latency link, a round trip dominates a page's perceived speed, which is why connection reuse and HTTP/3's lower-latency establishment are significant. The improvement is in the transport, not in the application code.
+
+Second, **an uncached DNS lookup can exceed server processing time**. A team that optimises a 40 ms handler while ignoring cache TTLs and connection behaviour is working on the wrong part of the budget.
+
+A migration example shows the layers interacting. Moving a service to a new address requires: lowering the DNS TTL in advance, ensuring the new endpoint accepts the same HTTP semantics, confirming the transport supports the expected connection behaviour, and verifying that clients do not pin an old address. A failure at any layer produces a symptom at the surface that looks like "the site is down".
+
+## Where the layers are configured
+
+The practical value of knowing the stack is that each layer has a control point, and a performance or reliability problem is often a wrong setting at one of them.
+
+**DNS is configured with TTLs and records.** A short TTL makes migrations safer and traffic shifting faster, at the cost of more lookups. A long TTL reduces load on authoritative servers but makes address changes slow. There is no universally correct value; there is a value appropriate to how often you expect to change the address.
+
+**HTTP is configured with headers and caching directives.** Whether a response can be cached, for how long, and by whom is expressed in the protocol's headers, not in the application's intent. A team that changes content frequently but serves long cache lifetimes is trading correctness for speed, and the symptom appears as stale pages.
+
+**The transport is configured by the server and client stack.** Whether HTTP/3 is negotiated depends on both ends and on the network path. Enabling it on a server does not guarantee that a given user benefits, which is why a claim about transport improvement should be checked against real traffic.
+
+**The application sits above all three.** It cannot override a cached DNS answer, and it cannot make a client support a protocol it does not implement. Recognising which layer owns a behaviour prevents the common mistake of tuning the application to solve a transport problem.
+
+This is why the worked latency budget is more than an illustration: it tells you which knob belongs to which layer, and therefore who should be involved when a number changes.
+
+## Where the model stops being useful
+
+Three limitations matter.
+
+**The RFCs define protocols, not deployments.** RFC 9114 specifies HTTP/3; your CDN, browser, and network may or may not support it in the way the specification allows. Always distinguish what a protocol permits from what a particular stack does.
+
+**Latency budgets are not additive in practice.** Connections are reused, requests are parallel, and caches interact. The worked example is a teaching device, not a prediction of a real page load.
+
+**The stack has policy layers.** Censorship, corporate proxies, and firewall rules can change behaviour without changing any protocol. A model that includes only the standards will miss them.
+
+The counterargument to caring about these details — that abstractions exist so developers need not understand them — is true until the abstraction leaks. It leaks precisely during incidents, which is when understanding is most valuable.
+
+## A decision test
+
+1. **Trace a real request** through DNS, connection setup, HTTP, and application processing.
+2. **Measure at each layer** rather than attributing all latency to the application.
+3. **Check DNS TTLs** before any address migration and verify propagation.
+4. **Confirm transport support** — HTTP/3 and QUIC — in the actual client and server stack.
+5. **Treat status codes as protocol outcomes**, not business results.
+6. **Review the failure mode of each layer** — what breaks, and what keeps working — before designing failover.
+
+For the measurement side of these layers, see [Web Performance](/articles/web-performance-from-dns-to-browser-find-the-slow-layer); for the transport change itself, see [HTTP/3 and QUIC](/articles/http3-what-changes-when-http-runs-over-quic).
 
 ## Further Reading
 
