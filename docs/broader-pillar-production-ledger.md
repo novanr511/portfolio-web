@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 196 tracked articles — 196 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 198 tracked articles — 198 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -210,6 +210,8 @@
 | **P-204** | Demand Generation vs Lead Generation: Where the Funnel Breaks | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/demand-generation-vs-lead-generation.mdx` | 2026-11-17 | New article: 1,395 words. Distinct jobs and metrics from secondary overviews; labeled funnel example (20 to 30 customers via acceptance rate); two-clocks budgeting; decision test. Two new sources verified. |
 | **P-205** | Email Deliverability: What Actually Affects Inbox Placement | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/email-deliverability.mdx` | 2026-11-17 | New article: 1,301 words. SPF/DKIM/DMARC RFCs and Gmail sender guidelines; hypothetical DMARC rollout with observation phase; setup order; metric caveats; decision test. Four new sources verified. |
 | **P-206** | Influencer Marketing Measurement: Codes vs Holdouts | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/influencer-marketing-measurement.mdx` | 2026-11-17 | New article: 1,198 words. Attributed vs incremental sales from code/link tracking; labeled worked example (400 attributed vs 80 incremental purchases); measurement-design ladder; decision test. Two new sources verified. |
+| **P-207** | Category Design: Create a Market Instead of Competing | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/category-design-create-a-market.mdx` | 2026-11-17 | New article: 1,256 words. Product-category and blue-ocean framing with Porter fit argument; hypothetical monitoring-to-prevention frame with three viability tests; adoption signals; decision test. Three new sources verified. |
+| **P-208** | Brand Consistency Across Channels: What Must Match | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/brand-consistency-across-channels.mdx` | 2026-11-17 | New article: 1,267 words. Promise/voice/identifiers frame with brand-management and marketing-communications overviews; hypothetical six-touchpoint audit; ownership patterns; decision test. Two new sources verified. |
 
 ---
 
@@ -232,6 +234,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AX (Expanded focus, cluster 6 — 2026-11-17):** Two brand and strategy articles drafted. *Category Design* uses blue-ocean and product-category overviews with Porter; *Brand Consistency* uses brand-management and communications overviews. Both include labeled worked audits and decision tests. Four new sources added; all 252 verify.
 - **Batch AW (Expanded focus, cluster 5 — 2026-11-17):** Two marketing articles drafted. *Email Deliverability* is built on IETF RFCs and a provider guideline; *Influencer Marketing Measurement* on secondary overviews with an explicit attribution-versus-incrementality frame. Both include labeled worked examples and decision tests. Six new sources added; all 248 verify.
 - **Batch AV (Expanded focus, cluster 4 — 2026-11-17):** Two articles drafted across the owner-requested themes. *AI Readiness Assessment* uses NIST, OECD.AI and O*NET; *Demand Generation vs Lead Generation* opens the marketing expansion using secondary overviews with clearly stated limits. Both include labeled worked examples and decision tests. Three new sources added; all 242 verify.
 - **Batch AU (Expanded AI focus, cluster 3 — 2026-11-17):** Two implementation articles drafted. *Routing Between LLMs* uses FrugalGPT, RouteLLM and published tier prices; *AI Integration Blueprint* uses NIST AI RMF and cloud-vendor catalogues treated as claims. Both include labeled worked examples and decision tests. Four new sources added; all 239 verify.
