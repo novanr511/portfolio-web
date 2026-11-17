@@ -1,0 +1,90 @@
+---
+title: "Evaluating LLM Applications Without a Harness"
+description: "A demo is not an evaluation. Read why single-score benchmarks mislead, what HELM measures beyond accuracy, and how to build a small harness."
+date: 2026-11-17
+tags:
+  - LLM
+  - AI
+  - Evaluation
+  - MLOps
+---
+
+An LLM application that works on ten examples you wrote yourself is not evaluated. It is demonstrated. The difference matters because the failures that reach production are usually the cases nobody thought to try — a different phrasing, an edge case, a document in a format the demo never saw. A harness is the mechanism that turns a demo into evidence.
+
+**Direct answer:** Evaluation means measuring a system on a representative set of cases with explicit metrics, then re-running the same measurement after every change. The HELM study argues for a multi-metric approach, measuring "7 metrics (accuracy, calibration, robustness, fairness, bias, toxicity, and efficiency)" across many scenarios because "metrics beyond accuracy don't fall to the wayside". OpenAI documents evals as the way to test applications built on its models. The boundary: a harness tells you whether the system improved on your test set; it does not prove the test set represents the world.
+
+## Why a single score fails
+
+**Benchmarks measure a different distribution.** HELM found that before its work, models "on average were evaluated on just 17.9% of the core HELM scenarios", with some prominent models sharing no scenario in common. A rank derived from different tests is not a comparison. HELM raised that coverage to 96.0% under standardised conditions — the point being that shared scenarios and explicit metrics make comparison possible.
+
+**Accuracy is not the only desideratum.** A model can be accurate and poorly calibrated, biased, or expensive. HELM's inclusion of calibration, robustness, fairness, bias, toxicity and efficiency exists because those properties trade off against accuracy and are invisible if you measure only correctness.
+
+**Your application has its own distribution.** A public benchmark asks generic questions. Your support bot sees your customers' phrasing, your product's names, and your knowledge base's quirks. A labelled set from your own traffic is the only evaluation that answers your question.
+
+## What a minimal harness contains
+
+Four components are enough to start:
+
+1. **A labelled set.** Real examples with the expected answer or an explicit rubric. Remove sensitive data. Include the failures you have already seen, because those are guaranteed to recur.
+2. **A fixed prompt and configuration.** If the prompt, model version, or parameters change between runs, the comparison is meaningless. Record them with the score.
+3. **A scoring method.** Exact match for extraction, a rubric for generation, and human review for a sample. An LLM-as-judge can scale the process, but it needs its own validation against human scores.
+4. **A comparison record.** Store the results per change so a regression is visible. A score with no history tells you nothing about direction.
+
+OpenAI's eval documentation exists because this is an engineering activity, not an afterthought: you define cases, run them, and inspect where the system fails.
+
+## A worked example of a harness result
+
+The following numbers are hypothetical and illustrative.
+
+A support assistant is evaluated on 200 real questions with rubric-scored answers. Two changes are proposed: a new prompt and a cheaper model.
+
+| Configuration | Correct | Calibrated refusal | Latency (p95) | Cost per 1k queries |
+| --- | --- | --- | --- | --- |
+| Baseline | 82% | 60% | 2.1s | 40 |
+| New prompt | 89% | 78% | 2.3s | 42 |
+| Cheaper model | 76% | 55% | 1.2s | 8 |
+
+Three decisions follow:
+
+1. **The new prompt wins overall.** Correct answers rise by 7 points and calibrated refusals by 18, for a small latency and cost increase. A single accuracy metric would have missed the refusal improvement, which is what stops the system from answering when it does not know.
+2. **The cheaper model needs conditions.** It is worse on every quality dimension and much faster. It may still be right for low-stakes, high-volume questions — but that decision requires a routing evaluation, not the aggregate table.
+3. **The harness reveals trade-offs.** A dashboard showing only "correct answers" would have hidden the latency and cost columns, and a dashboard showing only cost would have chosen the cheap model.
+
+The set has a limitation: 200 cases cannot detect a rare failure that occurs once in a thousand. Keep a separate set of known hard cases and treat passing it as a gate, not a score.
+
+## Building the habit
+
+**Run the harness on every change.** Prompt edits, model upgrades, retrieval changes, and knowledge-base updates all alter behaviour. A change that cannot be measured is a change you cannot learn from.
+
+**Investigate failures by category.** Group the failing cases — wrong retrieval, wrong tone, missing refusal — because each points to a different fix. An aggregate score tells you that something broke, not what.
+
+**Validate the judge.** If an LLM scores the answers, have humans score a sample and compare. A judge with a bias toward long answers will reward verbosity.
+
+**Keep the test set honest.** Once a set is used to tune prompts, it stops being a clean measure. Reserve a held-out portion that is only scored at milestones.
+
+## What an evaluation cannot prove
+
+**Representativeness is an assumption.** A test set drawn from last quarter's traffic will not contain next quarter's product launch or a new form of attack. Evaluation is evidence about the past, used cautiously for the future.
+
+**Rubrics encode values.** Deciding that a refusal is "calibrated" is a judgement about what the system should do. Make the rubric explicit so a reviewer can disagree with it.
+
+**Scores can be gamed.** Optimising directly against a fixed metric produces systems that score well on the metric. The held-out set and human review are the defence.
+
+The counterargument — that a lightweight team cannot afford a harness — is backwards. A small set of real examples with a fixed scoring script is cheap; what is expensive is discovering a regression from customer complaints.
+
+## A decision test
+
+1. **Collect 100–200 real examples** with expected answers or a rubric.
+2. **Choose at least two metrics** — quality and one of calibration, latency or cost.
+3. **Fix the prompt, model and configuration** and record them with each run.
+4. **Re-run on every change** and keep the history.
+5. **Group failures by cause** before proposing a fix.
+6. **Validate any automated judge** against human scores.
+7. **Keep a held-out set** for milestone checks.
+
+For the model-selection context, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026); for the production discipline, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline).
+
+## Further Reading
+
+- Percy Liang et al., 2022. [Holistic Evaluation of Language Models](https://arxiv.org/abs/2211.09110) — HELM's multi-metric framework: 7 metrics across 16 core scenarios, 30 models, and the finding that models were previously evaluated on only 17.9% of shared scenarios.
+- OpenAI, 2026. [Working with evals | OpenAI API](https://platform.openai.com/docs/guides/evals) — Official documentation on building and running evaluations for applications built on OpenAI models.

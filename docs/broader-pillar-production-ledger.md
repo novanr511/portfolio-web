@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 202 tracked articles — 202 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 204 tracked articles — 204 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -216,6 +216,8 @@
 | **P-210** | Cost of Capital for Private Companies: A Practical Estimate | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/cost-of-capital-private-companies.mdx` | 2026-11-17 | New article: 1,191 words. WACC components from Wikipedia and Damodaran; worked private-company estimate (9.85%) with size-premium sensitivity; uses of the estimate; decision test. Three new sources verified. |
 | **P-211** | Revenue Recognition: What Investors Watch in the Notes | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/revenue-recognition-investors.mdx` | 2026-11-17 | New article: 1,254 words. IFRS 15 five-step model and recognition principle; worked bundled-contract example (120k allocated, 80k year-one revenue); disclosure red flags; decision test. Two new sources verified. |
 | **P-212** | How Inflation Affects Valuation Multiples | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/inflation-and-valuation-multiples.mdx` | 2026-11-17 | New article: 1,147 words. Three inflation channels into P/E, worked depreciation-adjusted example (15x to 18.75x), nominal/real consistency; decision test. Five new sources verified. |
+| **P-213** | Decision Memos That Survive Review | Career, Productivity & Professional Development | Analysis / Decision Guide | `Ready` | `src/content/articles/decision-memos-that-survive-review.mdx` | 2026-11-17 | New article: 1,145 words. Memo and decision-making references; seven-part reviewable structure with weak/strong worked comparison and reversal conditions; decision test. Two new sources verified. |
+| **P-214** | Evaluating LLM Applications Without a Harness | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/evaluating-llm-applications.mdx` | 2026-11-17 | New article: 1,108 words. HELM 7-metric/17.9% coverage findings and OpenAI eval docs; worked three-configuration harness table; judge validation and held-out sets; decision test. Two new sources verified. |
 
 ---
 
@@ -238,6 +240,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch BA (Expanded focus, final cluster — 2026-11-17):** The final two titles from the 18-title shortlist drafted. *Decision Memos* uses memo and decision-making overviews with a weak/strong worked example; *Evaluating LLM Applications* uses HELM and OpenAI eval documentation. All 18 requested titles are now drafted. Four new sources added; all 266 verify.
 - **Batch AZ (Expanded focus, cluster 8 — 2026-11-17):** Two finance articles drafted. *Revenue Recognition* uses IFRS 15 and a secondary overview with a bundled-contract example; *Inflation and Valuation Multiples* uses valuation, P/E and inflation references with a depreciation-adjustment example. Five new sources added; all 262 verify.
 - **Batch AY (Expanded focus, cluster 7 — 2026-11-17):** Two finance articles drafted. *Working Capital* and *Cost of Capital for Private Companies* use secondary references plus Damodaran data, each with a labeled worked calculation and sensitivity analysis. Five new sources added; all 257 verify.
 - **Batch AX (Expanded focus, cluster 6 — 2026-11-17):** Two brand and strategy articles drafted. *Category Design* uses blue-ocean and product-category overviews with Porter; *Brand Consistency* uses brand-management and communications overviews. Both include labeled worked audits and decision tests. Four new sources added; all 252 verify.
