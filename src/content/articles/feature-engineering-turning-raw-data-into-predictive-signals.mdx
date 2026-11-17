@@ -1,71 +1,69 @@
 ---
 title: "Feature Engineering: Turning Raw Data into Predictive Signals"
-description: "Feature engineering transforms raw data into meaningful inputs for models. Learn techniques for tabular, text, time series, and categorical data."
+description: "Features are where domain knowledge enters a model. Read how to build them without leaking the future or inflating your validation."
 date: 2026-11-16
 tags:
   - Feature Engineering
   - Machine Learning
-  - Data Preprocessing
   - Data Science
+  - Data Preprocessing
 ---
 
-Models are only as good as their features.
+Feature engineering is usually described as a creative step — the place where a practitioner's intuition turns raw columns into useful signals. That is true, and it is also the source of most silent failures, because a feature is a claim about the world that has to be true at prediction time, not just in the training notebook.
 
-**Direct answer:** Feature engineering is the process of transforming raw data into meaningful input representations that improve model performance. It bridges domain knowledge and algorithmic requirements. Good features often matter more than model choice; a simple model with great features beats a complex model with poor features.
+**Direct answer:** Feature engineering is "adjusting and reworking the predictors to enable models to better uncover predictor-response relationships" — the phrase comes from Kuhn and Johnson's open reference on the subject. It works when the transformation encodes real domain structure and when the entire transformation is fitted inside the training fold. It fails when a feature uses information that will not be available at prediction time, or when preprocessing was applied before the split, which makes the validation score look excellent and the deployed model look random.
 
-## Types of features
+## What a feature actually is
 
-**Numerical:** scaling (standardization, min-max, robust), binning, log/power transforms for skewed distributions, interaction terms (multiplication, division, ratios).
+A raw column is a measurement. A feature is a representation built from measurements to make a relationship easier for a model to learn.
 
-**Categorical:** one-hot encoding (low cardinality), target encoding / mean encoding (high cardinality), frequency encoding, hashing trick, embedding layers (for neural nets).
+A timestamp is a measurement; the hour of day, the day of week, and the distance from a promotion date are features. A price is a measurement; the ratio to a rolling median and the change over seven days are features. Each transformation encodes an assumption about what drives the outcome — that time of day matters, that relative price matters more than absolute — and that assumption is the contribution.
 
-**Datetime:** extract components (hour, day, month, quarter, weekday, is_weekend), cyclical encoding (sin/cos for hour/month), time since last event, rolling window statistics.
+Kuhn and Johnson frame the goal as providing tools for re-representing predictors while placing them "in the context of a good predictive modeling framework" — and that second clause is where most tutorials stop too early. A clever feature inside a broken evaluation is worse than a simple feature inside a sound one, because the clever feature makes the broken evaluation harder to notice.
 
-**Text:** TF-IDF, n-grams, word/character n-grams, count vectorizer, sentence embeddings (BERT, SentenceTransformers), topic modeling (LDA).
+## The five families
 
-**Images:** raw pixels, pretrained embeddings (ResNet, EfficientNet, CLIP), handcrafted features (HOG, SIFT - legacy).
+Most useful transformations fall into a handful of groups:
 
-**Graph/relational:** node degree, PageRank, community membership, path lengths, neighborhood aggregation.
+**Numeric transforms** handle scale and shape. Standardisation, log transforms for skewed positive quantities, and binning for nonlinear relationships all change how much a model can learn from a variable. Tree-based models are largely indifferent to monotonic scaling; linear and distance-based models are not.
 
-## Techniques by data type
+**Categorical encoding** turns labels into numbers. One-hot encoding works for low cardinality; target or mean encoding can handle high cardinality but introduces a serious leak risk if computed on the full training set. Hashing trades interpretability for compactness.
 
-**Tabular:**
-- Handle missing: impute (median, mode, KNN, iterative) or indicator columns.
-- Outliers: winsorize, clip, or model robustly (tree-based).
-- Target encoding with smoothing for high-cardinality categoricals.
-- Feature interactions: polynomial features, domain-specific ratios.
+**Time features** encode calendar structure and recency — hour, weekday, time since last event, rolling statistics over defined windows. Rolling features are particularly easy to get wrong: the window must end at or before the prediction moment, and the model must see the same windows in production.
 
-**Time series:**
-- Lag features (t-1, t-7, t-30).
-- Rolling statistics (mean, std, min, max over windows).
-- Expanding window features.
-- Seasonal decomposition residuals.
+**Text and image features** come from pretrained models or classical representations such as TF-IDF. They are powerful and they inherit the biases and domain mismatch of the model that produced them.
 
-**Text:**
-- Preprocessing: lowercasing, stopword removal, lemmatization.
-- TF-IDF with n-gram range (1,2) or (1,3).
-- Subword tokenization for transformer models.
-- Domain-specific dictionaries for specialized vocabulary.
+**Interactions** combine variables — a ratio, a product, a difference. These are the features where domain knowledge pays most, because a model would need far more data to discover the interaction on its own.
 
-## Feature selection and dimensionality reduction
+## The leak is the main danger
 
-- **Filter methods:** correlation with target, mutual information, chi-squared, ANOVA F-value.
-- **Wrapper methods:** recursive feature elimination (RFE), forward/backward selection.
-- **Embedded methods:** tree-based feature importance, L1 regularization (Lasso), gradient boosting importance.
-- **Dimensionality reduction:** PCA, Truncated SVD, UMAP, t-SNE (for visualization).
+scikit-learn states the rule without ambiguity: "This situation is called overfitting. To avoid it, it is common practice when performing a (supervised) machine learning experiment to hold out part of the available data as a test set". The same documentation warns that "data leakage occurs when information that would not be available at prediction time is used when building the model", and prescribes splitting before any preprocessing.
 
-## Common pitfalls
+Feature engineering creates three specific leak risks:
 
-- **Data leakage:** using future information (target leakage, feature leakage from future timestamps).
-- **Over-engineering:** creating thousands of features without validation; increases overfitting risk.
-- **Ignoring domain knowledge:** purely automated features miss domain-specific signals.
-- **Inconsistent train/serve:** feature computation must match exactly at inference.
+**Computing a statistic on the full dataset.** A target-encoded category built on all rows includes the validation labels. The fix is to compute it inside the training fold, using out-of-fold encoding for the training rows themselves.
 
-## Automation
+**Using future values in a rolling window.** A 30-day average ending after the prediction date is a lookahead, even if it is only by one day. scikit-learn's `TimeSeriesSplit` supports a `gap` parameter precisely for the related case where recent data is not yet usable.
 
-Tools like Featuretools (automated feature engineering for relational data), tsfresh (time series), and Feature-engine automate repetitive steps. But domain-informed features usually outperform purely automated ones.
+**Creating a feature from an outcome that arrives late.** A "customer lifetime value to date" feature that includes events after the prediction moment is unavailable in production by definition. If an event cannot be observed at the moment of prediction, it cannot be a feature.
 
-For the related question of MLOps pipelines, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+The discipline is simple: every feature needs a stated answer to the question "at prediction time, could I have computed this exactly as I did in training?"
+
+## Time makes the problem harder
+
+Random splits are wrong for time-ordered data, and they are especially wrong for engineered features, because many of them are derived from neighbouring rows. A rolling statistic computed across a random split can see values from the future fold.
+
+Expanding-window validation — training on earlier periods and testing on later ones — matches the deployment. scikit-learn's `TimeSeriesSplit` does this with documented folds in which the training set grows: an early fold trains on indices 0–5 and tests on 6–7, a later fold trains on 0–7 and tests on 8–9. Adding a gap inserts a period between training and test, which matters when labels take time to arrive.
+
+The practical consequence for feature work is that the feature computation has to be refitted inside each fold, not computed once for the whole dataset. A pipeline object is the mechanism that makes this automatic rather than a matter of discipline.
+
+## When to stop
+
+Feature engineering has diminishing and then negative returns. More features increase the chance of finding a spurious relationship, complicate the pipeline, and create more places for a leak to hide.
+
+A reasonable stopping rule is to add a feature only when you can state the mechanism in one sentence and test its contribution in a clean validation. If you cannot say why it should matter, it is a candidate for noise, and if you cannot measure its contribution, you do not know whether it helped.
+
+For the evaluation framework, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the broader modelling context, see [Data Analytics vs Data Science](/articles/data-analytics-vs-data-science-differences-workflows-and-when-to-use-each).
 
 ## Further Reading
 

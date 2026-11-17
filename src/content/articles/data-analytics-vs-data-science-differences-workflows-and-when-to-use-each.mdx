@@ -1,84 +1,68 @@
 ---
 title: "Data Analytics vs Data Science: Differences, Workflows, and When to Use Each"
-description: "Data analytics and data science overlap but serve different purposes. Learn how to distinguish them and choose the right approach for your business problem."
+description: "The two disciplines ask different questions. Read how their workflows differ and how to staff the work without creating a bottleneck."
 date: 2026-11-16
 tags:
-  - Data Analytics
   - Data Science
+  - Data Analytics
+  - Careers
   - Business Intelligence
-  - Decision Making
 ---
 
-Data analytics looks backward; data science looks forward.
+The distinction between data analytics and data science is usually drawn with examples of tools — SQL and dashboards versus Python and models — and the examples obscure the thing that matters. Both use code; both use statistics; the difference is the question they are built to answer and the standard of evidence that answers requires.
 
-**Direct answer:** Data analytics examines historical data to answer what happened and why. Data science builds predictive and prescriptive models to answer what will happen and what to do about it. The two overlap in tools (SQL, Python, visualization) but differ in purpose, output, and required skills. Choosing the right one depends on whether you need insight or prediction.
+**Direct answer:** Data analytics explains what happened and why, using descriptive and diagnostic methods on existing data. Data science builds models that predict or decide, and its answers are evaluated against held-out data rather than against a narrative. The workflows differ in their validation step: an analytics project is checked for correctness and clarity; a data science project is checked for generalisation. Choosing the wrong one for a question produces either an expensive model where a query would have done, or a dashboard that cannot answer a predictive question.
 
-## Data analytics: understanding the past
+## Two different questions
 
-Data analytics focuses on descriptive and diagnostic questions:
+An analytics question sounds like: what was our retention by cohort last quarter, and which segment drove the change? The answer is a measurement with a clear definition and a transparent derivation. It is checked by reconciling against the source and by whether a reader can follow the logic.
 
-- What were our sales last quarter?
-- Why did churn spike in October?
-- Which marketing channel drove the most leads?
+A data science question sounds like: given a customer's behaviour so far, what is the probability they will churn next month? The answer is a model, and it is evaluated on customers it has never seen. It is checked by held-out performance, calibration, and robustness — not by whether the explanation feels persuasive.
 
-Typical workflow:
+The distinction is not about difficulty. A well-executed analysis can be harder than a straightforward model. It is about the nature of the claim: analytics makes claims about data you have; data science makes claims about data you do not yet have.
 
-1. **Define the business question.**
-2. **Extract data** from warehouses, logs, or CRM (SQL).
-3. **Clean and transform** (pandas, SQL, dbt).
-4. **Analyze and visualize** (BI tools, Jupyter, Excel).
-5. **Communicate findings** to stakeholders via dashboards or reports.
+## Where the workflows diverge
 
-Output: insights, dashboards, ad-hoc reports. Success metric: did the stakeholder make a better decision?
+Both start with a question and data preparation, and they diverge at validation.
 
-## Data science: predicting and prescribing
+**Analytics workflow:** define the metric, verify the source, compute, visualise, interpret, communicate. The critical failure mode is a definitional one — two people computing "active customer" differently — and the critical quality control is reproducibility: can someone else rerun the query and get the same number?
 
-Data science builds models that generalize beyond historical data:
+**Data science workflow:** define the target, build features, choose a model, validate on held-out data, tune, evaluate, deploy and monitor. The critical failure mode is leakage — using information that will not be available at prediction time — and the critical quality control is a split that matches deployment.
 
-- Which customers will churn next month?
-- What price maximizes revenue?
-- Which product should we recommend to this user?
+scikit-learn's guidance states the rule for the data science side: it is "common practice when performing a (supervised) machine learning experiment to hold out part of the available data as a test set", because otherwise the model overfits. Kuhn and Johnson make the complementary point that good modelling requires "other good practices" around representation and validation, not just an algorithm.
 
-Typical workflow:
+An analytics team that adopts a model without a held-out evaluation has made a category error; a data science team that produces a dashboard without a clear metric definition has made the opposite one.
 
-1. **Frame the problem** as prediction, classification, clustering, or optimization.
-2. **Collect and engineer features** from raw data.
-3. **Train and validate models** (scikit-learn, XGBoost, PyTorch).
-4. **Deploy models** as APIs or batch pipelines.
-5. **Monitor performance** and retrain as data drifts.
+## When to use which
 
-Output: models, scores, predictions, automated decisions. Success metric: model performance and business impact (lift, revenue, cost saved).
+Use **analytics** when the question is about the past, the answer needs to be auditable by many people, and the decision does not require a per-case prediction. Reporting, funnel analysis, cohort analysis, A/B test readout, and operational dashboards are analytics work.
 
-## Key differences
+Use **data science** when the decision applies to individual cases at scale, the future outcome matters, and you can measure accuracy on held-out examples. Churn scoring, demand forecasting, ranking, fraud detection, and personalisation are data science work.
 
-| Dimension | Data Analytics | Data Science |
-|---|---|---|
-| Primary question | What happened? Why? | What will happen? What should we do? |
-| Orientation | Descriptive, diagnostic | Predictive, prescriptive |
-| Time focus | Historical | Historical + future |
-| Core tools | SQL, BI, spreadsheets | Python/R, ML libraries, deployment |
-| Output | Reports, dashboards | Models, predictions, scores |
-| Stakeholder | Business users, managers | Product, engineering, leadership |
+There is a wide middle ground, and it is where many teams get stuck. A model that produces a single forecast for a planning meeting is often analytics with extra steps — the value is in the explanation and the scenario, not in generalisation. A rule-based scoring system that has to work on millions of cases is data science even if the "model" is a simple logistic regression.
 
-## When to use each
+## Staffing the two without a bottleneck
 
-**Use data analytics when:**
-- You need to understand current performance.
-- Stakeholders need ad-hoc answers.
-- Data quality is adequate but modeling is overkill.
-- The decision is one-time or infrequent.
+The usual failure is to build one team and ask it to do both, with the more visible, more urgent analytics requests crowding out the modelling work. The analytics work always wins because it has a deadline and a named requester.
 
-**Use data science when:**
-- You need to automate decisions at scale.
-- Historical patterns should predict future outcomes.
-- You have sufficient labeled data and engineering support.
-- The problem recurs (churn, fraud, recommendation, pricing).
+Three structures work better:
 
-## The hybrid reality
+- **Separate the on-call analytical work from the project work.** Rotating a data scientist through dashboard requests destroys the continuity a modelling project needs.
+- **Make analytics self-serve where the definitions are stable.** A well-modelled semantic layer lets business users answer their own descriptive questions, which is the premise of tools like Power BI and the reason the model matters more than the chart.
+- **Give data science a roadmap with fewer, longer items.** A model that has to be validated, deployed, and monitored cannot be delivered in the same cadence as a weekly report.
 
-Most mature organizations use both. Analytics monitors the business; science optimizes it. An analyst might discover churn is rising (analytics), then a data scientist builds a churn prediction model to intervene early (science). The two feed each other: analytics defines the problem, science operationalizes the solution.
+The CUPED result — a reported variance reduction of about 50% using pre-experiment data — is a useful reminder that analytics infrastructure is also an enabler of science: without the pre-period data logged, the variance-reduction method is unavailable.
 
-For the related question of how data changes marketing decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+## A decision checklist
+
+1. **Is the question about what happened or about what will happen to a specific case?** That decides the discipline.
+2. **What standard of proof applies?** Reconciliation and clarity, or held-out performance?
+3. **Can you measure the answer's accuracy?** If not, you are doing analytics even if you used a model.
+4. **Does the decision repeat at scale?** If yes, the investment in validation and monitoring pays off.
+5. **Who consumes the output?** A broad audience needs a transparent derivation; an automated system needs a reliable interface and a monitoring signal.
+6. **Are the two workflows competing for the same people?** If so, separate them before the modelling work disappears.
+
+For the modelling end of the distinction, see [Feature Engineering](/articles/feature-engineering-turning-raw-data-into-predictive-signals); for the reporting end, see [Power BI for Business Analytics](/articles/power-bi-for-business-analytics-data-modeling-dax-and-dashboard-best-practices).
 
 ## Further Reading
 
