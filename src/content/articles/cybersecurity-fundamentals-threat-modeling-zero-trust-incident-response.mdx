@@ -1,71 +1,92 @@
 ---
 title: "Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response"
-description: "Cybersecurity protects systems and data. Learn threat modeling, Zero Trust architecture, incident response lifecycle, and building a security program."
+description: "Security is a set of decisions about trust and failure. Read the three frameworks that make those decisions explicit — and the boundary each one has."
 date: 2026-11-16
 tags:
   - Cybersecurity
   - Threat Modeling
   - Zero Trust
   - Incident Response
-  - Security
 ---
 
-Security is not a product. It is a process.
+Security advice often collapses into a list of tools. A more useful starting point is a question: what are you protecting, from whom, and what happens when a control fails? Threat modeling, zero trust, and incident response are three ways of making that question explicit at different moments — before a system is built, while it runs, and after something goes wrong.
 
-**Direct answer:** Cybersecurity protects confidentiality, integrity, and availability (CIA triad) of systems and data. Core practices: threat modeling (identify risks), Zero Trust (never trust, always verify), incident response (detect, contain, recover), and continuous monitoring. Security is a shared responsibility across engineering, operations, and leadership.
+**Direct answer:** Threat modeling identifies assets, adversaries, and likely attack paths before implementation; zero trust is an architecture that removes implicit trust based on network location; incident response is the organised process of detecting, containing, and learning from a breach. NIST SP 800-30 provides the risk-assessment method, SP 800-207 defines zero trust, MITRE ATT&CK catalogues adversary behaviour, and SP 800-53 supplies the control catalogue. The boundary is that none of these is a product you can buy: they are disciplines whose value depends on being applied to your actual assets and threat model.
 
-## Threat modeling
+## Threat modeling: decide before you build
 
-**STRIDE:** Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege.
+A threat model is a structured answer to four questions: what are we protecting, who might attack it, how could they, and what is the impact if they succeed? Doing this before implementation is cheaper than discovering the answer during an incident.
 
-**PASTA:** Process for Attack Simulation and Threat Analysis (7 stages).
+NIST Special Publication 800-30 Rev. 1, published in September 2012, provides guidance for "conducting risk assessments of federal information systems and organizations", with risk assessments carried out "at all three tiers in the risk management hierarchy". Its vocabulary — threat, vulnerability, likelihood, impact, residual risk — is the common language of the field.
 
-**Attack trees:** root goal → sub-goals → attack vectors.
+MITRE ATT&CK adds the adversary side. It is a "globally-accessible knowledge base of adversary tactics and techniques based on real-world observations", used as a foundation for threat models in industry, government, and security products. ATT&CK's value is that it describes behaviour rather than tools: an adversary may phish, escalate privileges, or move laterally regardless of which product is installed.
 
-**Data flow diagrams:** trust boundaries, entry points, data stores, external entities.
+Three practical steps turn this into an exercise:
 
-**MITRE ATT&CK:** adversary tactics, techniques, procedures (TTPs). Map detections to techniques.
+1. **List the assets** — data, credentials, availability — and rank them by the damage their compromise would cause.
+2. **Choose relevant adversaries** and consult ATT&CK for techniques plausible against your environment, rather than inventing a generic attacker.
+3. **Map controls to the paths** and record the residual risk — what remains after the controls are applied.
 
-## Zero Trust architecture
+The last step is where threat modeling earns its keep. A control that does not reduce a plausible path is a cost, not a protection.
 
-**Principles:** never trust, always verify; least privilege; assume breach; verify explicitly.
+## Zero trust: remove implicit trust
 
-**Components:**
-- **Identity:** strong auth (MFA, passwordless), conditional access, identity providers (Okta, Entra ID, Ping).
-- **Device:** compliance (MDM/EDR), health attestation, certificate-based auth.
-- **Network:** micro-segmentation, software-defined perimeter, no implicit trust zones.
-- **Application:** least privilege access, just-in-time (JIT) access, API security.
-- **Data:** classification, encryption (at rest/in transit), DLP, rights management.
+Traditional network security treated the inside of a corporate network as trusted and the outside as hostile. That assumption breaks when users work remotely, devices are personally owned, and services live in clouds outside a company-owned boundary.
 
-**Implementation:** start with identity + device, expand to network + data. Continuous verification, not one-time.
+NIST SP 800-207 describes zero trust as "an evolving set of cybersecurity paradigms that move defenses from static, network-based perimeters to focus on users, assets, and resources". Its central statement is that "zero trust assumes there is no implicit trust granted to assets or user accounts based solely on their physical or network location". The architecture is a response to "remote users, bring your own device (BYOD), and cloud-based assets that are not located within an enterprise-owned network boundary".
 
-## Incident response lifecycle (NIST SP 800-61)
+Three principles follow, and they are more concrete than the slogan:
 
-1. **Preparation:** IR plan, runbooks, playbooks, tools (SIEM, EDR, SOAR), training, tabletop exercises.
-2. **Detection & Analysis:** alert triage, enrichment, scoping, severity classification (SEV-1 to SEV-4).
-3. **Containment:** short-term (isolate), long-term (eradicate). Short-term: network isolation, account disable. Long-term: malware removal, patching.
-4. **Eradication:** remove artifacts, close vulnerabilities, rotate credentials.
-5. **Recovery:** restore from clean backups, verify integrity, monitor for re-infection.
-6. **Post-incident:** root cause analysis (5 Whys), lessons learned, update playbooks, update defenses.
+- **Verify explicitly.** Authenticate and authorise each request using all available context — identity, device state, location, behaviour — not a one-time login.
+- **Use least privilege.** Grant the minimum access needed, for the minimum time, with just-in-time elevation where possible.
+- **Assume breach.** Design as if an attacker is already inside: segment access, encrypt traffic, and monitor continuously so that one compromised account does not expose everything.
 
-## Security program pillars
+The honest limitation is that zero trust is a direction, not a switch. SP 800-207 describes a set of principles and possible deployment models; migrating an existing estate takes years, and a partial implementation can create gaps where the old perimeter assumption still lingers.
 
-- **Governance:** policies, standards, risk appetite, board reporting.
-- **Vulnerability management:** scanning (SAST, DAST, SCA, container, container), prioritization (EPSS, KEV), SLAs, patch management.
-- **Identity & access:** least privilege, PAM, JIT, certification campaigns.
-- **Data protection:** classification, encryption, DLP, key management (HSM, KMS).
-- **Security awareness:** phishing simulations, training, culture.
-- **Third-party risk:** vendor assessment, contractual security clauses, continuous monitoring.
+## Incident response: assume the controls will fail
 
-## Detection & response stack
+No set of controls is complete. Incident response is the discipline of making failure survivable: detecting it quickly, containing it, and learning enough to prevent recurrence.
 
-- **SIEM:** log aggregation, correlation, alerting (Splunk, Sentinel, Datadog, Elastic).
-- **EDR/XDR:** endpoint detection, behavioral analytics (CrowdStrike, SentinelOne, Defender).
-- **NDR:** network traffic analysis (ExtraHop, Corelight, Zeek).
-- **SOAR:** automation, playbooks (Splunk SOAR, Cortex XSOAR, Tines).
-- **Threat intel:** feeds (MITRE, AlienVault, MISP), TIP integration.
+NIST SP 800-53, "Security and Privacy Controls for Information Systems and Organizations", provides the control catalogue that underpins much of this work, including the incident-response and monitoring families. The point of a catalogue is consistency: it gives an organisation a shared list of what "protected" is supposed to mean.
 
-For the related question of observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) and SRE, see [Site Reliability Engineering: SLOs, Error Budgets, Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response).
+The OWASP Top 10 complements this at the application layer. OWASP calls it "the reference standard for the most critical web application security risks" and "a standard awareness document for developers and web application security", representing "a broad consensus about the most critical security risks". The current release is the OWASP Top 10 2025. A team that maps its incident history to these categories is looking at the problems that recur across the industry, not just its own last outage.
+
+Incident response has a measurable rhythm: detect, triage, contain, eradicate, recover, and review. The review is the step most often skipped, and it is the one that converts an incident into a control improvement.
+
+## A worked example of a risk decision
+
+Suppose a service holds customer records and runs on a legacy network where any internal host can reach the database. A threat-model review identifies the path: compromise any low-value internal machine, then connect to the database directly.
+
+Using the risk vocabulary from SP 800-30, assess two options:
+
+**Option A — network segmentation.** Restrict database access to a small set of application hosts. Likelihood of lateral movement drops substantially; impact of a compromised application host is unchanged. Cost: a few days of engineering and some operational friction. Residual risk: an attacker who compromises an allowed host still reaches the data.
+
+**Option B — assume the database is already reachable.** Add per-query authorisation, audit logging, and anomaly alerts on access patterns. This does not remove the path but makes abuse visible and limits what any single credential can do. Cost: more engineering, and alert tuning over time.
+
+A zero-trust reading favours doing both, because neither eliminates the other's failure mode: segmentation reduces opportunity, while explicit authorisation and monitoring reduce the damage if the boundary is crossed. The decision is not "which control is best" but "what residual risk are we willing to accept, at what cost".
+
+This is where a penetration test or an ATT&CK mapping becomes useful — not as a score, but as evidence about whether the chosen controls actually interrupt the path you care about.
+
+## What the frameworks do not give you
+
+Three limits are worth stating plainly.
+
+**A catalogue is not a guarantee.** SP 800-53 lists controls; it does not implement them, and a control marked "selected" can be configured ineffectively. Compliance and security overlap but are not identical.
+
+**ATT&CK describes behaviour, not your exposure.** The knowledge base is built from real-world observations, but a technique being in the catalogue does not mean it is plausible in your environment. Relevance has to be judged locally.
+
+**Zero trust can be performed badly.** Turning it into a product purchase without changing identity, segmentation, and monitoring practices reproduces the old perimeter problem with new branding.
+
+## A decision test
+
+1. **Name the assets and adversaries** before choosing controls.
+2. **Map at least one real attack path** end to end and check which controls interrupt it.
+3. **Treat network location as untrusted** in new designs, per SP 800-207.
+4. **Assume breach** and verify that monitoring would reveal it.
+5. **Rehearse the incident response** and review what the last incident taught you.
+6. **Measure residual risk**, not just the number of controls deployed.
+
+For the organisational case for this work, see [Why Cybersecurity Is Becoming a Business Priority](/articles/why-cybersecurity-is-becoming-a-business-priority); for the operational side, see [Observability](/articles/observability-logging-metrics-tracing-alerting).
 
 ## Further Reading
 
