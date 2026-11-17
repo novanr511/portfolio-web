@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 192 tracked articles — 192 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 194 tracked articles — 194 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -206,6 +206,8 @@
 | **P-200** | Mixture of Experts: Why Sparse Models Changed AI Economics | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/mixture-of-experts-explained.mdx` | 2026-11-17 | New article: 1,282 words. Router/expert mechanism from Mixtral, Switch and DeepSeek-V3; 671B/37B worked active-parameter example (18x), load-balance and memory caveats; decision test. Four new sources verified. |
 | **P-201** | Routing Between LLMs: Cut Cost Without Losing Quality | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/routing-between-llms.mdx` | 2026-11-17 | New article: 1,366 words. FrugalGPT three strategies, RouteLLM 2x cost claim, worked $45k to $19.8k routing example with misroute/router/evaluation costs; decision test. Three new sources verified. |
 | **P-202** | AI Integration Into an Existing Business: A Practical Sequence | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/ai-integration-blueprint-businesses.mdx` | 2026-11-17 | New article: 1,224 words. NIST AI RMF wrapper, cloud building blocks as catalogue not plan; seven-step sequence; labeled invoice pilot (500 to 220 hours with frictions); decision test. Three new sources verified. |
+| **P-203** | AI Readiness Assessment: Questions to Ask Before Adopting | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/ai-readiness-assessment.mdx` | 2026-11-17 | New article: 1,281 words. NIST AI RMF, OECD.AI accountability and O*NET task descriptions; four-area profile with labeled insurer example where data is the binding constraint; artefact test; decision test. Three new sources verified. |
+| **P-204** | Demand Generation vs Lead Generation: Where the Funnel Breaks | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/demand-generation-vs-lead-generation.mdx` | 2026-11-17 | New article: 1,395 words. Distinct jobs and metrics from secondary overviews; labeled funnel example (20 to 30 customers via acceptance rate); two-clocks budgeting; decision test. Two new sources verified. |
 
 ---
 
@@ -228,6 +230,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AV (Expanded focus, cluster 4 — 2026-11-17):** Two articles drafted across the owner-requested themes. *AI Readiness Assessment* uses NIST, OECD.AI and O*NET; *Demand Generation vs Lead Generation* opens the marketing expansion using secondary overviews with clearly stated limits. Both include labeled worked examples and decision tests. Three new sources added; all 242 verify.
 - **Batch AU (Expanded AI focus, cluster 3 — 2026-11-17):** Two implementation articles drafted. *Routing Between LLMs* uses FrugalGPT, RouteLLM and published tier prices; *AI Integration Blueprint* uses NIST AI RMF and cloud-vendor catalogues treated as claims. Both include labeled worked examples and decision tests. Four new sources added; all 239 verify.
 - **Batch AT (Expanded AI focus, cluster 2 — 2026-11-17):** Two architecture articles drafted. *Long Context Windows* uses official model specs and the Lost in the Middle paper; *Mixture of Experts* uses Mixtral, Switch Transformer and DeepSeek-V3 papers. Both include labeled worked examples and position/load-balance tests. Four new sources added; all 235 verify.
 - **Batch AS (Expanded AI focus — 2026-11-17):** First two articles from the expanded shortlist requested by the owner, centred on the current LLM landscape and real-world task types. All claims about 2026 model lineups were taken from official provider documentation fetched and title-verified; the registry gained four new sources and now holds 231. No duplicate title, slug or context introduced.
