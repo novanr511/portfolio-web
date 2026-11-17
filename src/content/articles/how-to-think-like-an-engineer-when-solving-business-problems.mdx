@@ -1,72 +1,97 @@
 ---
 title: "How to Think Like an Engineer When Solving Business Problems"
-description: "Engineering thinking is not just for code. It is a structured approach to problems: decompose, measure, test, and iterate. Learn how to apply it to business decisions."
+description: "Engineering thinking is decomposition, explicit assumptions, and measurement. Read the method, a worked business example, and the point where it becomes over-engineering."
 date: 2026-11-16
 tags:
-  - Career
   - Problem Solving
-  - Engineering Thinking
+  - Engineering
+  - Decision Science
   - Business
 ---
 
-Engineering thinking is a method, not a job title.
+"Think like an engineer" is often used to mean being logical. That is too vague to be useful. The distinctive thing engineers do is make assumptions explicit, decompose a system into parts with defined interfaces, and measure whether the result behaves as predicted. Applied to a business problem, the same habits turn a vague complaint into a testable claim.
 
-**Direct answer:** Thinking like an engineer means approaching business problems with decomposition, measurement, testing, and iteration. It means breaking ambiguous problems into parts, identifying constraints, testing assumptions with evidence, and improving solutions incrementally. Engineers do not wait for perfect information; they make the best decision they can with available data, then refine. This approach applies to pricing, hiring, operations, and strategy as much as it applies to software.
+**Direct answer:** The method is to define the system boundary, decompose the problem, state assumptions with their uncertainty, build the smallest model that can be wrong, and measure the outcome against a baseline. Kuhn and Johnson's *Feature Engineering and Selection* is a good methodological reference because it insists that a variable's value depends on the prediction context, while scikit-learn's validation guidance supplies the discipline for testing. The boundary: the method produces clarity, not certainty, and a model is a tool for reasoning rather than a substitute for judgement.
 
-## Decompose the problem
+## The five moves
 
-Ambiguous problems feel overwhelming because they are large. Engineers break them down:
+**1. Draw the boundary.** What is inside the system you are analysing, and what is an external input? A complaint like "conversion is down" has no boundary. "Conversion from pricing page to trial signup for new organic visitors since March" does.
 
-- Instead of "grow revenue," ask: "how many customers, at what price, buying how often?"
-- Instead of "improve customer satisfaction," ask: "which touchpoints cause complaints, and how often?"
-- Instead of "should we enter this market?" ask: "what is the addressable market, what does it cost to acquire a customer, and what is the expected lifetime value?"
+**2. Decompose.** Split the system into stages with measurable flows. If each stage has an input count, an output count, and a conversion rate, the stage causing a change becomes visible.
 
-Decomposition reveals which parts of the problem matter most and where data is needed.
+**3. State assumptions.** Write down what you believe about each stage and how confident you are. This is the step that separates engineering reasoning from storytelling, because a written assumption can be falsified.
 
-## Identify constraints
+**4. Build the smallest useful model.** A spreadsheet with explicit inputs beats a complex model whose workings nobody can inspect. The purpose is to see which assumption matters most, not to impress.
 
-Every solution operates within constraints: time, money, people, regulation, technology, and market conditions. An engineer identifies constraints before designing a solution, not after.
+**5. Measure against a baseline.** Without a counterfactual, you cannot tell whether an intervention worked. scikit-learn's warning about leakage applies in spirit: using information that would not have been available at the decision time produces a flattering but useless evaluation.
 
-A pricing strategy constrained by cash flow differs from one constrained by brand position. A hiring plan constrained by budget differs from one constrained by talent availability. Constraints are not obstacles to creativity; they define the feasible space.
+## A worked example of a funnel problem
 
-## Test assumptions with evidence
+The following scenario and numbers are hypothetical and illustrative.
 
-Business decisions rest on assumptions: customers want this, the channel will work, the competitor will not respond. Engineers treat assumptions as hypotheses to test, not facts to defend.
+A subscription business reports that revenue growth slowed from 20% to 5% year over year. The instinctive response is "improve the product". An engineering-style decomposition asks where the slowdown is.
 
-Small tests beat big bets:
+| Stage | Last year | This year |
+| --- | --- | --- |
+| Visitors | 100,000 | 150,000 |
+| Trial starts | 10,000 (10%) | 12,000 (8%) |
+| Paid conversions | 2,000 (20%) | 1,800 (15%) |
+| Average revenue per user | 50 | 55 |
 
-- Talk to five customers before building a feature.
-- Run a one-week pilot before rolling out a process change.
-- Test one pricing tier with a segment before changing the whole price list.
+Revenue moved from 2,000 × 50 = 100,000 to 1,800 × 55 = 99,000 — roughly flat per period, despite 50% more visitors.
 
-The goal is to learn cheaply before committing expensively.
+Two stages deteriorated: trial-start rate from 10% to 8%, and trial-to-paid from 20% to 15%. Which matters more? A sensitivity calculation answers it:
 
-## Iterate, do not perfect
+- Restoring trial starts to 10% alone: 15,000 trials × 15% = 2,250 paid × 55 = 123,750.
+- Restoring trial-to-paid to 20% alone: 12,000 × 20% = 2,400 paid × 55 = 132,000.
 
-Engineers ship minimum viable versions and improve them based on feedback. Business problems benefit from the same approach:
+The second lever is larger, even though the first deterioration looks bigger in percentage points. The engineer's question — "what is the sensitivity of the outcome to each assumption?" — overturns the intuitive priority.
 
-- Launch a simplified version of a new service.
-- Measure what actually happens.
-- Adjust based on evidence.
-- Repeat.
+Three caveats keep this honest:
 
-Perfection before launch delays learning. A good-enough solution in the market teaches more than a perfect solution in a spreadsheet.
+- **The decomposition is only as good as the stage definitions.** If "visitor" changed meaning when the marketing team switched attribution, the comparison is invalid.
+- **The numbers are averages.** A drop in trial-to-paid might be concentrated in one acquisition channel; the aggregate hides it.
+- **The model does not explain why.** It tells you where to investigate, not what to fix. For that you need customer evidence, which is a different method.
 
-## Measure what matters
+## Define the problem before decomposing it
 
-Engineers define metrics before building. Business decisions should too:
+The most expensive error in this method is solving the wrong problem well. A team that decomposes "conversion is down" into a funnel is already committed to a view of the cause; the key question may be whether the traffic changed quality.
 
-- What does success look like?
-- How will you measure it?
-- What number would change your mind?
+A useful discipline is to write three versions of the problem before choosing one:
 
-Without predefined metrics, decisions are justified after the fact with whichever number looks good. That is not decision-making; it is rationalization.
+- **The reported problem:** "conversion is down."
+- **The measurable problem:** "paid conversion from organic pricing-page visitors fell from 20% to 15% between March and June."
+- **The decision the answer will support:** "whether to invest in onboarding or in acquisition quality."
 
-## Know when to stop optimizing
+These are different claims. The first invites a broad search, the second defines what to measure, and the third sets a budget for the investigation. A team that jumps from the first to a solution has skipped the two steps that make the work useful.
 
-Not every problem needs an engineering approach. Some decisions are strategic, cultural, or value-based, where quantification misses the point. Engineering thinking is a tool, not a worldview. Use it where ambiguity, complexity, and uncertainty create risk; use judgment where values and relationships matter.
+Kuhn and Johnson's context principle applies here too: the same metric can mean different things under different populations and time windows. A 15% conversion rate is a crisis if the visitors are qualified buyers and unremarkable if a campaign changed the traffic mix. The decomposition cannot tell you which, because the explanation lies outside the funnel — in the data definition and the channel history.
 
-For the related question of how to learn complex domains, see [Why Learning How to Learn Is a Competitive Advantage](/articles/why-learning-how-to-learn-is-a-competitive-advantage) and how to distinguish tool knowledge from system understanding, see [The Difference Between Knowing a Tool and Understanding a System](/articles/the-difference-between-knowing-a-tool-and-understanding-a-system).
+## When the method becomes over-engineering
+
+Three failure modes are worth naming.
+
+**Modelling what you cannot measure.** A beautifully specified model fed by unreliable inputs produces precise-looking nonsense. The first engineering question is always about data quality, not model sophistication.
+
+**False precision.** A calculation that yields 123,750 implies a level of knowledge the inputs do not support. Presenting ranges and sensitivities is more honest than a single number.
+
+**Treating the map as the territory.** The funnel table is a representation of a business, not the business. A team can spend weeks refining the model while the actual cause — a pricing page change, a competitor, a support issue — sits outside its boundary.
+
+This is the point where the engineering mindset meets its counterargument. Business decisions often arrive with incomplete data, political constraints, and time pressure, and an insistence on perfect measurement can be a way of avoiding a decision. The disciplined version of the method says: state the assumption, make the smallest test, and decide with the evidence you can get.
+
+Damodaran's valuation work is a useful counterweight here. It is explicitly a framework for making decisions under uncertainty, where the output is a range and the value lies in the assumptions being visible — not in a number that pretends to be certain.
+
+## A decision test
+
+1. **State the problem with a boundary** — population, time window, and metric.
+2. **Decompose into stages** with input, output, and conversion at each.
+3. **Compare against a baseline** and check that definitions did not change.
+4. **Rank assumptions by sensitivity** before choosing where to investigate.
+5. **Build the smallest model** that can be wrong, with explicit inputs.
+6. **Collect evidence outside the model** before committing to a cause.
+7. **Decide with a stated uncertainty** and a review date.
+
+For the feature-context principle, see [Feature Engineering](/articles/feature-engineering-turning-raw-data-into-predictive-signals); for the business framing, see [Business Model Canvas](/articles/business-model-canvas-mapping-how-a-company-creates-value).
 
 ## Further Reading
 
