@@ -1,10 +1,99 @@
 ---
 title: "Distillation in Practice: Teacher to Student on Your Task"
-description: "Reserved title for a future NOVANDRI article: Distillation in Practice: Teacher to Student on Your Task."
+description: "Distillation transfers a teacher's behaviour to a smaller student. Read the mechanism, a worked task example, and when a label is enough."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Training
+  - LLM
+  - Compression
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A large model can be a better teacher than it is a servant. Its outputs on your task can train a smaller model that is cheaper to run, provided the teacher is right often enough and the student is evaluated against the real objective rather than the teacher's style.
+
+**Direct answer:** Knowledge distillation trains a student model on a teacher's outputs — traditionally soft probability distributions, in practice often generated text or labels. The original distillation paper establishes the soft-target mechanism. The boundary: a student trained on a teacher's mistakes learns those mistakes, so distillation transfers the teacher's behaviour, not correctness — which is why a held-out evaluation on ground truth is required.
+
+## What gets transferred
+
+Three forms are common:
+
+**Soft targets.** The teacher's full probability distribution over outputs carries information about how confident it is and what alternatives it considered. The original paper showed that this richer signal helps students learn.
+
+**Generated text.** For language models, the teacher produces answers or reasoning traces that the student is trained to imitate. This is cheaper to collect than soft distributions and works when the output is text.
+
+**Labels and rationales.** The teacher labels examples and explains why. The student learns both the decision and the stated reasoning, which may or may not reflect the teacher's actual process, as the interpretability article warns.
+
+Three properties matter: coverage of the task, quality of the teacher's outputs, and a way to check the student against ground truth.
+
+## A worked distillation decision
+
+The following is hypothetical and illustrative.
+
+A company has a frontier model that answers 10,000 support questions with 92% accuracy. It wants a smaller model that costs a tenth as much to serve.
+
+Three steps:
+
+1. **Generate.** Run the teacher over 10,000 real questions, collecting answers. Optionally keep its confidence and discard low-confidence cases rather than teaching the student guesses.
+2. **Train.** Fine-tune the student on the teacher's answers. Keep a held-out set of questions with human-verified correct answers — not teacher answers — for evaluation.
+3. **Evaluate.** The student reaches 88% against human ground truth. The teacher's errors in the training set are part of the ceiling, as the label-noise problem in data-quality work predicts.
+
+Three decisions follow:
+
+- **Is the four-point drop acceptable?** If the saving is large and errors are recoverable, yes; if accuracy drives safety, no. The evaluation-rubric article covers measuring the cost of errors.
+- **Would more teacher data help?** Only if the teacher is right on those cases. Generating more wrong answers teaches more wrong behaviour.
+- **Would a hybrid be better?** Route low-confidence student cases to the teacher, as the routing article explains. The combination may beat either model on cost per correct answer.
+
+## When distillation helps
+
+**High-volume, narrow tasks** where the teacher's quality transfers and the volume justifies training.
+
+**Latency or privacy constraints** that favour a smaller deployed model, as the cloud-versus-device article explains.
+
+**A stable task definition** where the teacher's outputs remain relevant over time.
+
+## When it does not
+
+**Tasks where the teacher is unreliable.** The student inherits the errors.
+
+**Rapidly changing domains.** A distilled student encodes the teacher's behaviour at a point in time, and the index of what changed is elsewhere, as the monitoring article explains.
+
+**Tasks where the student must reason beyond the examples.** Distillation transfers demonstrated behaviour, not general capability, which the task-taxonomy article distinguishes.
+
+The counterargument — that a smaller model is always cheaper overall — ignores training cost and the risk of quality loss. The full arithmetic belongs in the cost estimator.
+
+## The data is the product
+
+A distillation project is mostly a data project. Three decisions determine its quality:
+
+**Which questions to include.** Sample from the distribution the student will actually see, including edge cases. A set drawn from a convenient source will produce a student that performs well on that source and poorly elsewhere, as the data-quality article warns.
+
+**Which teacher outputs to keep.** Discarding low-confidence answers avoids teaching guesses, but discarding too much removes hard cases that the student needs to learn. Track what was filtered and why, as the data-curation article recommends.
+
+**How to handle disagreement.** When two teacher runs produce different answers to the same question, that is a signal of uncertainty. Resolving it with a verified source is better than picking one arbitrarily, which the evaluation-rubric article explains for preference data.
+
+These choices matter more than the training hyperparameters, because the student can only reproduce what it is shown.
+
+## What distillation cannot do
+
+**It cannot improve on the teacher's knowledge.** It compresses behaviour; it does not add truth.
+
+**It cannot substitute for evaluation.** The student must be scored against ground truth, not against how closely it matches the teacher, which the benchmarks article argues more generally.
+
+**It is not interpretability.** A student that mimics a teacher's reasoning traces does not thereby make the reasoning understandable, as the mechanistic-interpretability article explains.
+
+## A decision test
+
+1. **Measure teacher accuracy** on a human-verified held-out set.
+2. **Check coverage** of the task in the generated data.
+3. **Filter low-confidence teacher outputs** rather than teaching guesses.
+4. **Keep human-verified ground truth** for student evaluation.
+5. **Score cost per correct answer**, not just model size.
+6. **Consider hybrid routing** for low-confidence cases.
+7. **Re-distil after a material task or teacher change.**
+
+For the model options, see [Small Language Models](/articles/small-language-models-when-smaller-is-the-right-choice); for the fine-tuning method, see [LoRA and PEFT](/articles/lora-and-peft-fine-tuning-without-full-retraining).
+
+## Further Reading
+
+- Geoffrey Hinton, Oriol Vinyals, and Jeff Dean, 2015. [Distilling the Knowledge in a Neural Network](https://arxiv.org/abs/1503.02531) — Soft-label distillation, the basis of most model compression work.
+- OpenAI, 2025. [GPT-4.1 Prompting Guide](https://cookbook.openai.com/examples/gpt4-1_prompting_guide) — A concrete prompting guide with reusable patterns for instruction-following models.

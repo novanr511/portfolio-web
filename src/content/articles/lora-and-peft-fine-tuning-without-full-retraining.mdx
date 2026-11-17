@@ -1,10 +1,98 @@
 ---
 title: "LoRA and PEFT: Fine-Tuning Without Full Retraining"
-description: "Reserved title for a future NOVANDRI article: LoRA and PEFT: Fine-Tuning Without Full Retraining."
+description: "PEFT trains a small fraction of parameters. Read the LoRA mechanism, a worked resource comparison, and when full fine-tuning still wins."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Fine-Tuning
+  - Training
+  - Efficiency
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Full fine-tuning updates every parameter in a model, which for a large model is expensive in memory, storage, and compute. Parameter-efficient fine-tuning, or PEFT, freezes most of the model and trains a small set of additional parameters. LoRA is the best-known method, and it changed what fine-tuning is practical for a small team.
+
+**Direct answer:** LoRA freezes pretrained weights and trains low-rank update matrices alongside them, reducing trainable parameters by orders of magnitude while often matching full fine-tuning on a task. The LoRA paper reports this on several model families. The boundary: parameter efficiency is not automatically quality — a small update may be insufficient when the task requires substantial behavioural change, in which case full fine-tuning or continued pretraining may be needed.
+
+## How LoRA works
+
+A weight matrix in a layer is frozen. LoRA adds a pair of small matrices whose product has the same shape as the weight update, and trains only those. Three properties follow:
+
+**Trainable parameters drop sharply.** The paper reports reductions on the order of 10,000× in some settings, which lowers optimizer memory and storage.
+
+**The base model stays intact.** Multiple LoRA adapters can be trained for different tasks and swapped at inference without duplicating the full model, as the deployment article explains for adapters.
+
+**Capacity is bounded by the rank.** A low-rank update can express a limited family of changes. If the task needs more, a higher rank or full fine-tuning is required.
+
+## A worked resource comparison
+
+The following is hypothetical and illustrative.
+
+A team wants to adapt a 7-billion-parameter model to a classification task.
+
+- **Full fine-tuning:** updates 7B parameters. Optimizer state and gradients for all of them require substantial GPU memory; a single checkpoint is many gigabytes.
+- **LoRA with rank 16:** trains perhaps 20 million parameters — roughly 0.3% of the model. Optimizer memory falls dramatically, and each adapter checkpoint is tens of megabytes.
+
+Three decisions follow:
+
+1. **Does the adapter meet the accuracy target?** Evaluate on a held-out set from real work, as the evaluation article recommends. Parameter savings are irrelevant if the task fails.
+2. **Do you need several tasks?** If so, LoRA's swappable adapters are a structural advantage: one base model, many small adapters.
+3. **Is the task a large behavioural shift?** Teaching a new domain's concepts may need continued pretraining or full fine-tuning, as the domain-adaptation article explains.
+
+The numbers are illustrative; the method is to compare trainable parameters, memory, storage, and measured accuracy together.
+
+## Where PEFT fits
+
+**Task-specific adaptation** where the base model already knows the domain.
+
+**Multiple tasks on one base model**, with separate adapters.
+
+**Limited hardware**, where full fine-tuning would not fit in memory.
+
+**Frequent iteration**, where small checkpoints and fast training matter, as the MLOps article describes.
+
+## Where it does not
+
+**Large domain shifts** requiring new knowledge, which continued pretraining addresses.
+
+**Tasks needing extensive behavioural change**, where a low-rank update may be too constrained.
+
+**Cases where full fine-tuning is affordable and clearly better.** The method is an efficiency trade, not a virtue.
+
+The counterargument — that LoRA always matches full fine-tuning — is too strong. The LoRA paper shows strong results in its settings; whether it holds for yours is an empirical question answered by evaluation.
+
+## Operating adapters
+
+An adapter is a versioned artifact, and that creates operational responsibilities. Three practices help:
+
+**Version the adapter with its base model.** A LoRA adapter is meaningless without the specific base weights it was trained against. Record both versions together, as the MLOps article recommends for reproducibility.
+
+**Test before swapping.** Replacing an adapter changes behaviour instantly. Run the new adapter through the evaluation set before routing traffic to it, and keep the previous one available for rollback, which the deployment article describes.
+
+**Watch for interference.** When several adapters are composed or switched on one base model, behaviour can change in ways not predicted by individual evaluations. Test combinations, not only single adapters, which the evaluation article covers.
+
+These practices are the cost of the flexibility PEFT provides. The small checkpoint is an advantage only if it is managed as carefully as a large one.
+
+## What PEFT cannot do
+
+**It cannot add knowledge absent from the base model.** It modifies behaviour using what is already there.
+
+**It eliminates training cost rather than inference cost.** The deployed model still runs the base weights plus the adapter, as the serving article explains.
+
+**It is not a substitute for good data.** A small adapter trained on poor labels learns poor behaviour quickly, which the data-quality article covers.
+
+## A decision test
+
+1. **State the task and its accuracy target.**
+2. **Check whether the base model knows the domain.**
+3. **Try LoRA first** with a stated rank and evaluate on held-out data.
+4. **Compare memory, training time and checkpoint size** with full fine-tuning.
+5. **Increase rank or switch methods** if the adapter plateaus.
+6. **Use continued pretraining** when the gap is domain knowledge.
+7. **Version adapters** with the base model version, as the MLOps article recommends.
+
+For the training method, see [Continued Pretraining](/articles/continued-pretraining-for-domain-adaptation); for the deployment side, see [Edge AI](/articles/edge-ai-model-compression-quantization-and-on-device-inference).
+
+## Further Reading
+
+- Edward Hu et al., 2021. [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685) — Freezing pretrained weights and training low-rank update matrices, reducing trainable parameters by orders of magnitude.
+- Geoffrey Hinton, Oriol Vinyals, and Jeff Dean, 2015. [Distilling the Knowledge in a Neural Network](https://arxiv.org/abs/1503.02531) — Soft-label distillation, the basis of most model compression work.

@@ -1,10 +1,81 @@
 ---
 title: "Serving Frameworks: What vLLM-Style Batching Changes"
-description: "Reserved title for a future NOVANDRI article: Serving Frameworks: What vLLM-Style Batching Changes."
+description: "A serving framework is where throughput becomes real. Read continuous batching and paged memory, a worked example, and what still needs tuning."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - LLM
+  - Infrastructure
+  - Performance
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A model's architecture sets the upper bound on serving performance; the serving framework determines how much of that bound you reach. Two ideas from vLLM — continuous batching and paged attention memory — changed the practical throughput of LLM serving without changing the models themselves.
+
+**Direct answer:** Continuous batching replaces fixed batches with dynamic scheduling as requests finish, and paged memory allocates KV-cache space in blocks rather than contiguous reservations. The vLLM paper reports substantial throughput improvements from these changes. The boundary: a framework improves hardware utilisation; it cannot fix a model that is too large for memory or a workload whose latency target is incompatible with batching.
+
+## Two mechanisms
+
+**Continuous batching.** In static batching, a group of requests is processed together and the next group waits for all of them to finish. Short requests wait for long ones. Continuous batching admits new requests as soon as a slot frees, keeping the hardware busy and reducing the tail caused by stragglers.
+
+**Paged memory.** The KV cache grows during generation, and reserving a contiguous block for the maximum possible length wastes memory. Paged attention allocates fixed-size blocks on demand, like virtual memory in an operating system, so memory is used by tokens that actually exist. The KV-cache article covers the memory pressure this relieves.
+
+Three consequences follow:
+
+- **Higher throughput** from better utilisation.
+- **Less memory waste**, allowing more concurrent requests on the same hardware.
+- **No change to outputs** — these are scheduling and memory techniques, not approximations.
+
+## A worked example of utilisation
+
+The following is hypothetical and illustrative.
+
+A server has enough memory for 40 concurrent sequences at an average context length. Under static batching with a fixed batch of 8, a request that finishes early holds its slot until the longest request in the batch completes. If lengths vary from 200 to 2,000 tokens, average utilisation may be 50% because slots sit idle waiting.
+
+With continuous batching, each finished slot is immediately filled. Utilisation rises toward 90%, and effective throughput nearly doubles on the same hardware. Paged memory contributes by fitting more active sequences in the same memory budget, since it allocates for actual tokens rather than reserved maximums.
+
+Three lessons follow:
+
+1. **The gain comes from scheduling**, not from a faster model.
+2. **Length variance is the lever** — uniform requests gain little; mixed workloads gain a lot.
+3. **Memory management and batching interact** — more available memory permits more concurrent sequences, which continuous batching can exploit.
+
+## Measuring the gain
+
+A serving framework's benefit is empirical for your workload. Three measurements matter:
+
+**Throughput at a fixed latency target.** Compare requests per second while holding the tail latency constant. A framework that doubles throughput at the same latency is a real gain; one that does so by tripling latency is a different trade, as the batching-economics article explains.
+
+**Memory utilisation.** Track how much of the available memory is actually used by active sequences. Paged memory should raise this figure, especially with mixed request lengths.
+
+**Tail behaviour under bursts.** Steady-state throughput can hide poor behaviour when arrivals spike. Measure the 95th and 99th percentile latency during bursts, which the observability article recommends.
+
+Run the comparison on representative traffic — real request lengths and arrival patterns — not a synthetic uniform load. The benefits of continuous batching grow with length variance, so a uniform test will understate them.
+
+## What the framework does not solve
+
+**It cannot make an oversized model fit.** Total memory still has to hold weights and active caches, as the GPU article explains.
+
+**It cannot meet an incompatible latency SLO.** If the workload needs a response in 20 ms and the model needs 40 ms per pass, scheduling cannot close the gap, as the batching-economics article shows.
+
+**It does not remove the need for measurement.** The right configuration — batch limits, memory settings, precision — is empirical and workload-specific, which the observability article covers.
+
+**It is a dependency.** Serving frameworks evolve, and an update can change behaviour. Pin versions and re-evaluate, as the build-versus-buy article recommends.
+
+The counterargument — that managed APIs make serving frameworks irrelevant — is fair for teams that do not host models. For anyone running their own inference, the framework is the difference between theoretical and actual throughput.
+
+## A decision test
+
+1. **Measure the request-length distribution** to estimate batching gains.
+2. **Check memory headroom** for weights and active KV caches.
+3. **Choose a framework with continuous batching** if you self-host.
+4. **Tune batch limits against your latency SLO**, not for maximum throughput.
+5. **Re-evaluate precision and memory settings** on your hardware.
+6. **Pin versions** and test updates on a labelled workload.
+7. **Watch utilisation and tail latency** as operating signals.
+
+For the batching trade-off, see [Batch Inference Economics](/articles/batch-inference-economics-throughput-vs-latency); for the speculative alternative, see [Speculative Decoding](/articles/speculative-decoding-how-draft-models-speed-up-inference).
+
+## Further Reading
+
+- Woosuk Kwon et al., 2023. [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) — Continuous batching and paged KV-cache memory that raise serving throughput.
+- Yani Leviathan, Diego Alvarez, Francesco Nagle, 2022. [Fast Inference from Transformers via Speculative Decoding](https://arxiv.org/abs/2211.17192) — The paper showing how a draft model proposes tokens that a target model verifies, speeding up inference without changing output distribution.
