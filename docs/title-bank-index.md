@@ -1,0 +1,1019 @@
+# Article title bank — 1000 reserved titles
+
+All titles are unique against each other and against the 237 already-written articles.
+Source of truth: `docs/article-title-registry.json`. Guard: `scripts/check-title-duplicates.mjs` (runs in CI).
+
+Status legend: **existing** = written article; **planned** = reserved file (N-xxx); **high-intent** = reserved file from `docs/high-traffic-title-backlog.md` (B-xxx); **bank** = reserved file (T-xxx).
+
+## Written articles (237)
+
+- A/B Testing Recommendation Systems: Measuring Lift Without Bias — `a-b-testing-recommendation-systems-measuring-lift-without-bias`
+- A/B Testing: Making Decisions with Experiments — `ab-testing-making-decisions-with-experiments`
+- AI Agents vs Traditional Automation: What Is Actually Different — `ai-agents-vs-traditional-automation-what-is-actually-different`
+- AI Crawlers Are Not Googlebot: How to Govern Crawlers You Don't Control — `ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control`
+- AI Ethics: Responsible Use of Artificial Intelligence — `ai-ethics-responsible-use-of-artificial-intelligence`
+- AI Governance: Managing AI Responsibly at Scale — `ai-governance-managing-ai-responsibly-at-scale`
+- AI in Healthcare: Promise and Pitfalls — `ai-in-healthcare-promise-and-pitfalls`
+- AI Integration Into an Existing Business: A Practical Sequence — `ai-integration-blueprint-businesses`
+- AI Readiness Assessment: Questions to Ask Before Adopting — `ai-readiness-assessment`
+- AI Safety: Alignment, Robustness, and Governance — `ai-safety-alignment-robustness-and-governance`
+- AI Search and Technical SEO: What Website Owners Should Actually Do — `ai-search-and-technical-seo-what-website-owners-should-do`
+- Anomaly Detection: Statistical, ML, and Deep Learning Approaches — `anomaly-detection-statistical-ml-and-deep-learning-approaches`
+- API Design: REST, GraphQL, gRPC, API Gateway, Rate Limiting — `api-design-rest-graphql-grpc-api-gateway-rate-limiting`
+- API Design: The Contract Between Systems — `api-design-the-contract-between-systems`
+- AutoML: Neural Architecture Search and Automated ML Pipelines — `automl-neural-architecture-search-and-automated-ml-pipelines`
+- B2B Marketing: ABM, Lead Scoring, and Sales Enablement — `b2b-marketing-abm-lead-scoring-and-sales-enablement`
+- Behavioral Finance: Cognitive Biases in Investing and Spending — `behavioral-finance-cognitive-biases-in-investing-and-spending`
+- Brand Consistency Across Channels: What Must Match — `brand-consistency-across-channels`
+- Brand Positioning: Why Being Different Is More Important Than Being Better — `brand-positioning-why-being-different-is-more-important-than-being-better`
+- Build, Buy, or Integrate: A Decision Framework for Software Capabilities — `build-buy-or-integrate-decision-framework`
+- Building a Recommendation Engine with Python: End-to-End Pipeline — `building-a-recommendation-engine-with-python-end-to-end-pipeline`
+- Business Model Canvas: Mapping How a Company Creates Value — `business-model-canvas-mapping-how-a-company-creates-value`
+- Cache-Control Is a Contract, Not a Suggestion: Reading HTTP Freshness Correctly — `cache-control-is-a-contract-not-a-suggestion`
+- Canonical Tags and Duplicate URLs: Signals, Not Commands — `canonical-tags-and-duplicate-urls-signals-not-commands`
+- Career Transitions: Moving Between Industries and Roles — `career-transitions-moving-between-industries-and-roles`
+- Category Design: Create a Market Instead of Competing — `category-design-create-a-market`
+- Causal Inference: Counterfactuals, DAGs, and Do-Calculus — `causal-inference-counterfactuals-dags-and-do-calculus`
+- CDN Caching and Googlebot: Avoid Origin Overload — `cdn-caching-and-googlebot-avoid-origin-overload`
+- Central Banking: Monetary Policy, Inflation Targeting, and Financial Stability — `central-banking-monetary-policy-inflation-targeting-and-financial-stability`
+- Certificate Transparency: What the Public Logs Prove, and What They Don't — `certificate-transparency-what-the-public-logs-prove`
+- Chinchilla and the Scaling Laws: Why 'Just Make It Bigger' Stopped Being the Rule — `chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule`
+- Cloud Cost Optimization: FinOps, Right-sizing, and Reserved Instances — `cloud-cost-optimization-finops-right-sizing-and-reserved-instances`
+- Cold Start Problem in Recommender Systems: Strategies for New Users and Items — `cold-start-problem-in-recommender-systems-strategies-for-new-users-and-items`
+- Commodity Markets: Oil, Gold, and Price Discovery — `commodity-markets-oil-gold-and-price-discovery`
+- Competitive Intelligence: Win/Loss Analysis, Battlecards, and Tracking — `competitive-intelligence-win-loss-analysis-battlecards-and-tracking`
+- Computer Vision Basics: CNNs, Transfer Learning, and Object Detection — `computer-vision-basics-cnns-transfer-learning-and-object-detection`
+- Confidence Intervals and p-values: What They Do and Do Not Support — `confidence-intervals-and-p-values`
+- Content Marketing: Building Trust Before Asking for the Sale — `content-marketing-building-trust-before-asking-for-the-sale`
+- Core Web Vitals: Diagnose LCP, INP, and CLS — `core-web-vitals-diagnose-lcp-inp-cls`
+- Corporate Finance Essentials: Capital Structure, WACC, and Investment Decisions — `corporate-finance-essentials-capital-structure-wacc-and-investment-decisions`
+- Correlation vs Causation: The Most Common Mistake in Data Analysis — `correlation-vs-causation-the-most-common-mistake-in-data-analysis`
+- Cost of Capital for Private Companies: A Practical Estimate — `cost-of-capital-private-companies`
+- Crawl Budget: When It Matters and How to Diagnose It — `crawl-budget-when-it-matters-and-how-to-diagnose-it`
+- Credit Spreads: What Corporate Bond Yields Add to the Risk-Free Rate — `credit-spreads-what-corporate-yields-add`
+- Crisis Management: PR Crises, Product Recalls, and Reputation Recovery — `crisis-management-pr-crises-product-recalls-and-reputation-recovery`
+- Cryptocurrency and the Future of Money — `cryptocurrency-and-the-future-of-money`
+- Customer Data Platforms: Unifying Data for Personalization — `customer-data-platforms-unifying-data-for-personalization`
+- Customer Lifetime Value: The Metric That Guides Acquisition — `customer-lifetime-value-the-metric-that-guides-acquisition`
+- Customer Retention: Keeping Customers Is Cheaper Than Acquiring Them — `customer-retention-keeping-customers-is-cheaper-than-acquiring-them`
+- Customer Success: Onboarding, Health Scores, and Expansion Revenue — `customer-success-onboarding-health-scores-and-expansion-revenue`
+- Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response — `cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response`
+- Data Analytics vs Data Science: Differences, Workflows, and When to Use Each — `data-analytics-vs-data-science-differences-workflows-and-when-to-use-each`
+- Data Centre Electricity: Reading the IEA Forecasts Without Fooling Yourself — `data-centre-electricity-reading-the-iea-forecasts-honestly`
+- Data Ethics: Responsible Use of Customer Data — `data-ethics-responsible-use-of-customer-data`
+- Data Governance: Managing Data as an Asset — `data-governance-managing-data-as-an-asset`
+- Data Pipelines: Airflow, Prefect, and Orchestrating ETL at Scale — `data-pipelines-airflow-prefect-and-orchestrating-etl-at-scale`
+- Data Privacy: GDPR, CCPA, Data Governance, and Privacy by Design — `data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design`
+- Data Strategy: How Organizations Use Data to Compete — `data-strategy-how-organizations-use-data-to-compete`
+- Data Visualization: Telling Stories with Numbers — `data-visualization-telling-stories-with-numbers`
+- Database Indexes and Query Plans: Why the Same Query Gets Slow — `database-indexes-and-query-plans`
+- Decision Memos That Survive Review — `decision-memos-that-survive-review`
+- Deep Learning Basics: Neural Networks, Backpropagation, and Practical Use Cases — `deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases`
+- Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings — `deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings`
+- Demand Generation vs Lead Generation: Where the Funnel Breaks — `demand-generation-vs-lead-generation`
+- Derivatives and Options: Pricing, Greeks, and Hedging Strategies — `derivatives-and-options-pricing-greeks-and-hedging-strategies`
+- DevOps: Bridging Development and Operations — `devops-bridging-development-and-operations`
+- Discovered, Crawled, Rendered, Indexed: Why Stages Differ — `discovered-crawled-rendered-indexed-why-stages-differ`
+- DNS for SEO: How Domain Resolution Works and How to Debug It — `dns-for-seo-how-domain-resolution-works`
+- E-commerce vs Brick and Mortar: The Economics of Retail Channels — `e-commerce-vs-brick-and-mortar-the-economics-of-retail-channels`
+- E-commerce Technical SEO: Product URLs and Faceted Navigation — `ecommerce-technical-seo-product-urls-faceted-navigation`
+- Edge AI: Model Compression, Quantization, and On-Device Inference — `edge-ai-model-compression-quantization-and-on-device-inference`
+- Email Deliverability: What Actually Affects Inbox Placement — `email-deliverability`
+- Engineering Management: Hiring, Culture, Metrics, and Career Ladders — `engineering-management-hiring-culture-metrics-and-career-ladders`
+- ESG Investing: Sustainable Finance, Green Bonds, and Impact Measurement — `esg-investing-sustainable-finance-green-bonds-and-impact-measurement`
+- Evaluating LLM Applications Without a Harness — `evaluating-llm-applications`
+- Feature Engineering: Turning Raw Data into Predictive Signals — `feature-engineering-turning-raw-data-into-predictive-signals`
+- Federated Learning: Privacy-Preserving Distributed Machine Learning — `federated-learning-privacy-preserving-distributed-machine-learning`
+- Financial Crises: Systemic Risk, Contagion, and Lessons from History — `financial-crises-systemic-risk-contagion-and-lessons-from-history`
+- Fixed Income Markets: Bonds, Yields, and Duration Risk — `fixed-income-markets-bonds-yields-and-duration-risk`
+- Founder-Led Sales: Early-Stage GTM, Founder-Led Selling, and Hiring the First Sales Team — `founder-led-sales-early-stage-gtm-founder-led-selling-and-hiring-first-sales-team`
+- From Chatbots to Autonomous Systems: The Evolution of AI — `from-chatbots-to-autonomous-systems-the-evolution-of-ai`
+- Generative AI: LLMs, Prompt Engineering, and Fine-Tuning — `generative-ai-llms-prompt-engineering-and-fine-tuning`
+- Go-to-Market Strategy: How to Launch a Product — `go-to-market-strategy-how-to-launch-a-product`
+- Google Search Console for Technical SEO: A Diagnostic Workflow — `google-search-console-for-technical-seo-a-diagnostic-workflow`
+- Graph Neural Networks: Graph Convolutional Networks and Applications — `graph-neural-networks-graph-convolutional-networks-and-applications`
+- How AI Is Changing the Economics of Software Development — `how-ai-is-changing-the-economics-of-software-development`
+- How AI Models Are Trained: From Data to Deployment — `how-ai-models-are-trained-from-data-to-deployment`
+- How Cloud Computing Changed the Modern Economy — `how-cloud-computing-changed-the-modern-economy`
+- How Companies Build Competitive Advantages — `how-companies-build-competitive-advantages`
+- How Companies Use Predictive Analytics to Make Business Decisions — `how-companies-use-predictive-analytics-to-make-business-decisions`
+- How Crawlers Actually Fetch Pages: Protocol, Limits, and Caching on the Wire — `how-crawlers-actually-fetch-pages-protocol-limits-and-caching`
+- How Data Changes the Way Marketing Decisions Are Made — `how-data-changes-the-way-marketing-decisions-are-made`
+- How Energy Markets Actually Work — `how-energy-markets-actually-work`
+- How Googlebot Discovers and Crawls Pages — `how-googlebot-discovers-and-crawls-pages`
+- How Marketplace Business Models Actually Work — `how-marketplace-business-models-actually-work`
+- How Operating Systems Shape the Modern Computing Experience — `how-operating-systems-shape-the-modern-computing-experience`
+- How Recommendation Systems Influence What We Buy — `how-recommendation-systems-influence-what-we-buy`
+- How Retailers Use Data to Optimize Product Placement — `how-retailers-use-data-to-optimize-product-placement`
+- How Small Businesses Can Compete Using AI — `how-small-businesses-can-compete-using-ai`
+- How the Internet Actually Works: From DNS to Global Connectivity — `how-the-internet-actually-works-from-dns-to-global-connectivity`
+- How to Become a T-Shaped Professional in the AI Era — `how-to-become-a-t-shaped-professional-in-the-ai-era`
+- How to Build a Technical Portfolio That Demonstrates Real Skills — `how-to-build-a-technical-portfolio-that-demonstrates-real-skills`
+- How to Actually Start Learning AI as a Developer in 2026 — `how-to-start-learning-ai`
+- How to Think Like an Engineer When Solving Business Problems — `how-to-think-like-an-engineer-when-solving-business-problems`
+- How to Validate a Startup Idea Before Building the Product — `how-to-validate-a-startup-idea-before-building-the-product`
+- Hreflang for International SEO: Build Valid Language Clusters — `hreflang-for-international-seo-build-valid-language-clusters`
+- HTTP 103 Early Hints: What the Interim Response Can—and Cannot—Do — `http-103-early-hints-what-the-interim-response-can-do`
+- HTTP 429 Too Many Requests: How to Debug and Retry Responsibly — `http-429-too-many-requests-how-to-debug-and-retry`
+- HTTP 451 Unavailable for Legal Reasons: What the Status Actually Signals — `http-451-unavailable-for-legal-reasons-what-it-signals`
+- The HTTP Priority Header: What Priority Signals Actually Do — `http-priority-header-what-priority-signals-actually-do`
+- Safe and Idempotent HTTP Methods: What They Mean for Retries — `http-safe-and-idempotent-methods-what-retries-mean`
+- HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx — `http-status-codes-for-seo-diagnose-200-redirects-404-5xx`
+- HTTP/3: What Changes When HTTP Runs over QUIC? — `http3-what-changes-when-http-runs-over-quic`
+- HTTPS, TLS, and SEO: Diagnose Certificates and Redirects — `https-tls-and-seo-diagnose-certificates-and-redirects`
+- Human in the Loop by Design: Overrides, Escalation, and Failure States — `human-in-the-loop-by-design`
+- Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization — `hyperparameter-tuning-grid-search-random-search-and-bayesian-optimization`
+- How Inflation Affects Valuation Multiples — `inflation-and-valuation-multiples`
+- Influencer Marketing Measurement: Codes vs Holdouts — `influencer-marketing-measurement`
+- Interest Rates and Their Effect on Technology Companies — `interest-rates-and-their-effect-on-technology-companies`
+- International Expansion: Localization, GTM Adaptation, and Compliance — `international-expansion-localization-gtm-adaptation-and-compliance`
+- International Finance: Exchange Rates, Trade, and Balance of Payments — `international-finance-exchange-rates-trade-and-balance-of-payments`
+- Inventory Management: Balancing Stock and Cash Flow — `inventory-management-balancing-stock-and-cash-flow`
+- IP Anycast Routes You to a Service, Not Necessarily the Nearest Server — `ip-anycast-routing-to-a-service-not-the-nearest-server`
+- JavaScript SEO: SSR, CSR, SSG, and ISR Explained — `javascript-seo-ssr-csr-ssg-isr`
+- Kubernetes Requests and Limits: Why Pods Get Evicted Under Load — `kubernetes-requests-and-limits-why-pods-get-evicted`
+- From LangChain to LangGraph: Building Stateful AI Agents That Don't Fall Apart — `langchain-to-langgraph`
+- LLM Model Landscape 2026: Comparing Flagships Without Benchmark Theatre — `llm-model-landscape-2026`
+- What LLMs Actually Solve in the Real World: A Task Taxonomy — `llm-real-world-problem-taxonomy`
+- llms.txt, robots.txt, and the IETF Drafts: Sorting AI File Formats by Evidence — `llms-txt-robots-txt-and-ietf-drafts-sorting-ai-file-formats-by-evidence`
+- Long Context Windows: What a 1M-Token Window Actually Buys You — `long-context-windows-what-they-buy`
+- Macroeconomics for Business Leaders: Inflation, GDP, and Monetary Policy — `macroeconomics-for-business-leaders-inflation-gdp-and-monetary-policy`
+- Market Research: Survey Design, Conjoint Analysis, and MaxDiff — `market-research-survey-design-conjoint-analysis-and-maxdiff`
+- Market Structures: Perfect Competition, Monopoly, and Oligopoly — `market-structures-perfect-competition-monopoly-and-oligopoly`
+- Marketing Attribution: Multi-Touch Models, Incrementality, and Budget Allocation — `marketing-attribution-multi-touch-models-incrementality-and-budget-allocation`
+- Measuring GEO: What You Can Actually Count When Traffic Comes From Answers — `measuring-geo-what-you-can-actually-count`
+- Mergers and Acquisitions: When 1+1 Equals 3 (or Less) — `mergers-and-acquisitions-when-1-plus-1-equals-3-or-less`
+- Microeconomics for Decision Makers: Supply, Demand, and Elasticity — `microeconomics-for-decision-makers-supply-demand-and-elasticity`
+- Microservices Architecture: Service Mesh, Event-Driven, Saga Pattern — `microservices-architecture-service-mesh-event-driven-and-saga-pattern`
+- Missing Data: When Dropping Rows Changes the Answer — `missing-data-when-dropping-rows-changes-the-answer`
+- Mixture of Experts: Why Sparse Models Changed AI Economics — `mixture-of-experts-explained`
+- MLOps: From Experiment to Production Pipeline — `mlops-from-experiment-to-production-pipeline`
+- Mobile-First Indexing: Check Content and Rendering Parity — `mobile-first-indexing-check-content-and-rendering-parity`
+- Model Explainability: SHAP, LIME, and Interpreting Black Boxes — `model-explainability-shap-lime-and-interpreting-black-boxes`
+- Model Monitoring: Detecting Drift, Bias, and Performance Degradation — `model-monitoring-detecting-drift-bias-and-performance-degradation`
+- Negotiation: Getting to Yes in Business and Career — `negotiation-getting-to-yes-in-business-and-career`
+- NLP Fundamentals: Tokenization, Embeddings, and Transformers — `nlp-fundamentals-tokenization-embeddings-and-transformers`
+- Observability: Logging, Metrics, Tracing, Alerting — `observability-logging-metrics-tracing-alerting`
+- Omnichannel Retail: Selling Wherever Customers Are — `omnichannel-retail-selling-wherever-customers-are`
+- Open Source Is a License Term, Not a Vibe: Reading OSD, OSAID, and BSL — `open-source-is-a-license-term-not-a-vibe`
+- Open Source vs Proprietary Software: Who Really Wins? — `open-source-vs-proprietary-software-who-really-wins`
+- Partner Ecosystems: Channel Strategy, Marketplace, and ISV Partnerships — `partner-ecosystems-channel-strategy-marketplace-and-isv-partnerships`
+- Passkeys and WebAuthn: What Passwordless Authentication Actually Verifies — `passkeys-webauthn-what-passwordless-authentication-verifies`
+- Personal Branding: Building Your Professional Reputation — `personal-branding-building-your-professional-reputation`
+- Personal Finance for Professionals: Managing Income, Saving, and Investing — `personal-finance-for-professionals-managing-income-saving-and-investing`
+- Power BI for Business Analytics: Data Modeling, DAX, and Dashboard Best Practices — `power-bi-for-business-analytics-data-modeling-dax-and-dashboard-best-practices`
+- Pricing Strategy Advanced: Dynamic Pricing, Revenue Management, and Price Optimization — `pricing-strategy-advanced-dynamic-pricing-revenue-management-and-price-optimization`
+- Pricing Strategy: How to Charge What Your Product Is Worth — `pricing-strategy-how-to-charge-what-your-product-is-worth`
+- Private Label: Retailers Competing with Brands — `private-label-retailers-competing-with-brands`
+- Product-Led Growth: Acquisition, Activation, and Retention Loops — `product-led-growth-acquisition-activation-and-retention-loops`
+- Product Marketing: Positioning, Messaging, and Launch Frameworks — `product-marketing-positioning-messaging-and-launch-frameworks`
+- Prompt Injection in LLM Applications: A Threat Model, Not a Patch — `prompt-injection-llm-applications-threat-model`
+- Python for Data Analytics: Pandas, NumPy, and Visualization Workflows — `python-for-data-analytics-pandas-numpy-and-visualization-workflows`
+- QUIC DATAGRAMs: When Unreliable Delivery Is Useful — `quic-datagrams-when-unreliable-delivery-is-useful`
+- Retrieval-Augmented Generation, Explained From the Inside Out — `rag-explained`
+- Raw HTML vs Rendered DOM: What Can a Crawler Read? — `raw-html-vs-rendered-dom-what-can-a-crawler-read`
+- Reading Financial Statements Without an Accounting Background — `reading-financial-statements-without-an-accounting-background`
+- Real Estate Markets: REITs, Property Cycles, and Investment Analysis — `real-estate-markets-reits-property-cycles-and-investment-analysis`
+- Recommender Systems: Collaborative Filtering, Content-Based, and Hybrid Approaches — `recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches`
+- Reinforcement Learning: Q-Learning, Policy Gradients, and Applications — `reinforcement-learning-q-learning-policy-gradients-and-applications`
+- Remote Work: The Economics and Culture of Distributed Teams — `remote-work-the-economics-and-culture-of-distributed-teams`
+- Responsible AI: Ethics, Fairness, and Regulatory Compliance — `responsible-ai-ethics-fairness-and-regulatory-compliance`
+- Retail Media Networks: When the Retailer Becomes the Advertising Channel — `retail-media-networks`
+- Returns and Reverse Logistics: The Hidden Cost of Online Shopping — `returns-and-reverse-logistics`
+- Revenue Recognition: What Investors Watch in the Notes — `revenue-recognition-investors`
+- robots.txt Is a Parsing Specification: The Rules Your Crawler Actually Follows — `robots-txt-is-a-parsing-specification-the-rules-your-crawler-follows`
+- Robots.txt vs Noindex vs Sitemap: What Each One Does — `robots-txt-vs-noindex-vs-sitemap`
+- Routing Between LLMs: Cut Cost Without Losing Quality — `routing-between-llms`
+- Sales Operations: Territory Planning, Quota Setting, and Compensation Design — `sales-operations-territory-planning-quota-setting-and-compensation-design`
+- Search Recommender Engines: How Search and Recommendation Converge — `search-recommender-engines-how-search-and-recommendation-converge`
+- SEO Observability: Turn Logs and Checks into Useful Alerts — `seo-observability-turn-logs-and-checks-into-useful-alerts`
+- SEO Regression Tests in CI/CD: Catch Errors Before Release — `seo-regression-tests-in-cicd-catch-errors-before-release`
+- SEO URL Structure: Normalize Hostnames, Paths, and Parameters — `seo-url-structure-normalize-hostnames-paths-parameters`
+- SEO vs Paid Advertising: Understanding the Economics of Customer Acquisition — `seo-vs-paid-advertising-understanding-the-economics-of-customer-acquisition`
+- Server Logs for SEO: See What Googlebot Requests — `server-logs-for-seo-see-what-googlebot-requests`
+- Simpson's Paradox in Your Own Data: Why a Single Correlation Can Reverse Its Sign — `simpsons-paradox-why-a-single-correlation-can-reverse-its-sign`
+- Site Reliability Engineering: SLOs, Error Budgets, and Incident Response — `site-reliability-engineering-slos-error-budgets-and-incident-response`
+- Social Media Marketing: Platform Strategies, Content, and Community — `social-media-marketing-platform-strategies-content-and-community`
+- Stock Market Fundamentals: Valuation, Indices, and Market Mechanics — `stock-market-fundamentals-valuation-indices-and-market-mechanics`
+- Structured Data and Schema.org: What It Can—and Cannot—Do — `structured-data-and-schema-org-what-it-can-and-cannot-do`
+- Technical Debt: The Hidden Cost of Shortcuts — `technical-debt-the-hidden-cost-of-shortcuts`
+- Technical Interviews That Test Systems Thinking, Not Recall — `technical-interviews-that-test-systems-thinking`
+- Technical SEO at Scale: URL Inventory, Capacity, and Observability — `technical-seo-at-scale-url-inventory-capacity-observability`
+- A Technical SEO Audit That Follows the Request Path — `technical-seo-audit-follows-request-path`
+- Technical SEO Engineering: From Web Request to Search Index — `technical-seo-engineering-from-web-request-to-search-index`
+- Technical SEO for Next.js and Headless CMS — `technical-seo-nextjs-headless-cms`
+- Technical Writing: Documentation, API Docs, and Developer Experience — `technical-writing-documentation-api-docs-and-developer-experience`
+- The Anatomy of a Successful Digital Business — `the-anatomy-of-a-successful-digital-business`
+- The Difference Between Building a Product and Building a Business — `the-difference-between-building-a-product-and-building-a-business`
+- The Difference Between Knowing a Tool and Understanding a System — `the-difference-between-knowing-a-tool-and-understanding-a-system`
+- The Difference Between Sell-In and Sell-Out in Retail — `the-difference-between-sell-in-and-sell-out-in-retail`
+- The Economics of AI: Why Intelligence Is Becoming a Commodity — `the-economics-of-ai-why-intelligence-is-becoming-a-commodity`
+- The Evolution of Web Browsers and the Future of the Internet — `the-evolution-of-web-browsers-and-the-future-of-the-internet`
+- The Future of Autonomous Businesses — `the-future-of-autonomous-businesses`
+- The Future of Work: Skills That Will Matter in the Next Decade — `the-future-of-work-skills-that-will-matter-in-the-next-decade`
+- The Hidden Infrastructure Behind Every Digital Platform — `the-hidden-infrastructure-behind-every-digital-platform`
+- The Limits of AI: What Machines Cannot Do — `the-limits-of-ai-what-machines-cannot-do`
+- The Science of Conversion Rate Optimization — `the-science-of-conversion-rate-optimization`
+- Three Technical SEO Bugs Diagnosed from Symptom to Root Cause — `three-technical-seo-bugs-diagnosed-symptom-to-root-cause`
+- Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models — `time-series-forecasting-arima-prophet-and-deep-learning-models`
+- Understanding Unit Economics: CAC, LTV, Churn, and Contribution Margin — `understanding-unit-economics-cac-ltv-churn-contribution-margin`
+- Vector Databases: Embeddings, ANN Search, and RAG Applications — `vector-databases-embeddings-ann-search-and-rag-applications`
+- Venture Capital and Private Equity: How Startups Get Funded — `venture-capital-and-private-equity-how-startups-get-funded`
+- Web Performance from DNS to Browser: Find the Slow Layer — `web-performance-from-dns-to-browser-find-the-slow-layer`
+- Web Server vs Application Server: Where SEO Errors Begin — `web-server-vs-application-server-where-seo-errors-begin`
+- Web3 & Blockchain: Smart Contracts, DeFi, and Tokenomics — `web3-blockchain-smart-contracts-defi-and-tokenomics`
+- Website Migration SEO: Infrastructure Checklist Before and After Launch — `website-migration-seo-infrastructure-checklist-before-and-after-launch`
+- Website Uptime, 5xx Errors, and Crawl Reliability — `website-uptime-5xx-errors-and-crawl-reliability`
+- What a Field Study of Generative AI at Work Actually Found — `what-a-field-study-of-generative-ai-at-work-found`
+- What E-commerce’s Share of Retail Sales Measures—and What It Leaves Out — `what-ecommerce-share-of-retail-sales-measures`
+- What Happens When a Crawler Requests a URL? — `what-happens-when-a-crawler-requests-a-url`
+- What HTTP Archive’s CDN Numbers Can—and Cannot—Tell You — `what-http-archives-cdn-numbers-can-and-cannot-tell-you`
+- What the Web Almanac’s E-commerce Adoption Number Measures — `what-web-almanacs-ecommerce-adoption-number-measures`
+- Why AI Adoption Is Harder Than Building an AI Model — `why-ai-adoption-is-harder-than-building-an-ai-model`
+- Why Cybersecurity Is Becoming a Business Priority — `why-cybersecurity-is-becoming-a-business-priority`
+- Why Data Quality Matters More Than Model Complexity — `why-data-quality-matters-more-than-model-complexity`
+- Why Distribution Is Often More Important Than Product Quality — `why-distribution-is-often-more-important-than-product-quality`
+- Why Every Business Is Becoming a Software Company — `why-every-business-is-becoming-a-software-company`
+- Why GPU Computing Is Becoming a Strategic Resource — `why-gpu-computing-is-becoming-a-strategic-resource`
+- Why Learning How to Learn Is a Competitive Advantage — `why-learning-how-to-learn-is-a-competitive-advantage`
+- Why Many Startups Fail Despite Having Great Products — `why-many-startups-fail-despite-having-great-products`
+- Why People Buy Products They Don't Actually Need — `why-people-buy-products-they-dont-actually-need`
+- Why Product Assortment Matters More Than Having More Products — `why-product-assortment-matters-more-than-having-more-products`
+- Why Some SaaS Businesses Have Better Economics Than Traditional Businesses — `why-some-saas-businesses-have-better-economics-than-traditional-businesses`
+- Why Subscription Businesses Are So Attractive — `why-subscription-businesses-are-so-attractive`
+- Will AI Replace Jobs or Create an Entirely New Economy? — `will-ai-replace-jobs-or-create-an-entirely-new-economy`
+- WordPress Technical SEO: From Permalink to HTML Response — `wordpress-technical-seo-from-permalink-to-html-response`
+- Working Capital: The Cash Constraint Growth Companies Miss — `working-capital-management-growth`
+
+## Reserved titles — first batch (100)
+
+- `N-001` Context Engineering: Designing What the Model Sees, Not Just the Prompt — `context-engineering-designing-what-the-model-sees-not-just-the-prompt`
+- `N-002` Structured Output and Constrained Decoding for Production APIs — `structured-output-and-constrained-decoding-for-production-apis`
+- `N-003` Tool Calling Reliability: When Function Calls Fail in Agent Systems — `tool-calling-reliability-when-function-calls-fail-in-agent-systems`
+- `N-004` Speculative Decoding: How Draft Models Speed Up Inference — `speculative-decoding-how-draft-models-speed-up-inference`
+- `N-005` Prompt Caching: Reducing Cost on Repeated Context — `prompt-caching-reducing-cost-on-repeated-context`
+- `N-006` KV Cache and Memory: Why Long Conversations Get Expensive — `kv-cache-and-memory-why-long-conversations-get-expensive`
+- `N-007` FlashAttention and Attention Variants: What They Actually Optimize — `flashattention-and-attention-variants-what-they-actually-optimize`
+- `N-008` RoPE and Position Encoding: How Models Understand Order — `rope-and-position-encoding-how-models-understand-order`
+- `N-009` Embedding Model Selection: A Task-Driven Evaluation — `embedding-model-selection-a-task-driven-evaluation`
+- `N-010` Reranking in Retrieval Pipelines: When and Why It Pays — `reranking-in-retrieval-pipelines-when-and-why-it-pays`
+- `N-011` Knowledge Graphs for Grounded AI Applications — `knowledge-graphs-for-grounded-ai-applications`
+- `N-012` Synthetic Data for Model Training: Value and Collapse Risk — `synthetic-data-for-model-training-value-and-collapse-risk`
+- `N-013` Data Curation for LLM Pretraining: Deduplication and Quality — `data-curation-for-llm-pretraining-deduplication-and-quality`
+- `N-014` RLHF, DPO, and RLAIF: Three Ways to Align a Model — `rlhf-dpo-and-rlaif-three-ways-to-align-a-model`
+- `N-015` Reward Models and Their Failure Modes — `reward-models-and-their-failure-modes`
+- `N-016` Mechanistic Interpretability: Reading Circuits Inside a Model — `mechanistic-interpretability-reading-circuits-inside-a-model`
+- `N-017` AI Red Teaming: A Practical Methodology — `ai-red-teaming-a-practical-methodology`
+- `N-018` Test-Time Compute: Why Reasoning Models Spend More at Inference — `test-time-compute-why-reasoning-models-spend-more-at-inference`
+- `N-019` Small Language Models: When Smaller Is the Right Choice — `small-language-models-when-smaller-is-the-right-choice`
+- `N-020` Continued Pretraining for Domain Adaptation — `continued-pretraining-for-domain-adaptation`
+- `N-021` Agent Memory Architectures: Short-Term, Long-Term, and Episodic — `agent-memory-architectures-short-term-long-term-and-episodic`
+- `N-022` Multi-Agent Coordination: When More Agents Make Things Worse — `multi-agent-coordination-when-more-agents-make-things-worse`
+- `N-023` Model Context Protocol (MCP): What It Standardizes — `model-context-protocol-mcp-what-it-standardizes`
+- `N-024` Computer-Use Agents: Capabilities and Failure Modes — `computer-use-agents-capabilities-and-failure-modes`
+- `N-025` Batch Inference Economics: Throughput vs Latency — `batch-inference-economics-throughput-vs-latency`
+- `N-026` Serving Frameworks: What vLLM-Style Batching Changes — `serving-frameworks-what-vllm-style-batching-changes`
+- `N-027` Distillation in Practice: Teacher to Student on Your Task — `distillation-in-practice-teacher-to-student-on-your-task`
+- `N-028` LoRA and PEFT: Fine-Tuning Without Full Retraining — `lora-and-peft-fine-tuning-without-full-retraining`
+- `N-029` Fine-Tuning vs Continued Pretraining vs RAG: A Decision Guide — `fine-tuning-vs-continued-pretraining-vs-rag-a-decision-guide`
+- `N-030` AI for Code Review: What It Catches and What It Misses — `ai-for-code-review-what-it-catches-and-what-it-misses`
+- `N-031` AI for Data Analysis: From Question to Verified Answer — `ai-for-data-analysis-from-question-to-verified-answer`
+- `N-032` AI Product Management: From Use Case to Roadmap — `ai-product-management-from-use-case-to-roadmap`
+- `N-033` AI Risk Assessment: A Pre-Deployment Checklist — `ai-risk-assessment-a-pre-deployment-checklist`
+- `N-034` EU AI Act: What Deployers Actually Need to Know — `eu-ai-act-what-deployers-actually-need-to-know`
+- `N-035` Copyright and AI Training Data: What the Law Currently Says — `copyright-and-ai-training-data-what-the-law-currently-says`
+- `N-036` AI for Document Processing: Classification, Extraction, Redaction — `ai-for-document-processing-classification-extraction-redaction`
+- `N-037` AI for Contract Review: What to Automate and What to Escalate — `ai-for-contract-review-what-to-automate-and-what-to-escalate`
+- `N-038` AI in Customer Support: Routing, Drafting, and Handoff — `ai-in-customer-support-routing-drafting-and-handoff`
+- `N-039` AI for Sales: Research, Personalization, and Follow-Up — `ai-for-sales-research-personalization-and-follow-up`
+- `N-040` AI in Finance Operations: Reconciliation, Reporting, Controls — `ai-in-finance-operations-reconciliation-reporting-controls`
+- `N-041` AI in Legal Research: Retrieval, Summarization, Citation Checks — `ai-in-legal-research-retrieval-summarization-citation-checks`
+- `N-042` AI for Marketing Content: Drafting, Testing, and Brand Voice — `ai-for-marketing-content-drafting-testing-and-brand-voice`
+- `N-043` AI for Product Analytics: Natural Language to Insight — `ai-for-product-analytics-natural-language-to-insight`
+- `N-044` AI for HR: Screening, Onboarding, and Bias Controls — `ai-for-hr-screening-onboarding-and-bias-controls`
+- `N-045` AI for Supply Chain: Forecasting, Exceptions, Documentation — `ai-for-supply-chain-forecasting-exceptions-documentation`
+- `N-046` Lifecycle Email: Triggered Messages Across the Customer Journey — `lifecycle-email-triggered-messages-across-the-customer-journey`
+- `N-047` Personalization at Scale: What Actually Needs to Be Personal — `personalization-at-scale-what-actually-needs-to-be-personal`
+- `N-048` Loyalty Programs: When Points Change Behavior — `loyalty-programs-when-points-change-behavior`
+- `N-049` Referral Marketing: Design, Incentives, and Fraud — `referral-marketing-design-incentives-and-fraud`
+- `N-050` Pricing Psychology: Anchors, Framing, and Fairness — `pricing-psychology-anchors-framing-and-fairness`
+- `N-051` Waitlist and Launch Marketing: Building Demand Before Product — `waitlist-and-launch-marketing-building-demand-before-product`
+- `N-052` Community-Led Growth: When It Works and When It Does Not — `community-led-growth-when-it-works-and-when-it-does-not`
+- `N-053` Content Repurposing: One Asset, Many Channels — `content-repurposing-one-asset-many-channels`
+- `N-054` Search Intent Mapping: Matching Content to the Decision Stage — `search-intent-mapping-matching-content-to-the-decision-stage`
+- `N-055` Zero-Click Content: Value When Nobody Clicks — `zero-click-content-value-when-nobody-clicks`
+- `N-056` Dark Social: Measuring Sharing You Cannot See — `dark-social-measuring-sharing-you-cannot-see`
+- `N-057` Visual Identity Systems: More Than a Logo — `visual-identity-systems-more-than-a-logo`
+- `N-058` Naming and Verbal Identity: Words That Carry Strategy — `naming-and-verbal-identity-words-that-carry-strategy`
+- `N-059` Employer Branding: The Candidate as Customer — `employer-branding-the-candidate-as-customer`
+- `N-060` Brand Architecture: House of Brands vs Branded House — `brand-architecture-house-of-brands-vs-branded-house`
+- `N-061` Rebranding Without Losing Recognition — `rebranding-without-losing-recognition`
+- `N-062` Customer Advocacy and User-Generated Content — `customer-advocacy-and-user-generated-content`
+- `N-063` Online Reviews and Reputation Management — `online-reviews-and-reputation-management`
+- `N-064` NPS and Its Discontents: What the Score Does Not Say — `nps-and-its-discontents-what-the-score-does-not-say`
+- `N-065` Voice of Customer: Turning Feedback into Decisions — `voice-of-customer-turning-feedback-into-decisions`
+- `N-066` Jobs-to-be-Done as a Product and Marketing Tool — `jobs-to-be-done-as-a-product-and-marketing-tool`
+- `N-067` Customer Segmentation That Survives Contact with Sales — `customer-segmentation-that-survives-contact-with-sales`
+- `N-068` Personas Reconsidered: Evidence Over Fiction — `personas-reconsidered-evidence-over-fiction`
+- `N-069` Positioning Ladders: Competing on the Right Dimension — `positioning-ladders-competing-on-the-right-dimension`
+- `N-070` Webinar and Event Marketing in a Hybrid World — `webinar-and-event-marketing-in-a-hybrid-world`
+- `N-071` Podcast Marketing: Distribution and Measurement — `podcast-marketing-distribution-and-measurement`
+- `N-072` Affiliate Program Design: Terms, Tracking, and Trust — `affiliate-program-design-terms-tracking-and-trust`
+- `N-073` Discount and Coupon Strategy: Margin, Habit, and Signal — `discount-and-coupon-strategy-margin-habit-and-signal`
+- `N-074` Freemium Conversion: Where the Free Boundary Should Sit — `freemium-conversion-where-the-free-boundary-should-sit`
+- `N-075` Trial Design: Time, Features, and Human Help — `trial-design-time-features-and-human-help`
+- `N-076` Brand Voice Guidelines That People Actually Use — `brand-voice-guidelines-that-people-actually-use`
+- `N-077` Content Operations: Calendars, Roles, and Review Loops — `content-operations-calendars-roles-and-review-loops`
+- `N-078` Crisis Communication Templates: Before You Need Them — `crisis-communication-templates-before-you-need-them`
+- `N-079` Internal Communications as a Strategy Tool — `internal-communications-as-a-strategy-tool`
+- `N-080` Executive Communication: The Five-Minute Update — `executive-communication-the-five-minute-update`
+- `N-081` Cash Flow Forecasting: A 13-Week Operating Model — `cash-flow-forecasting-a-13-week-operating-model`
+- `N-082` Burn Rate and Runway: The Founder's Daily Number — `burn-rate-and-runway-the-founder-s-daily-number`
+- `N-083` Cap Table Mechanics: Equity, Options, and Dilution — `cap-table-mechanics-equity-options-and-dilution`
+- `N-084` Startup Valuation Methods Compared — `startup-valuation-methods-compared`
+- `N-085` SAFE Notes and Convertible Instruments — `safe-notes-and-convertible-instruments`
+- `N-086` Term Sheet Basics: What Founders Should Read Twice — `term-sheet-basics-what-founders-should-read-twice`
+- `N-087` Dividend Policy and Share Buybacks — `dividend-policy-and-share-buybacks`
+- `N-088` Debt Restructuring: Workouts and Covenants — `debt-restructuring-workouts-and-covenants`
+- `N-089` The Yield Curve Shape: What It Signals and Does Not — `the-yield-curve-shape-what-it-signals-and-does-not`
+- `N-090` Real Interest Rates: Inflation Adjustment in Practice — `real-interest-rates-inflation-adjustment-in-practice`
+- `N-091` Portfolio Rebalancing: Rules, Costs, and Taxes — `portfolio-rebalancing-rules-costs-and-taxes`
+- `N-092` Asset Allocation for Long Horizons — `asset-allocation-for-long-horizons`
+- `N-093` Factor Investing: Value, Momentum, and Their Limits — `factor-investing-value-momentum-and-their-limits`
+- `N-094` ETF vs Mutual Fund: Structure, Cost, and Liquidity — `etf-vs-mutual-fund-structure-cost-and-liquidity`
+- `N-095` Financial Modeling Best Practices and Common Errors — `financial-modeling-best-practices-and-common-errors`
+- `N-096` Scenario Analysis and Monte Carlo: When to Use Each — `scenario-analysis-and-monte-carlo-when-to-use-each`
+- `N-097` Sensitivity Analysis That Changes a Decision — `sensitivity-analysis-that-changes-a-decision`
+- `N-098` DCF Pitfalls: The Assumptions That Break Valuation — `dcf-pitfalls-the-assumptions-that-break-valuation`
+- `N-099` Comparable Company Analysis: Selecting and Adjusting Peers — `comparable-company-analysis-selecting-and-adjusting-peers`
+- `N-100` Earnings Quality: Accruals, Estimates, and Red Flags — `earnings-quality-accruals-estimates-and-red-flags`
+
+## High-intent backlog (50)
+
+- `B-001` How to Write a System Prompt That Actually Works — `how-to-write-a-system-prompt-that-actually-works`
+- `B-002` Prompt Engineering Examples for Everyday Work — `prompt-engineering-examples-for-everyday-work`
+- `B-003` LLM Cost Estimator: How to Predict Your Monthly Bill — `llm-cost-estimator-how-to-predict-your-monthly-bill`
+- `B-004` LLM Benchmarks Explained Without the Hype — `llm-benchmarks-explained-without-the-hype`
+- `B-005` What Is a Reasoning Model and When to Use One — `what-is-a-reasoning-model-and-when-to-use-one`
+- `B-006` How to Reduce Hallucinations in LLM Applications — `how-to-reduce-hallucinations-in-llm-applications`
+- `B-007` AI Workflow Automation: Patterns and Examples — `ai-workflow-automation-patterns-and-examples`
+- `B-008` How to Build an AI Chatbot That Does Not Fail — `how-to-build-an-ai-chatbot-that-does-not-fail`
+- `B-009` Best Open-Weight Language Models in 2026 — `best-open-weight-language-models-in-2026`
+- `B-010` AI for Spreadsheets: Practical Workflows — `ai-for-spreadsheets-practical-workflows`
+- `B-011` How to Automate Reporting with AI — `how-to-automate-reporting-with-ai`
+- `B-012` AI Tools for Product Managers: A Practical Shortlist — `ai-tools-for-product-managers-a-practical-shortlist`
+- `B-013` What Is Model Collapse and Why It Matters — `what-is-model-collapse-and-why-it-matters`
+- `B-014` How to Write an AI Evaluation Rubric — `how-to-write-an-ai-evaluation-rubric`
+- `B-015` AI Content Detection: What It Can and Cannot Prove — `ai-content-detection-what-it-can-and-cannot-prove`
+- `B-016` How to Measure AI Adoption in Your Organization — `how-to-measure-ai-adoption-in-your-organization`
+- `B-017` AI Governance Checklist for Small Teams — `ai-governance-checklist-for-small-teams`
+- `B-018` Generative AI Security Checklist — `generative-ai-security-checklist`
+- `B-019` How to Choose Between Cloud and On-Device AI — `how-to-choose-between-cloud-and-on-device-ai`
+- `B-020` AI Translation: Where It Works and Where It Fails — `ai-translation-where-it-works-and-where-it-fails`
+- `B-021` Email Marketing Metrics That Matter — `email-marketing-metrics-that-matter`
+- `B-022` How to Write Subject Lines People Open — `how-to-write-subject-lines-people-open`
+- `B-023` Customer Retention Strategies With Examples — `customer-retention-strategies-with-examples`
+- `B-024` How to Build a Marketing Funnel From Scratch — `how-to-build-a-marketing-funnel-from-scratch`
+- `B-025` Brand Awareness Metrics That Are Actually Useful — `brand-awareness-metrics-that-are-actually-useful`
+- `B-026` Content Marketing Examples That Convert — `content-marketing-examples-that-convert`
+- `B-027` Keyword Research for AI Search Answers — `keyword-research-for-ai-search-answers`
+- `B-028` Landing Page Best Practices for B2B — `landing-page-best-practices-for-b2b`
+- `B-029` Marketing Budget Template and Allocation Rules — `marketing-budget-template-and-allocation-rules`
+- `B-030` How to Measure Brand Lift — `how-to-measure-brand-lift`
+- `B-031` Customer Journey Mapping: A Template — `customer-journey-mapping-a-template`
+- `B-032` How to Write a Value Proposition — `how-to-write-a-value-proposition`
+- `B-033` Pricing Page Best Practices — `pricing-page-best-practices`
+- `B-034` How to Grow a Newsletter From Zero — `how-to-grow-a-newsletter-from-zero`
+- `B-035` Social Media Content Calendar Template — `social-media-content-calendar-template`
+- `B-036` How to Get More Customer Reviews — `how-to-get-more-customer-reviews`
+- `B-037` Marketing Automation Examples for Small Teams — `marketing-automation-examples-for-small-teams`
+- `B-038` How to Brief a Designer for Brand Work — `how-to-brief-a-designer-for-brand-work`
+- `B-039` Brand Guidelines Template: What to Include — `brand-guidelines-template-what-to-include`
+- `B-040` How to Run a Competitive Positioning Workshop — `how-to-run-a-competitive-positioning-workshop`
+- `B-041` EBITDA Explained: What It Measures and What It Hides — `ebitda-explained-what-it-measures-and-what-it-hides`
+- `B-042` Free Cash Flow Explained With an Example — `free-cash-flow-explained-with-an-example`
+- `B-043` How to Analyze a Company Before Investing — `how-to-analyze-a-company-before-investing`
+- `B-044` How to Value a Public Company: Three Methods — `how-to-value-a-public-company-three-methods`
+- `B-045` Compound Interest Examples That Make It Click — `compound-interest-examples-that-make-it-click`
+- `B-046` Emergency Fund: How Much You Actually Need — `emergency-fund-how-much-you-actually-need`
+- `B-047` How to Build Wealth on a Middle Income — `how-to-build-wealth-on-a-middle-income`
+- `B-048` Tax-Efficient Investing Basics — `tax-efficient-investing-basics`
+- `B-049` ETF vs Individual Stocks: The Real Trade-Offs — `etf-vs-individual-stocks-the-real-trade-offs`
+- `B-050` How to Compare Two Companies' Financials — `how-to-compare-two-companies-financials`
+
+## Reserved titles — scale-up bank (613)
+
+- `T-001` Brand Awareness Tracking Best Practices — `brand-awareness-tracking-best-practices`
+- `T-002` Threat Modeling Checklist — `threat-modeling-checklist`
+- `T-003` Market Cycles for Beginners — `market-cycles-for-beginners`
+- `T-004` Futures Markets Mistakes to Avoid — `futures-markets-mistakes-to-avoid`
+- `T-005` Getting Started with Account-based Marketing — `getting-started-with-account-based-marketing`
+- `T-006` Referral Programs without the Hype — `referral-programs-without-the-hype`
+- `T-007` Retail Technology Best Practices — `retail-technology-best-practices`
+- `T-008` CI/CD Pipelines Metrics that Matter — `ci-cd-pipelines-metrics-that-matter`
+- `T-009` Message Queues Explained — `message-queues-explained`
+- `T-010` Mobile-first Indexing Costs Explained — `mobile-first-indexing-costs-explained`
+- `T-011` Customer Segmentation Metrics that Matter — `customer-segmentation-metrics-that-matter`
+- `T-012` Growth Loops Pitfalls — `growth-loops-pitfalls`
+- `T-013` Server-side Tagging without the Hype — `server-side-tagging-without-the-hype`
+- `T-014` Competitive Battlecards without the Hype — `competitive-battlecards-without-the-hype`
+- `T-015` Procurement Marketing Costs Explained — `procurement-marketing-costs-explained`
+- `T-016` Local SEO Trade-Offs — `local-seo-trade-offs`
+- `T-017` GDPR Compliance Costs Explained — `gdpr-compliance-costs-explained`
+- `T-018` How to Get Product Management Right — `how-to-get-product-management-right`
+- `T-019` Network Effects without the Hype — `network-effects-without-the-hype`
+- `T-020` Getting Started with Retail Media Buying — `getting-started-with-retail-media-buying`
+- `T-021` How to Evaluate AI Search — `how-to-evaluate-ai-search`
+- `T-022` Distributed Tracing in Practice — `distributed-tracing-in-practice`
+- `T-023` Venture Debt Best Practices — `venture-debt-best-practices`
+- `T-024` Marketing Dashboards without the Hype — `marketing-dashboards-without-the-hype`
+- `T-025` How to Get Creative Testing Right — `how-to-get-creative-testing-right`
+- `T-026` Runway Extension Trade-Offs — `runway-extension-trade-offs`
+- `T-027` Getting Started with AI for Energy — `getting-started-with-ai-for-energy`
+- `T-028` Font Loading: a Decision Framework — `font-loading-a-decision-framework`
+- `T-029` Getting Started with Estate Planning — `getting-started-with-estate-planning`
+- `T-030` Retirement Planning for Small Teams — `retirement-planning-for-small-teams`
+- `T-031` Sales Enablement Metrics that Matter — `sales-enablement-metrics-that-matter`
+- `T-032` FlashAttention for Small Teams — `flashattention-for-small-teams`
+- `T-033` First-party Data Trade-Offs — `first-party-data-trade-offs`
+- `T-034` AI for Healthcare Operations Pitfalls — `ai-for-healthcare-operations-pitfalls`
+- `T-035` How to Evaluate Martech Stacks — `how-to-evaluate-martech-stacks`
+- `T-036` What AI Search Actually Measures — `what-ai-search-actually-measures`
+- `T-037` Search Intent Mapping Metrics that Matter — `search-intent-mapping-metrics-that-matter`
+- `T-038` Equity Financing Pitfalls — `equity-financing-pitfalls`
+- `T-039` Team Culture for Beginners — `team-culture-for-beginners`
+- `T-040` What Risk-adjusted Returns Actually Measures — `what-risk-adjusted-returns-actually-measures`
+- `T-041` How to Evaluate Image Optimization — `how-to-evaluate-image-optimization`
+- `T-042` Skill Development Examples — `skill-development-examples`
+- `T-043` Correlation Analysis Costs Explained — `correlation-analysis-costs-explained`
+- `T-044` Survey Design Explained — `survey-design-explained`
+- `T-045` How to Evaluate Long-context Retrieval — `how-to-evaluate-long-context-retrieval`
+- `T-046` REIT Analysis: Common Questions — `reit-analysis-common-questions`
+- `T-047` How to Evaluate Robots.txt Parsing — `how-to-evaluate-robots-txt-parsing`
+- `T-048` Store Formats Examples — `store-formats-examples`
+- `T-049` Agent Evaluation Examples — `agent-evaluation-examples`
+- `T-050` CLS Diagnosis Pitfalls — `cls-diagnosis-pitfalls`
+- `T-051` Profitability Ratios Costs Explained — `profitability-ratios-costs-explained`
+- `T-052` How to Get AI Safety Cases Right — `how-to-get-ai-safety-cases-right`
+- `T-053` AI HR Screening Checklist — `ai-hr-screening-checklist`
+- `T-054` 404 Handling Best Practices — `404-handling-best-practices`
+- `T-055` Options Strategies Explained — `options-strategies-explained`
+- `T-056` AI Legal Research: a Decision Framework — `ai-legal-research-a-decision-framework`
+- `T-057` Getting Started with Martech Stacks — `getting-started-with-martech-stacks`
+- `T-058` AI Agent Memory without the Hype — `ai-agent-memory-without-the-hype`
+- `T-059` Credit Ratings: Common Questions — `credit-ratings-common-questions`
+- `T-060` Influencer Contracts Mistakes to Avoid — `influencer-contracts-mistakes-to-avoid`
+- `T-061` Time Management for Small Teams — `time-management-for-small-teams`
+- `T-062` Marketplaces in Practice — `marketplaces-in-practice`
+- `T-063` How to Evaluate International SEO — `how-to-evaluate-international-seo`
+- `T-064` Decision Making for Small Teams — `decision-making-for-small-teams`
+- `T-065` Security Headers Explained — `security-headers-explained`
+- `T-066` Model Distillation for Small Teams — `model-distillation-for-small-teams`
+- `T-067` Getting Started with Customer Retention — `getting-started-with-customer-retention`
+- `T-068` E-E-A-T in Practice — `e-e-a-t-in-practice`
+- `T-069` Conflict Resolution Examples — `conflict-resolution-examples`
+- `T-070` Rollback Strategies Best Practices — `rollback-strategies-best-practices`
+- `T-071` What Category Design Actually Measures — `what-category-design-actually-measures`
+- `T-072` AI Supply Chain Forecasting Trade-Offs — `ai-supply-chain-forecasting-trade-offs`
+- `T-073` Insurance Basics for Small Teams — `insurance-basics-for-small-teams`
+- `T-074` Feedback Delivery Checklist — `feedback-delivery-checklist`
+- `T-075` Duration Risk Mistakes to Avoid — `duration-risk-mistakes-to-avoid`
+- `T-076` Bond Pricing: Common Questions — `bond-pricing-common-questions`
+- `T-077` 5xx Errors: Common Questions — `5xx-errors-common-questions`
+- `T-078` Income Statement Analysis Metrics that Matter — `income-statement-analysis-metrics-that-matter`
+- `T-079` Wholesale Pitfalls — `wholesale-pitfalls`
+- `T-080` Getting Started with AI Document Extraction — `getting-started-with-ai-document-extraction`
+- `T-081` URL Structure for Small Teams — `url-structure-for-small-teams`
+- `T-082` How to Get Problem Solving Right — `how-to-get-problem-solving-right`
+- `T-083` AI for Agriculture: Common Questions — `ai-for-agriculture-common-questions`
+- `T-084` Multimodal Models Trade-Offs — `multimodal-models-trade-offs`
+- `T-085` Waitlist Campaigns Costs Explained — `waitlist-campaigns-costs-explained`
+- `T-086` Product-led Growth Explained — `product-led-growth-explained`
+- `T-087` AI Product Analytics Metrics that Matter — `ai-product-analytics-metrics-that-matter`
+- `T-088` Food and Beverage Metrics that Matter — `food-and-beverage-metrics-that-matter`
+- `T-089` Web Accessibility at Scale — `web-accessibility-at-scale`
+- `T-090` Last-mile Delivery Explained — `last-mile-delivery-explained`
+- `T-091` Commodity Markets Best Practices — `commodity-markets-best-practices`
+- `T-092` How to Evaluate SIEM — `how-to-evaluate-siem`
+- `T-093` Hiring Trade-Offs — `hiring-trade-offs`
+- `T-094` Storytelling Metrics that Matter — `storytelling-metrics-that-matter`
+- `T-095` Fashion Retail for Beginners — `fashion-retail-for-beginners`
+- `T-096` Review Management Pitfalls — `review-management-pitfalls`
+- `T-097` Getting Started with AI Approval Gates — `getting-started-with-ai-approval-gates`
+- `T-098` Bootstrapping at Scale — `bootstrapping-at-scale`
+- `T-099` Referral Programs Metrics that Matter — `referral-programs-metrics-that-matter`
+- `T-100` HSTS Metrics that Matter — `hsts-metrics-that-matter`
+- `T-101` Digital Shelves Mistakes to Avoid — `digital-shelves-mistakes-to-avoid`
+- `T-102` AI Literacy Checklist — `ai-literacy-checklist`
+- `T-103` How to Evaluate Term Sheets — `how-to-evaluate-term-sheets`
+- `T-104` Real Estate Markets Costs Explained — `real-estate-markets-costs-explained`
+- `T-105` AI Search Best Practices — `ai-search-best-practices`
+- `T-106` How to Evaluate Oil Markets — `how-to-evaluate-oil-markets`
+- `T-107` Failure Recovery: Common Questions — `failure-recovery-common-questions`
+- `T-108` LLM Inference Cost Pitfalls — `llm-inference-cost-pitfalls`
+- `T-109` What Commodity Markets Actually Measures — `what-commodity-markets-actually-measures`
+- `T-110` Financial Modeling Mistakes to Avoid — `financial-modeling-mistakes-to-avoid`
+- `T-111` NoSQL Design at Scale — `nosql-design-at-scale`
+- `T-112` Distribution Channels in Practice — `distribution-channels-in-practice`
+- `T-113` Franchising for Small Teams — `franchising-for-small-teams`
+- `T-114` Engineering Management Costs Explained — `engineering-management-costs-explained`
+- `T-115` Third-party Scripts Examples — `third-party-scripts-examples`
+- `T-116` How to Evaluate AI Voice Agents — `how-to-evaluate-ai-voice-agents`
+- `T-117` Promotions Costs Explained — `promotions-costs-explained`
+- `T-118` Influence in Practice — `influence-in-practice`
+- `T-119` Inventory Accuracy Mistakes to Avoid — `inventory-accuracy-mistakes-to-avoid`
+- `T-120` Factor Investing Costs Explained — `factor-investing-costs-explained`
+- `T-121` LCP Optimization Pitfalls — `lcp-optimization-pitfalls`
+- `T-122` Cross-functional Collaboration Best Practices — `cross-functional-collaboration-best-practices`
+- `T-123` Consulting Costs Explained — `consulting-costs-explained`
+- `T-124` Discount Strategy Pitfalls — `discount-strategy-pitfalls`
+- `T-125` Cloud Cost for Beginners — `cloud-cost-for-beginners`
+- `T-126` Newsletter Growth for Beginners — `newsletter-growth-for-beginners`
+- `T-127` Travel Industry at Scale — `travel-industry-at-scale`
+- `T-128` Docker Images without the Hype — `docker-images-without-the-hype`
+- `T-129` Hiring Checklist — `hiring-checklist`
+- `T-130` Lifecycle Messaging Explained — `lifecycle-messaging-explained`
+- `T-131` Systems Thinking: Common Questions — `systems-thinking-common-questions`
+- `T-132` How to Evaluate Event Marketing — `how-to-evaluate-event-marketing`
+- `T-133` Negotiation: a Decision Framework — `negotiation-a-decision-framework`
+- `T-134` AI for Cybersecurity Metrics that Matter — `ai-for-cybersecurity-metrics-that-matter`
+- `T-135` How to Evaluate Yield Curve — `how-to-evaluate-yield-curve`
+- `T-136` Inventory Management Metrics that Matter — `inventory-management-metrics-that-matter`
+- `T-137` Career Transitions for Beginners — `career-transitions-for-beginners`
+- `T-138` AI for Manufacturing in Practice — `ai-for-manufacturing-in-practice`
+- `T-139` Mentorship Explained — `mentorship-explained`
+- `T-140` Core Web Vitals: a Decision Framework — `core-web-vitals-a-decision-framework`
+- `T-141` Dividend Policy Best Practices — `dividend-policy-best-practices`
+- `T-142` Data Modeling Explained — `data-modeling-explained`
+- `T-143` Synthetic Data for Beginners — `synthetic-data-for-beginners`
+- `T-144` Trade Promotions in Practice — `trade-promotions-in-practice`
+- `T-145` Server Log Analysis Metrics that Matter — `server-log-analysis-metrics-that-matter`
+- `T-146` Mechanistic Interpretability Examples — `mechanistic-interpretability-examples`
+- `T-147` Getting Started with Personal Branding — `getting-started-with-personal-branding`
+- `T-148` RoPE Position Encoding Metrics that Matter — `rope-position-encoding-metrics-that-matter`
+- `T-149` Loss Prevention for Small Teams — `loss-prevention-for-small-teams`
+- `T-150` CRM Marketing Trade-Offs — `crm-marketing-trade-offs`
+- `T-151` AI Fallback Design Explained — `ai-fallback-design-explained`
+- `T-152` How to Evaluate Landing Page Testing — `how-to-evaluate-landing-page-testing`
+- `T-153` Lazy Loading without the Hype — `lazy-loading-without-the-hype`
+- `T-154` Knowledge Graphs: Common Questions — `knowledge-graphs-common-questions`
+- `T-155` Structured Logging: a Decision Framework — `structured-logging-a-decision-framework`
+- `T-156` What Dividend Policy Actually Measures — `what-dividend-policy-actually-measures`
+- `T-157` Incident Response at Scale — `incident-response-at-scale`
+- `T-158` Upskilling Checklist — `upskilling-checklist`
+- `T-159` Efficiency Ratios Examples — `efficiency-ratios-examples`
+- `T-160` Customer Advocacy for Beginners — `customer-advocacy-for-beginners`
+- `T-161` Supply Chains Metrics that Matter — `supply-chains-metrics-that-matter`
+- `T-162` ETL Orchestration Mistakes to Avoid — `etl-orchestration-mistakes-to-avoid`
+- `T-163` Professional Reputation Pitfalls — `professional-reputation-pitfalls`
+- `T-164` Performance Reviews Costs Explained — `performance-reviews-costs-explained`
+- `T-165` Infrastructure as Code Mistakes to Avoid — `infrastructure-as-code-mistakes-to-avoid`
+- `T-166` How to Get Systems Thinking Right — `how-to-get-systems-thinking-right`
+- `T-167` How to Get Hedging Right — `how-to-get-hedging-right`
+- `T-168` What Win-back Campaigns Actually Measures — `what-win-back-campaigns-actually-measures`
+- `T-169` AI Red Teaming Metrics that Matter — `ai-red-teaming-metrics-that-matter`
+- `T-170` DNS Resolution Examples — `dns-resolution-examples`
+- `T-171` Promotion Decisions for Beginners — `promotion-decisions-for-beginners`
+- `T-172` KV Cache Management Examples — `kv-cache-management-examples`
+- `T-173` Retail Analytics Costs Explained — `retail-analytics-costs-explained`
+- `T-174` Async Work Metrics that Matter — `async-work-metrics-that-matter`
+- `T-175` How to Get Emergency Funds Right — `how-to-get-emergency-funds-right`
+- `T-176` Inflation Adjustment Trade-Offs — `inflation-adjustment-trade-offs`
+- `T-177` Lead Scoring Explained — `lead-scoring-explained`
+- `T-178` How to Evaluate Monetary Policy — `how-to-evaluate-monetary-policy`
+- `T-179` AI Voice Agents: Common Questions — `ai-voice-agents-common-questions`
+- `T-180` Leverage Ratios Metrics that Matter — `leverage-ratios-metrics-that-matter`
+- `T-181` Retail Media for Beginners — `retail-media-for-beginners`
+- `T-182` QUIC Transport: Common Questions — `quic-transport-common-questions`
+- `T-183` 5xx Errors Best Practices — `5xx-errors-best-practices`
+- `T-184` Server-side Tagging: Common Questions — `server-side-tagging-common-questions`
+- `T-185` Podcast Marketing: Common Questions — `podcast-marketing-common-questions`
+- `T-186` Data Curation at Scale — `data-curation-at-scale`
+- `T-187` Shrinkage Metrics that Matter — `shrinkage-metrics-that-matter`
+- `T-188` Customer Acquisition Cost Costs Explained — `customer-acquisition-cost-costs-explained`
+- `T-189` EBITDA Quality without the Hype — `ebitda-quality-without-the-hype`
+- `T-190` Cache-Control Headers Costs Explained — `cache-control-headers-costs-explained`
+- `T-191` AI Build Versus Buy Explained — `ai-build-versus-buy-explained`
+- `T-192` Getting Started with Rollback Strategies — `getting-started-with-rollback-strategies`
+- `T-193` Getting Started with System Design Interviews — `getting-started-with-system-design-interviews`
+- `T-194` Churn Reduction Examples — `churn-reduction-examples`
+- `T-195` Small Language Models Checklist — `small-language-models-checklist`
+- `T-196` Diversification at Scale — `diversification-at-scale`
+- `T-197` Demand Forecasting Metrics that Matter — `demand-forecasting-metrics-that-matter`
+- `T-198` Planograms: a Decision Framework — `planograms-a-decision-framework`
+- `T-199` AI Vendor Selection Explained — `ai-vendor-selection-explained`
+- `T-200` Private Label: a Decision Framework — `private-label-a-decision-framework`
+- `T-201` What Data Governance Actually Measures — `what-data-governance-actually-measures`
+- `T-202` Meeting Culture for Beginners — `meeting-culture-for-beginners`
+- `T-203` Docker Images: Common Questions — `docker-images-common-questions`
+- `T-204` AI for Agriculture Checklist — `ai-for-agriculture-checklist`
+- `T-205` Model Routing Metrics that Matter — `model-routing-metrics-that-matter`
+- `T-206` Accrual Analysis Mistakes to Avoid — `accrual-analysis-mistakes-to-avoid`
+- `T-207` AI Sales Research Mistakes to Avoid — `ai-sales-research-mistakes-to-avoid`
+- `T-208` INP Optimization Costs Explained — `inp-optimization-costs-explained`
+- `T-209` Subject Line Testing Costs Explained — `subject-line-testing-costs-explained`
+- `T-210` Getting Started with Canary Releases — `getting-started-with-canary-releases`
+- `T-211` Employee Onboarding: a Decision Framework — `employee-onboarding-a-decision-framework`
+- `T-212` Postmortems without the Hype — `postmortems-without-the-hype`
+- `T-213` What Agentic Workflows Actually Measures — `what-agentic-workflows-actually-measures`
+- `T-214` Comparable Companies Examples — `comparable-companies-examples`
+- `T-215` EU AI Act Compliance in Practice — `eu-ai-act-compliance-in-practice`
+- `T-216` TLS Certificates: a Decision Framework — `tls-certificates-a-decision-framework`
+- `T-217` Career Ladders Costs Explained — `career-ladders-costs-explained`
+- `T-218` Zero-click Content Metrics that Matter — `zero-click-content-metrics-that-matter`
+- `T-219` Campaign Measurement at Scale — `campaign-measurement-at-scale`
+- `T-220` Tool Calling Examples — `tool-calling-examples`
+- `T-221` How to Get Emerging Markets Right — `how-to-get-emerging-markets-right`
+- `T-222` Media Planning: Common Questions — `media-planning-common-questions`
+- `T-223` Customer Experience Examples — `customer-experience-examples`
+- `T-224` Getting Started with Lazy Loading — `getting-started-with-lazy-loading`
+- `T-225` Database Replication in Practice — `database-replication-in-practice`
+- `T-226` Query Planners in Practice — `query-planners-in-practice`
+- `T-227` Documentation Design for Beginners — `documentation-design-for-beginners`
+- `T-228` AI Content Moderation without the Hype — `ai-content-moderation-without-the-hype`
+- `T-229` Store Pricing Checklist — `store-pricing-checklist`
+- `T-230` Bear Markets for Small Teams — `bear-markets-for-small-teams`
+- `T-231` Mental Models Metrics that Matter — `mental-models-metrics-that-matter`
+- `T-232` Error Budgets Pitfalls — `error-budgets-pitfalls`
+- `T-233` Continued Pretraining Trade-Offs — `continued-pretraining-trade-offs`
+- `T-234` Affiliate Programs in Practice — `affiliate-programs-in-practice`
+- `T-235` Problem Solving without the Hype — `problem-solving-without-the-hype`
+- `T-236` Hospitality at Scale — `hospitality-at-scale`
+- `T-237` Serverless: a Decision Framework — `serverless-a-decision-framework`
+- `T-238` Model Monitoring Examples — `model-monitoring-examples`
+- `T-239` Feature Stores for Beginners — `feature-stores-for-beginners`
+- `T-240` HTTP Semantics without the Hype — `http-semantics-without-the-hype`
+- `T-241` AI Risk Assessment Metrics that Matter — `ai-risk-assessment-metrics-that-matter`
+- `T-242` Capacity Planning Checklist — `capacity-planning-checklist`
+- `T-243` Postmortems Checklist — `postmortems-checklist`
+- `T-244` Getting Started with Search Console — `getting-started-with-search-console`
+- `T-245` SLOs Metrics that Matter — `slos-metrics-that-matter`
+- `T-246` Sponsorship Examples — `sponsorship-examples`
+- `T-247` Decentralized Finance: Common Questions — `decentralized-finance-common-questions`
+- `T-248` How to Evaluate Prioritization — `how-to-evaluate-prioritization`
+- `T-249` AI for Data Analysis Checklist — `ai-for-data-analysis-checklist`
+- `T-250` Employer Branding: Common Questions — `employer-branding-common-questions`
+- `T-251` Getting Started with Zero Trust — `getting-started-with-zero-trust`
+- `T-252` How to Get Procurement Marketing Right — `how-to-get-procurement-marketing-right`
+- `T-253` Online Review Strategy Pitfalls — `online-review-strategy-pitfalls`
+- `T-254` Volatility for Small Teams — `volatility-for-small-teams`
+- `T-255` How to Evaluate Canary Releases — `how-to-evaluate-canary-releases`
+- `T-256` Reverse Logistics Best Practices — `reverse-logistics-best-practices`
+- `T-257` Inventory Financing for Beginners — `inventory-financing-for-beginners`
+- `T-258` Secondary Markets: Common Questions — `secondary-markets-common-questions`
+- `T-259` Working Capital for Small Teams — `working-capital-for-small-teams`
+- `T-260` Disaster Recovery: a Decision Framework — `disaster-recovery-a-decision-framework`
+- `T-261` Privacy Sandbox Trade-Offs — `privacy-sandbox-trade-offs`
+- `T-262` Public Speaking Pitfalls — `public-speaking-pitfalls`
+- `T-263` How to Evaluate Promotions — `how-to-evaluate-promotions`
+- `T-264` Rollback Strategies Trade-Offs — `rollback-strategies-trade-offs`
+- `T-265` AI for Government Costs Explained — `ai-for-government-costs-explained`
+- `T-266` POS Systems for Beginners — `pos-systems-for-beginners`
+- `T-267` Activation Emails Costs Explained — `activation-emails-costs-explained`
+- `T-268` E-commerce Operations Pitfalls — `e-commerce-operations-pitfalls`
+- `T-269` Convexity Explained — `convexity-explained`
+- `T-270` Agent Observability Trade-Offs — `agent-observability-trade-offs`
+- `T-271` How to Evaluate Drift Detection — `how-to-evaluate-drift-detection`
+- `T-272` Balance Sheet Analysis for Beginners — `balance-sheet-analysis-for-beginners`
+- `T-273` AI for Education Checklist — `ai-for-education-checklist`
+- `T-274` Merchandising for Beginners — `merchandising-for-beginners`
+- `T-275` How to Evaluate Incrementality Testing — `how-to-evaluate-incrementality-testing`
+- `T-276` How to Evaluate AI-assisted Code Review — `how-to-evaluate-ai-assisted-code-review`
+- `T-277` Interest Rate Risk: Common Questions — `interest-rate-risk-common-questions`
+- `T-278` What Privacy Sandbox Actually Measures — `what-privacy-sandbox-actually-measures`
+- `T-279` AI Red Teaming Trade-Offs — `ai-red-teaming-trade-offs`
+- `T-280` AI Agent Memory Best Practices — `ai-agent-memory-best-practices`
+- `T-281` What Mental Models Actually Measures — `what-mental-models-actually-measures`
+- `T-282` Getting Started with Indexing Diagnostics — `getting-started-with-indexing-diagnostics`
+- `T-283` Editorial Calendars Checklist — `editorial-calendars-checklist`
+- `T-284` Carbon Markets Trade-Offs — `carbon-markets-trade-offs`
+- `T-285` Reranking Examples — `reranking-examples`
+- `T-286` How to Get Discounted Cash Flow Right — `how-to-get-discounted-cash-flow-right`
+- `T-287` How to Get First-party Data Right — `how-to-get-first-party-data-right`
+- `T-288` Keyword Research Costs Explained — `keyword-research-costs-explained`
+- `T-289` What DPO Alignment Actually Measures — `what-dpo-alignment-actually-measures`
+- `T-290` Thin Content Examples — `thin-content-examples`
+- `T-291` AI Approval Gates Best Practices — `ai-approval-gates-best-practices`
+- `T-292` MLOps Examples — `mlops-examples`
+- `T-293` What Luxury Retail Actually Measures — `what-luxury-retail-actually-measures`
+- `T-294` Inventory Accuracy without the Hype — `inventory-accuracy-without-the-hype`
+- `T-295` Net Promoter Score in Practice — `net-promoter-score-in-practice`
+- `T-296` Buyer Enablement for Beginners — `buyer-enablement-for-beginners`
+- `T-297` Return on Ad Spend at Scale — `return-on-ad-spend-at-scale`
+- `T-298` Dark Social in Practice — `dark-social-in-practice`
+- `T-299` Reskilling Explained — `reskilling-explained`
+- `T-300` How to Get Brand Lift Measurement Right — `how-to-get-brand-lift-measurement-right`
+- `T-301` Kubernetes Scheduling: a Decision Framework — `kubernetes-scheduling-a-decision-framework`
+- `T-302` Model Routing Trade-Offs — `model-routing-trade-offs`
+- `T-303` Martech Stacks Trade-Offs — `martech-stacks-trade-offs`
+- `T-304` Referral Loops for Small Teams — `referral-loops-for-small-teams`
+- `T-305` Structured Outputs: Common Questions — `structured-outputs-common-questions`
+- `T-306` AI Content Moderation: Common Questions — `ai-content-moderation-common-questions`
+- `T-307` Getting Started with Creative Testing — `getting-started-with-creative-testing`
+- `T-308` Conjoint Analysis Trade-Offs — `conjoint-analysis-trade-offs`
+- `T-309` Paid Search Examples — `paid-search-examples`
+- `T-310` Luxury Retail Metrics that Matter — `luxury-retail-metrics-that-matter`
+- `T-311` First Principles for Beginners — `first-principles-for-beginners`
+- `T-312` Observability Mistakes to Avoid — `observability-mistakes-to-avoid`
+- `T-313` AI for Real Estate Metrics that Matter — `ai-for-real-estate-metrics-that-matter`
+- `T-314` Consumer Electronics Mistakes to Avoid — `consumer-electronics-mistakes-to-avoid`
+- `T-315` Consent Mode without the Hype — `consent-mode-without-the-hype`
+- `T-316` Display Advertising Explained — `display-advertising-explained`
+- `T-317` Monte Carlo Simulation Best Practices — `monte-carlo-simulation-best-practices`
+- `T-318` Shopper Marketing Checklist — `shopper-marketing-checklist`
+- `T-319` AI Video Generation Best Practices — `ai-video-generation-best-practices`
+- `T-320` Presentation Skills at Scale — `presentation-skills-at-scale`
+- `T-321` AI for Energy Examples — `ai-for-energy-examples`
+- `T-322` Circular Economy Metrics that Matter — `circular-economy-metrics-that-matter`
+- `T-323` Technical Writing for Small Teams — `technical-writing-for-small-teams`
+- `T-324` B2B Demand Generation at Scale — `b2b-demand-generation-at-scale`
+- `T-325` Entrepreneurship Metrics that Matter — `entrepreneurship-metrics-that-matter`
+- `T-326` Server-side Tagging Trade-Offs — `server-side-tagging-trade-offs`
+- `T-327` Receivables Management in Practice — `receivables-management-in-practice`
+- `T-328` AI-assisted Writing Examples — `ai-assisted-writing-examples`
+- `T-329` Burn Rate: a Decision Framework — `burn-rate-a-decision-framework`
+- `T-330` What Knowledge Graphs Actually Measures — `what-knowledge-graphs-actually-measures`
+- `T-331` Leverage Ratios: Common Questions — `leverage-ratios-common-questions`
+- `T-332` Real Interest Rates without the Hype — `real-interest-rates-without-the-hype`
+- `T-333` What Paid Social Actually Measures — `what-paid-social-actually-measures`
+- `T-334` Channel Conflict Metrics that Matter — `channel-conflict-metrics-that-matter`
+- `T-335` Terraform for Beginners — `terraform-for-beginners`
+- `T-336` Remote Work Mistakes to Avoid — `remote-work-mistakes-to-avoid`
+- `T-337` Indexing Diagnostics Best Practices — `indexing-diagnostics-best-practices`
+- `T-338` Featured Snippets Mistakes to Avoid — `featured-snippets-mistakes-to-avoid`
+- `T-339` Content Operations in Practice — `content-operations-in-practice`
+- `T-340` Behavioral Finance Trade-Offs — `behavioral-finance-trade-offs`
+- `T-341` Internal Linking Mistakes to Avoid — `internal-linking-mistakes-to-avoid`
+- `T-342` Value Proposition Writing Mistakes to Avoid — `value-proposition-writing-mistakes-to-avoid`
+- `T-343` Product Assortment in Practice — `product-assortment-in-practice`
+- `T-344` XML Sitemaps at Scale — `xml-sitemaps-at-scale`
+- `T-345` Store Labor Explained — `store-labor-explained`
+- `T-346` Freelancing Pitfalls — `freelancing-pitfalls`
+- `T-347` Derivatives Metrics that Matter — `derivatives-metrics-that-matter`
+- `T-348` How to Get Competitive Battlecards Right — `how-to-get-competitive-battlecards-right`
+- `T-349` Leadership Checklist — `leadership-checklist`
+- `T-350` Stakeholder Management: Common Questions — `stakeholder-management-common-questions`
+- `T-351` Portfolio Rebalancing Checklist — `portfolio-rebalancing-checklist`
+- `T-352` How to Get Cap Table Right — `how-to-get-cap-table-right`
+- `T-353` Index Investing Explained — `index-investing-explained`
+- `T-354` Marketing Operations in Practice — `marketing-operations-in-practice`
+- `T-355` What Product Content Actually Measures — `what-product-content-actually-measures`
+- `T-356` How to Get Behavioral Interviews Right — `how-to-get-behavioral-interviews-right`
+- `T-357` Anchor Text Explained — `anchor-text-explained`
+- `T-358` 13-week Cash Flow Costs Explained — `13-week-cash-flow-costs-explained`
+- `T-359` What Marketing Dashboards Actually Measures — `what-marketing-dashboards-actually-measures`
+- `T-360` Crawl Budget Best Practices — `crawl-budget-best-practices`
+- `T-361` How to Get Inventory Accuracy Right — `how-to-get-inventory-accuracy-right`
+- `T-362` Greeks for Beginners — `greeks-for-beginners`
+- `T-363` Webinar Marketing Best Practices — `webinar-marketing-best-practices`
+- `T-364` Mortgage Markets Examples — `mortgage-markets-examples`
+- `T-365` Cognitive Biases Examples — `cognitive-biases-examples`
+- `T-366` DPO Alignment Trade-Offs — `dpo-alignment-trade-offs`
+- `T-367` How to Evaluate Model Cards — `how-to-evaluate-model-cards`
+- `T-368` Proptech Best Practices — `proptech-best-practices`
+- `T-369` Credit Ratings Best Practices — `credit-ratings-best-practices`
+- `T-370` Sell-in Checklist — `sell-in-checklist`
+- `T-371` How to Get Trial Design Right — `how-to-get-trial-design-right`
+- `T-372` How to Evaluate Embedding Model Selection — `how-to-evaluate-embedding-model-selection`
+- `T-373` Retail Technology without the Hype — `retail-technology-without-the-hype`
+- `T-374` AI Contract Review Costs Explained — `ai-contract-review-costs-explained`
+- `T-375` Open Source Contributions for Small Teams — `open-source-contributions-for-small-teams`
+- `T-376` What Liquidity Ratios Actually Measures — `what-liquidity-ratios-actually-measures`
+- `T-377` Precedent Transactions at Scale — `precedent-transactions-at-scale`
+- `T-378` Coupon Strategy for Beginners — `coupon-strategy-for-beginners`
+- `T-379` What Executive Communication Actually Measures — `what-executive-communication-actually-measures`
+- `T-380` On-call Rotations Costs Explained — `on-call-rotations-costs-explained`
+- `T-381` What Docker Images Actually Measures — `what-docker-images-actually-measures`
+- `T-382` Payables Strategy Explained — `payables-strategy-explained`
+- `T-383` Risk Taking Trade-Offs — `risk-taking-trade-offs`
+- `T-384` Emergency Funds Trade-Offs — `emergency-funds-trade-offs`
+- `T-385` What Remote Work Actually Measures — `what-remote-work-actually-measures`
+- `T-386` FinOps for Beginners — `finops-for-beginners`
+- `T-387` Loyalty Mechanics Trade-Offs — `loyalty-mechanics-trade-offs`
+- `T-388` Equity Dilution for Small Teams — `equity-dilution-for-small-teams`
+- `T-389` How to Evaluate Retention Analytics — `how-to-evaluate-retention-analytics`
+- `T-390` AI Output Verification Costs Explained — `ai-output-verification-costs-explained`
+- `T-391` Customer Data Platforms without the Hype — `customer-data-platforms-without-the-hype`
+- `T-392` Drawdowns for Beginners — `drawdowns-for-beginners`
+- `T-393` How to Get Media Planning Right — `how-to-get-media-planning-right`
+- `T-394` Indexing Diagnostics Trade-Offs — `indexing-diagnostics-trade-offs`
+- `T-395` Structured Data Examples — `structured-data-examples`
+- `T-396` Duplicate Content Pitfalls — `duplicate-content-pitfalls`
+- `T-397` Getting Started with Activation Emails — `getting-started-with-activation-emails`
+- `T-398` Market Research for Beginners — `market-research-for-beginners`
+- `T-399` Tag Management Explained — `tag-management-explained`
+- `T-400` Feature Flags Checklist — `feature-flags-checklist`
+- `T-401` Entrepreneurship Costs Explained — `entrepreneurship-costs-explained`
+- `T-402` AI Customer Support Examples — `ai-customer-support-examples`
+- `T-403` Local SEO without the Hype — `local-seo-without-the-hype`
+- `T-404` Goal Setting Metrics that Matter — `goal-setting-metrics-that-matter`
+- `T-405` Asset Allocation Metrics that Matter — `asset-allocation-metrics-that-matter`
+- `T-406` Sovereign Debt without the Hype — `sovereign-debt-without-the-hype`
+- `T-407` Credit Spreads for Beginners — `credit-spreads-for-beginners`
+- `T-408` Test-time Compute Checklist — `test-time-compute-checklist`
+- `T-409` Retail Fraud Pitfalls — `retail-fraud-pitfalls`
+- `T-410` How to Get Industry Switching Right — `how-to-get-industry-switching-right`
+- `T-411` Personal Branding Metrics that Matter — `personal-branding-metrics-that-matter`
+- `T-412` How to Get AI Approval Gates Right — `how-to-get-ai-approval-gates-right`
+- `T-413` Healthtech Explained — `healthtech-explained`
+- `T-414` Pricing Psychology Mistakes to Avoid — `pricing-psychology-mistakes-to-avoid`
+- `T-415` Technical Portfolios for Beginners — `technical-portfolios-for-beginners`
+- `T-416` ESG Reporting Checklist — `esg-reporting-checklist`
+- `T-417` Direct-to-consumer for Small Teams — `direct-to-consumer-for-small-teams`
+- `T-418` How to Evaluate Cap Table — `how-to-evaluate-cap-table`
+- `T-419` Career Ladders Trade-Offs — `career-ladders-trade-offs`
+- `T-420` Earnings Quality: a Decision Framework — `earnings-quality-a-decision-framework`
+- `T-421` Digital Shelves Trade-Offs — `digital-shelves-trade-offs`
+- `T-422` Loyalty Mechanics Best Practices — `loyalty-mechanics-best-practices`
+- `T-423` Getting Started with Venture Debt — `getting-started-with-venture-debt`
+- `T-424` Continued Pretraining Costs Explained — `continued-pretraining-costs-explained`
+- `T-425` How to Evaluate Hedging — `how-to-evaluate-hedging`
+- `T-426` Sovereign Debt Mistakes to Avoid — `sovereign-debt-mistakes-to-avoid`
+- `T-427` AI Approval Gates without the Hype — `ai-approval-gates-without-the-hype`
+- `T-428` Learning Strategies Explained — `learning-strategies-explained`
+- `T-429` Engagement Loops Costs Explained — `engagement-loops-costs-explained`
+- `T-430` How to Get Cash Conversion Cycle Right — `how-to-get-cash-conversion-cycle-right`
+- `T-431` Risk Taking Best Practices — `risk-taking-best-practices`
+- `T-432` Data Quality in Practice — `data-quality-in-practice`
+- `T-433` Promotions Mistakes to Avoid — `promotions-mistakes-to-avoid`
+- `T-434` Brand Architecture Best Practices — `brand-architecture-best-practices`
+- `T-435` Rendering Queues in Practice — `rendering-queues-in-practice`
+- `T-436` Executive Communication: Common Questions — `executive-communication-common-questions`
+- `T-437` Inflation Adjustment: Common Questions — `inflation-adjustment-common-questions`
+- `T-438` Quantization in Practice for Beginners — `quantization-in-practice-for-beginners`
+- `T-439` Systemic Risk at Scale — `systemic-risk-at-scale`
+- `T-440` How to Evaluate AI Finance Operations — `how-to-evaluate-ai-finance-operations`
+- `T-441` GA4 Measurement Mistakes to Avoid — `ga4-measurement-mistakes-to-avoid`
+- `T-442` On-device Inference Mistakes to Avoid — `on-device-inference-mistakes-to-avoid`
+- `T-443` Visual Identity: a Decision Framework — `visual-identity-a-decision-framework`
+- `T-444` How to Get Geo Experiments Right — `how-to-get-geo-experiments-right`
+- `T-445` Decision Memos Metrics that Matter — `decision-memos-metrics-that-matter`
+- `T-446` Getting Started with Positioning Ladders — `getting-started-with-positioning-ladders`
+- `T-447` How to Get Lazy Loading Right — `how-to-get-lazy-loading-right`
+- `T-448` How to Get Agent Observability Right — `how-to-get-agent-observability-right`
+- `T-449` Behavioral Finance Best Practices — `behavioral-finance-best-practices`
+- `T-450` AI for Procurement Best Practices — `ai-for-procurement-best-practices`
+- `T-451` Inventory Management Trade-Offs — `inventory-management-trade-offs`
+- `T-452` What Continuous Learning Actually Measures — `what-continuous-learning-actually-measures`
+- `T-453` Remote Work Trade-Offs — `remote-work-trade-offs`
+- `T-454` Getting Started with Runway Extension — `getting-started-with-runway-extension`
+- `T-455` Inflation Adjustment Costs Explained — `inflation-adjustment-costs-explained`
+- `T-456` Speculative Decoding Mistakes to Avoid — `speculative-decoding-mistakes-to-avoid`
+- `T-457` HTTP/3: a Decision Framework — `http-3-a-decision-framework`
+- `T-458` How to Get Executive Communication Right — `how-to-get-executive-communication-right`
+- `T-459` Progressive Web Apps in Practice — `progressive-web-apps-in-practice`
+- `T-460` Personal Branding Trade-Offs — `personal-branding-trade-offs`
+- `T-461` Retention Analytics: Common Questions — `retention-analytics-common-questions`
+- `T-462` Market Makers for Small Teams — `market-makers-for-small-teams`
+- `T-463` What Debt Restructuring Actually Measures — `what-debt-restructuring-actually-measures`
+- `T-464` Prompt Caching Checklist — `prompt-caching-checklist`
+- `T-465` Getting Started with Food and Beverage — `getting-started-with-food-and-beverage`
+- `T-466` GDPR Compliance Trade-Offs — `gdpr-compliance-trade-offs`
+- `T-467` Community-led Growth Costs Explained — `community-led-growth-costs-explained`
+- `T-468` Getting Started with On-device Inference — `getting-started-with-on-device-inference`
+- `T-469` Model Cards without the Hype — `model-cards-without-the-hype`
+- `T-470` Hedging Best Practices — `hedging-best-practices`
+- `T-471` Brand Voice Metrics that Matter — `brand-voice-metrics-that-matter`
+- `T-472` Stablecoins: a Decision Framework — `stablecoins-a-decision-framework`
+- `T-473` Getting Started with Performance Reviews — `getting-started-with-performance-reviews`
+- `T-474` How to Get INP Optimization Right — `how-to-get-inp-optimization-right`
+- `T-475` What Personal Branding Actually Measures — `what-personal-branding-actually-measures`
+- `T-476` How to Get Customer Segmentation Right — `how-to-get-customer-segmentation-right`
+- `T-477` HTTP Semantics: Common Questions — `http-semantics-common-questions`
+- `T-478` GDPR Compliance without the Hype — `gdpr-compliance-without-the-hype`
+- `T-479` Sustainable Retail: Common Questions — `sustainable-retail-common-questions`
+- `T-480` AI for Product Research Pitfalls — `ai-for-product-research-pitfalls`
+- `T-481` Getting Started with Remote Work — `getting-started-with-remote-work`
+- `T-482` REIT Analysis Best Practices — `reit-analysis-best-practices`
+- `T-483` What Local SEO Actually Measures — `what-local-seo-actually-measures`
+- `T-484` Structured Outputs Costs Explained — `structured-outputs-costs-explained`
+- `T-485` Jobs-to-be-done Explained — `jobs-to-be-done-explained`
+- `T-486` Getting Started with Loyalty Mechanics — `getting-started-with-loyalty-mechanics`
+- `T-487` Green Bonds Costs Explained — `green-bonds-costs-explained`
+- `T-488` AI for Logistics Explained — `ai-for-logistics-explained`
+- `T-489` Infrastructure as Code: Common Questions — `infrastructure-as-code-common-questions`
+- `T-490` Multimodal Models Mistakes to Avoid — `multimodal-models-mistakes-to-avoid`
+- `T-491` Naming Strategy for Small Teams — `naming-strategy-for-small-teams`
+- `T-492` Consulting Mistakes to Avoid — `consulting-mistakes-to-avoid`
+- `T-493` Edge Computing at Scale — `edge-computing-at-scale`
+- `T-494` How to Evaluate Rebranding — `how-to-evaluate-rebranding`
+- `T-495` AI Translation Quality: a Decision Framework — `ai-translation-quality-a-decision-framework`
+- `T-496` Marketing Budgets for Beginners — `marketing-budgets-for-beginners`
+- `T-497` Omnichannel Retail Explained — `omnichannel-retail-explained`
+- `T-498` Loan Covenants Costs Explained — `loan-covenants-costs-explained`
+- `T-499` Site Migrations Pitfalls — `site-migrations-pitfalls`
+- `T-500` What Initial Public Offerings Actually Measures — `what-initial-public-offerings-actually-measures`
+- `T-501` Tokenomics Checklist — `tokenomics-checklist`
+- `T-502` Compound Interest Costs Explained — `compound-interest-costs-explained`
+- `T-503` Continuous Learning Best Practices — `continuous-learning-best-practices`
+- `T-504` Featured Snippets without the Hype — `featured-snippets-without-the-hype`
+- `T-505` Deep Work Checklist — `deep-work-checklist`
+- `T-506` Marketing Mix Models for Small Teams — `marketing-mix-models-for-small-teams`
+- `T-507` How to Get Scenario Analysis Right — `how-to-get-scenario-analysis-right`
+- `T-508` Enterprise Marketing at Scale — `enterprise-marketing-at-scale`
+- `T-509` Customer Lifetime Value Best Practices — `customer-lifetime-value-best-practices`
+- `T-510` How to Get Retail Analytics Right — `how-to-get-retail-analytics-right`
+- `T-511` Cache Invalidation Trade-Offs — `cache-invalidation-trade-offs`
+- `T-512` AI Roadmap Planning at Scale — `ai-roadmap-planning-at-scale`
+- `T-513` Consent Mode Trade-Offs — `consent-mode-trade-offs`
+- `T-514` How to Evaluate Consent Mode — `how-to-evaluate-consent-mode`
+- `T-515` What Digital Shelves Actually Measures — `what-digital-shelves-actually-measures`
+- `T-516` Sell-out Costs Explained — `sell-out-costs-explained`
+- `T-517` SMB Marketing Checklist — `smb-marketing-checklist`
+- `T-518` What Brand Lift Measurement Actually Measures — `what-brand-lift-measurement-actually-measures`
+- `T-519` Currency Risk: a Decision Framework — `currency-risk-a-decision-framework`
+- `T-520` Consent Mode: Common Questions — `consent-mode-common-questions`
+- `T-521` CDN Selection at Scale — `cdn-selection-at-scale`
+- `T-522` How to Get Knowledge Graphs Right — `how-to-get-knowledge-graphs-right`
+- `T-523` Getting Started with Server-side Tagging — `getting-started-with-server-side-tagging`
+- `T-524` Price Testing Metrics that Matter — `price-testing-metrics-that-matter`
+- `T-525` MaxDiff Analysis for Small Teams — `maxdiff-analysis-for-small-teams`
+- `T-526` Cash Conversion Cycle Trade-Offs — `cash-conversion-cycle-trade-offs`
+- `T-527` Monetary Policy without the Hype — `monetary-policy-without-the-hype`
+- `T-528` Faceted Navigation Explained — `faceted-navigation-explained`
+- `T-529` AI Supply Chain Forecasting: Common Questions — `ai-supply-chain-forecasting-common-questions`
+- `T-530` Computer-use Agents Costs Explained — `computer-use-agents-costs-explained`
+- `T-531` AI Watermarking Explained — `ai-watermarking-explained`
+- `T-532` AI Document Extraction Mistakes to Avoid — `ai-document-extraction-mistakes-to-avoid`
+- `T-533` Content Security Policy Best Practices — `content-security-policy-best-practices`
+- `T-534` Brand Storytelling Explained — `brand-storytelling-explained`
+- `T-535` Secondary Markets Metrics that Matter — `secondary-markets-metrics-that-matter`
+- `T-536` Getting Started with Featured Snippets — `getting-started-with-featured-snippets`
+- `T-537` What Sell-out Actually Measures — `what-sell-out-actually-measures`
+- `T-538` What Problem Solving Actually Measures — `what-problem-solving-actually-measures`
+- `T-539` Getting Started with Loan Covenants — `getting-started-with-loan-covenants`
+- `T-540` Climate Risk Pitfalls — `climate-risk-pitfalls`
+- `T-541` What Referral Programs Actually Measures — `what-referral-programs-actually-measures`
+- `T-542` Debt Restructuring: Common Questions — `debt-restructuring-common-questions`
+- `T-543` Privacy Sandbox without the Hype — `privacy-sandbox-without-the-hype`
+- `T-544` Continued Pretraining: Common Questions — `continued-pretraining-common-questions`
+- `T-545` How to Evaluate Behavioral Interviews — `how-to-evaluate-behavioral-interviews`
+- `T-546` Sustainable Retail Trade-Offs — `sustainable-retail-trade-offs`
+- `T-547` Sharpe Ratio Metrics that Matter — `sharpe-ratio-metrics-that-matter`
+- `T-548` Grocery Retail Explained — `grocery-retail-explained`
+- `T-549` Docker Images Best Practices — `docker-images-best-practices`
+- `T-550` Pricing Psychology without the Hype — `pricing-psychology-without-the-hype`
+- `T-551` Performance Reviews: Common Questions — `performance-reviews-common-questions`
+- `T-552` Project Management: a Decision Framework — `project-management-a-decision-framework`
+- `T-553` What Pricing Psychology Actually Measures — `what-pricing-psychology-actually-measures`
+- `T-554` Gold Markets in Practice — `gold-markets-in-practice`
+- `T-555` Paid Social Trade-Offs — `paid-social-trade-offs`
+- `T-556` How to Get Profitability Ratios Right — `how-to-get-profitability-ratios-right`
+- `T-557` Prioritization Metrics that Matter — `prioritization-metrics-that-matter`
+- `T-558` How to Evaluate Salary Negotiation — `how-to-evaluate-salary-negotiation`
+- `T-559` Database Indexing Costs Explained — `database-indexing-costs-explained`
+- `T-560` Fiscal Policy in Practice — `fiscal-policy-in-practice`
+- `T-561` Getting Started with Data Warehouses — `getting-started-with-data-warehouses`
+- `T-562` Page Speed Examples — `page-speed-examples`
+- `T-563` Dark Funnel Metrics that Matter — `dark-funnel-metrics-that-matter`
+- `T-564` Brick-and-mortar Economics Best Practices — `brick-and-mortar-economics-best-practices`
+- `T-565` Sales-led Growth Best Practices — `sales-led-growth-best-practices`
+- `T-566` Customer Segmentation: Common Questions — `customer-segmentation-common-questions`
+- `T-567` SLOs Best Practices — `slos-best-practices`
+- `T-568` Engagement Loops without the Hype — `engagement-loops-without-the-hype`
+- `T-569` Canonicalization Metrics that Matter — `canonicalization-metrics-that-matter`
+- `T-570` How to Evaluate Employer Branding — `how-to-evaluate-employer-branding`
+- `T-571` How to Evaluate Systems Thinking — `how-to-evaluate-systems-thinking`
+- `T-572` Internal Linking: Common Questions — `internal-linking-common-questions`
+- `T-573` AI for DevOps for Small Teams — `ai-for-devops-for-small-teams`
+- `T-574` How to Evaluate Observability — `how-to-evaluate-observability`
+- `T-575` Storytelling Best Practices — `storytelling-best-practices`
+- `T-576` EBITDA Quality Metrics that Matter — `ebitda-quality-metrics-that-matter`
+- `T-577` Experimentation Platforms Pitfalls — `experimentation-platforms-pitfalls`
+- `T-578` How to Get Referral Programs Right — `how-to-get-referral-programs-right`
+- `T-579` Zero Trust Best Practices — `zero-trust-best-practices`
+- `T-580` Lazy Loading Costs Explained — `lazy-loading-costs-explained`
+- `T-581` Network Effects Metrics that Matter — `network-effects-metrics-that-matter`
+- `T-582` International SEO: Common Questions — `international-seo-common-questions`
+- `T-583` Category Design Best Practices — `category-design-best-practices`
+- `T-584` Fintech Mistakes to Avoid — `fintech-mistakes-to-avoid`
+- `T-585` Getting Started with Engineering Management — `getting-started-with-engineering-management`
+- `T-586` Data Governance Metrics that Matter — `data-governance-metrics-that-matter`
+- `T-587` Datasheets at Scale — `datasheets-at-scale`
+- `T-588` Getting Started with Compound Interest — `getting-started-with-compound-interest`
+- `T-589` Paid Social without the Hype — `paid-social-without-the-hype`
+- `T-590` Hreflang Clusters Metrics that Matter — `hreflang-clusters-metrics-that-matter`
+- `T-591` How to Get Dark Funnel Right — `how-to-get-dark-funnel-right`
+- `T-592` What ETL Orchestration Actually Measures — `what-etl-orchestration-actually-measures`
+- `T-593` What Rollback Strategies Actually Measures — `what-rollback-strategies-actually-measures`
+- `T-594` Reward Models Best Practices — `reward-models-best-practices`
+- `T-595` Getting Started with Green Bonds — `getting-started-with-green-bonds`
+- `T-596` Privacy Sandbox Metrics that Matter — `privacy-sandbox-metrics-that-matter`
+- `T-597` Share Buybacks Best Practices — `share-buybacks-best-practices`
+- `T-598` What Prompt Injection Defenses Actually Measures — `what-prompt-injection-defenses-actually-measures`
+- `T-599` What INP Optimization Actually Measures — `what-inp-optimization-actually-measures`
+- `T-600` Debt Restructuring Trade-Offs — `debt-restructuring-trade-offs`
+- `T-601` How to Get Activation Emails Right — `how-to-get-activation-emails-right`
+- `T-602` How to Evaluate RLHF — `how-to-evaluate-rlhf`
+- `T-603` Systems Thinking Trade-Offs — `systems-thinking-trade-offs`
+- `T-604` What Structured Outputs Actually Measures — `what-structured-outputs-actually-measures`
+- `T-605` INP Optimization: Common Questions — `inp-optimization-common-questions`
+- `T-606` How to Get Duration Risk Right — `how-to-get-duration-risk-right`
+- `T-607` AI Search Costs Explained — `ai-search-costs-explained`
+- `T-608` Critical Thinking Costs Explained — `critical-thinking-costs-explained`
+- `T-609` Getting Started with 404 Handling — `getting-started-with-404-handling`
+- `T-610` Discounted Cash Flow: Common Questions — `discounted-cash-flow-common-questions`
+- `T-611` How to Get Network Effects Right — `how-to-get-network-effects-right`
+- `T-612` AI Safety Cases Trade-Offs — `ai-safety-cases-trade-offs`
+- `T-613` Data Warehouses Mistakes to Avoid — `data-warehouses-mistakes-to-avoid`
+

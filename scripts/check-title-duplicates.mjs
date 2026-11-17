@@ -40,6 +40,7 @@ const entries = [
   ...registry.existing.map((e) => ({ ...e, source: "existing" })),
   ...registry.planned.map((e) => ({ ...e, source: "planned" })),
   ...registry.high_traffic_backlog.map((e) => ({ ...e, source: "backlog" })),
+  ...(registry.title_bank_2 ?? []).map((e) => ({ ...e, source: "title_bank_2" })),
 ];
 
 const problems = [];
@@ -77,7 +78,15 @@ for (const [slug, n] of regSlugs) if (n > 1) problems.push(`duplicate registry s
 for (const [title, n] of regTitles) if (n > 1) problems.push(`duplicate registry title: ${title}`);
 
 // 4. Near-duplicate titles and slugs (only report pairs involving a new entry).
-const tokens = (text) => new Set((text.toLowerCase().match(/[a-z0-9]+/g) ?? []));
+// Ignore stopwords and generic title scaffolding so that "What Is X" and
+// "What Is Y" are not treated as near-duplicates just for sharing "what is".
+const STOPWORDS = new Set(
+  ("a an and are as at be by for from how in is it its of on or that the their this to was what when where which who why with you your " +
+   "guide explained examples example checklist template framework practices mistakes pitfalls metrics decisions decision comparison compared vs " +
+   "beginners practice scale small teams into about").split(" "),
+);
+const tokens = (text) =>
+  new Set((text.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((word) => word.length > 2 && !STOPWORDS.has(word)));
 const jaccard = (a, b) => {
   const A = tokens(a), B = tokens(b);
   if (!A.size && !B.size) return 0;
