@@ -1,84 +1,65 @@
 ---
 title: "Marketing Attribution: Multi-Touch Models, Incrementality, and Budget Allocation"
-description: "Marketing attribution assigns credit to touchpoints. Learn MTA, MMM, incrementality testing, and how to allocate budget for maximum ROI."
+description: "Attribution allocates credit; incrementality measures what would not have happened. Read why the second is the one that decides budgets."
 date: 2026-11-16
 tags:
   - Marketing Attribution
-  - Multi-Touch Attribution
-  - Marketing Mix Modeling
+  - Analytics
   - Incrementality
   - Budget Allocation
 ---
 
-Attribution answers: which marketing dollar worked?
+Marketing attribution is one of the most confident-sounding areas of analytics and one of the least reliable as a decision tool. The output is a precise-looking split of credit across channels — 30% first touch, 50% last touch, 20% in between — and the precision is misleading, because the numbers come from a rule the analyst chose, not from a measurement of what each channel caused.
 
-**Direct answer:** Marketing attribution assigns credit for conversions across customer touchpoints. Multi-Touch Attribution (MTA) uses user-level data for granular credit assignment. Marketing Mix Modeling (MMM) uses aggregate time-series data for privacy-safe, channel-level insights. Incrementality testing (geo-lift, holdout) measures true causal impact. Combining methods yields robust budget allocation.
+**Direct answer:** Attribution models assign credit for a conversion across the interactions that preceded it; they do not tell you what would have happened without those interactions. Google Ads says it directly: "Attribution models let you choose how much credit each ad interaction gets for your conversions", with data-driven attribution now the default and last-click still supported. For budget allocation you need the incremental effect, which comes from experiments — and where user-level randomisation is impossible, from geo-level designs. Use attribution to describe journeys; use experiments to decide spend.
 
-## Attribution approaches
+## A model is a rule, not a finding
 
-**Single-touch:** first-touch (awareness), last-touch (conversion). Simple, biased.
+The main models differ only in how they distribute credit:
 
-**Multi-Touch Attribution (MTA):**
-- **Rule-based:** linear, time-decay, U-shaped (position-based), W-shaped.
-- **Algorithmic / Data-driven:** Shapley value, Markov chains, ML models. Requires user-level data (cookies, IDFA, UTM).
+- **Last-click** gives everything to the final interaction. It is simple, and it systematically over-credits channels that catch customers at the end of a journey they did not create.
+- **First-click** gives everything to the first interaction, with the mirror-image problem.
+- **Linear, time-decay, and position-based** models spread credit by a stated rule. Each is a reasonable convention; none is derived from your customers.
+- **Data-driven attribution** uses observed patterns to distribute credit statistically. It is more responsive to data, and it remains a model of association unless the underlying variation was experimental.
 
-**Marketing Mix Modeling (MMM):** regression on aggregate time-series (spend, impressions, seasonality, macro). No user-level data needed. Privacy-safe. Channel-level granularity.
+Google Ads notes that "conversion actions that used the deprecated attribution models have been upgraded to use data-driven attribution", and that "attribution models can give you a better understanding of how your ads perform and can help you optimize across conversion journeys". That is a fair description of the use case — understanding journeys — and the important word is "understanding" rather than "measuring causation".
 
-**Incrementality testing:** controlled experiments (geo-lift, audience holdout, PSA). Measures true causal lift. Gold standard but slow/expensive.
+The practical consequence is that two teams using different models on the same data can reach opposite budget recommendations, and both will say the data supports them. When that happens, it is not a data-quality problem; it is a disagreement about a rule that was never made explicit.
 
-## Choosing the right method
+## Incrementality is the missing measurement
 
-| Scenario | Best fit |
-|---|---|
-| Digital-first, rich user data | MTA (algorithmic) |
-| Omnichannel, offline-heavy | MMM |
-| High-stakes budget decisions | Incrementality testing |
-| Privacy-first / post-cookie | MMM + incrementality |
-| Real-time optimization | MTA + holdout validation |
+The question a budget decision actually needs is: if we stopped spending on this channel, how much revenue would disappear? That is a counterfactual, and attribution cannot answer it because all the journeys in the data include the channel's presence.
 
-## Multi-touch models
+Two designs can answer it.
 
-**Linear:** equal credit to all touches.
+**Randomised user-level tests** work when the intervention can be assigned to individuals. Hold out a group from a campaign, compare outcomes, and the difference is the incremental effect.
 
-**Time-decay:** recency-weighted. Recent touches get more credit.
+**Geo experiments** work when the intervention operates at a market level — a brand campaign, a regional price change, a channel rollout. Google's published work states that "one approach that Google has successfully employed to measure advertising effectiveness is geo experiments", and describes them as having "a systematic and effective design process" with results that are "easy to interpret".
 
-**U-shaped (Position-based):** 40% first, 40% last, 20% middle.
+Both require more planning than a dashboard, and the planning is the point: you state the comparison, the horizon, and the decision rule before you look at the result.
 
-**W-shaped:** 30% first, 30% lead creation, 30% opportunity creation, 10% other.
+## Why the two answers diverge, and which to trust
 
-**Algorithmic:** Shapley value (game theory), Markov chain removal effect, gradient boosting. Learns from conversion paths.
+Attribution and incrementality disagree in predictable situations.
 
-## Incrementality testing
+**The channel catches existing demand.** Branded search often gets credited with conversions that would have happened anyway; a holdout reveals that its incrementality is small. This is the most common and most expensive discrepancy.
 
-**Geo-lift:** split DMAs/regions into test/control. Measure lift in test geo.
+**The channel assists rather than closes.** A social campaign may create awareness that converts much later through search. Last-click credits search; a geo holdout shows the campaign mattered.
 
-**Audience holdout:** random user holdout (PSA/ghost ads). Measure conversion difference.
+**The channel cannibalises another.** A new paid channel may take credit for customers who would have arrived organically, so total revenue barely changes despite a large attributed number.
 
-**Synthetic control:** construct synthetic control from donor pool (CausalImpact).
+In all three cases the incremental answer is the one that should govern the budget, and the attribution number remains useful for diagnosing why the discrepancy appeared.
 
-**Design:** power calculation, minimum detectable effect, duration, seasonality control.
+## A budget process that uses both
 
-## Budget allocation
+1. **Use attribution to map the journey** and identify which channels appear where. Treat the model as a stated convention and name it.
+2. **List the channels where attributed and incremental effects may diverge** — branded search, retargeting, and any channel that intercepts existing demand.
+3. **Run a holdout on the largest uncertain channel first.** The value of information is proportional to the budget at stake.
+4. **Use geo designs for market-level interventions**, with the same discipline about sample and horizon.
+5. **Compare the incremental cost per outcome across channels**, fully loaded, and reallocate towards the better one.
+6. **Keep attribution for diagnosis and incrementality for decisions.** Mixing the two in one report is how an organization ends up optimising the wrong metric with great precision.
 
-**Marginal ROI:** allocate next dollar to channel with highest marginal ROAS.
-
-**Diminishing returns:** saturation curves (log, Michaelis-Menten, Hill). Optimize across channels.
-
-**Constraints:** minimum/maximum spend, brand minimums, contractual commitments.
-
-**Scenario planning:** Monte Carlo simulation of budget scenarios.
-
-**Unified framework:** MMM for strategic allocation → MTA for tactical → Incrementality for validation.
-
-## Challenges
-
-- **Walled gardens:** limited data access (Meta, Google, Amazon).
-- **Privacy:** cookie deprecation, ATT, GDPR, CCPA. Shift to MMM.
-- **Cross-device:** identity resolution incomplete.
-- **View-through attribution:** overstates display/video impact.
-- **Offline conversions:** store visits, call tracking, CRM match.
-
-For the related question of how data changes marketing decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and customer retention, see [Customer Retention: Keeping Customers Is Cheaper Than Acquiring Them](/articles/customer-retention-keeping-customers-is-cheaper-than-acquiring-them).
+For the experimental method, see [A/B Testing](/articles/ab-testing-making-decisions-with-experiments); for how these numbers feed acquisition economics, see [SEO vs Paid Advertising](/articles/seo-vs-paid-advertising-understanding-the-economics-of-customer-acquisition).
 
 ## Further Reading
 
