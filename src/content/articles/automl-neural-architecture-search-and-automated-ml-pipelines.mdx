@@ -1,74 +1,84 @@
 ---
 title: "AutoML: Neural Architecture Search and Automated ML Pipelines"
-description: "AutoML automates the ML lifecycle. Learn neural architecture search, hyperparameter optimization, and end-to-end automated pipelines."
+description: "AutoML automates the search over models, hyperparameters, and even architectures. Read what the search actually optimizes — and why that boundary decides when it helps."
 date: 2026-11-16
 tags:
   - AutoML
-  - Neural Architecture Search
-  - Hyperparameter Optimization
-  - ML Engineering
+  - Machine Learning
+  - Hyperparameter Tuning
+  - MLOps
 ---
 
-AutoML automates the tedious parts of ML. Experts design search spaces; AutoML searches them.
+Choosing a model is itself a search problem. Pick a family, set its hyperparameters, decide how to preprocess the inputs, choose which features to keep — each choice creates a branch, and the branches multiply. AutoML is the attempt to let an algorithm explore that space instead of a person guessing. The results can be strong, but the machinery has a specific boundary that is easy to miss: it optimizes a score you can measure, not the outcome you actually care about.
 
-**Direct answer:** AutoML (Automated Machine Learning) automates the end-to-end ML pipeline: data preprocessing, feature engineering, model selection, hyperparameter optimization (HPO), neural architecture search (NAS), and model deployment. It democratizes ML for non-experts and accelerates expert workflows. Key components: search space definition, search strategy, performance estimation, and resource management.
+**Direct answer:** Automated machine learning covers three related tasks — selecting a model, tuning its hyperparameters, and in neural architecture search (NAS), designing the network structure itself. The methods differ in how they search: Bayesian optimisation, bandit-style resource allocation, and reinforcement learning are the main families. Zoph and Le's neural architecture search used a recurrent controller trained with reinforcement learning and reached a 3.65% test error on CIFAR-10, then 0.09 percentage points better and 1.05× faster than the previous comparable state of the art. The boundary is that every method optimizes a validation metric, so a system that is excellent at that metric can still be a poor fit for the deployed problem.
 
-## AutoML pipeline stages
+## The three things being searched
 
-1. **Data preprocessing:** missing value handling, encoding, scaling, feature selection.
-2. **Feature engineering:** automated feature construction (Featuretools, tsfresh).
-3. **Model selection:** choose algorithm family (tree, linear, neural, ensemble).
-4. **Hyperparameter optimization (HPO):** search hyperparameter space.
-5. **Neural Architecture Search (NAS):** search neural network architectures.
-6. **Ensembling:** stack/blend top models.
-6. **Deployment:** export model, generate inference code, monitoring setup.
+It helps to separate the layers, because "AutoML" is used for all of them.
 
-## Hyperparameter Optimization (HPO)
+**Hyperparameter tuning** searches the settings of a fixed model — learning rate, tree depth, regularisation strength. The model family is chosen by the human; the algorithm finds good values within it.
 
-Search space: learning rate, batch size, layers, dropout, regularization, optimizer.
+**Pipeline and model selection** searches across families and preprocessing steps. Auto-sklearn, described by Feurer et al. as improving on earlier AutoML methods, does this by "automatically taking into account past performance on similar datasets, and by constructing ensembles from the models evaluated during the optimization". Meta-learning — using results from previous datasets to start in a promising region — is the distinctive idea here.
 
-**Strategies:**
-- **Grid / Random search:** baseline.
-- **Bayesian optimization (TPE, GP, SMAC):** surrogate model, acquisition function. Optuna, Hyperopt, SMAC.
-- **Multi-fidelity:** Hyperband, ASHA, BOHB. Early stopping, resource allocation.
-- **Population-based training (PBT):** evolutionary, online adaptation.
+**Neural architecture search** searches the structure of the network itself: how many layers, what operations, how they connect. Zoph and Le's formulation generates model descriptions with a recurrent network and trains that controller "with reinforcement learning to maximize the expected accuracy of the generated architectures on a validation set". This is the most expensive layer and the one with the largest potential payoff.
 
-## Neural Architecture Search (NAS)
+The three are often combined. A NAS system still needs its training hyperparameters tuned, and a pipeline search still picks among fixed model families.
 
-NAS searches neural network topology: layers, connections, operations, widths.
+## How the search works
 
-**Search space:** macro (entire architecture) or micro (cell repeated). DARTS (differentiable), ENAS (weight sharing), ProxylessNAS, FBNet, MobileNetV3.
+Every AutoML system has three components, and understanding them explains both the strengths and the limits.
 
-**Search strategy:**
-- **RL-based:** controller RNN samples architectures, reward = validation accuracy.
-- **Evolutionary:** mutation/crossover, tournament selection.
-- **Gradient-based (DARTS):** relax discrete search to continuous, optimize via gradient descent.
-- **One-shot / weight-sharing:** train supernet once, evaluate sub-networks.
+**A search space** defines what can be tried. A broad space can contain better solutions but is harder to explore; a narrow space is fast but may exclude the best design. This is a human decision disguised as a configuration — someone decides which operations and ranges are admissible.
 
-**Efficiency:** weight sharing, progressive shrinking, early stopping, proxy tasks.
+**A search strategy** decides what to try next. Bayesian optimisation builds a model of the objective and samples where improvement is likely. Random search, unfashionable but hard to beat, samples configurations independently. Hyperband, from Li et al., takes a different approach: it "focus[es] on speeding up random search through adaptive resource allocation and early-stopping", formulating the problem as a "pure-exploration non-stochastic infinite-armed bandit problem". The practical effect is that weak configurations are killed early and the budget goes to promising ones.
 
-## AutoML systems
+**A performance estimation strategy** decides how good a configuration is. Training each one fully is accurate but expensive, so systems use subsets of data, fewer epochs, or lower-fidelity models. Every shortcut introduces a bias: a configuration that looks good at low fidelity may not hold up at full scale.
 
-| System | Focus | Strength |
-|---|---|---|
-| Auto-sklearn | Tabular, HPO + meta-learning | Strong on tabular |
-| AutoKeras | NAS for vision/text | Easy API |
-| H2O AutoML | Ensemble, stacked models | Production-ready |
-| TPOT | Genetic programming | Pipeline optimization |
-| AutoGluon | Multi-modal, tabular, text, image | Strong benchmark |
-| Ray Tune + Ray AIR | Distributed HPO/NAS | Scalable |
-| Optuna | HPO framework | Flexible, pruning |
-| NNI (Microsoft) | HPO + NAS + compression | Extensible |
+Optuna illustrates the engineering side. Its documentation describes an "imperative, define-by-run style user API" with which "the user of Optuna can dynamically construct the search spaces for the hyperparameters", together with algorithms that "efficiently prun[e] unpromising trials". Define-by-run matters because real search spaces are often conditional — a parameter exists only if another takes a certain value — and a static configuration format handles that awkwardly.
 
-## Evaluation and pitfalls
+## A worked example of resource allocation
 
-- **Data leakage in CV:** must isolate test set completely.
-- **Overfitting to validation:** too many trials, use nested CV or holdout.
-- **Compute cost:** NAS can take GPU-days. Use proxy tasks, weight sharing.
-- **Reproducibility:** seed control, config versioning.
-- **Deployment gap:** AutoML models may need optimization (quantization, distillation) for production.
+The value of early stopping is easiest to see in arithmetic. Suppose you have 81 candidate configurations and a full training run costs 27 epochs, for a total of 2,187 epochs.
 
-For the related question of hyperparameter tuning, see [Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization](/articles/hyperparameter-tuning-grid-search-random-search-and-bayesian-optimization) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+Successive halving — the mechanism behind Hyperband — proceeds in rounds. Keep a fraction of the candidates and give the survivors more budget:
+
+| Round | Configs | Epochs each | Epochs spent |
+| --- | --- | --- | --- |
+| 1 | 81 | 1 | 81 |
+| 2 | 27 | 3 | 81 |
+| 3 | 9 | 9 | 81 |
+| 4 | 3 | 27 | 81 |
+
+The total is 324 epochs instead of 2,187 — a saving of roughly 6.75× — while the final configuration still received the full 27 epochs. The trick is that 78 candidates were discarded after cheap evaluations, and the budget was concentrated on the survivors.
+
+This is not free. A configuration that needs many epochs to show its value can be eliminated too early, and the random search that Hyperband accelerates is itself not guaranteed to find the global optimum. The saving is real; the guarantee is not. For the same reason, distillation — Hinton et al.'s method of compressing an ensemble into a single model using soft targets — addresses a different cost: not the search but the deployment of the result.
+
+## What the automation does not solve
+
+Three limitations change how AutoML should be used.
+
+**The metric is a proxy.** A search maximises validation accuracy, cross-entropy, or another measurable score. If the deployed system cares about calibration, latency, fairness across groups, or robustness to shift, the search will not optimise for those unless they are written into the objective. Feurer et al.'s ensembles are a useful reminder: an ensemble often wins on the metric precisely because it averages over many models, and that may be exactly the complexity a low-latency deployment cannot afford.
+
+**Search overfits the validation set.** Trying hundreds of configurations against one validation split turns the split into a training set. The configuration that wins may have won by fitting the noise in that split. Nested cross-validation and a held-out final test set are not optional; they are the difference between a measured result and a lucky one.
+
+**The cost is real.** NAS's 3.65% on CIFAR-10 came from a search that, in the original formulation, trained many child networks. That is acceptable for a research benchmark and often unacceptable for a product team with a deadline. The honest comparison is not "AutoML versus manual tuning" but "AutoML plus its compute cost versus the best result a person could reach in the same time".
+
+## A decision test
+
+Use AutoML when the search space is well-defined, the validation metric genuinely represents the goal, and compute is cheaper than the engineer's time. Prefer manual exploration when the objective is poorly specified, when interpretability or latency constraints dominate, or when understanding *why* a model works matters more than the last point of accuracy.
+
+A practical sequence:
+
+1. **Write down the real objective** and the measurable proxy, and name where they diverge.
+2. **Fix a held-out test set** that the search never sees.
+3. **Start with random search** as a baseline — it is cheap and surprisingly competitive.
+4. **Add early stopping** (Hyperband or a pruner) before widening the search space.
+5. **Use meta-learning or AutoML** when you have many similar datasets and want to reuse prior results.
+6. **Reserve NAS** for cases where architecture is genuinely the bottleneck and the compute budget is explicit.
+7. **Audit the winner** against the real objective before deployment.
+
+For the pipeline discipline this depends on, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the data and leakage traps that search can worsen, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
 
 ## Further Reading
 

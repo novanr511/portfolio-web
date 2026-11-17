@@ -1,76 +1,80 @@
 ---
 title: "Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models"
-description: "Time series forecasting predicts future values from historical data. Learn classical and modern approaches: ARIMA, Prophet, and deep learning models."
+description: "Forecasting methods make different assumptions about what drives the future. Read the mechanism behind ARIMA, modern hurtles, and neural forecasters — and how to choose."
 date: 2026-11-16
 tags:
   - Time Series
   - Forecasting
-  - ARIMA
-  - Prophet
+  - Statistics
   - Deep Learning
 ---
 
-Forecasting is not crystal ball gazing. It is structured extrapolation from patterns.
+A time series forecast is a claim about which patterns will repeat. ARIMA assumes structure in the series itself; models with regressors assume external variables help; neural forecasters assume there is a learnable mapping from history and covariates to the future. None of these is universally right, and the choice is mostly a question of what you believe is stable.
 
-**Direct answer:** Time series forecasting predicts future values based on historical observations. Classical methods (ARIMA, ETS) model trend, seasonality, and noise statistically. Prophet adds interpretable components for holidays and changepoints. Deep learning models (LSTM, Temporal Fusion Transformer, N-BEATS) capture complex nonlinear patterns but require more data and compute. Method choice depends on data volume, horizon, seasonality, and interpretability needs.
+**Direct answer:** Classical methods such as exponential smoothing and ARIMA model the series from its own past and work well on short, relatively clean series with clear patterns. Deep models such as N-BEATS and the Temporal Fusion Transformer learn from large collections of series and can incorporate covariates, at the cost of data and complexity. Oreshkin et al. report that N-BEATS improved forecast accuracy by 11% over a statistical benchmark and 3% over the previous M4 competition winner, so the neural approach is genuinely competitive — but that result is on competition datasets, not a guarantee for a single business series.
 
-## Classical statistical methods
+## What makes time series different
 
-**ARIMA (AutoRegressive Integrated Moving Average):** models autocorrelation (AR), differencing for stationarity (I), and moving average (MA). Requires stationary series (constant mean/variance). Seasonal ARIMA (SARIMA) adds seasonal terms.
+A row in a time series is not independent of the row before it. This breaks the usual cross-validation assumption and introduces three issues that must be handled explicitly.
 
-**ETS (Error, Trend, Seasonal):** exponential smoothing with additive/multiplicative trend and seasonality. Automated via `forecast::ets` or `statsmodels`.
+**Trend and seasonality.** A series can drift upward and repeat a daily or yearly cycle. A model that treats these as noise will waste capacity relearning them.
 
-**Theta method:** decomposes into trend and seasonality, applies simple exponential smoothing to deseasonalized data.
+**Non-stationarity.** The statistical properties of the series can change. A model fitted on last year's data may describe a process that no longer exists — the reason a forecast can fail without any bug in the code.
 
-**Strengths:** interpretable, fast, work with small data, uncertainty quantification via prediction intervals.
-**Weaknesses:** linear assumptions, struggle with multiple seasonalities, external regressors require SARIMAX.
+**Leakage from the future.** Randomly splitting a time series lets the model see observations that occur after the ones it is predicting. scikit-learn's `TimeSeriesSplit` exists for this reason: it builds expanding folds that respect chronology, and its `gap` parameter handles cases where labels arrive late. A random split on time-ordered data is a methodological error, not a stylistic choice.
 
-## Prophet: interpretable forecasting at scale
+The forecasting textbook *Forecasting: Principles and Practice* by Hyndman and Athanasopoulos is the clearest reference for the classical toolkit — exponential smoothing, ARIMA, and the discipline of evaluating on a holdout that mimics the deployment horizon.
 
-Prophet (Meta) decomposes time series into:
+## The classical approach
 
-- **Trend:** piecewise linear or logistic growth with changepoints.
-- **Seasonality:** Fourier series for yearly, weekly, daily patterns.
-- **Holidays:** user-specified events with prior scales.
-- **Regressors:** additional covariates.
+ARIMA models a series as a function of its own past values and past errors. The "AR" term captures dependence on previous observations; the "MA" term captures dependence on previous forecast errors; "I" denotes differencing, which removes trend to make the series stationary.
 
-**Strengths:** handles missing data, outliers, multiple seasonalities, holidays, intuitive parameters. Good for business metrics with weekly/yearly seasonality.
-**Weaknesses:** assumes additive seasonality, limited extrapolation beyond trend, less suited for high-frequency or complex nonlinear patterns.
+The appeal is transparency and low data requirements. On a single series with a few hundred observations and a stable pattern, an ARIMA or exponential-smoothing model is often hard to beat, and its assumptions can be checked.
 
-## Deep learning for time series
+The limitation is that a univariate model ignores everything else. If promotions, holidays, or price changes drive demand, the series alone is an incomplete description, and no amount of tuning recovers information that was never in the inputs.
 
-**LSTM/GRU:** recurrent networks for sequence modeling. Capture long-term dependencies. Require careful tuning, sequence windowing.
+## The deep learning approach
 
-**Temporal Fusion Transformer (TFT):** attention-based, handles static covariates, known future inputs, variable selection. Interpretable attention weights. State-of-the-art for many benchmarks.
+Deep forecasters address two weaknesses at once: they can share information across many related series, and they can incorporate covariates.
 
-**N-BEATS:** deep backward and forward residual links. Pure deep learning, no autoregressive component. Strong on M4 competition.
+N-BEATS, from Oreshkin et al., is built from "backward and forward residual links and a very deep stack of fully-connected layers". Its basis-expansion design makes the output decomposable — the forecast can be expressed as trend and seasonality components — which is what the authors mean by interpretable. The paper tested it on M3, M4, and TOURISM datasets and reported state-of-the-art results, with an 11% improvement over a statistical benchmark and 3% over the previous M4 winner, a hand-crafted hybrid model.
 
-**DeepAR:** autoregressive RNN with likelihood-based training. Probabilistic forecasts.
+The Temporal Fusion Transformer, from Lim et al., targets multi-horizon forecasting with a "complex mix of inputs — including static covariates, known future inputs, and other exogenous time series that are only observed historically". It combines "recurrent layers for local processing and interpretable self-attention layers for learning long-term dependencies" and produces variable-importance measures, which matter when a human needs to trust a forecast.
 
-**PatchTST / TimesNet / DLinear:** recent transformer/linear models for long-term forecasting.
+The distinction between covariate types is practically important. A known future input — a planned promotion, a holiday calendar — can be used directly. A covariate observed only historically — yesterday's actual traffic — must be forecast or lagged, and treating it as known is a subtle form of leakage.
 
-**Strengths:** capture nonlinearities, multiple seasonalities, exogenous variables, long horizons.
-**Weaknesses:** need large data, GPU training, less interpretable, hyperparameter sensitivity.
+## A worked example of horizon and validation
 
-## Evaluation metrics
+Suppose you need a daily demand forecast for the next 14 days, using two years of history.
 
-- **MAE / RMSE:** point forecast accuracy.
-- **MAPE / sMAPE:** relative error (scale-independent).
-- **QLoss / Pinball Loss:** quantile forecasts for prediction intervals.
-- **CRPS:** proper scoring rule for probabilistic forecasts.
-- **Backtesting:** rolling origin evaluation (expanding or sliding window).
+A correct validation design uses a rolling origin: train on the first 700 days, forecast days 701–714, measure error; then train on 714 days, forecast days 715–728; repeat. Each fold mirrors the real task — predicting 14 days ahead with only past data available.
 
-## When to use which
+Now add a planned promotion in week 3 of the forecast. This is a known future covariate, so a model that accepts calendar features can use it. A univariate ARIMA cannot; it will treat the promotion's effect as unexplained error and, if the promotion recurs, may eventually learn a seasonal pattern that only coincidentally aligns.
 
-| Scenario | Recommended |
-|---|---|
-| Small data (< 1000 pts), simple seasonality | ARIMA, ETS, Prophet |
-| Business metrics with holidays, changepoints | Prophet |
-| High-frequency, large data, complex patterns | TFT, N-BEATS, DeepAR |
-| Need interpretability | Prophet, ARIMA, linear models |
-| Probabilistic forecasts required | DeepAR, TFT, Prophet |
+The choice between a "simple" and a "powerful" model depends on this detail. With 20 related product series and a promotion calendar, a shared deep model with covariates can exploit information a set of independent ARIMA fits cannot. With one series, no covariates, and 400 observations, the deep model has nothing to learn from that the classical model does not already see.
 
-For the related question of feature engineering for time series, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+The arithmetic of error also matters. A 5% mean absolute percentage error is meaningless if the series contains zeros or near-zeros; use a scale-dependent measure with a stated denominator, and report error by segment, since aggregate accuracy can hide systematic failure on the products that matter most.
+
+## What the competition results do not tell you
+
+Three caveats change the practical conclusion.
+
+**Competition datasets are not your data.** M4 and TOURISM contain thousands of diverse series. A method that wins there benefits from cross-series learning; if you have one series, that advantage disappears.
+
+**Accuracy is not the only criterion.** N-BEATS and TFT are described as interpretable relative to earlier neural models, but an ARIMA coefficient or an exponential-smoothing component is still easier to explain to a stakeholder. In a setting where a human must act on the forecast, a small accuracy gain may not justify the loss of transparency.
+
+**The world moves.** Any model assumes the future resembles the past in relevant ways. A structural break — a new competitor, a policy change — invalidates the historical relationship regardless of architecture. Monitoring forecast error and retraining on a schedule is part of the method, not an afterthought.
+
+## A decision test
+
+1. **State the horizon and the covariate availability** before choosing a model.
+2. **Build a naive or seasonal-naive baseline** and a simple exponential-smoothing or ARIMA model.
+3. **Validate with a rolling origin** that mirrors the deployment horizon, never a random split.
+4. **Add covariates only if they are genuinely available at prediction time.**
+5. **Move to a deep model** when you have many related series, rich covariates, or clear evidence that the baselines leave structured error on the table.
+6. **Report error by segment** with explicit denominators, and monitor it after deployment.
+
+For the validation and monitoring discipline that makes any of this trustworthy, see [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation); for the operational side, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline).
 
 ## Further Reading
 
