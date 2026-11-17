@@ -1,67 +1,59 @@
 ---
 title: "Cold Start Problem in Recommender Systems: Strategies for New Users and Items"
-description: "The cold start problem occurs when recommender systems lack data for new users or items. Learn strategies to handle it without sacrificing quality."
+description: "Collaborative filtering cannot recommend what it has never seen. Read the three cold starts and the strategies that actually address each."
 date: 2026-11-16
 tags:
   - Recommender Systems
   - Cold Start
+  - Machine Learning
   - Personalization
-  - Data Science
 ---
 
-New users and new items break traditional recommenders.
+Every recommender works by learning from past behaviour, and every system meets a moment when there is no past behaviour to learn from. A new user has no history; a new item has no interactions; a new platform has neither. The cold start is not an edge case in a catalogue that grows — it is the permanent condition at the boundary of the system.
 
-**Direct answer:** The cold start problem occurs when a recommender system lacks sufficient interaction data to make reliable predictions—for new users (no history), new items (no interactions), or both. Strategies include content-based fallbacks, demographic or contextual cues, explicit preference collection, and hybrid models. No single method eliminates cold start; a layered approach works best.
+**Direct answer:** There are three distinct cold starts — user, item, and system — and they require different responses. User cold start needs information about the person beyond their behaviour; item cold start needs information about the item beyond its interactions; system cold start needs a strategy that does not depend on personalisation at all. Content-based signals, side information, and a deliberate onboarding moment are the standard instruments, and each trades precision for coverage.
 
-## Types of cold start
+## The three cases
 
-**User cold start:** a new user has no interaction history. Collaborative filtering cannot compute similarities.
+**New user.** Collaborative filtering cannot place a user in the interaction structure because there are no interactions. The typical response is to ask for something — explicit preferences, a few selections, or an implicit signal from the first session — and to use demographic or contextual information where it is available and acceptable.
 
-**Item cold start:** a new item has no interactions. Item-based collaborative filtering cannot recommend it.
+**New item.** A product with no interactions cannot appear in a collaborative recommendation, no matter how good it is. This is the quieter and often more damaging case, because it means a catalogue's newest additions are systematically invisible, and the system becomes biased toward its own past.
 
-**Cold start for both:** a brand-new platform with few users and items. Everything is uncertain.
+**New system.** A brand-new platform has neither users nor interactions, and no amount of clever modelling creates them. The answer is editorial curation, popularity, and human-designed defaults until enough behaviour exists.
 
-## Strategies for user cold start
+## Content is the bridge
 
-**Explicit preference elicitation:** ask new users to rate or select favorite categories, genres, or items during onboarding. Netflix asks "pick three movies you like." This provides immediate signal.
+The most general answer to both user and item cold start is side information — anything known about the entity that does not depend on interactions with it.
 
-**Demographic or contextual fallback:** use location, device, time of day, or referral source to infer initial preferences. A mobile user at 8 PM may want entertainment; a desktop user at 9 AM may want productivity tools.
+For items, that means the product description, category, price, image, text, or the structured attributes a catalogue already carries. A content-based model can recommend items similar to what the user liked even if nobody else has interacted with them, which is exactly what a collaborative model cannot do.
 
-**Popularity or trending fallback:** show globally popular or trending items until personal data accumulates. Not personalized, but better than random.
+For users, it means the preferences they state, the context they arrive in, or a small set of choices they make at onboarding. The key is that the signal is collected *before* the system has to make a decision, which is why onboarding is a product decision rather than a formality.
 
-**Progressive personalization:** start generic, personalize more as interactions accumulate. Monitor when to switch strategies (e.g., after 5–10 interactions).
+The trade-off is that content-based methods are limited by the richness of the metadata. A sparse catalogue with generic descriptions produces generic recommendations, and they suffer from the "more of the same" problem — showing a user only variations of what they already consumed. Hybrid systems combine content and collaborative signals, and DeepFM's work on feature interactions is relevant to the ranking side: it is built to model "both low- and high-order feature interactions" from user behaviour and item attributes, which is one way of letting content signal into a ranking model.
 
-## Strategies for item cold start
+## Embeddings help when content is unstructured
 
-**Content-based features:** recommend new items based on attributes (genre, category, price, description) similar to items users already like. A new action movie can be recommended to action fans immediately.
+When the side information is text or images, pretrained embeddings turn it into a representation a model can use. Sentence-BERT produces sentence embeddings that "can be compared using cosine-similarity", which is the basis for recommending items by the semantic similarity of their descriptions. Word2vec-style embeddings do the same for shorter text and for sequences of behaviour.
 
-**Editorial seeding:** manually feature new items in prominent slots (homepage, newsletters) to generate initial interactions.
+This is not a cure. A pretrained embedding brings the model's own training distribution and biases into your catalogue, and a domain with specialised vocabulary will be represented poorly. The embeddings are a bridge over the cold start, not a source of truth about the item.
 
-**Transfer learning:** use embeddings from similar domains or pre-trained models (e.g., item text embeddings) to estimate similarity before interactions exist.
+## Why the problem never goes away
 
-**Incentivize early interactions:** offer discounts or bonuses for users who try new items, accelerating feedback collection.
+A catalogue is a stream. New items arrive continuously, new users arrive continuously, and the system's cold-start population is therefore a steady-state property, not a phase it passes through.
 
-## Hybrid cold-start handling
+Two consequences follow. First, cold-start handling has to be a permanent part of the architecture rather than a launch-time workaround. Second, the system needs a way to move entities *out* of the cold start — an exposure policy that gives new items a controlled chance to accumulate interactions, and a measurement of whether that exposure produced useful signal.
 
-Combine strategies in a cascade:
+A catalogue that never exposes new items will converge on its past favourites, and the recommendation quality will appear excellent while the catalogue quietly becomes a museum. This is a distribution problem as much as a modelling one: without a deliberate route to exposure, new items have no chance to become recommendable.
 
-1. If user has history: collaborative filtering.
-2. Else if item has features: content-based.
-3. Else: popularity or editorial.
+## A strategy for each case
 
-This ensures every user sees something relevant, even on day one.
+1. **User cold start:** collect a minimal, explicit signal at onboarding; use content-based recommendations until behaviour exists; measure how quickly a new user reaches useful recommendations.
+2. **Item cold start:** ensure the catalogue carries descriptive metadata; use content-based similarity; reserve a small, measured share of exposure for new items.
+3. **System cold start:** use editorial curation and popularity, and instrument the behaviour that will later feed the model.
+4. **All three:** build a hybrid ranker that can combine content and collaborative signals, and validate it on the segments where one signal is absent.
+5. **Measure the transition:** track how long it takes a new user or item to acquire enough signal to be served by the main model. That time is the real measure of your cold-start handling.
 
-## Monitoring cold-start health
-
-Track:
-
-- **New user retention:** do new users return after their first session?
-- **New item exposure rate:** what percentage of new items receive at least one interaction?
-- **Time to first relevant recommendation:** how quickly does the system personalize?
-
-If new users churn quickly, the cold-start strategy is failing.
-
-For the related question of how recommendation systems work generally, see [Recommender Systems: Collaborative Filtering, Content-Based, and Hybrid Approaches](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches) and how to evaluate experiments, see [A/B Testing Recommendation Systems: Measuring Lift Without Bias](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
+For the modelling side, see [Recommender Systems](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches); for the experimentation constraints, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
 
 ## Further Reading
 

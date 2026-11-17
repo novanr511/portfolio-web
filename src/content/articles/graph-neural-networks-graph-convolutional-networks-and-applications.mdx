@@ -1,67 +1,62 @@
 ---
 title: "Graph Neural Networks: Graph Convolutional Networks and Applications"
-description: "Graph neural networks process graph-structured data. Learn GCN, GraphSAGE, GAT, and applications in recommendation, fraud detection, and molecular design."
+description: "Graph neural networks learn from relationships, not just features. Read how message passing works and where it actually helps."
 date: 2026-11-16
 tags:
   - Graph Neural Networks
-  - GCN
-  - GraphSAGE
-  - GAT
+  - Machine Learning
   - Deep Learning
+  - Recommender Systems
 ---
 
-Many real-world systems are graphs. GNNs learn from structure.
+Most machine learning assumes the input is a neatly arranged vector. Graph data is not: a social network, a molecule, a citation graph, or a user-item interaction catalogue has a shape that carries information, and flattening it into rows throws that information away. Graph neural networks exist to learn directly from the structure.
 
-**Direct answer:** Graph Neural Networks (GNNs) operate on graph-structured data (nodes, edges, features) by passing messages along edges to learn node, edge, or graph-level representations. Core architectures: GCN (spectral convolution), GraphSAGE (inductive sampling), GAT (attention-based aggregation). Applications: recommendation, fraud detection, molecular property prediction, traffic forecasting, social network analysis.
+**Direct answer:** A graph neural network learns a representation for each node by aggregating information from its neighbours, repeatedly, so that a node's vector comes to encode its position in the structure. The mechanism is message passing: collect information from neighbours, combine it with the node's own state, and update. It helps when relationships carry signal that node attributes alone do not — which is exactly the case in recommender systems, where the user-item interaction graph is the thing a matrix factorisation model used only as a training target.
 
-## Graph representation
+## The problem the graph solves
 
-A graph G = (V, E) with nodes V, edges E, node features X ∈ R^(N×D), adjacency matrix A ∈ {0,1}^(N×N). May include edge features E_f.
+Kipf and Welling's semi-supervised graph convolutional network established the modern pattern, and its value is in what it changed about the input. A node is no longer described only by its features but by its features *and* the features of the nodes around it, with the graph determining how information flows.
 
-## Message passing framework
+This matters most when the data is relational in a way that features do not capture. In a citation network, a paper's neighbours tell you about its field. In a molecule, the bonds determine the behaviour. In a user-item catalogue, the exposure graph tells you which users have overlapping behaviour — a signal that is present in the structure but not in any user's attributes.
 
-GNNs follow a message passing neural network (MPNN) paradigm:
+## Message passing is the whole idea
 
-1. **Message:** `m_v = Σ_{u∈N(v)} M(h_u, h_v, e_uv)` — aggregate neighbor info.
-2. **Update:** `h_v' = U(h_v, m_v)` — update node representation.
+GNNs follow a message-passing neural network paradigm, and the operation is simple enough to state in words:
 
-After K layers, node embeddings capture K-hop neighborhood structure.
+1. Each node starts with a vector — its features, or an embedding.
+2. In each layer, a node receives messages from its neighbours, typically a transformed version of their current vectors.
+3. The messages are aggregated — by sum, mean, or attention-weighted combination.
+4. The node's own vector is updated using its previous state and the aggregated message.
 
-## Core architectures
+After $k$ layers, a node's representation incorporates information from nodes up to $k$ hops away. That is both the capability and a limitation: shallow GNNs cannot see long-range dependencies, and deep ones suffer from over-smoothing, in which all node representations converge toward the same vector and become useless.
 
-**GCN (Graph Convolutional Network):** spectral convolution approximated by localized first-order filter. H^(l+1) = σ(D^(-1/2) A D^(-1/2) H^(l) W^(l)). Transductive (requires full graph during training).
+Hamilton et al.'s GraphSAGE addresses the scaling side of the problem. Neighbour sampling means a node does not aggregate over its entire neighbourhood, which makes training on large graphs feasible and lets the model generalise to new nodes. Their framing — inductive representation learning on large graphs — is the right one for any production system where the graph keeps growing.
 
-**GraphSAGE:** inductive. Samples fixed-size neighborhood, applies aggregator (mean, LSTM, pooling). Learns aggregator function, generalizes to unseen nodes.
+Veličković et al.'s graph attention networks add a learned weighting: instead of averaging neighbours uniformly, the model learns which neighbours matter for the current node. This is useful where neighbourhoods are heterogeneous, which is most real graphs.
 
-**GAT (Graph Attention Network):** attention-weighted aggregation. α_ij = softmax(LeakyReLU(a^T [Wh_i || Wh_j])). Learns edge importance. Multi-head attention.
+## The recommender connection
 
-**GraphTransformer / Graphormer:** transformer on graphs with structural encodings. Strong on molecular graphs.
+Wang et al. make the case that applies most directly to this publication's audience. They argue that a drawback of existing approaches — "ranging from early matrix factorization to recently emerged deep learning based methods" — is that a user's or item's embedding is obtained "by mapping from pre-existing features that describe the user (or the item), such as ID and attributes". The consequence is that "the collaborative signal, which is latent in user-item interactions, is not encoded in the embedding process" — so the resulting embeddings "may not be sufficient to capture the collaborative filtering effect".
 
-**Message Passing Neural Networks (MPNN):** general framework unifying GNN variants.
+Neural Graph Collaborative Filtering takes the interaction graph itself as an input to the embedding, so the representation is shaped by the relationships rather than only by the fit. This is the clearest example of what graph methods add: they move a signal from the loss function into the representation.
 
-## Training objectives
+## Where they fail
 
-- **Node classification:** semi-supervised (GCN, GraphSAGE).
-- **Link prediction:** predict missing edges (dot product of embeddings).
-- **Graph classification:** readout (sum/mean/max pooling + MLP).
-- **Node embedding:** unsupervised (DeepWalk, Node2Vec) or contrastive (GraphCL, GRACE).
+Three failure modes are worth knowing before choosing a GNN.
 
-## Applications
+**Over-smoothing.** With too many layers, node representations become indistinguishable. The number of layers is a modelling decision tied to the graph's diameter, not a depth to increase for its own sake.
 
-- **Recommendation:** user-item bipartite graph (PinSage, LightGCN).
-- **Fraud detection:** transaction graph, anomalous subgraphs.
-- **Drug discovery:** molecular property prediction (Graphormer, Grover).
-- **Traffic forecasting:** spatial-temporal GNNs (STGCN, DCRNN).
-- **Knowledge graphs:** RGCN, CompGCN for relation prediction.
+**Scale and neighbourhood explosion.** Aggregating over all neighbours at every layer grows combinatorially. Sampling, as in GraphSAGE, is a practical necessity at production scale.
 
-## Challenges
+**A wrong graph.** If the edges do not encode a meaningful relationship, message passing propagates noise. A recommender built on co-clicks will learn a different structure from one built on purchases, and the choice of edge is the modelling decision.
 
-- **Scalability:** mini-batch sampling (GraphSAGE, Cluster-GCN), distributed training.
-- **Oversmoothing:** deep GNNs converge to similar embeddings. Residual connections, jumping knowledge.
-- **Heterophily:** neighbors have different labels. H2GCN, GPR-GNN.
-- **Dynamic graphs:** temporal GNNs (TGN, DyRep).
+## When to use one
 
-For the related question of deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings) and vector databases, see [Vector Databases: Embeddings, ANN Search, and RAG Applications](/articles/vector-databases-embeddings-ann-search-and-rag-applications).
+Use a graph neural network when the relationship is part of the signal — when who is connected to whom, or what is bonded to what, carries information that attributes do not. Recommender systems, fraud detection over transaction graphs, molecular property prediction, and knowledge-graph reasoning are the natural cases.
+
+Do not use one when the rows are independent, or when a simpler relational feature — a neighbour count, a graph-derived statistic — already captures the useful part. The extra machinery has to earn its place against that baseline.
+
+For the recommender application, see [Recommender Systems](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches); for the relational features that provide a simpler baseline, see [Feature Engineering](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
 
 ## Further Reading
 
