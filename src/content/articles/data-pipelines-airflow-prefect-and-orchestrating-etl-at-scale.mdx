@@ -1,91 +1,105 @@
 ---
 title: "Data Pipelines: Airflow, Prefect, and Orchestrating ETL at Scale"
-description: "Data pipelines move and transform data reliably. Learn orchestration patterns, Airflow vs Prefect, and production-grade ETL patterns."
+description: "Orchestration is about dependencies, retries, and knowing what ran. Read the mechanism, an SLA worked example, and why event semantics matter more than scheduling."
 date: 2026-11-16
 tags:
   - Data Engineering
-  - Data Pipelines
-  - Airflow
-  - Prefect
   - ETL
+  - Orchestration
+  - DevOps
 ---
 
-Data doesn't move itself. Pipelines do.
+A data pipeline is rarely difficult because of any single transformation. It becomes difficult when dozens of transformations depend on one another, run on different schedules, and fail in partial ways that leave downstream tables quietly wrong. Orchestration is the discipline of making those dependencies explicit and the failures visible.
 
-**Direct answer:** Data pipelines orchestrate the extraction, transformation, and loading (ETL/ELT) of data from sources to destinations. Modern orchestration tools (Airflow, Prefect, Dagster) manage dependencies, retries, scheduling, and observability. Production pipelines require idempotency, idempotent writes, exactly-once semantics, backfill support, and observability.
+**Direct answer:** Workflow orchestration tools — Apache Airflow and Prefect are the two named here — manage task dependencies, scheduling, retries, and observability for data workflows. CloudEvents provides "a specification for describing event data in a common way", which matters when pipelines react to events rather than clocks. GitHub Actions automates "software development workflows" and can run CI/CD, which overlaps with orchestration but is optimised for code, not data dependencies. The boundary: an orchestrator does not make a pipeline correct; it makes the order and state of execution explicit.
 
-## Orchestration concepts
+## What an orchestrator actually provides
 
-**DAG (Directed Acyclic Graph):** tasks as nodes, dependencies as edges. No cycles. Execution follows topological order.
+Four capabilities distinguish orchestration from a collection of cron jobs.
 
-**Operators / Tasks:** atomic units of work (Python function, SQL query, dbt model, Spark job, API call).
+**A dependency graph.** Tasks are declared as a directed acyclic graph: this transformation runs after those two complete. The graph is the system's memory of how data is produced, which is valuable precisely when the original author has left.
 
-**Dependencies:** upstream → downstream. Trigger rules (all_success, all_failed, one_success, all_done).
+**Retry and failure semantics.** A transient failure should be retried; a deterministic one should not. A good orchestrator lets you declare retries, backoff, and the conditions under which a task is considered failed.
 
-**Scheduling:** cron-based, event-driven (dataset updates, API webhooks), manual trigger.
+**State and history.** You should be able to answer "did yesterday's load succeed?" and "which run produced this table?" without reading logs. That history is the basis of trust in a data warehouse.
 
-**Backfill / catchup:** re-run historical intervals. Requires idempotent tasks.
+**Backfills.** When a transformation changes, you need to recompute past periods in the correct order. A tool that cannot backfill reliably forces manual work and creates silent inconsistencies.
 
-## Airflow vs Prefect vs Dagster
+## Scheduling versus events
 
-| Feature | Airflow | Prefect | Dagster |
-|---|---|---|---|
-| Paradigm | DAG-centric, Python operators | Python-native, dynamic workflows | Asset-centric, software-defined assets |
-| Deployment | Heavyweight (Celery/K8s executor) | Lightweight (Prefect Cloud/server) | Hybrid (Dagster Cloud/Open Source) |
-| Dynamic workflows | Limited (SubDAG, TaskGroup) | Native (mapping, flow-of-flows) | Native (partitioned assets) |
-| UI/Monitoring | Mature, rich | Modern, clean | Asset lineage, catalog |
-| Testing | Unit test DAGs | pytest-native | Built-in asset checks |
-| Community | Largest, mature | Growing fast | Growing, strong typing |
+Two trigger models appear in practice.
 
-## ETL vs ELT
+**Scheduled pipelines** run at fixed times — hourly, nightly. They are predictable and easy to reason about, and they assume the inputs are ready when the clock fires. When they are not, the pipeline either fails or processes stale data.
 
-**ETL (Extract → Transform → Load):** transform in-flight (Spark, Python), load clean data. Traditional, compute on pipeline side.
+**Event-driven pipelines** run when something happens: a file arrives, an order is placed. CloudEvents exists because "the lack of a common way of describing events means developers have to write new event handling logic for each event source"; a standard format gives "accessibility" through common libraries and tooling and "portability" across environments. AMQP provides the messaging substrate for reliable delivery.
 
-**ELT (Extract → Load → Transform):** load raw to warehouse (Snowflake, BigQuery, Redshift), transform in SQL (dbt). Modern, leverages warehouse compute.
+The two models are often combined. A nightly aggregate can be scheduled while a fraud feature is computed on each order event. The orchestrator's job is to make both models visible in one place, not to force a single trigger style.
 
-**Hybrid:** EL for raw ingestion, T in warehouse (dbt), ML features in Python.
+## A worked example of an SLA
 
-## Production patterns
+Suppose a daily revenue table must be ready by 07:00, and three jobs feed it:
 
-**Idempotency:** re-running a task produces same result. Use upserts (MERGE), primary keys, deterministic transforms.
+| Job | Duration | Depends on |
+| --- | --- | --- |
+| Extract orders | 20 min | — |
+| Extract refunds | 10 min | — |
+| Join and aggregate | 15 min | both extracts |
 
-**Exactly-once / at-least-once:** transactional sinks, idempotent writes, deduplication keys.
+Run sequentially, the total is 45 minutes, so a 06:15 start meets the 07:00 SLA with 15 minutes of slack. Run the two extracts in parallel, the critical path is 20 + 15 = 35 minutes, giving 25 minutes of slack.
 
-**Partitioning:** by date, tenant, region. Enables partition-level backfill and pruning.
+Now add a retry. If the orders extract has a 10% chance of failing once and taking 20 minutes again, the expected duration is 20 + 0.1 × 20 = 22 minutes, and the 10% tail is 42 minutes on the critical path. With a 06:15 start, a single retry still finishes around 06:57 — just inside the SLA. Two retries would breach it.
 
-**Incremental processing:** process only new/changed data (watermarks, CDC, incremental dbt models).
+This arithmetic explains three design choices:
 
-**Data quality checks:** schema validation, row counts, null checks, distribution checks (Great Expectations, dbt tests, Soda).
+1. **Parallelise independent extracts** to buy slack before you need it.
+2. **Set retry limits from the SLA**, not from a default of three.
+3. **Alert on predicted breach**, not only on failure — a delayed input at 06:30 is already a problem even if nothing has failed yet.
 
-**Observability:** task duration, success/failure, row counts, data freshness (data lineage).
+The numbers are hypothetical, but the method is the point: an SLA is a budget of time, and retries, dependencies, and delays spend it.
 
-## Airflow vs Prefect code comparison
+## Where CI/CD overlaps and where it does not
 
-**Airflow (DAG):**
-```python
-with DAG('etl_daily', schedule='@daily') as dag:
-    extract = PythonOperator(task_id='extract', python_callable=extract_fn)
-    transform = PythonOperator(task_id='transform', python_callable=transform_fn)
-    load = PythonOperator(task_id='load', python_callable=load_fn)
-    extract >> transform >> load
-```
+GitHub Actions is designed to "automate, customize, and execute your software development workflows", including CI/CD, with workflows, runners, and secrets. It can run a data transformation on a schedule, which is why teams sometimes use it as a lightweight orchestrator.
 
-**Prefect (Flow):**
-```python
-@flow
-def etl_daily():
-    data = extract()
-    transformed = transform(data)
-    load(transformed)
-```
+The difference is in the object being managed. CI/CD cares about code versions, test results, and deployments. Data orchestration cares about data partitions, freshness, upstream availability, and backfills. A tool optimised for the first can run a SQL job, but it will not tell you that a partition is stale or help you recompute six months of history in dependency order.
 
-## Choosing an orchestrator
+Use both, with clear boundaries: CI/CD to build and deploy the transformation code, the orchestrator to run it against data.
 
-- **Airflow:** mature, large community, heavy infra, good for static DAGs.
-- **Prefect:** Pythonic, dynamic, lightweight, great for modern stacks.
-- **Dagster:** asset-centric, strong typing, great for data mesh / platform teams.
+## Idempotency is the safety property
 
-For the related question of feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+A pipeline will be retried. A task will run twice after a worker loses its connection at the moment it was writing. The question is whether a second execution produces the same result as the first — the property called idempotency.
+
+Three patterns make it achievable:
+
+**Overwrite by key.** Instead of appending rows, write a partition keyed by the date being processed. A rerun replaces the partition rather than duplicating it. This is the most reliable pattern for batch aggregates.
+
+**Transactional writes.** If the destination supports transactions, wrap the write so that a partial failure leaves no trace. The orchestrator's retry then starts from a clean state.
+
+**Deduplication keys.** For event streams, attach a stable identifier to each event and make the destination reject duplicates. This is where CloudEvents' common format helps: the identifier travels with the event in a standard field rather than being invented by each consumer.
+
+The alternative — hoping that retries are rare — fails at scale. A one-in-a-thousand duplicate rate on a million-row load produces a thousand wrong rows, and the error surfaces weeks later as a discrepancy nobody can reproduce.
+
+## What orchestration does not solve
+
+Three limits matter.
+
+**A green task is not a correct table.** An orchestrator confirms that a job exited successfully. It does not know whether the row count is plausible, whether a join silently dropped records, or whether a source changed its schema. Data-quality checks are a separate concern and should be part of the pipeline.
+
+**Dependencies must be declared.** The orchestrator cannot infer that table B needs table A if nobody encoded it. An undocumented dependency is a hidden failure waiting for a change in timing.
+
+**The graph rots.** Pipelines accumulate tasks that nobody remembers the purpose of. Keep a Changelog's discipline — "all notable changes to this project will be documented in this file", with categories such as Added, Changed, and Removed — applies to pipeline definitions: record why a task was added and when it was retired.
+
+## A decision test
+
+1. **Draw the dependency graph** and identify the critical path.
+2. **Parallelise independent work** to buy SLA slack.
+3. **Set retries and timeouts from the SLA**, not from tool defaults.
+4. **Add data-quality checks** that run after each task, not just success/failure states.
+5. **Use standard event formats** such as CloudEvents when triggers are event-driven.
+6. **Keep CI/CD and data orchestration separate** with a clear handoff.
+7. **Log changes to the pipeline** with reasons and retirement dates.
+
+For the operational side, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the broader architecture, see [Microservices Architecture](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern).
 
 ## Further Reading
 

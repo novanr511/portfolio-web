@@ -1,89 +1,88 @@
 ---
 title: "Data Privacy: GDPR, CCPA, Data Governance, and Privacy by Design"
-description: "Data privacy protects personal information. Learn GDPR, CCPA/CPRA, data governance frameworks, privacy by design, and building a privacy program."
+description: "Privacy rules create obligations at specific moments. Read the two regimes, the 72-hour clock, and why privacy by design is a sequence of decisions."
 date: 2026-11-16
 tags:
   - Data Privacy
   - GDPR
   - CCPA
-  - Data Governance
-  - Privacy by Design
+  - Compliance
 ---
 
-Privacy is not a feature. It is a right.
+Privacy is often presented as a set of policies to publish. In practice it is a set of constraints on what an organisation may do with personal data, when it must act, and what it must be able to prove afterwards. A policy that is not backed by those capabilities is a statement of intent rather than compliance.
 
-**Direct answer:** Data privacy governs how personal information is collected, processed, stored, shared, and deleted. Major regulations: GDPR (EU), CCPA/CPRA (California), LGPD (Brazil), PDPA (Singapore/Thailand), PIPL (China), APPI (Japan). Privacy by Design embeds privacy into systems from inception. A privacy program covers governance, data mapping, DPIA, rights fulfillment, breach response, and vendor management.
+**Direct answer:** Two major regimes shape the operating environment. The EU's GDPR requires notification of a personal-data breach to the supervisory authority "without undue delay and, where feasible, not later than 72 hours after having become aware of it", unless the breach is unlikely to result in a risk to people. California's CCPA was amended by Proposition 24 in November 2020, which also established the California Privacy Protection Agency. The boundary: these are legal instruments with jurisdiction and effective dates; educational summaries cannot substitute for current legal advice.
 
-## Key regulations
+## The two regimes
 
-**GDPR (EU):** lawful basis (consent, contract, legitimate interest), data subject rights (access, rectification, erasure, portability, objection, restriction), DPIA for high-risk processing, DPO appointment, 72-hour breach notification, fines up to 4% global turnover.
+**GDPR.** Article 33 of Regulation (EU) 2016/679 sets the breach-notification clock quoted above. The exception is risk-based: notification is not required if the controller "is able to demonstrate, in accordance with the accountability principle, that the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons". The burden of proof sits with the organisation, and the deadline begins at awareness, not at the end of the investigation.
 
-**CCPA/CPRA (California):** consumer rights (know, delete, opt-out, correct, limit), business obligations (notice at collection, Do Not Sell/Share, contracts with service providers), enforcement (AG, CPPA), private right of action for breaches.
+**CCPA and the CPPA.** The California Privacy Protection Agency states that voters passed Proposition 24 in November 2020, "amending the California Consumer Privacy Act of 2018" and establishing the agency. It is "responsible for implementing and enforcing the CCPA as well as the Delete Act, which creates additional requirements unique to data brokers". The Delete Act took effect on 1 January 2026, and the agency notes that the Delete Request and Opt-out Platform is live.
 
-**Other:** LGPD (Brazil, GDPR-like), PDPA (Singapore/Thailand), PIPL (China, cross-border transfer rules), APPI (Japan), HIPAA (US health), FERPA (education), GLBA (financial).
+The operational difference matters. A 72-hour notification deadline is a clock that starts on an event; a delete or opt-out right is a capability that must exist continuously. An organisation can prepare for the first with an incident plan and for the second only by building the data plumbing in advance.
 
-## Privacy by Design (PbD)
+## Privacy by design is a sequence
 
-**7 principles (Cavoukian):**
-1. Proactive not reactive.
-2. Privacy as default.
-3. Embedded into design.
-4. Full functionality (positive-sum).
-5. End-to-end security.
-6. Visibility and transparency.
-7. Respect for user privacy.
+"Privacy by design" is a phrase that can sound like a principle without content. It becomes concrete as a sequence of decisions made before data is collected:
 
-**Implementation:** data minimization, purpose limitation, storage limitation, pseudonymization/anonymization, encryption, access controls, privacy-enhancing technologies (PETs).
+1. **Define the purpose** and collect only what the purpose requires.
+2. **Set the retention period** at collection time, not later when storage is cheap and deletion is hard.
+3. **Decide who may access** the data and how that access is logged.
+4. **Choose the security controls** appropriate to the sensitivity and the threat model. NIST SP 800-53 provides a catalogue of security and privacy controls for this purpose.
+5. **Design the deletion path** — how a request is found, executed, and verified across every system that holds a copy.
+6. **Record the lawful basis** and the decisions, so they can be demonstrated.
 
-## Data governance framework
+The order is the point. A retention rule added after five years of accumulation is a cleanup project; a deletion capability designed into the data model is a feature.
 
-**Data inventory / catalog:** what data, where, source, purpose, retention, owner, sensitivity.
+Datasheets contribute to the same sequence. Gebru et al.'s documentation of "composition, collection process, recommended uses" is the record of what was collected and for what purpose — the evidence that a later use is or is not compatible with the original one.
 
-**Classification:** public, internal, confidential, restricted. Handling rules per class.
+## A worked example of a breach decision
 
-**Roles:** Data Controller (determines purpose/means), Data Processor (acts on behalf), DPO (oversight), Data Stewards (operational).
+The following scenario is hypothetical and illustrative.
 
-**Policies:** retention schedule, deletion procedures, access control, sharing agreements (DPA/SCC), cross-border transfer mechanisms (SCC, BCR, adequacy).
+A company discovers at 09:00 on Monday that an employee exported a file containing 80,000 customer records to a personal cloud account. The security team confirms the export by 11:00. By 15:00 it has established that the account was accessed twice by an unknown IP address.
 
-## Data subject rights fulfillment
+Apply the GDPR clock from Article 33:
 
-**Automation:** self-service portals (access, deletion, portability, rectification, objection).
+- **Awareness:** approximately 11:00 Monday, when the export was confirmed. The 72-hour window ends around 11:00 Thursday.
+- **Risk assessment:** the data includes names, email addresses, and purchase history, but no payment details or passwords. Whether this is "unlikely to result in a risk" is a judgement the organisation must be able to demonstrate — not a feeling.
+- **Decision:** if the risk is not demonstrably low, notify the supervisory authority before Thursday 11:00. The notification can be phased, which is why the rule says "without undue delay" rather than "when complete".
 
-**Timelines:** GDPR 30 days (extendable 60), CCPA 45 days (extendable 45).
+Three things go wrong in organisations that have not prepared:
 
-**Verification:** identity verification without excessive data collection.
+1. **The clock is missed** because the legal team learns of the event on Wednesday.
+2. **The scope is unknown** because there is no inventory of where customer data lives, so the team cannot say what was in the file.
+3. **The risk assessment is invented under pressure** because nobody documented the sensitivity of the fields in advance.
 
-**Exceptions:** legal obligations, fraud prevention, freedom of expression.
+This is why a data inventory, a documented field-level classification, and a rehearsed escalation path are privacy controls. They are also the prerequisites for using the Article 33 exception honestly: you cannot demonstrate low risk without evidence.
 
-## Data Protection Impact Assessment (DPIA)
+## What compliance does not guarantee
 
-**When required:** systematic profiling, large-scale special category data, public monitoring, new technologies.
+Three qualifications keep the topic honest.
 
-**Process:** describe processing, assess necessity/proportionality, identify risks, mitigate, consult DPO, document.
+**Jurisdiction and effective dates matter.** The CPPA's rules and the GDPR's obligations apply in specific territories and change over time. The Delete Act's 1 January 2026 effective date is a concrete example. Any implementation must check the current rule, not a summary written last year.
 
-**Review:** at least annually or when processing changes.
+**A right is not a capability.** Stating that customers may delete their data is different from being able to find and delete every copy across production, backups, analytics, and third-party processors. The engineering work is the substance of compliance.
 
-## Breach response
+**Notice is not consent, and consent is not a purpose.** Collecting a lawful basis at signup does not authorise a later, incompatible use. Datasheets help here by recording the original purpose, but the decision to reuse data still requires a fresh assessment.
 
-**Detection:** monitoring, reporting channels.
+This article is educational and is not legal advice. For a high-impact implementation, qualified counsel in the relevant jurisdiction should review the design.
 
-**Assessment:** severity, scope, data types, affected individuals.
+## A decision test
 
-**Notification:** supervisory authority (72h GDPR), affected individuals (high risk), regulators (sector-specific).
+1. **State the purpose** before collecting personal data and collect only what it requires.
+2. **Record the retention period** and the lawful basis at collection time.
+3. **Keep a field-level inventory** so a breach scope can be established quickly.
+4. **Rehearse a 72-hour notification** with legal, security, and communications.
+5. **Build deletion as a system capability**, not a manual request process.
+6. **Check the current rules** in every jurisdiction where you operate.
+7. **Document the risk assessment** with evidence, since the burden of proof is yours.
 
-**Containment & remediation:** containment, eradication, recovery, post-incident review.
-
-## Privacy program maturity
-
-**Level 1 (Ad hoc):** reactive, minimal compliance.
-**Level 2 (Defined):** policies, DPIA process, basic training.
-**Level 3 (Managed):** automated rights fulfillment, DPIA integrated, metrics.
-**Level 4 (Optimized):** privacy by default, PETs deployed, continuous improvement, board-level reporting.
-
-For the related question of data ethics, see [Data Ethics: Responsible Use of Customer Data](/articles/data-ethics-responsible-use-of-customer-data) and data governance, see [Data Governance: Managing Data as an Asset](/articles/data-governance-managing-data-as-an-asset).
+For the governance layer, see [Data Governance](/articles/data-governance-managing-data-as-an-asset); for the incident mechanics, see [Crisis Management](/articles/crisis-management-pr-crises-product-recalls-and-reputation-recovery).
 
 ## Further Reading
 
+- European Union, 2016. [Regulation (EU) 2016/679 (GDPR)](https://eur-lex.europa.eu/eli/reg/2016/679/oj) — Article 33 requires notification of a personal-data breach to the supervisory authority within 72 hours where feasible.
 - California Privacy Protection Agency, 2026. [California Privacy Protection Agency — Regulations](https://cppa.ca.gov/regulations/) — The California privacy rules and the implementing regulations.
 - NIST, 2020. [NIST SP 800-53: Security and Privacy Controls for Information Systems and Organizations](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) — The control catalogue behind most compliance programmes.
 - Timnit Gebru et al., 2021. [Datasheets for Datasets](https://arxiv.org/abs/1803.09010) — The document format that makes a dataset's provenance and limits reviewable.

@@ -1,87 +1,89 @@
 ---
 title: "Data Governance: Managing Data as an Asset"
-description: "Data governance is the framework for managing data quality, access, and accountability. Learn how organizations treat data as a strategic asset."
+description: "Data becomes an asset only when someone can answer what it contains, who may use it, and how it was collected. Read the documentation mechanism and its limits."
 date: 2026-11-16
 tags:
-  - Data
-  - Governance
-  - Data Management
-  - Strategy
+  - Data Governance
+  - Data Quality
+  - AI Governance
+  - Risk Management
 ---
 
-Data is only an asset if it is managed like one.
+Organisations routinely say that data is an asset and then treat it as a byproduct — something that accumulates in warehouses with no owner, no definition, and no agreed standard of quality. Calling data an asset is not a metaphor with consequences; it is a claim that should be testable. The test is whether a person can find the data, understand what it means, and trust it for a decision.
 
-**Direct answer:** Data governance is the framework of policies, roles, and processes that ensures data is accurate, accessible, secure, and used appropriately. It defines who owns data, who can access it, how quality is maintained, and how decisions about data are made. Without governance, data becomes inconsistent, unreliable, and risky. With governance, data becomes a dependable asset for decisions, products, and compliance.
+**Direct answer:** Data governance is the system of ownership, definitions, documentation, and controls that makes data usable and accountable. Two concrete instruments do much of the work: datasheets, which document a dataset's "motivation, composition, collection process, recommended uses", and model cards, which record intended use and evaluation conditions. NIST's AI Risk Management Framework is "intended for voluntary use" to incorporate trustworthiness into "design, development, use, and evaluation". The boundary: documentation describes a dataset at a point in time; it does not keep it correct as the data changes.
 
-## What data governance covers
+## What governing data actually means
 
-Data governance answers:
+Three questions expose whether governance exists:
 
-- **Ownership:** who is accountable for each dataset?
-- **Access:** who can see, edit, or delete what?
-- **Quality:** what standards define accurate, complete, timely data?
-- **Usage:** what is allowed, and what is prohibited?
-- **Compliance:** how are privacy and regulatory requirements met?
-- **Issues:** how are data problems reported and resolved?
+**Who owns it?** A named owner decides who may access the data, what quality bar it must meet, and when it is retired. A dataset with no owner is a liability that happens to be stored.
 
-## Why governance matters
+**What does it mean?** A column called "active user" can mean someone who logged in this week, this month, or ever. Without a definition and a stated measurement window, two teams will compute different numbers from the same table and argue about which is correct.
 
-Without governance:
+**How was it collected?** This determines what the data can legitimately be used for. Consent, collection method, and sampling frame constrain downstream use in ways that a schema never shows.
 
-- **Inconsistent definitions.** "Active user" means different things to marketing, product, and finance.
-- **Silos.** Data is trapped in systems and teams, inaccessible to those who need it.
-- **Quality decay.** Errors propagate because no one is responsible for fixing them.
-- **Compliance risk.** Personal data is mishandled, triggering fines and reputational damage.
-- **Bad decisions.** Decisions are based on wrong or incomplete data.
+Datasheets, as described by Gebru et al., exist precisely to answer the third question: they document "motivation, composition, collection process, recommended uses". The point is not bureaucracy. A team that encounters a dataset years later needs to know whether it was collected in a way that supports the use they have in mind.
 
-## The governance structure
+## The documentation travels with the data
 
-Effective governance includes:
+A documented dataset whose documentation lives elsewhere is undocumented in practice. Three properties make documentation useful:
 
-- **Data owners:** accountable for specific datasets, responsible for quality and access decisions.
-- **Data stewards:** day-to-day managers of data quality and metadata.
-- **Data users:** analysts, engineers, and business staff who use data and report issues.
-- **Governance council:** cross-functional leadership that sets policy and resolves conflicts.
+**It is co-located.** The definition and caveats must be reachable from where the data is accessed, not in a document nobody opens.
 
-Governance is not IT's job alone. It requires business participation because business context defines what data means.
+**It names the failures.** A datasheet that lists only the intended use is incomplete. It should state what was not measured, which groups are underrepresented, and what uses are discouraged. Absence of evidence is not evidence of suitability.
 
-## Data quality as governance output
+**It is versioned.** A dataset that has been retraining, backfilled, or resampled is a different object. The documentation must say which version it describes, or it will describe something that no longer exists.
 
-Governance produces quality through:
+Model cards extend the same discipline to models. Mitchell et al. call for "benchmarked evaluation in a variety of conditions" across relevant groups, with the intended use stated alongside. In a governance programme, the model card and the datasheet together form a chain of provenance: what went in, what was built, and where it is valid.
 
-- **Standards:** naming, formatting, and definition conventions.
-- **Validation:** checks at data entry and integration points.
-- **Monitoring:** alerts when quality metrics drift.
-- **Remediation:** processes for fixing errors and preventing recurrence.
+NIST's AI RMF is the process layer. Its voluntary status is important to state plainly: it is a framework for producing and organising evidence, not a certification or a legal requirement.
 
-Quality is not a one-time cleanup. It is an ongoing discipline.
+## A worked example of a failed definition
 
-## Access and security
+The following scenario is hypothetical and illustrative.
 
-Governance balances access with protection:
+Two teams in a company report "monthly active users". The growth team counts anyone who opened the app in the last 30 days. The finance team counts anyone with a successful payment in the period. Both call the number "MAU", both query the same warehouse, and both present a figure of 1.2 million in the same board deck — because one team's definition includes free trials that the other excludes, and the totals happen to coincide that month.
 
-- **Role-based access:** people see what they need for their job, no more.
-- **Approval workflows:** sensitive data requires approval to access.
-- **Audit logs:** who accessed what, and when.
-- **Privacy controls:** personal data is handled according to regulation and expectation.
+Three consequences follow:
 
-Too little access slows the business. Too much access creates risk.
+1. **The metric cannot be used to resolve a decision.** When growth and finance disagree about a campaign's effect, they are measuring different populations, so no amount of analysis settles it.
+2. **Trust erodes.** Once the discrepancy is discovered, every number from both teams is questioned, including the correct ones.
+3. **The underlying data is blamed.** The usual response — "we need better data" — misses the actual problem, which is an undefined term and no owner.
 
-## Governance is not bureaucracy
+The fix is not a new tool. It is a definition with an owner: the population, the event, the window, the exclusion rules, and the name of the person who approves changes. That definition belongs with the dataset, in the datasheet, and it should be versioned so that historical figures can be interpreted against the definition that produced them.
 
-Governance is often perceived as red tape. Done well, it removes friction: trusted data means less time verifying numbers and more time making decisions. The goal is not to control every data point; it is to make the right data available to the right people at the right time.
+This example shows why "data as an asset" is a discipline rather than a slogan. An asset has a defined value and a clearly identified owner; an ambiguous column with two meanings has neither.
 
-## Implementing governance
+## Where governance meets privacy
 
-Start small:
+Data governance and privacy overlap but are not identical. Governance asks whether data is fit for use; privacy asks whether the use is permitted.
 
-1. **Identify critical datasets.** Not all data needs equal governance. Start with the datasets that drive decisions.
-2. **Assign owners.** Name the person accountable for each.
-3. **Define standards.** Document definitions, quality rules, and access policies.
-4. **Monitor and enforce.** Track compliance and address violations.
-5. **Expand gradually.** Add datasets and processes as governance matures.
+The California Privacy Protection Agency illustrates the regulatory layer. It states that California voters passed Proposition 24 in November 2020, "amending the California Consumer Privacy Act of 2018" and establishing the agency, which is "responsible for implementing and enforcing the CCPA as well as the Delete Act". The Delete Act, effective 1 January 2026, creates "additional requirements unique to data brokers". A governance programme that does not track such rules will describe data as available when it is no longer lawful to use it in a particular way.
 
-For the related question of data strategy, see [Data Strategy: How Organizations Use Data to Compete](/articles/data-strategy-how-organizations-use-data-to-compete) and why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+## What documentation cannot do
+
+Three limitations deserve more than a footnote.
+
+**It goes stale.** A datasheet written at collection time does not describe later processing, and a model card does not update itself. Governance requires a review trigger — a retrain, a schema change, a new use case — not a one-off document.
+
+**It does not create quality.** Recording that a dataset has missing values is useful; it does not fix them. Governance sets expectations and makes gaps visible, but the engineering work remains.
+
+**It can become theatre.** A programme that measures success by the number of documents produced will generate documents nobody reads. The useful measure is whether a question about a dataset can be answered quickly and correctly.
+
+The counterargument to heavy documentation — that it slows down a small team — is real. The proportionate response is to document the datasets that decisions depend on, rather than every table in the warehouse.
+
+## A decision test
+
+1. **Name an owner** for every dataset used in a decision.
+2. **Define the terms** — population, event, window, exclusions — and version the definition.
+3. **Attach a datasheet** with composition, collection process, and discouraged uses.
+4. **Attach a model card** to any model built on the data, with evaluation conditions and limits.
+5. **Check the permitted uses** against the relevant privacy rules and their effective dates.
+6. **Set a review trigger** for every document, tied to a change in the data or its use.
+7. **Measure whether questions get answered**, not how many documents exist.
+
+For the privacy side, see [Data Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design); for the organisational framework, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale).
 
 ## Further Reading
 
