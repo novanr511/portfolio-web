@@ -1,10 +1,91 @@
 ---
 title: "Small Language Models: When Smaller Is the Right Choice"
-description: "Reserved title for a future NOVANDRI article: Small Language Models: When Smaller Is the Right Choice."
+description: "A smaller model is cheaper and faster, not automatically worse. Read the task-fit test, a worked example, and what you give up."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - LLM
+  - SLM
+  - Edge AI
+  - Decision Guide
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+The default assumption in many projects is to use the largest model available and only downgrade when cost forces it. That is backwards for tasks with a narrow scope. A small language model, fine-tuned or prompted for a specific job, can match a frontier model on that job while being faster, cheaper, and deployable closer to the data.
+
+**Direct answer:** Choose a small model when the task is narrow, the output is verifiable, and latency or cost dominates. Large multimodal families such as Gemini illustrate the capability available at the top end; the edge-AI article covers the deployment techniques that make small models practical. The boundary: a small model has less general knowledge and weaker reasoning on unfamiliar tasks, so it is the right choice for a defined job, not as a universal replacement.
+
+## What "small" changes
+
+Three differences matter:
+
+**Capability breadth.** A small model knows less and reasons less well on unfamiliar problems. On a narrow task with a clear pattern, that gap can vanish.
+
+**Speed and cost.** Fewer parameters mean faster inference and lower memory, which the KV-cache article quantifies. At high volume the difference is decisive.
+
+**Deployment flexibility.** A small model can run on a laptop, a phone, or an edge device, which matters for privacy and offline use, as the cloud-versus-device article explains.
+
+## A worked selection example
+
+The following is hypothetical and illustrative.
+
+A company processes 50,000 support tickets a month, classifying them into ten categories. A frontier model achieves 95% accuracy at a cost of roughly $500 a month. A small model, fine-tuned on 5,000 labelled tickets, achieves 93% at $30 a month and half the latency.
+
+Three questions decide:
+
+1. **What does the two-point gap cost?** If a misrouted ticket costs a few minutes of rework, the saving is clearly worth it. If it delays a safety escalation, it is not.
+2. **Is the accuracy stable on new categories?** The small model was tuned on ten categories. When an eleventh appears, it may fail badly, as the monitoring article warns about drift.
+3. **Is there a verifier?** Classification has a clear correct answer, so errors can be measured continuously and the model retrained when accuracy falls. The evaluation-rubric article covers the scoring method.
+
+Three conclusions follow:
+
+- **The small model wins on economics** if the error cost is low and the category set is stable.
+- **The frontier model wins on robustness** to novel inputs.
+- **A hybrid is possible** — small model for known categories, escalation to a larger one for low-confidence cases, which the routing article describes.
+
+## Where small models fit
+
+**Classification and extraction** with defined outputs and labelled examples.
+
+**High-volume, low-stakes tasks** where cost per request dominates.
+
+**On-device and offline applications** where data cannot leave the device.
+
+**Drafting with review** where a first version is enough and a human checks it.
+
+## Where they do not
+
+**Open-ended reasoning** across unfamiliar domains, where broad knowledge matters.
+
+**Tasks with little training data** for fine-tuning, where a general model's pretraining is the advantage.
+
+**Applications that need multimodal depth** — high-resolution images, audio, or video — where the largest models currently lead, as the Gemini paper illustrates.
+
+The counterargument — that small models are always cheaper — needs a caveat. A small model that fails and needs escalation can cost more than a frontier model that succeeds first time. Measure the full pipeline, as the cost estimator explains.
+
+## The evaluation that decides
+
+A small model should be chosen on a labelled comparison, not on a parameter count. Three parts of the evaluation matter:
+
+**Task accuracy against a baseline.** Score both models on the same held-out set from real work. A two-point gap is meaningful only if the set is large enough to detect it, as the confidence-interval article explains.
+
+**Behaviour on novel inputs.** Include cases outside the fine-tuning distribution — a new category, a different phrasing, a malformed request. A small model may fail sharply here while a general model degrades gracefully.
+
+**Full-pipeline cost.** Count escalation, review, and retries alongside token cost. A small model that handles 80% of cases and escalates the rest may beat either extreme, which the routing article shows.
+
+These three measurements turn a size debate into an engineering decision with stated trade-offs.
+
+## A decision test
+
+1. **Define the task narrowly** and list its outputs.
+2. **Check for labelled examples** to fine-tune or evaluate.
+3. **Measure accuracy against a frontier baseline** on your own data.
+4. **Price the error cost** of the gap, not just the token cost.
+5. **Test behaviour on novel inputs** and define an escalation path.
+6. **Measure latency and memory** on the target hardware.
+7. **Re-evaluate when the task or data changes.**
+
+For the deployment techniques, see [Edge AI](/articles/edge-ai-model-compression-quantization-and-on-device-inference); for the hardware, see [Why GPU Computing Is Becoming a Strategic Resource](/articles/why-gpu-computing-is-becoming-a-strategic-resource).
+
+## Further Reading
+
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.
+- Anthropic, 2026. [Models overview - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/models/overview) — The current Claude model lineup (Opus 5, Fable 5.2, Sonnet 5.5, Haiku 5.5), supported inputs and the official model-selection guidance.

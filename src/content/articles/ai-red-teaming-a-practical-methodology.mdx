@@ -1,10 +1,91 @@
 ---
 title: "AI Red Teaming: A Practical Methodology"
-description: "Reserved title for a future NOVANDRI article: AI Red Teaming: A Practical Methodology."
+description: "Red teaming finds failure before users do. Read a repeatable method, a worked exercise, and why a list of prompts is not a programme."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Security
+  - Safety
+  - Testing
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An AI red team that only tries famous jailbreak prompts is testing last year's attacks. The purpose of red teaming is to discover *new* failure modes in your specific system — the combination of model, tools, data, and interface that you deployed. That requires a method, not a prompt list.
+
+**Direct answer:** Red teaming is a structured attempt to make a system fail in ways that matter, with defined scope, attackers, and success criteria. NIST's adversarial-ML taxonomy and OWASP's LLM Top 10 provide the reference categories. The boundary: a red-team exercise finds vulnerabilities present at that time under those conditions — it is evidence of failure, not proof of safety when nothing is found.
+
+## A repeatable method
+
+**1. Define the system boundary.** What is in scope — the model, the tools, the retrieved data, the interface? A prompt-only test misses tool and data failures, which the security checklist covers.
+
+**2. Define the threat model.** Who is the adversary, what can they control, and what do they want? A curious user and a determined attacker have different capabilities. NIST's taxonomy organises attacks by goals and knowledge.
+
+**3. Choose the attack categories.** Map to a recognised list — prompt injection, data exfiltration, excessive agency, misinformation, resource abuse — then add categories specific to your domain.
+
+**4. Record attempts and outcomes.** Each test needs the input, the observed behaviour, and a severity judgement. Without records, the exercise is anecdotes.
+
+**5. Fix and retest.** A finding without an owner and a retest is a report, not a programme. The governance checklist covers the ownership question.
+
+## A worked exercise
+
+The following is hypothetical and illustrative.
+
+A team red-teams a support assistant with access to account lookup and a refund tool. Three attempts:
+
+1. **Direct instruction override.** The tester asks the assistant to ignore its rules. It refuses. Severity: none.
+2. **Indirect injection.** The tester plants a instruction in a document the assistant retrieves, telling it to issue a refund to a specific account. The assistant attempts the refund; the tool's authorisation check rejects it because no valid reason code exists. Severity: medium — the model was influenced, but the boundary held.
+3. **Excessive agency.** The tester asks for a summary of "all customers with outstanding refunds" and the tool returns more data than the interface should show. Severity: high — the tool's output was not scoped.
+
+Three lessons follow:
+
+- **The direct attack failed but the indirect one partially worked.** Testing only direct prompts would have missed the real vector, which the prompt-injection article explains.
+- **The tool boundary held, which is good — but the model was still influenced.** That is a signal worth fixing, not ignoring because no damage occurred.
+- **The high-severity finding was not an AI failure at all.** It was an overbroad tool response, which is why the system boundary matters.
+
+## What to measure
+
+**Discovery rate.** How many new failure modes were found per session? A programme that finds nothing after several sessions is probably not looking hard enough.
+
+**Time to fix.** How long from finding to verified fix? A long tail means the team is finding problems faster than it can repair them.
+
+**Recurrence.** Do fixed failures reappear after a model or prompt change? Recurrence means the fix was superficial, as the evaluation article warns.
+
+**Coverage.** Which categories were tested, and which were not? An untested category is not safe; it is unknown.
+
+## Building a team and a cadence
+
+A red-team programme needs people and a rhythm, not just a tool. Three practical points:
+
+**Mix perspectives.** Engineers know where the code is fragile; domain experts know where the answer would be harmful; people unfamiliar with the system find the assumptions everyone else shares. A homogeneous team tests a narrow slice of the failure surface.
+
+**Schedule around change.** Run an exercise after a material change — a new tool, a model update, a new data source — rather than on a date alone. Changes introduce new paths, and a stale exercise tests a system that no longer exists.
+
+**Keep findings short and specific.** A finding that says "the model can be manipulated" is not actionable. One that says "a prompt in a retrieved document causes a refund call with a valid reason code" tells engineering exactly what to fix. The specificity is the value.
+
+These practices turn an exercise into an institutional capability. Without them, red teaming is a one-off performance that satisfies a checklist and leaves the system unchanged.
+
+## What red teaming cannot do
+
+**It cannot prove absence.** A session with no findings is evidence about that session, not about the system in general.
+
+**It cannot replace monitoring.** Production traffic contains novel attacks. The observability article covers the alerting discipline.
+
+**It cannot fix governance.** A finding that nobody owns will not be repaired, which is why the stop condition and owner matter as much as the test.
+
+The counterargument — that red teaming is expensive for a small system — is fair. The response is proportionality: a short, scoped exercise on the highest-impact boundary is better than an elaborate programme that never runs.
+
+## A decision test
+
+1. **Define the system boundary** and the attacker's capabilities.
+2. **Map to a recognised category list**, then add domain-specific cases.
+3. **Include indirect attacks** through retrieved content and tools.
+4. **Record input, behaviour and severity** for every attempt.
+5. **Assign an owner and retest** each verified finding.
+6. **Measure discovery, fix time and recurrence.**
+7. **Repeat after material changes** to model, tools or data.
+
+For the main attack class, see [Prompt Injection in LLM Applications](/articles/prompt-injection-llm-applications-threat-model); for the taxonomy, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## Further Reading
+
+- NIST, 2025. [AI 100-2 E2025, Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations | CSRC](https://csrc.nist.gov/pubs/ai/100/2/e2025/final) — The adversarial machine learning taxonomy that treats abuse and large-language-model attacks as a formal category.
+- OWASP Gen AI Security Project, 2025. [LLMRisks Archive - OWASP Gen AI Security Project](https://genai.owasp.org/llm-top-10/) — The OWASP Top 10 for LLM Applications 2025, where prompt injection is ranked LLM01:2025.

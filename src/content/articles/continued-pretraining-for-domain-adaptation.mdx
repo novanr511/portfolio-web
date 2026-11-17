@@ -1,10 +1,97 @@
 ---
 title: "Continued Pretraining for Domain Adaptation"
-description: "Reserved title for a future NOVANDRI article: Continued Pretraining for Domain Adaptation."
+description: "When a model does not know your domain, more pretraining on it can help. Read the method, a worked decision, and when fine-tuning is enough."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Training
+  - LLM
+  - Data
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A general model knows a great deal about language and very little about your specific corpus — its terminology, its document formats, the way its experts reason. Fine-tuning on a small labelled set can teach a task, but it cannot teach a domain. Continued pretraining exposes the model to more of the domain's text before task-specific training.
+
+**Direct answer:** Continued pretraining applies the language-modelling objective to additional domain text, adapting the model's representations before fine-tuning. The deduplication paper is relevant because the quality of that additional text determines whether the adaptation helps. The boundary: continued pretraining is expensive and can damage general capability if the domain corpus is narrow or low-quality — it is not a default step.
+
+## When to consider it
+
+Three conditions point toward continued pretraining:
+
+**Vocabulary and concepts are unfamiliar.** Legal, biomedical, or engineering domains use terms and relationships that general pretraining barely covers.
+
+**You have substantial unlabelled domain text.** Continued pretraining needs volume. A few thousand documents are not enough; millions of tokens may be.
+
+**Fine-tuning has plateaued.** If a task-specific set has been exhausted and performance is still poor, the bottleneck may be domain knowledge rather than task format.
+
+## A worked decision
+
+The following is hypothetical and illustrative.
+
+A team has 500 million tokens of internal technical documentation and 10,000 labelled question-answer pairs. A fine-tuned general model reaches 78% accuracy on a held-out set.
+
+Three options:
+
+- **More fine-tuning.** Re-run on the same 10,000 pairs with tuning changes. Likely small gains, since the labelled data is exhausted.
+- **Continued pretraining then fine-tuning.** Train on the 500 million tokens, then on the pairs. Expensive, but it may teach the terminology the pairs assume.
+- **Retrieval instead.** Index the documents and ground answers in retrieved passages, as the RAG article describes. Cheaper and often effective when the knowledge is in the documents.
+
+Three checks decide:
+
+1. **Is the knowledge in the corpus or in the model?** If answers can be retrieved from documents, retrieval is usually cheaper and more updatable than continued pretraining.
+2. **Is the corpus clean?** Training on duplicated or stale documents wastes compute and biases the model, which the data-curation article explains.
+3. **Does general capability survive?** Continued pretraining on narrow text can degrade performance outside the domain. Evaluate a general benchmark before and after, as the benchmarks article recommends.
+
+Three conclusions follow:
+
+- **Retrieval is the first option** when the knowledge is documented and verifiable.
+- **Continued pretraining is justified** when the domain changes how language is used, not just what it refers to.
+- **General capability is a guardrail**, not an assumption — measure it.
+
+## How to do it safely
+
+**Curate the corpus.** Remove duplicates, filter low-quality text, and record provenance, as the data-curation article describes.
+
+**Mix in general data.** A small fraction of general text helps prevent catastrophic forgetting of broad capability. The right ratio is empirical, not a rule.
+
+**Use a low learning rate.** The model already knows language; the goal is adaptation, not relearning. Aggressive updates damage what was there.
+
+**Evaluate at checkpoints.** Domain accuracy and general capability move at different rates. The best checkpoint is a trade-off, which the evaluation article covers.
+
+## Evaluating the adapted model
+
+A successful adaptation improves the domain without destroying the general model. Three evaluations belong in the decision:
+
+**Domain benchmark.** A labelled set of tasks in the target domain, scored before and after. This is the primary evidence that adaptation worked.
+
+**General benchmark.** A standard set covering broad knowledge and reasoning, scored before and after. A drop here is the cost of specialisation, as the benchmarks article explains.
+
+**Downstream task metrics.** The fine-tuned system's actual performance — accuracy, error rate, escalation rate — on real work. Domain improvement that does not reach the task is not useful, which the evaluation article covers.
+
+The three can move in different directions. The right checkpoint is a trade-off among them, not the one that maximises the domain score alone.
+
+## What continued pretraining cannot do
+
+**It cannot replace labelled task data.** It teaches the domain, not the specific task format or desired behaviour.
+
+**It cannot fix an absent corpus.** If the knowledge is not written down, there is nothing to train on.
+
+**It is not always cheaper than retrieval.** The compute cost is substantial, and the result becomes stale as documents change, whereas an index can be updated, as the RAG article explains.
+
+The counterargument — that a larger general model would know the domain already — is fair for some domains and expensive at every request. Continued pretraining moves knowledge into the weights, which is a different trade from paying for a frontier model each time.
+
+## A decision test
+
+1. **Ask whether retrieval can supply the knowledge** first.
+2. **Check corpus volume and quality** with deduplication applied.
+3. **Measure the fine-tuning plateau** before adding complexity.
+4. **Mix general data** to protect broad capability.
+5. **Use a conservative learning rate** and evaluate checkpoints.
+6. **Track domain accuracy and general capability** together.
+7. **Re-evaluate after corpus changes**, not on a fixed schedule.
+
+For the retrieval alternative, see [Retrieval-Augmented Generation](/articles/rag-explained); for corpus preparation, see [Data Curation](/articles/data-curation-for-llm-pretraining-deduplication-and-quality).
+
+## Further Reading
+
+- Katherine Lee et al., 2021. [Deduplicating Training Data Makes Language Models Better](https://arxiv.org/abs/2107.06499) — Exact and near-duplicate removal improves language models and reduces memorisation of training examples.
+- Anthropic, 2026. [Models overview - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/models/overview) — The current Claude model lineup (Opus 5, Fable 5.2, Sonnet 5.5, Haiku 5.5), supported inputs and the official model-selection guidance.
