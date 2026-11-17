@@ -1,10 +1,85 @@
 ---
 title: "AI in Legal Research: Retrieval, Summarization, Citation Checks"
-description: "Reserved title for a future NOVANDRI article: AI in Legal Research: Retrieval, Summarization, Citation Checks."
+description: "Legal AI must show its sources. Read the three tasks, a worked research workflow, and why a fluent summary is not authority."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Legal
+  - Research
+  - Verification
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Legal research has three properties that make AI both useful and dangerous: the sources are authoritative and citable, the language is precise, and a wrong answer can affect a real decision. A tool that helps find and summarise law is valuable; a tool that invents a citation is a liability. The discipline is to keep the source visible at every step.
+
+**Direct answer:** Use AI to retrieve relevant authorities, summarise what they say, and check that every citation points to a real source supporting the claim. Anthropic's legal summarisation guide is the primary use-case reference, and the retrieval article covers the search mechanism. The boundary: a model can locate and condense authority, but it cannot replace legal judgement about how a source applies to a specific matter, which the contract-review article explains for adjacent work.
+
+## Three tasks
+
+**Retrieval.** Find statutes, regulations, and case law relevant to a question. This is a search problem, as the retrieval article explains, and the measure is recall — did the search find the controlling authority?
+
+**Summarisation.** Condense a long judgment or statute into the points that matter for the question. The reduce-hallucinations article covers grounding: every claim should trace to the text.
+
+**Citation checking.** Verify that every cited source exists and supports the claim attached to it. This is the hardest and most important task, because a plausible but nonexistent citation is a specific failure mode of language models, as the detection article discusses for generated text generally.
+
+## A worked research workflow
+
+The following is hypothetical and illustrative.
+
+A lawyer asks a research assistant: "What does the governing statute say about notice periods for this contract type?"
+
+The workflow:
+
+1. The system retrieves three candidate sources from a licensed database.
+2. It summarises the relevant sections, quoting the operative language.
+3. It produces an answer with a citation to section and paragraph for each claim.
+
+Three checks decide whether the result is safe:
+
+1. **Citation existence.** Does the cited section exist? A check against the source database catches invented references, which the reduce-hallucinations article treats as a core verification.
+2. **Citation support.** Does the cited passage actually say what the summary claims? A real citation attached to a wrong claim is a subtler failure, which the evaluation-rubric article explains for groundedness scoring.
+3. **Completeness.** Was the controlling authority retrieved at all? A clean summary of the wrong source is worse than no answer, which the reranking article covers for retrieval quality.
+
+Three conclusions follow:
+
+- **The lawyer verifies every citation**, as the human-in-the-loop design requires.
+- **The system's value is in finding and condensing**, not in deciding how the law applies, which the governance article addresses for high-stakes domains.
+- **Provenance is the product** — a summary without traceable sources is not useful legal work, as the data-governance article argues.
+
+## Building a citation-checking habit
+
+A citation check is only useful if it is routine and specific. Three practices make it reliable:
+
+**Check in two directions.** Verify both that a cited source exists and that it supports the exact claim, as the reduce-hallucinations article distinguishes grounding from mere reference. A real citation attached to the wrong proposition is the subtle failure.
+
+**Keep the source text adjacent.** A summary whose cited passage sits next to it is faster to check than one that requires opening a database. The context-engineering article explains why placing material near the decision improves use.
+
+**Record what was checked.** A note of which citations were verified and when gives the reviewer a trail and makes a later challenge answerable, which the data-governance article requires for relied-upon records.
+
+These habits are slow relative to generating a summary, which is precisely why they must be designed into the workflow rather than left to the reviewer's discretion at the end of a busy day.
+
+## What legal AI cannot do
+
+**It cannot give legal advice.** A summary is a research aid, not an opinion, which the EU AI Act and governance discussions treat as a high-stakes distinction.
+
+**It cannot guarantee the law is current.** A retrieved statute may have been amended, which the monitoring article frames as a change trigger.
+
+**It cannot replace judgement.** Applying authority to a client's facts is the lawyer's work, as the contract-review article explains for the adjacent task of clause evaluation.
+
+The counterargument — that a competent lawyer will catch errors — is true and does not remove the need for tool design that makes errors visible, which the security checklist argues for boundaries that do not depend on vigilance alone.
+
+## A decision test
+
+1. **Retrieve from authoritative, licensed sources** with a defined scope.
+2. **Ground every summary claim** in the retrieved text.
+3. **Check that citations exist** against the source database.
+4. **Check that citations support** the specific claim, not just the topic.
+5. **Measure recall** of controlling authority on a labelled set, as the embedding-selection article recommends.
+6. **Keep legal judgement with a person**, as the oversight article explains.
+7. **Verify currency** of sources with a dated check.
+
+For the extraction mechanics, see [AI for Document Processing](/articles/ai-for-document-processing-classification-extraction-redaction); for the grounding method, see [How to Reduce Hallucinations](/articles/how-to-reduce-hallucinations-in-llm-applications).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Nils Reimers and Iryna Gurevych, 2019. [Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks](https://arxiv.org/abs/1908.10084) — The bi-encoder recipe behind modern semantic search and RAG retrieval.
