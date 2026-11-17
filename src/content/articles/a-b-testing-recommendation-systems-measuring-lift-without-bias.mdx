@@ -1,72 +1,62 @@
 ---
 title: "A/B Testing Recommendation Systems: Measuring Lift Without Bias"
-description: "A/B testing recommendation systems requires special care. Learn how to run experiments, measure lift, and avoid common biases."
+description: "Recommender experiments are unusually easy to get wrong. Read the biases, the interference, and the design choices that make lift measurable."
 date: 2026-11-16
 tags:
-  - A/B Testing
   - Recommender Systems
   - Experimentation
-  - Measurement
+  - Machine Learning
+  - A/B Testing
 ---
 
-A recommendation system that cannot be measured cannot be improved.
+Testing a recommender is not like testing a button colour, and treating it as such is how teams end up with a metric that improved while users were worse off. The system chooses what people see, which means the experiment changes the thing being measured, and the customers in the two groups are not independent of each other in the usual way.
 
-**Direct answer:** A/B testing recommendation systems compares a treatment algorithm against a control to measure causal lift in metrics like click-through, conversion, or retention. Unlike simple page tests, recommendation experiments face network effects, position bias, and carryover effects. Proper design requires random assignment at the right unit, adequate sample size, and metrics that reflect long-term value, not just immediate clicks.
+**Direct answer:** The lift from a recommender change has to be measured against an unbiased assignment, over a horizon long enough to include the feedback loop, with a metric tied to value rather than to clicks. Three properties make this hard: position bias — users click what is shown near the top regardless of relevance; interference — one user's behaviour helps train the model that serves another; and delayed feedback — a good recommendation today changes what a user buys next month. The practical answer combines user-level randomisation, delayed measurement, and variance reduction such as CUPED.
 
-## Why recommendation A/B tests are different
+## Why position bias poisons a naive test
 
-Recommendation systems create feedback loops: showing an item changes user behavior, which changes future data, which changes future recommendations. This means:
+A recommender ranks items, and rank itself drives clicks. Users scan from the top, so an item in position one gets more clicks than the same item in position ten even when their preferences are unchanged.
 
-- **Carryover effects:** a user exposed to better recommendations in week 1 may behave differently in week 2, even if switched to control.
-- **Network effects:** in two-sided marketplaces, recommendations affect both buyers and sellers.
-- **Position bias:** users click top results more, regardless of relevance. A change in position can look like a change in preference.
+The consequence for experimentation is that if the new model changes the ordering, a click-through-rate improvement may reflect nothing more than a different distribution of positions. This is not a nuisance that a larger sample removes — the bias is in the metric, not in its variance.
 
-## Experimental design
+The two standard responses are to randomise the position of items being evaluated — interleaving, where two ranking systems are blended into one list and compared at the item level — or to log the position explicitly and adjust for it in the analysis. Both are designs you have to choose before the test; neither can be reconstructed afterwards from a click log that omitted the position.
 
-**Unit of randomization:** randomize at the user level (session-level randomization can fragment the experience and contaminate results). Ensure a user sees the same variant throughout the experiment.
+## Interference and the feedback loop
 
-**Sample size:** recommendation lift is often small (1–5%). Power analysis determines required sample size. Underpowered tests produce false negatives or inflated effect estimates (winner's curse).
+In an ordinary A/B test, we assume one user's treatment does not affect another's outcome. A recommender breaks that assumption in two ways.
 
-**Duration:** run for at least one full business cycle (weekly seasonality) and until pre-specified sample size is reached. Do not stop early because results look significant (peeking).
+First, the model is trained on the behaviour of everyone, so the control group's clicks influence what the treatment group is shown. Second, the items themselves compete: a recommendation that promotes one product suppresses another, and the effect on the suppressed item is a real business outcome that does not appear in the treated user's session.
 
-**Holdout group:** consider a permanent holdout (5–10%) never exposed to any algorithmic change. It measures long-term cumulative impact and detects slow creep.
+The implication is that the unit of analysis matters. User-level randomisation is a start; geo-level or time-based designs are sometimes required when the intervention changes the catalogue, the ranking policy, or the supply of recommendations. Google's published work on geo experiments notes that "one approach that Google has successfully employed to measure advertising effectiveness is geo experiments" and that the approach has "a systematic and effective design process" — the same motivation applies when a recommender change operates at market level.
 
-## Metrics beyond CTR
+## The metric has to survive the feedback loop
 
-Click-through rate is easy to measure but can mislead:
+Recommenders operate over time: what you show a user changes what they click, which changes what you show them next. A short test measures the first step and misses the loop.
 
-- **CTR lift:** more clicks, but are they quality clicks?
-- **Conversion lift:** did recommendations lead to purchases, sign-ups, or watches?
-- **Revenue per user:** the ultimate business metric for commercial systems.
-- **Retention / repeat usage:** did users come back because recommendations were good?
-- **Diversity and novelty:** did users see new items, or just the same popular ones?
+This is why the primary metric in a recommender test should be something that survives the horizon — retained usage, repeat purchase, total value over a defined window — rather than immediate click-through. CTR is a diagnostic, not an objective. A model that optimises for it can win the test and degrade the experience by surfacing sensational items that are clicked once and never returned to.
 
-A system that boosts CTR by showing sensational content may hurt retention. Measure the right outcome.
+The ranking objective itself matters here. DeepFM's work on click-through prediction argues that "learning sophisticated feature interactions behind user behaviours is critical in maximizing CTR" and describes an end-to-end model that "emphasizes both low- and high-order feature interactions". Richer interaction modelling can genuinely improve ranking — but note the objective in that sentence is CTR, which is exactly why a test needs a second metric that the ranking model was not trained to optimise.
 
-## Common biases and how to handle them
+## Sensitivity is still the constraint
 
-**Selection bias:** treatment and control groups must be comparable. Randomization handles this if sample size is adequate.
+Recommender metrics are noisy, and user-level variance is high. CUPED is described as using "data from the pre-experiment period to reduce metric variability and hence achieve better sensitivity", and the reported Bing result is about a 50% reduction in variance — "the same statistical power with only half of the users, or half the duration".
 
-**Position bias:** if the treatment changes where items appear, CTR differences may reflect position, not quality. Use position-aware metrics or randomize positions within the test.
+For a recommender test, this is unusually valuable, because the pre-period behaviour is a strong predictor of the post-period behaviour, and the same users are typically available. The practical consequence is that a recommender team should treat the pre-period data as a first-class asset and design the logging to support it, rather than treat variance reduction as an analysis-time trick.
 
-**Novelty effect:** users click new things because they are new, not because they are better. Longer experiments reveal whether lift persists.
+## A test design that holds up
 
-**A/A testing:** run control vs. control to validate your experimentation infrastructure. If you detect "significant" differences, your system is biased.
+1. **Decide the objective before the model.** If the business wants repeat purchase, a CTR win is a diagnostic, not a result.
+2. **Log position and candidate set**, not just what was clicked. Without them, position bias cannot be diagnosed.
+3. **Use interleaving or another position-controlled design** when evaluating ranking changes.
+4. **Randomise at a unit that matches the intervention** — user for interface changes, geo or time for catalogue-wide changes.
+5. **Measure over a horizon long enough to include the feedback loop**, and keep the same horizon for control and treatment.
+6. **Use pre-period covariates for variance reduction** where the data exists, and fix the analysis before launch.
+7. **Track the suppressed items and segments**, because a recommender's gains are often a transfer between items rather than a net gain.
 
-## Implementation checklist
-
-1. Define the hypothesis and primary metric before launching.
-2. Randomize at the user level with sticky assignment.
-3. Calculate required sample size and duration.
-4. Instrument both variants identically (same logging, same latency).
-5. Run an A/A test first.
-6. Launch, monitor for bugs, and do not peek.
-7. Analyze with pre-specified metrics; decide to roll out, iterate, or kill.
-
-For the related question of general experimentation, see [A/B Testing: Making Decisions with Experiments](/articles/ab-testing-making-decisions-with-experiments) and how recommender systems influence behavior, see [How Recommendation Systems Influence What We Buy](/articles/how-recommendation-systems-influence-what-we-buy).
+For the recommendation mechanics being tested, see [Recommender Systems](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches); for the general experiment design, see [A/B Testing](/articles/ab-testing-making-decisions-with-experiments).
 
 ## Further Reading
 
-- Kohavi, Tang, and Xu, 2013. [Improving Sensitivity of Controlled Experiments via Cuped](https://exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf) — Variance reduction that makes A/B tests able to detect smaller effects.
+- Kohavi, Tang, and Xu, 2013. [CUPED — ExP Platform](https://exp-platform.com/cuped/) — Using pre-experiment data to reduce metric variability; the Bing result cut variance by about 50 percent, giving the same power with half the users or half the duration.
 - Brian Vaver and Koehler, 2011. [Measuring Ad Effectiveness Using Geo Experiments](https://research.google/pubs/measuring-ad-effectiveness-using-geo-experiments/) — Geo experiments for incrementality, the cleanest way to attribute marketing spend.
 - Google Ads Help, 2026. [About attribution models - Google Ads Help](https://support.google.com/google-ads/answer/6259715) — First-party documentation of attribution models and their limits.

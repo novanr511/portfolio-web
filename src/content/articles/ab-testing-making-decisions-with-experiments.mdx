@@ -1,80 +1,63 @@
 ---
 title: "A/B Testing: Making Decisions with Experiments"
-description: "A/B testing compares two versions of a page, feature, or message to see which performs better. Learn how to run experiments and interpret results."
+description: "An A/B test is a decision instrument with a failure mode. Read how variability, power, and stopping rules determine whether it is trustworthy."
 date: 2026-11-16
 tags:
-  - Analytics
-  - A/B Testing
   - Experimentation
-  - Decision Making
+  - A/B Testing
+  - Statistics
+  - Product
 ---
 
-Guessing is expensive. Testing is cheap.
+The most common way organisations use A/B tests is also the least reliable: launch a change, wait until a number looks favourable, and ship. That is not experimentation, and it is not an opinion about a lack of rigour — it is a description of a specific statistical failure that produces false wins at a predictable rate.
 
-**Direct answer:** A/B testing is an experiment that compares two versions (A and B) of a webpage, feature, message, or process to determine which performs better on a defined metric. It replaces opinion with evidence by randomly splitting traffic and measuring outcomes. A/B testing works best when the hypothesis is clear, the sample is large enough, and the result is acted on—regardless of which version wins.
+**Direct answer:** An A/B test is a decision instrument whose output is a noisy estimate, and its value depends entirely on design choices made before it runs — the sample size, the metric, the assignment, and the stopping rule. The most useful practical finding in the field is that you do not need more traffic to get more sensitivity: CUPED uses data from the pre-experiment period to reduce metric variability, and the reported Bing result is "reduce variance by about 50%, effectively achieving the same statistical power with only half of the users, or half the duration". That result reframes the whole conversation from "how long do we run it" to "how much noise are we carrying".
 
-## What A/B testing is
+## The failure mode is variance, not traffic
 
-In an A/B test:
+Teams usually explain inconclusive tests by blaming traffic. They ran for two weeks and nothing moved, so they need a bigger test or a bigger effect. Often the real problem is that the metric was noisy: the same user's behaviour varies wildly day to day, and the treatment effect is a small signal on top of that.
 
-- **Version A** is the control (current experience).
-- **Version B** is the variant (proposed change).
-- Traffic is randomly split between them.
-- A metric (conversion rate, click-through, sign-ups, revenue) is measured for each.
-- Statistical analysis determines whether the difference is real or noise.
+CUPED addresses this directly. The method is described as using "data from the pre-experiment period to reduce metric variability and hence achieve better sensitivity". In plain terms: if a user's behaviour before the experiment predicts their behaviour during it, you can adjust for the pre-period value and remove the predictable part of the variation. What remains is the part the experiment can actually detect.
 
-The change can be anything: a headline, button color, price, layout, email subject, or feature flag.
+The reported magnitude is the point. A 50% reduction in variance means doubling the effective sensitivity without doubling the sample — the same power with half the users or half the duration. For any team whose answer to "we cannot detect small effects" is "we need more traffic", this is the first thing to check.
 
-## Why experiments beat opinions
+It also carries a condition: the pre-experiment data must exist and must be joined to the same users. An organisation that did not instrument the pre-period cannot use the method retroactively, which is one of many reasons instrumentation is a strategic decision rather than a reporting detail.
 
-The highest-paid person's opinion (HiPPO) is often wrong. Customers behave unpredictably; what seems like an improvement can hurt performance. A/B testing lets the customer vote with their behavior, not their words.
+## Design the decision before the metric
 
-Examples:
-- A "free trial" button outperforms a "contact sales" button.
-- A shorter checkout form increases completion by 15%.
-- A lower price increases volume but reduces revenue per customer.
+The most important question in an experiment is not which statistical test to run. It is what decision will follow from each possible result, and what outcome would change your mind.
 
-Without testing, these are guesses. With testing, they are decisions.
+This is where most programmes quietly fail. A team launches an experiment, the result comes back, and the organisation discovers it had not agreed on what a win looked like. At that point the result is interpreted in light of the preferred outcome, and the experiment becomes a way to ratify a decision rather than inform one.
 
-## The experiment process
+The practical discipline is to write four things before launch:
 
-1. **Identify a problem.** Where are users dropping off? What metric needs improvement?
-2. **Form a hypothesis.** "Changing X will increase Y because Z."
-3. **Design the test.** Control vs variant, randomization, metric, duration.
-4. **Run the test.** Split traffic, collect data, avoid peeking.
-5. **Analyze.** Is the difference statistically significant? Is it practically meaningful?
-6. **Decide.** Implement the winner, or learn and test again.
+- **The primary metric and the direction of improvement.**
+- **The minimum detectable effect** — the smallest change that would be worth shipping, given the cost and the risk.
+- **The sample size and duration** implied by that effect, at an agreed confidence level.
+- **The decision rule** — what happens if the result is positive, negative, or inconclusive.
 
-## Statistical significance matters
+The last item is the one teams skip, and it is the one that makes experiments useful.
 
-A result from 50 visitors is not reliable. Tests need enough observations in both control and variant to detect a real difference with confidence. Running a test too long wastes time; stopping too early produces false positives.
+## The geo alternative when you cannot randomise users
 
-Also, testing many variants at once increases false-positive risk. Test one change at a time, or correct for multiple comparisons.
+Not every question can be answered by assigning individual users to variants — pricing changes by market, brand campaigns, and distribution changes often cannot be randomised at the user level.
 
-## What A/B testing cannot do
+Google's published work on geo experiments offers the alternative: "One approach that Google has successfully employed to measure advertising effectiveness is geo experiments." The paper "describes the application of geo experiments and demonstrates that they are conceptually simple, have a systematic and effective design process, and provide results that are easy to interpret."
 
-A/B testing answers "which performs better" but not "why." It cannot:
-- Tell you what to test next (that comes from research and insight).
-- Fix a bad product or offer.
-- Measure long-term brand effects from short-term tests.
-- Replace strategic judgment.
+The trade-off is specific. You trade the precision of individual randomisation for the feasibility of a randomised design at the level where the intervention actually applies — and you accept that a small number of geographies gives you a much larger variance, which brings you back to the power problem. The same principles apply: design the comparison before you run it, and size the test against the effect you need to detect.
 
-A test can show that variant B converts better, but not whether B builds long-term trust.
+## What to do on Monday
 
-## Common mistakes
+1. **Check whether your metric has pre-experiment data.** If it does, look at variance reduction before you buy more traffic.
+2. **Write the decision rule before the test starts**, including what you will do with an inconclusive result.
+3. **State the smallest effect worth shipping.** This is a business judgement, not a statistical output.
+4. **Fix the sample size and duration in advance**, and report when they changed.
+5. **Do not stop when the number looks good.** Repeated peeking at a noisy metric manufactures false positives; if you need to monitor, use a method designed for it.
+6. **Keep a record of every test, including the failures.** An archive with only wins is evidence of a process problem, not of a successful experimentation culture.
 
-- **Testing without a hypothesis.** Random changes produce random results.
-- **Peeking.** Checking results daily and stopping when they look good inflates false positives.
-- **Ignoring segment differences.** A change that helps new users may hurt returning users.
-- **Optimizing the wrong metric.** Increasing clicks at the expense of quality leads is not progress.
-
-## When to test and when to decide
-
-A/B testing is for optimization, not strategy. It cannot tell you whether to enter a new market or build a new product. It can tell you how to price, position, and present what you have already decided to do.
-
-For the related question of how data informs marketing decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and why correlation is not causation, see [Correlation vs Causation: The Most Common Mistake in Data Analysis](/articles/correlation-vs-causation-the-most-common-mistake-in-data-analysis).
+For the recommender-specific version of this, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias); for the attribution question underneath marketing experiments, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation).
 
 ## Further Reading
 
-- Kohavi, Tang, and Xu, 2013. [Improving Sensitivity of Controlled Experiments via Cuped](https://exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf) — Variance reduction that makes A/B tests able to detect smaller effects.
+- Kohavi, Tang, and Xu, 2013. [CUPED — ExP Platform](https://exp-platform.com/cuped/) — Using pre-experiment data to reduce metric variability; the Bing result cut variance by about 50 percent, giving the same power with half the users or half the duration.
 - Brian Vaver and Koehler, 2011. [Measuring Ad Effectiveness Using Geo Experiments](https://research.google/pubs/measuring-ad-effectiveness-using-geo-experiments/) — Geo experiments for incrementality, the cleanest way to attribute marketing spend.
