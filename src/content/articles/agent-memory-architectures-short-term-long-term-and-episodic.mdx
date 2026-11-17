@@ -1,10 +1,85 @@
 ---
 title: "Agent Memory Architectures: Short-Term, Long-Term, and Episodic"
-description: "Reserved title for a future NOVANDRI article: Agent Memory Architectures: Short-Term, Long-Term, and Episodic."
+description: "An agent needs to remember across steps and sessions. Read the three memory types, a worked design, and why more memory can hurt."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - Agents
+  - LLM
+  - Architecture
+  - Memory
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A model's context window resets between sessions, which means an agent has no memory unless the system provides one. The tempting response is to store everything and retrieve it later. That produces an agent which recalls irrelevant details and occasionally confuses an old task with the current one. Memory is a design problem about what to keep.
+
+**Direct answer:** Agent memory is usually divided into short-term working state, long-term semantic knowledge, and episodic records of past events. The Generative Agents paper describes an architecture with stored observations, reflection, and retrieval. The boundary: memory is only useful if retrieval surfaces the right item at the right time — an unbounded store becomes noise, as the context-engineering article explains.
+
+## Three types of memory
+
+**Short-term / working memory.** The current task's state — what has been done, what remains, what the user just said. It lives in the context window and should be small and structured, not a raw transcript.
+
+**Long-term semantic memory.** Facts and knowledge that remain true across tasks: customer preferences, product specifications, established procedures. This is typically stored in a database or vector index and retrieved when relevant.
+
+**Episodic memory.** Records of specific past events — what happened in an earlier session, what was tried and failed, what the user decided. This is the hardest type because it is time-indexed and can become misleading when circumstances change.
+
+Three differences matter:
+
+- **Lifetime.** Working memory dies with the session; the other two persist.
+- **Retrieval.** Working memory is always present; long-term and episodic memory must be found, as the retrieval article explains.
+- **Risk of staleness.** Episodic memory in particular can describe a decision that no longer applies, which the monitoring article covers.
+
+## A worked memory design
+
+The following is hypothetical and illustrative.
+
+A support agent handles repeated customers. Its memory design has three layers:
+
+1. **Working state (structured, in context).** Current ticket ID, issue type, steps already tried, whether a tool result is pending. Kept as fields, not prose.
+2. **Semantic memory (database).** Customer plan, region, product configuration, and stated preferences. Retrieved at the start of a session with a fixed query.
+3. **Episodic memory (indexed records).** Summaries of previous tickets, with dates and outcomes. Retrieved only when the current issue resembles a past one.
+
+Three decisions follow:
+
+1. **The working state is compressed deliberately.** Old turns are summarised into named fields, so the context stays bounded, as the KV-cache article explains for long conversations.
+2. **Semantic facts are verified.** A plan recorded six months ago may have changed. The memory store needs a source and an update path, which the data-governance article covers.
+3. **Episodic records carry dates and outcomes.** A past failure is useful only if the agent knows when it happened and whether the cause was fixed.
+
+Three cautions apply: retrieval from episodic memory can surface a similar-looking but irrelevant case; storing too much raises that risk; and a memory that is never reviewed becomes stale silently.
+
+## Retrieval quality is memory quality
+
+A memory store is only as good as the retrieval that surfaces it. Three factors decide whether the right memory appears:
+
+**The retrieval key.** Semantic similarity is a reasonable default, but episodic memories often need recency and outcome as additional signals. A failure from last year and one from yesterday should not rank the same way, which the reranking article explains for documents.
+
+**The summary quality.** Stored memories are usually summaries written by the model. A summary that drops a qualifier — "approved pending legal review" becoming "approved" — changes the meaning permanently. Keep the original record alongside the summary where possible, as the data-governance article recommends for provenance.
+
+**The retrieval budget.** Memory that competes with the current task for context space can crowd out the actual request, which the context-engineering article explains. Retrieve a few relevant items, not everything that matches.
+
+These factors are measurable: on a labelled set of past cases, did the right memory surface, and did it change the answer for the better?
+
+## What memory cannot do
+
+**It cannot replace retrieval from authoritative sources.** A customer's plan in memory is a copy; the billing system is the source. The RAG article explains why grounding matters.
+
+**It cannot be assumed correct.** Memory is a record of what the system believed, not what is true. Provenance and dates are part of the design, as the datasheets paper argues for data generally.
+
+**It is not the same as context.** A larger memory store does not help if the right item is not surfaced. The context-engineering article explains why selection beats capacity.
+
+The counterargument — that an agent should simply keep the full conversation — is wrong at scale. Full transcripts consume the context budget and bury the current task, which the long-context article shows affects reliability.
+
+## A decision test
+
+1. **Separate working, semantic and episodic memory** in the design.
+2. **Keep working state structured and small.**
+3. **Attach sources and dates** to stored facts and events.
+4. **Retrieve selectively**, using similarity plus recency where relevant.
+5. **Expire or review stale records** on a defined trigger.
+6. **Measure memory quality** — did the right item surface, and did it help?
+7. **Re-evaluate after a model or retrieval change.**
+
+For the broader agent design, see [From LangChain to LangGraph](/articles/langchain-to-langgraph); for retrieval, see [Retrieval-Augmented Generation](/articles/rag-explained).
+
+## Further Reading
+
+- Joon Sung Park et al., 2023. [Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442) — An architecture for agent memory: observations, reflection and planning, with retrieval of stored experiences.
+- Anthropic, 2025. [Effective context engineering for AI agents \ Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — The distinction between context engineering and prompt engineering, and why context is a scarce resource in agents.

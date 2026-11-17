@@ -1,10 +1,100 @@
 ---
 title: "Multi-Agent Coordination: When More Agents Make Things Worse"
-description: "Reserved title for a future NOVANDRI article: Multi-Agent Coordination: When More Agents Make Things Worse."
+description: "Adding agents adds coordination cost and new failure modes. Read the evidence, a worked comparison, and when a single agent wins."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - Agents
+  - LLM
+  - Architecture
+  - Systems
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+The idea behind multi-agent systems is appealing: give each agent a role — researcher, writer, reviewer — and let them collaborate. The reality is that coordination consumes tokens, introduces miscommunication, and can produce worse results than one well-prompted agent. A survey of LLM-based multi-agent systems documents both the progress and the challenges.
+
+**Direct answer:** Multi-agent systems help when tasks can be genuinely decomposed and the sub-agents have distinct information or tools. They hurt when the task is a single coherent problem, because the agents must re-establish context at every handoff and errors compound. The survey and the AgentVerse work are the primary references. The boundary: the benefit is task-dependent — there is no general reason that more agents means better answers.
+
+## What coordination costs
+
+Three costs appear as soon as more than one agent is involved:
+
+**Context duplication.** Each agent needs the task context, which means the same background is sent multiple times. The context-engineering article explains why that consumes a scarce resource.
+
+**Handoff loss.** The output of one agent becomes the input of the next. If the first agent omits a detail, the second cannot recover it. This is the same failure as a broken tool response, which the tool-calling article covers.
+
+**Error compounding.** Each agent has a probability of being wrong. A chain of four agents with 90% reliability each succeeds about 66% of the time, before considering miscommunication — the arithmetic the autonomous-business article shows.
+
+## A worked comparison
+
+The following is hypothetical and illustrative.
+
+A team compares two designs for a market-research task:
+
+- **Single agent:** retrieves sources, synthesises findings, writes a report in one continuous run. 20,000 input tokens, 4,000 output tokens, 3 tool calls.
+- **Three agents:** a researcher retrieves, an analyst synthesises, a writer drafts. Each handoff passes a summary. Total 45,000 input tokens, 7,000 output tokens, 3 tool calls plus 2 handoffs.
+
+Three questions decide:
+
+1. **Does decomposition improve quality?** If the analyst can use a different model or a stricter verifier than the writer, specialisation may help. If all three use the same model and prompt style, the extra structure adds cost without a new capability.
+2. **Where do errors enter?** If the researcher misses a source, the analyst and writer produce a confident but incomplete report. Check the handoff content, not only the final output, which the evaluation article recommends.
+3. **Is the cost justified?** The three-agent design costs more than twice as much. It wins only if the quality gain is material and the task is infrequent enough to absorb it.
+
+Three conclusions follow:
+
+- **Specialisation must be real**, not nominal role labels.
+- **Handoffs are a failure surface** and need validation.
+- **The single-agent baseline must be measured first**, as the routing article argues for model choice.
+
+## When multiple agents help
+
+**Distinct tools or permissions.** One agent can read a database; another can act on it. Separating them enforces a boundary, which the security checklist recommends.
+
+**Genuinely independent subtasks.** If two research threads do not depend on each other, parallel agents reduce latency.
+
+**Adversarial review.** A critic agent with a different prompt can catch errors the author missed, provided it is evaluated rather than trusted, as the evaluation-rubric article explains.
+
+## When one agent wins
+
+**Coherent tasks** where the context must be held throughout.
+
+**Tight latency or cost budgets** where handoffs are expensive.
+
+**Tasks without a clear decomposition** — forcing sub-agents to split an indivisible problem produces fragmentation, not parallelism.
+
+The counterargument — that multi-agent systems mirror human teams — is an analogy, not evidence. Human teams share persistent context and have mechanisms for resolving disagreement that agent handoffs do not automatically replicate.
+
+## Reducing coordination cost
+
+When multiple agents are justified, three mechanisms reduce the cost:
+
+**Pass structured artifacts, not prose.** A handoff that is a schema — findings, sources, confidence, open questions — is easier for the next agent to consume than a narrative summary, as the structured-output article explains.
+
+**Share read-only context.** If all agents need the same background, provide it from a common source rather than asking one to summarise it for the others. The context-engineering article explains why repeated context consumes the budget.
+
+**Bound the conversation.** A supervisor that routes tasks to specialists should limit the number of turns and the depth of the chain. Unbounded agent conversations are a cost generator, as the autonomous-business article warns.
+
+These mechanisms do not remove the fundamental trade-off — coordination is still work — but they keep it from dominating the task.
+
+## What the research does not settle
+
+**Not a universal result.** The survey documents progress and challenges, not a rule that multi-agent systems outperform single agents. Task structure decides.
+
+**Not cheaper by default.** More agents mean more tokens and more calls, as the cost estimator shows.
+
+**Not more reliable by default.** Extra agents can catch errors or introduce them. The combined system needs evaluation, as the LLM evaluation article explains.
+
+## A decision test
+
+1. **Measure a single-agent baseline** first.
+2. **Decompose only if subtasks are genuinely independent** or need distinct tools.
+3. **Give each agent a different capability**, not just a different name.
+4. **Validate every handoff**, not only the final output.
+5. **Price the extra tokens and latency** at your volume.
+6. **Check error compounding** across the chain.
+7. **Revert to one agent** when the gain is not measurable.
+
+For the orchestration context, see [From LangChain to LangGraph](/articles/langchain-to-langgraph); for the workload type, see [AI Workflow Automation](/articles/ai-workflow-automation-patterns-and-examples).
+
+## Further Reading
+
+- Xu et al., 2024. [Large Language Model based Multi-Agents: A Survey of Progress and Challenges](https://arxiv.org/abs/2402.01680) — Survey of multi-agent systems, including coordination failures and emergent behaviours.
+- Anthropic, 2025. [Effective context engineering for AI agents \ Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — The distinction between context engineering and prompt engineering, and why context is a scarce resource in agents.
