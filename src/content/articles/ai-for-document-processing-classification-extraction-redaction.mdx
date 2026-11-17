@@ -1,10 +1,83 @@
 ---
 title: "AI for Document Processing: Classification, Extraction, Redaction"
-description: "Reserved title for a future NOVANDRI article: AI for Document Processing: Classification, Extraction, Redaction."
+description: "Three document tasks have different error costs. Read what each needs, a worked pipeline, and where human review belongs."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Documents
+  - Automation
+  - Data
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Document processing is where AI often delivers its clearest value, because the tasks are bounded and the outputs are checkable. Classification, extraction, and redaction sound like one workflow, but they fail differently — a wrong category is usually recoverable, a wrong extracted number can propagate, and a missed redaction is a privacy incident.
+
+**Direct answer:** Use AI for document classification to route items, extraction to turn text into structured fields, and redaction to remove sensitive content — with validation proportionate to each task's error cost. Anthropic's use-case guides cover document and extraction patterns, and structured output provides the schema. The boundary: a model's output is a proposal; the system must verify it against the document and the business rule before the result is trusted.
+
+## Three tasks, three controls
+
+**Classification.** Assign a document to a category — invoice, contract, complaint. The output is a label, which is easy to validate against examples, as the classification-pattern article explains. Errors are usually recoverable because the document can be rerouted.
+
+**Extraction.** Pull structured fields — dates, amounts, parties — from the text. A field can look valid and be wrong, so cross-field checks matter: a total should equal the sum of line items, and a date should fall in a plausible range. The structured-output article covers the schema.
+
+**Redaction.** Remove or mask sensitive content before a document is shared or stored. A missed redaction has high impact and may be invisible, so recall is the priority and human review is often required. The data-privacy article covers the obligations.
+
+## A worked pipeline
+
+The following is hypothetical and illustrative.
+
+A team processes 10,000 mixed documents a month: invoices, contracts, and support letters. The pipeline has three stages:
+
+1. **Classify** each document into one of three types with a confidence score. Low-confidence cases go to a human queue.
+2. **Extract** fields appropriate to the type — amounts and dates for invoices, parties and clauses for contracts — into a validated schema.
+3. **Redact** personal identifiers from support letters before storage, with a second pass that checks for residual patterns.
+
+Three checks decide whether it works:
+
+- **Classification accuracy** against a labelled sample; if it drops below the threshold, the human queue grows and costs rise, as the workflow-automation article explains.
+- **Extraction correctness** measured by comparing fields against the source document, not against another model's output. The cross-field checks catch arithmetic errors that a format validator misses.
+- **Redaction recall** measured by searching processed documents for patterns that should have been removed, which the data-governance article frames as an audit.
+
+Three conclusions follow:
+
+- **Each stage has its own metric**, and an aggregate "accuracy" would hide a redaction failure.
+- **Low-confidence routing is a control**, not a sign of weakness, which the human-in-the-loop article argues.
+- **Provenance matters** — keep the original document linked to the processed result so a disputed field can be checked, as the reporting-automation article recommends.
+
+## Choosing the review boundary
+
+The three tasks justify different review intensities. A useful rule is to spend review effort where an error is both likely and costly:
+
+**Classification** is cheap to check and cheap to reverse, so automated routing with a low-confidence queue is usually sufficient. Reviewers sample the confident cases to detect drift, as the monitoring article recommends.
+
+**Extraction** benefits from automated cross-field checks plus a sample of human verification. Full review of every field is rarely economical, but a sample catches systematic errors that a validator misses, which the evaluation-rubric article explains.
+
+**Redaction** warrants the highest scrutiny because a miss can expose sensitive data. Automated pattern checks should be supplemented by human review of a sample, and the threshold for escalation should be low, as the data-privacy article argues.
+
+These choices are not fixed. As measured error rates fall, review can be reduced; as document formats change, it should increase, which the risk-assessment article frames as a change trigger.
+
+## What document AI cannot do
+
+**It cannot read what is not there.** A missing clause in the source cannot be extracted, however good the model.
+
+**It cannot judge legal sufficiency.** A contract clause can be extracted correctly and still be inadequate, which the contract-review article covers as a separate question.
+
+**It cannot guarantee privacy.** Redaction is a probabilistic process; high-stakes sharing needs an independent check, as the data-privacy article explains.
+
+The counterargument — that document AI is mature and needs no review — is true for low-stakes, high-volume work and false where an error has real consequences. The error cost decides the review design.
+
+## A decision test
+
+1. **Separate classification, extraction, and redaction** with a metric for each.
+2. **Set a confidence threshold** and route low-confidence cases to people.
+3. **Validate extracted fields** with cross-field checks and against the source.
+4. **Measure redaction recall** with independent pattern searches.
+5. **Keep the original document** linked to the processed result.
+6. **Assign an owner** for each stage's error rate, as the governance checklist requires.
+7. **Re-evaluate after a model or document-format change.**
+
+For the schema design, see [Structured Output](/articles/structured-output-and-constrained-decoding-for-production-apis); for the privacy side, see [Data Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- OpenAI, 2026. [Structured model outputs | OpenAI API](https://platform.openai.com/docs/guides/structured-outputs) — The official guide to constrained decoding and schema-enforced model outputs.

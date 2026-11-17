@@ -1,10 +1,84 @@
 ---
 title: "AI Risk Assessment: A Pre-Deployment Checklist"
-description: "Reserved title for a future NOVANDRI article: AI Risk Assessment: A Pre-Deployment Checklist."
+description: "A risk assessment finds the failures you can anticipate. Read the five questions, a worked example, and what an assessment cannot cover."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Risk
+  - Governance
+  - Safety
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A pre-deployment review is often treated as a form to complete before launch. Done well, it is a short investigation that changes the launch plan — sometimes by reducing scope, sometimes by adding a control. NIST's risk-assessment guidance and the AI RMF provide the structure; the value comes from answering honestly.
+
+**Direct answer:** An AI risk assessment identifies the plausible failure modes of a specific system, their likelihood and impact, and the controls that reduce them. NIST SP 800-30 describes risk assessment in terms of threats, vulnerabilities, likelihood and impact, while the AI RMF organises the work into govern, map, measure and manage. The boundary: an assessment covers failures you can anticipate — it is evidence about known risks, not a guarantee about novel ones.
+
+## Five questions
+
+**1. What can go wrong?** List concrete failure modes for this system: a wrong answer, a leaked document, an unauthorised action, a biased decision, an outage. Vague categories like "AI risk" are not actionable.
+
+**2. Who is affected, and how badly?** Impact differs by stakeholder. A misrouted support ticket is a nuisance; a wrong benefits decision is a harm. The severity shapes the control.
+
+**3. How likely is each failure?** Use evidence — evaluation results, historical error rates, red-team findings — rather than intuition, as the red-teaming article explains.
+
+**4. What control reduces it?** Each risk needs a control: retrieval grounding, a tool limit, a human review, a monitoring alert. A risk with no control is either accepted explicitly or blocks launch.
+
+**5. What would change the assessment?** A model update, a new data source, or a new user group can invalidate the analysis. Name the trigger for revisiting it, which the governance checklist covers.
+
+## A worked assessment
+
+The following is hypothetical and illustrative.
+
+A team deploys an assistant that summarises internal contracts for lawyers. The assessment lists four risks:
+
+| Risk | Impact | Likelihood evidence | Control |
+| --- | --- | --- | --- |
+| Wrong clause summarised | High | 8% error on labelled set | Cite source; lawyer review |
+| Confidential clause shown to wrong user | High | Access-control test found a gap | Fix permissions; log access |
+| Stale contract version used | Medium | Index refresh is weekly | Add version check; daily refresh |
+| Output too long for review | Low | Feedback from pilot | Length limit in prompt |
+
+Three conclusions follow:
+
+1. **The access-control gap blocks launch** until fixed, regardless of low likelihood — impact is high and the control is concrete, as the security checklist requires.
+2. **The 8% error rate is accepted with review**, because the control (lawyer review) catches it and the workflow has time for it, as the human-in-the-loop article explains.
+3. **The version risk has an owner and a refresh trigger**, which turns a vague concern into an operational task, as the data-governance article recommends.
+
+## Making the assessment usable
+
+A risk assessment that lives in a document nobody opens has no effect. Three practices make it a working artefact:
+
+**Keep it short and specific.** One page with four or five named risks, their controls, and their owners is more useful than a long catalogue of hypotheticals. Each row should be something a reviewer can check, as the decision-memo article argues for concrete claims.
+
+**Attach it to the change process.** When a model, prompt, data source, or tool changes, the assessment should be revisited. The trigger belongs in the deployment checklist, which the governance article describes, not in a calendar reminder.
+
+**Record accepted risks with an owner.** Some risks will be accepted rather than controlled. That is a legitimate decision, but it needs a name and a review date, otherwise it becomes an unexamined assumption that grows with the system, as the model-monitoring article warns.
+
+These practices turn the assessment from a launch gate into a living record of what the team knows about its system.
+
+## What an assessment cannot cover
+
+**Novel attacks.** An adversary will find failure modes the assessment did not list, which is why red teaming and monitoring are ongoing, as the observability article explains.
+
+**Interaction effects.** Two individually safe components can combine into an unsafe system. The combined-system error rate is what matters, as the workflow-automation article argues.
+
+**Value judgments.** Deciding which risk is acceptable is a business and ethical choice, not a technical calculation, which the AI-governance article addresses.
+
+The counterargument — that assessments slow deployment — is fair when they become paperwork. A short assessment that changes one decision is worth more than a long document that approves everything.
+
+## A decision test
+
+1. **List concrete failure modes** for this system.
+2. **State impact and likelihood** with evidence.
+3. **Assign a control** to each material risk.
+4. **Block launch** on high-impact risks without controls.
+5. **Accept residual risks explicitly**, with an owner.
+6. **Name the change triggers** for re-assessment.
+7. **Record the assessment** where the team can find it, as the decision-memo article recommends.
+
+For the framework, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale); for the pre-deployment decisions that follow an assessment, see [AI Readiness Assessment](/articles/ai-readiness-assessment).
+
+## Further Reading
+
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.
+- NIST, 2026. [SP 800-30 Rev. 1, Guide for Conducting Risk Assessments | CSRC](https://csrc.nist.gov/pubs/sp/800/30/r1/final) — The standard threat-modelling method.
