@@ -2,7 +2,7 @@
 
 This guide records the method used to rewrite the short, bullet-shaped articles
 produced in the P-101–P-170 batches into articles that meet the editorial
-standard in `docs/technical-seo-article-generation-prompt.md`. It exists so the
+standard in `docs/publication-wide-editorial-standard.md`. It exists so the
 rewrite is repeatable rather than a matter of taste.
 
 ## What went wrong

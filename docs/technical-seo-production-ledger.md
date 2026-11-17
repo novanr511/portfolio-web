@@ -5,7 +5,7 @@
 **Editorial standard:** Evidence-Based Editorial — no unsupported claims, fabricated facts, or unverified citations.
 **Language:** English only across the publication, as decided by the owner.
 **Knowledge Hub Plan Reference:** `docs/technical-seo-knowledge-hub-plan.md`
-**Master Prompt Reference:** `docs/technical-seo-article-generation-prompt.md`
+**Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** 32 Chapters + 1 Hub Pillar
 **Current Progress:** 33 Drafted (32 chapters + pillar); evidence review pending
 

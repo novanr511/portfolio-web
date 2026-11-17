@@ -2,7 +2,7 @@
 /**
  * Article quality gate.
  *
- * Enforces the editorial standard in docs/technical-seo-article-generation-prompt.md
+ * Enforces the editorial standard in docs/publication-wide-editorial-standard.md
  * mechanically, so it cannot drift again:
  *
  *   - frontmatter is valid and the description fits the CMS limit

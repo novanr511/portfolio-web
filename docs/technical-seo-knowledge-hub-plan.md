@@ -148,7 +148,7 @@ The publication's core workflow is **research finding → source validation → 
 
 This is a starting hierarchy, not a reputation shortcut: use the source closest to the claim, evaluate its methods and incentives, and do not cite a secondary report when the underlying primary evidence is reasonably available.
 
-This plan applies that standard specifically to the Technical SEO series. See `docs/technical-seo-article-generation-prompt.md` for the reusable production workflow and QA gates.
+This plan applies that standard specifically to the Technical SEO series. See `docs/publication-wide-editorial-standard.md` for the publication-wide production workflow and QA gates.
 
 ### Series architecture
 
