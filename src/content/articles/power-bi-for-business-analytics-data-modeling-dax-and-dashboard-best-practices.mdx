@@ -1,82 +1,69 @@
 ---
 title: "Power BI for Business Analytics: Data Modeling, DAX, and Dashboard Best Practices"
-description: "Power BI turns raw data into business insight. Learn data modeling, DAX measures, and dashboard design principles for reliable analytics."
+description: "Power BI is a modelling tool with a chart layer on top. Read why the semantic model decides everything and how DAX actually fits."
 date: 2026-11-16
 tags:
   - Power BI
-  - Business Analytics
-  - Data Modeling
+  - Business Intelligence
   - DAX
-  - Dashboards
+  - Data Modelling
 ---
 
-A dashboard is only as good as the model behind it.
+Most Power BI tutorials teach the interface, and the interface is the least consequential part of the tool. Two teams can build visually identical dashboards from the same data, and one of them will be trusted by finance and the other will not, because one of them modelled the business and the other modelled the query.
 
-**Direct answer:** Power BI enables business analytics through connected data models, DAX measures, and interactive dashboards. Effective use requires star-schema modeling, well-written DAX, and report design that prioritizes clarity over visual flair. Poor modeling leads to incorrect numbers; good modeling makes insights trustworthy and scalable.
+**Direct answer:** Power BI's own documentation describes the product as covering "cloud capabilities in Microsoft Fabric, standalone desktop and on-premises applications, and guidance tailored to your role—whether you create reports, model data, or consume insights". That last clause is the design brief: the reporting layer is one of three roles, and the modelling layer is where the value is decided. The order that works is model first, measure second, visualise third — and the reason is that a measure computed correctly once can be reused everywhere, while a number typed into a visual has to be re-derived and re-checked every time someone adds a page.
 
-## Data modeling: the foundation
+## Why the semantic model is the product
 
-Power BI is not Excel. Dumping flat tables into one table creates ambiguous relationships and incorrect aggregates. Use a star schema:
+A semantic model is a description of your business expressed as entities, relationships, and measures. It is not a query result and it is not a table; it is a layer between the source data and every question anyone will ask.
 
-- **Fact tables:** quantitative events (sales, orders, logins) with foreign keys to dimensions.
-- **Dimension tables:** descriptive entities (products, customers, dates, regions) with unique keys.
+The benefit is that it makes disagreement about definitions impossible to hide. If "active customer" appears in three dashboards with three definitions, the problem is not the dashboards — it is that the definition lives in each dashboard instead of in the model. Putting it in the model means it exists once, and every report inherits it.
 
-Model rules:
+This also changes what a new report costs. With a modelled source, adding a metric is a measure and a visual. Without one, it is a new query, a new column, and a fresh round of validation — and it is the second path that usually gets taken, because the first path requires someone to understand the model.
 
-- **One-to-many from dimension to fact**, single direction.
-- **Avoid bidirectional relationships** unless absolutely necessary; they confuse filter propagation.
-- **Hide key columns** from report users; expose only meaningful attributes.
-- **Use a dedicated date table** with Mark as Date Table for time intelligence.
+## DAX is a measure language, and the distinction matters
 
-A clean model makes DAX simpler and numbers auditable.
+Microsoft's DAX reference describes "the over 250 functions used in Data Analysis Expressions", each documented with syntax, parameters, return values, and examples. Two hundred and fifty functions is a lot, and it is worth being clear about what most of them are for.
 
-## DAX: measures, not calculated columns
+DAX comes in two families, and mixing them up is the most common source of confusion:
 
-DAX is Power BI's formula language. Know the difference:
+**Measures** are calculated at query time in the context of the report's current filters and groupings. A measure is a question. It is evaluated against whatever slice of the data the user is looking at, which is why a single measure can serve a total row, a month, a category, and a filtered view correctly without being rewritten.
 
-- **Calculated columns:** computed row-by-row at refresh, stored in the model. Use for row-level categorization (e.g., age group).
-- **Measures:** computed at query time based on filter context. Use for aggregations (sum, average, ratio).
+**Calculated columns** are computed at refresh time, row by row, and then stored. They are a transformation, not a question. They are also expensive: a calculated column over a large fact table is processed on every refresh, it is materialised into the model, and it cannot respond to slicers the way a measure can.
 
-Best practices:
+The practical rule that follows is simple and worth internalising: if the value depends on the context the user is currently viewing, it is a measure. If it depends only on the row, it is a calculated column. Most badly performing Power BI reports are reports with measures written as calculated columns, because someone wanted the number to appear in a table and reached for the tool that makes it appear without thinking about how it will behave when the user filters.
 
-- **Prefer measures** for KPIs; they respond to slicers and filters dynamically.
-- **Use variables** (`VAR` / `RETURN`) for readability and performance.
-- **Avoid `SUMX` over large tables** when a simple `SUM` suffices.
-- **Understand filter context vs. row context.** A common error is expecting a measure to behave like a column.
+## The modelling choices that decide everything
 
-Example measure:
-```dax
-Total Sales = SUM(Sales[Amount])
-YoY Growth % =
-VAR CurrentYear = CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Date'[Date]))
-VAR PriorYear = CALCULATE([Total Sales], DATEADD('Date'[Date], -1, YEAR))
-RETURN DIVIDE([Total Sales] - PriorYear, PriorYear, 0)
-```
+Three decisions account for most of the difference between a model that performs and one that does not.
 
-## Dashboard design: clarity first
+**The grain of the fact table.** A fact table has one row per event at a stated grain. Most bad models contain a fact table at two grains, which forces the tool to invent a relationship that is not true and produces numbers that are subtly wrong in ways that are hard to spot.
 
-Dashboards answer questions, not impress with visuals.
+**The direction of the relationships and the cardinality.** Dimensions filter facts; facts do not filter dimensions in a well-formed model. When you find yourself writing a measure that has to "unpivot" something, the model is fighting you, and the fix is in the model rather than in the measure.
 
-- **Start with the question.** What decision does this dashboard support?
-- **One screen, one story.** Avoid cramming 20 visuals onto one page.
-- **Use appropriate charts:** bar for comparison, line for trends, scatter for correlation, card for KPIs. Avoid pie charts with many slices.
-- **Use slicers sparingly.** Too many slicers overwhelm users and hurt performance.
-- **Add tooltips and titles.** Explain what the number means and how it is calculated.
-- **Set a default date range.** Users should see something useful immediately.
+**Star schema over snowflake.** A flat dimension set around a fact table is simple to reason about and fast to query. A fully normalised dimension hierarchy is elegant on paper and expensive in practice, and the denormalisation cost is usually less than the modelling and query cost of the alternative.
 
-Performance: reduce visual-level calculations, use aggregations, and limit imported data to what is needed.
+## Performance is usually a modelling symptom
 
-## Common mistakes
+When a report is slow, the instinct is to look for a setting to change. Usually the cause is structural: a calculated column on a wide fact table, a relationship that prevents filter propagation, a measure that iterates rows rather than sets, or a source that has not been pushed into the right form before it enters the model.
 
-- **Using calculated columns for measures.** Bloats the model and breaks filter context.
-- **Bi-directional filters.** Creates ambiguous filter paths and incorrect totals.
-- **No date table.** Makes time intelligence impossible or unreliable.
-- **Designing for the creator, not the user.** Stakeholders need answers, not data exploration.
+Each of those is fixable in the model, and fixing it there fixes every report built on top. Tuning the query engine is treating the symptom.
 
-For the related question of how data informs decisions, see [How Data Changes the Way Marketing Decisions Are Made](/articles/how-data-changes-the-way-marketing-decisions-are-made) and why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+There is one external factor that is genuinely worth checking before blaming the model: the source. A dashboard reading a live transactional table will be slow regardless of how well it is modelled, because the problem is the access pattern, not the expression engine.
+
+## A build order that avoids rework
+
+1. **Write the grain of every table before loading anything.** If you cannot state it in one sentence, the table is not ready.
+2. **Build the dimensional model and the relationships.** Validate that each fact connects to its dimensions in one hop where possible.
+3. **Create the measures library, and only then build a report.** A shared measure library is the thing that makes the second report cheap.
+4. **Check that each measure has one definition and one name.** Two measures for the same number is the beginning of an argument.
+5. **Only then visualise.** The visual is the last step because it is the only one that is cheap to change.
+6. **Validate the totals against the source system** for the three numbers finance will check, and keep the reconciliation visible to reviewers.
+
+For the organisational question of where analytics capability sits and how it competes for attention, see [Data Strategy](/articles/data-strategy-how-organizations-use-data-to-compete); for how to present the output so it drives decisions, see [Data Visualization](/articles/data-visualization-telling-stories-with-numbers).
 
 ## Further Reading
 
-- Aswath Damodaran, 2026. [Damodaran Online: Home Page for Aswath Damodaran](https://pages.stern.nyu.edu/~adamodar/) — Publicly maintained datasets for industry averages, WACC, and valuation.
-- Federal Reserve Bank of St. Louis, 2026. [FRED economic data](https://fred.stlouisfed.org/) — The primary time-series database used for macro indicators.
+- Microsoft Learn, 2026. [Power BI documentation](https://learn.microsoft.com/en-us/power-bi/) — How the platform divides between cloud capabilities in Microsoft Fabric, standalone desktop, and on-premises, and the role-based guidance for building reports, modelling data, or consuming insights.
+- Microsoft Learn, 2026. [DAX function reference](https://learn.microsoft.com/en-us/dax/dax-function-reference) — The reference for the over 250 functions used in Data Analysis Expressions, with syntax, parameters, return values, and examples.
 - U.S. Census Bureau, 2026. [Business Trends and Outlook Survey](https://www.census.gov/hfp/btos/) — Official small-business AI adoption measurement.

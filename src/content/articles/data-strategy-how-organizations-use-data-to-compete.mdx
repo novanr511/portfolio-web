@@ -1,83 +1,61 @@
 ---
 title: "Data Strategy: How Organizations Use Data to Compete"
-description: "Data is not an asset by itself. It becomes valuable when an organization has a strategy for collecting, governing, analyzing, and acting on it."
+description: "A data strategy is a list of decisions, not a list of dashboards. Read how to connect the data you collect to the decisions you actually make."
 date: 2026-11-16
 tags:
-  - Data
-  - Strategy
   - Data Strategy
   - Analytics
+  - Business Intelligence
+  - Leadership
 ---
 
-Data is often called the new oil. Unlike oil, data does not create value by existing. It creates value when it is used.
+Data strategy has an image problem. It is usually presented as a stack diagram — sources, warehouse, lakehouse, dashboards, machine learning — and the implication is that assembling the stack produces the strategy. It does. The stack is the cost; the strategy is deciding which decisions the data changes.
 
-**Direct answer:** Data strategy is the plan for how an organization collects, governs, analyzes, and acts on data to achieve business objectives. It is not a technology stack or a hiring plan. It is a set of choices about what data matters, who owns it, how quality is maintained, and how insights become decisions. Without a strategy, data collection becomes expensive hoarding; with one, data becomes a competitive advantage.
+**Direct answer:** A data strategy answers three questions: which decisions need to change based on new information, what data and instrumentation those decisions require, and what cadence they are made at. Everything else — platforms, models, dashboards — is an enabler chosen to serve those answers. The measurable test of a data strategy is not the volume of data collected but the number of decisions whose outcomes have improved because the data arrived in time to act on them.
 
-## What data strategy covers
+## Start from decisions, not from data
 
-A data strategy answers:
+The most common failure is inverting the direction of causation. An organisation surveys what data it has, catalogues it, and then asks what it could build. The resulting list is long and unrelated to any decision anyone makes, and it produces dashboards nobody opens.
 
-- **What data do we need?** Customer behavior, operational metrics, market signals—not everything that can be collected.
-- **Who owns it?** Accountability for quality, access, and decisions about each dataset.
-- **How is it governed?** Access controls, privacy, compliance, and documentation.
-- **How is it analyzed?** Tools, skills, and processes for turning data into insight.
-- **How is it acted on?** How insights reach the people who make decisions.
+The reverse order is short and hard. Start by listing the decisions that are currently made on gut feel, on a spreadsheet someone maintains manually, or on a quarterly meeting. For each one, ask what information would have to arrive, and when, for the decision to come out differently. Many of those questions will have an answer of "no information would change this" — which is a useful finding, because it identifies the decisions that are not actually decisions.
 
-## Data is not strategy; it supports strategy
+This exercise usually produces a striking result: a small number of decisions carry most of the value, and they cluster into a handful of rhythms. A demand-forecast decision that drives inventory, a pricing decision that must be made weekly, a retention decision that must be made before renewal, a capacity decision made a quarter ahead. Those clusters are where the instrumentation budget belongs.
 
-Collecting data without a question is hoarding. A data strategy starts with business decisions: what decisions are being made, what information would improve them, and what data is needed to supply that information.
+## The data has to arrive before the decision
 
-A retailer deciding where to open a store needs foot traffic, demographics, and competitor data—not social media sentiment. A SaaS company deciding which feature to build needs usage patterns and churn signals—not vanity metrics.
+The word "in time" is doing more work than it appears to. A dashboard that reports yesterday's numbers for a decision made this morning is not useful data; it is an accurate description of the past. The design constraint is *latency against the decision cadence*, and it is a different number for every decision.
 
-## The data value chain
+This is where the gap between collecting data and using it becomes visible. Consider search visibility: Google Search Central's own documentation sets out what a site needs in order to be crawled and indexed — and the documentation is itself an example of the exercise. It names the specific signals a site must emit (crawlable pages, sitemaps, canonical signals, rendered content) so that the search engine's decision — whether to crawl, whether to index — can be made correctly. It is a statement about which decisions need which data, written by the party making the decisions.
 
-Data moves through stages:
+The same pattern shows up in macro data, where the delay is published alongside the data. The Federal Reserve Bank of St. Louis's FRED database exists to make macro series available with their release dates attached, and the Bureau of Labor Statistics publishes a release schedule precisely so that consumers know when a number became knowable. Any organisation that builds a forecast on a series has to respect that publication delay, or it is modelling information nobody had.
 
-1. **Collection:** capturing data from systems, users, sensors, and external sources.
-2. **Storage:** databases, warehouses, lakes—where data lives.
-3. **Processing:** cleaning, transforming, integrating.
-4. **Analysis:** dashboards, models, reports.
-5. **Decision:** action taken based on insight.
-6. **Measurement:** did the decision work?
+## The measurement you can actually trust
 
-A bottleneck at any stage breaks the chain. A beautiful dashboard is useless if the data is wrong or if no one acts on it.
+Before choosing platforms, there is a question that decides more than any tool: can you say, for each important decision, how you would know whether the data-based decision was better? Usually the honest answer is "we cannot tell", and that answer is worth having early.
 
-## Governance and quality
+Without it, "data-driven" degrades into "data-observed" — the decision is the same one that would have been made, with extra slides attached. That is not harmless, because it consumes budget and creates the appearance of rigour.
 
-Data governance is not bureaucracy; it is risk management. Without it:
+For workforce-facing decisions there is now an official baseline. The U.S. Census Bureau's Business Trends and Outlook Survey is the statistical agency tracking how businesses are actually using these technologies, which means a company arguing about its own AI adoption can check itself against a measured population rather than against anecdotes. Where such a baseline exists, use it; where it does not, the honest position is that the organisation is a data source rather than a data consumer.
 
-- Different teams use conflicting definitions ("active user" means different things to marketing and product).
-- Sensitive data is exposed.
-- Decisions are based on wrong numbers.
+## The layer people forget: instrumentation
 
-Quality requires ownership. Someone must be accountable for each critical dataset: its definition, accuracy, and completeness.
+Much of a data strategy is a list of things that must be *recorded* rather than things that must be *analysed*. Whether a customer used the feature you built. When the renewal was agreed. What the support interaction actually was. Which experiment variant they saw.
 
-## Culture over tools
+This work is unglamorous and it is the part that determines whether the strategy is deliverable, because instrumentation is engineering work that competes for the same capacity as the products. And it is the part that decays silently: an event that stops firing, a pipeline that starts dropping a field, a dashboard nobody checks after a migration. Silent decay is worse than visible failure, because the report keeps arriving and slowly becomes untrue.
 
-Tools (warehouses, BI platforms, AI models) are enablers, not strategy. A data-driven organization is one where decisions are informed by evidence, where people ask "what do the data say?" before acting, and where data quality is everyone's responsibility.
+## A way to write a data strategy that gets used
 
-Culture change is harder than tool selection. It requires leadership modeling, training, and incentives aligned with evidence-based decisions.
+1. **Name the decisions.** A short list, each with an owner and a cadence. If the list is long, it is a wish list.
+2. **For each decision, name the information and the deadline.** If the information would not arrive in time to change the decision, the decision does not belong on the list.
+3. **Say how you will know it was better.** A comparison, a holdout, a forecast error — something that can be wrong.
+4. **Instrument what the decisions need, and keep it instrumented.** Add a maintenance owner for the events, not just a builder.
+5. **Check the baseline.** Where an official statistic exists for your comparison, use it rather than your own impression.
+6. **Review the list, and retire entries.** A decision that no longer needs data should leave the strategy, and a decision that changed should enter it. A strategy that only grows is a backlog.
 
-## Common data strategy mistakes
-
-- **Collecting everything.** Storage is cheap, but cleaning, securing, and governing data is not.
-- **Centralizing everything.** A single data team becomes a bottleneck. Domain teams need access and skills.
-- **Ignoring privacy.** Regulations and customer expectations limit what can be collected and used.
-- **Measuring activity, not outcomes.** Dashboards that show usage without showing impact create illusion, not insight.
-
-## Measuring data strategy success
-
-Not by data volume or tool count. By:
-
-- **Decisions made with data.** How many important decisions used data as input?
-- **Time to insight.** How long from question to answer?
-- **Data quality incidents.** How often are decisions based on wrong data?
-- **Business impact.** Did the data-driven decision improve outcomes?
-
-For the related question of why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity) and how companies use predictive analytics, see [How Companies Use Predictive Analytics to Make Business Decisions](/articles/how-companies-use-predictive-analytics-to-make-business-decisions).
+For the governance side — who owns data, and what happens when it is wrong — see [Data Governance](/articles/data-governance-managing-data-as-an-asset) and [Data Ethics](/articles/data-ethics-responsible-use-of-customer-data).
 
 ## Further Reading
 
-- Aswath Damodaran, 2026. [Damodaran Online: Home Page for Aswath Damodaran](https://pages.stern.nyu.edu/~adamodar/) — Publicly maintained datasets for industry averages, WACC, and valuation.
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.
 - U.S. Census Bureau, 2026. [Business Trends and Outlook Survey](https://www.census.gov/hfp/btos/) — Official small-business AI adoption measurement.
 - Federal Reserve Bank of St. Louis, 2026. [FRED economic data](https://fred.stlouisfed.org/) — The primary time-series database used for macro indicators.
