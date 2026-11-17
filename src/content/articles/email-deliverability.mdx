@@ -1,0 +1,103 @@
+---
+title: "Email Deliverability: What Actually Affects Inbox Placement"
+description: "Authentication proves who you are; reputation decides whether you get delivered. Read the three standards, the worked setup, and why opens mislead."
+date: 2026-11-17
+tags:
+  - Email Marketing
+  - Deliverability
+  - Marketing
+  - Standards
+---
+
+A sender can pass every authentication check and still land in spam. The checks answer "are you who you claim to be?"; the mailbox provider then asks a different question — "do recipients want this?" Confusing the two produces teams that configure DKIM correctly, see no improvement, and conclude that deliverability is a mystery.
+
+**Direct answer:** SPF, DKIM and DMARC are the three authentication standards — SPF authorises sending hosts for a domain, DKIM signs messages cryptographically, and DMARC ties both to the visible From address and publishes a handling policy. Gmail's sender guidelines add the reputation layer: authentication is required, but recipient engagement and list quality affect placement. The boundary: authentication is necessary and verifiable; reputation is probabilistic and controlled by the receiving provider.
+
+## The three standards do different jobs
+
+**SPF (RFC 7208)** lets a domain owner publish which hosts are authorised to send mail for that domain. A receiving server checks the sending host against the published record. It answers a narrow question about the envelope, not about the From address a human sees.
+
+**DKIM (RFC 6376)** adds a cryptographic signature. The signing domain publishes a public key; the receiver verifies the signature and can confirm that the message was signed by that domain and that specified parts were not altered in transit.
+
+**DMARC (RFC 7489)** connects the two to the *visible* From domain — the one the recipient reads — and lets the owner publish a policy for messages that fail. It also provides reporting, which is how a sender learns that mail claiming to be from its domain is being sent from elsewhere.
+
+Three properties follow:
+
+- **SPF and DKIM can both pass while DMARC fails** if the authenticated domains do not align with the visible From domain. This is the most common configuration surprise.
+- **DMARC is a policy, not a delivery guarantee.** A `p=none` record requests reports without asking receivers to reject anything; moving to `quarantine` or `reject` changes handling, and should follow a period of reading the reports.
+- **Authentication identifies, it does not persuade.** Passing all three says the message is genuine, not that it is wanted.
+
+## The reputation layer
+
+Gmail's sender guidelines illustrate what providers ask beyond authentication: send wanted mail, avoid spam traps, make it easy to unsubscribe, and keep complaint rates low. Bulk senders face additional requirements, because the volume makes abuse more damaging.
+
+Three practical implications:
+
+1. **List hygiene is a deliverability control.** Sending to addresses that no longer exist or that never opted in generates bounces and complaints, which damage reputation. A smaller, engaged list outperforms a large stale one.
+2. **Engagement is feedback.** Opens and clicks are signals providers can observe. A message nobody interacts with teaches the provider that the sender's mail is not wanted.
+3. **Complaints are expensive.** A single spam complaint from a recipient can outweigh many successful deliveries, which is why unsubscribe friction is counterproductive.
+
+## A worked example of a DMARC rollout
+
+The following is a hypothetical sequence and timeline, not a measured result.
+
+A company sends 500,000 emails a month from three systems: a marketing platform, a transactional service, and a CRM used by sales.
+
+**Step 1 — inventory.** List every host that sends as the company's domain. The inventory finds the three known systems and one forgotten script sending invoices from a subdomain.
+
+**Step 2 — SPF and DKIM.** Publish an SPF record authorising the known hosts and enable DKIM signing on each system. The forgotten script is now a source of SPF failures — which is the point of the inventory.
+
+**Step 3 — DMARC at `p=none`.** Publish a DMARC record with reporting. After two weeks, the reports show that 98% of messages align, and that the remaining 2% come from the forgotten script plus an unauthorised source using the domain in the From field.
+
+**Step 4 — fix and escalate.** Move the script to an authorised host, investigate the unauthorised source, then change the policy to `quarantine` and later `reject` once alignment is consistently above the team's threshold.
+
+Three lessons follow:
+
+- **The rollout starts with observation.** Moving straight to `reject` would have blocked the legitimate script along with the spoofed mail.
+- **The reports are the deliverable.** They reveal both misconfiguration and abuse; without reading them, DMARC is just a DNS record.
+- **Authentication and reputation remain separate.** After alignment reaches 100%, a campaign sent to a stale list can still go to spam. The work is not finished at `reject`.
+
+## The setup order that avoids outages
+
+A deliverability project changes DNS records that affect every message the domain sends. The order matters:
+
+**Inventory first.** Find every system that sends as your domain, including subdomains and old scripts. A record that authorises only the known systems will break the unknown ones.
+
+**Monitor before enforcing.** A DMARC record at `p=none` gives reports without changing handling. This is the observation phase; treat the reports as the output of the project.
+
+**Fix the sources the reports reveal.** Align the authenticated domains with the visible From address, and move or retire unauthorised senders. At this stage, a spike in failures is a success — it means the report is doing its job.
+
+**Tighten policy gradually.** Move to `quarantine`, watch complaint and bounce rates, then move to `reject` when alignment is stable. A sudden jump to `reject` can silently drop legitimate mail.
+
+**Keep subdomain policy in mind.** DMARC allows a separate policy for subdomains. A domain that is protected while its subdomains are not leaves an obvious path for impersonation.
+
+This sequence is unglamorous, and it is the difference between a project that improves placement and one that interrupts invoices.
+
+## Metrics that mislead
+
+**Open rates are noisy.** Privacy features in mail clients pre-fetch images, which can register as opens without a human reading. Treat open rate as a directional signal, not a measurement.
+
+**Delivery is not inbox placement.** "Delivered" typically means the receiving server accepted the message; it may have been filed in spam or promotions. The distinction matters when diagnosing a deliverability drop.
+
+**A single seed test is weak.** Checking whether a test message reached your own inbox tells you about one recipient with one history. Use seed lists across providers and monitor complaint and bounce rates over time.
+
+The counterargument — that deliverability is opaque because providers do not publish their rules — is partly fair. The standards and published guidelines are public, and they remove the failures a sender can control. What remains is a reputation system you influence through list quality and recipient behaviour rather than configure directly.
+
+## A decision test
+
+1. **Inventory every sending host** before changing DNS records.
+2. **Publish SPF and enable DKIM**, checking alignment with the visible From domain.
+3. **Start DMARC at `p=none`** and read the reports before tightening policy.
+4. **Treat a stale list as a deliverability risk**, not just a marketing-quality issue.
+5. **Make unsubscribing easy** to limit complaints.
+6. **Measure bounces, complaints and inbox placement** rather than trusting opens.
+7. **Test across providers** and re-check after any sending-system change.
+
+For the retention context, see [Customer Retention](/articles/customer-retention-keeping-customers-is-cheaper-than-acquiring-them); for the measurement caveat, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation).
+
+## Further Reading
+
+- IETF, 2014. [RFC 7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1](https://www.rfc-editor.org/rfc/rfc7208) — The SPF standard for authorising which hosts may send mail for a domain.
+- IETF, 2011. [RFC 6376: DomainKeys Identified Mail (DKIM) Signatures](https://www.rfc-editor.org/rfc/rfc6376) — The DKIM standard for cryptographically signing messages so a receiver can verify the signing domain.
+- IETF, 2015. [RFC 7489: Domain-based Message Authentication, Reporting, and Conformance (DMARC)](https://www.rfc-editor.org/rfc/rfc7489) — The DMARC standard for tying SPF and DKIM to the visible From domain and publishing a handling policy.
+- Google, 2026. [Email sender guidelines - Gmail Help](https://support.google.com/a/answer/81126) — A major mailbox provider's published sender requirements and bulk-sender recommendations.

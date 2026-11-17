@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 194 tracked articles — 194 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 196 tracked articles — 196 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -208,6 +208,8 @@
 | **P-202** | AI Integration Into an Existing Business: A Practical Sequence | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/ai-integration-blueprint-businesses.mdx` | 2026-11-17 | New article: 1,224 words. NIST AI RMF wrapper, cloud building blocks as catalogue not plan; seven-step sequence; labeled invoice pilot (500 to 220 hours with frictions); decision test. Three new sources verified. |
 | **P-203** | AI Readiness Assessment: Questions to Ask Before Adopting | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/ai-readiness-assessment.mdx` | 2026-11-17 | New article: 1,281 words. NIST AI RMF, OECD.AI accountability and O*NET task descriptions; four-area profile with labeled insurer example where data is the binding constraint; artefact test; decision test. Three new sources verified. |
 | **P-204** | Demand Generation vs Lead Generation: Where the Funnel Breaks | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/demand-generation-vs-lead-generation.mdx` | 2026-11-17 | New article: 1,395 words. Distinct jobs and metrics from secondary overviews; labeled funnel example (20 to 30 customers via acceptance rate); two-clocks budgeting; decision test. Two new sources verified. |
+| **P-205** | Email Deliverability: What Actually Affects Inbox Placement | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/email-deliverability.mdx` | 2026-11-17 | New article: 1,301 words. SPF/DKIM/DMARC RFCs and Gmail sender guidelines; hypothetical DMARC rollout with observation phase; setup order; metric caveats; decision test. Four new sources verified. |
+| **P-206** | Influencer Marketing Measurement: Codes vs Holdouts | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/influencer-marketing-measurement.mdx` | 2026-11-17 | New article: 1,198 words. Attributed vs incremental sales from code/link tracking; labeled worked example (400 attributed vs 80 incremental purchases); measurement-design ladder; decision test. Two new sources verified. |
 
 ---
 
@@ -230,6 +232,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AW (Expanded focus, cluster 5 — 2026-11-17):** Two marketing articles drafted. *Email Deliverability* is built on IETF RFCs and a provider guideline; *Influencer Marketing Measurement* on secondary overviews with an explicit attribution-versus-incrementality frame. Both include labeled worked examples and decision tests. Six new sources added; all 248 verify.
 - **Batch AV (Expanded focus, cluster 4 — 2026-11-17):** Two articles drafted across the owner-requested themes. *AI Readiness Assessment* uses NIST, OECD.AI and O*NET; *Demand Generation vs Lead Generation* opens the marketing expansion using secondary overviews with clearly stated limits. Both include labeled worked examples and decision tests. Three new sources added; all 242 verify.
 - **Batch AU (Expanded AI focus, cluster 3 — 2026-11-17):** Two implementation articles drafted. *Routing Between LLMs* uses FrugalGPT, RouteLLM and published tier prices; *AI Integration Blueprint* uses NIST AI RMF and cloud-vendor catalogues treated as claims. Both include labeled worked examples and decision tests. Four new sources added; all 239 verify.
 - **Batch AT (Expanded AI focus, cluster 2 — 2026-11-17):** Two architecture articles drafted. *Long Context Windows* uses official model specs and the Lost in the Middle paper; *Mixture of Experts* uses Mixtral, Switch Transformer and DeepSeek-V3 papers. Both include labeled worked examples and position/load-balance tests. Four new sources added; all 235 verify.
