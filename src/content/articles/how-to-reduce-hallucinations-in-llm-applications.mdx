@@ -1,10 +1,86 @@
 ---
 title: "How to Reduce Hallucinations in LLM Applications"
-description: "Reserved high-intent title for a future NOVANDRI article: How to Reduce Hallucinations in LLM Applications."
+description: "Hallucinations are a system property, not just a model flaw. Read the causes, the controls that work, and a worked example of grounding."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - LLM
+  - Hallucinations
+  - AI
+  - Reliability
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A hallucination is a confident answer that is not supported by the evidence available to the system. The usual response is to change the prompt, which addresses one cause and leaves the others. A survey of hallucination in natural language generation distinguishes multiple sources — data, model, and process — and each needs a different control.
+
+**Direct answer:** Reduce hallucinations by grounding answers in supplied sources, requiring citations that can be checked, constraining the model to say "not found" when evidence is absent, and evaluating the full system on a labelled set. Anthropic's prompt-engineering guidance lists reducing hallucinations as a distinct task with its own approach. The boundary: no control eliminates the possibility of a wrong answer — the goal is to make unsupported claims detectable and less likely to reach the user.
+
+## Three causes, three controls
+
+**Input causes.** The source material may be missing, ambiguous, or contradictory. No prompt can recover information that was never provided. The control is retrieval quality and source coverage, which is a data-engineering problem.
+
+**Model causes.** The model is trained to produce plausible text, which is not the same as true text. The control is grounding: require it to use the supplied context and cite specific passages.
+
+**Process causes.** A long conversation can drift; a tool can return a stale result; a retry can produce a different answer. The control is verification at the point where the answer is used — a schema check, a citation check, or a human review.
+
+The practical implication is that hallucination reduction is a system design task. A prompt-only approach is the least reliable of the three controls.
+
+## The controls that work
+
+**Ground the answer.** Provide the relevant passages and instruct the model to answer only from them. This turns an open-ended generation problem into a constrained extraction problem. The long-context article discusses the limit: a model may not use every part of a long prompt reliably, so position the critical material well and keep the context focused.
+
+**Require checkable citations.** Ask for the section or line that supports each claim. A citation is useful only if a reviewer can verify it, which means the source must be identifiable in your system.
+
+**Define the refusal.** Give exact wording for "I don't have that information". Without an explicit refusal path, the model will fill gaps with plausible text.
+
+**Verify structured output.** If the answer is data — a date, an amount, a code — validate it against a schema or a second source. A model's confidence is not evidence.
+
+**Keep a human in the loop for high-impact answers.** The human-in-the-loop article covers the design: the reviewer needs time, information, and authority to override.
+
+## A worked example of grounding
+
+The following is hypothetical and illustrative.
+
+A support assistant answers questions from a policy handbook. A user asks: "What is the refund window for international orders?"
+
+**Ungrounded prompt:** "Answer the user's question about our refund policy."
+The model may draw on general e-commerce knowledge and answer "30 days" — plausible, possibly wrong, and unverifiable.
+
+**Grounded prompt:**
+> Answer only from the `<source>` passages. If the answer is not present, reply exactly: "I don't have that information. A human will follow up." Cite the section heading you used.
+>
+> Source: [Section 4: Domestic orders — refunds accepted within 30 days of delivery.]
+> Source: [Section 7: International orders — refunds accepted within 14 days of delivery, customs duties excluded.]
+
+A grounded answer should say 14 days and cite Section 7. Three checks make this measurable:
+
+1. **Citation correctness.** Does the cited section actually contain the claim? If not, the answer failed even if the number is right.
+2. **Refusal rate on out-of-scope questions.** Ask "Do you offer lifetime warranties?" — the correct behaviour is the exact refusal. A low refusal rate means the model is guessing.
+3. **Coverage of the retrieval step.** If Section 7 was not retrieved, the failure happened before the model saw it. No prompt fixes a missing passage.
+
+The lesson is that a hallucination incident has a stage: retrieval, generation, or verification. Diagnosing the stage decides the fix.
+
+## What does not work
+
+**"Do not hallucinate" as an instruction.** It restates the goal without changing the mechanism. A model that is about to fabricate does not gain information from the warning.
+
+**Longer system prompts without a failure to prevent.** Each instruction should map to an observed error. Unbounded instructions dilute priority, as the system-prompt article explains.
+
+**Relying on confidence scores.** A model's stated confidence is a generated number, not a calibrated probability unless it has been measured as such. HELM's inclusion of calibration as a metric exists because accuracy alone hides this.
+
+The counterargument — that newer models hallucinate less, so the problem is shrinking — is true at the margin and irrelevant to system design. A lower error rate at high volume still produces errors, and the cost of an unsupported claim in a regulated domain is not linear.
+
+## A decision test
+
+1. **Classify the failure stage** — retrieval, generation, or verification.
+2. **Ground the answer** in supplied passages, with a clear source boundary.
+3. **Require a checkable citation** for each factual claim.
+4. **Define the exact refusal** for missing information.
+5. **Validate structured outputs** against a schema or second source.
+6. **Measure citation correctness and refusal rate**, not only answer accuracy.
+7. **Keep human review** where the cost of a wrong answer is high.
+
+For the retrieval side, see [Retrieval-Augmented Generation](/articles/rag-explained); for the evaluation method, see [Evaluating LLM Applications](/articles/evaluating-llm-applications).
+
+## References & Further Reading
+
+- Ji et al., 2022. [Survey of Hallucination in Natural Language Generation](https://arxiv.org/abs/2202.03629) — The types, causes and mitigation approaches for hallucination.
+- Anthropic. [Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Hallucination reduction as a distinct prompting task with its own guidance.

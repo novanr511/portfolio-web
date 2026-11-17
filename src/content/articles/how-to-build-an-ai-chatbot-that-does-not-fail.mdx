@@ -1,10 +1,90 @@
 ---
 title: "How to Build an AI Chatbot That Does Not Fail"
-description: "Reserved high-intent title for a future NOVANDRI article: How to Build an AI Chatbot That Does Not Fail."
+description: "A chatbot fails at handoff, memory, and overreach — not at generating sentences. Read the three boundaries and a worked design."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - Chatbot
+  - LLM
+  - Customer Support
+  - AI
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Most chatbot demos are conversations with a friendly text generator. The hard part appears later: the bot answers a question it should have escalated, forgets what the user said three turns ago, or promises an action it cannot perform. Reliability is designed at those boundaries, not in the tone of the replies.
+
+**Direct answer:** A chatbot that does not fail has three explicit boundaries: a knowledge boundary that defines what it may answer, an escalation boundary that says when a person takes over, and an action boundary that limits what tools it may call. Anthropic's customer-support guide covers context-aware assistants, and its prompt-engineering guidance puts success criteria before wording. The boundary: "does not fail" means failures are detected and contained, not that the bot is never wrong.
+
+## Three boundaries
+
+**Knowledge boundary.** The bot answers only from defined sources — a knowledge base, a policy document, a product catalogue. When the answer is absent, it must say so in a specific way. The reduce-hallucinations article covers the mechanism.
+
+**Escalation boundary.** Some cases need a person: angry customers, unusual requests, anything involving money or legal commitments. The escalation must be cheap for the user — a clear handoff with the conversation history, not a restart.
+
+**Action boundary.** If the bot can call tools, each tool needs its own authorisation and limits. A refund tool should enforce an amount ceiling and a policy check regardless of what the model decides. Prompt Injection in LLM Applications explains why the tool is the real security boundary.
+
+## Memory and context
+
+A conversation accumulates state: who the user is, what they asked, what was already resolved. Three practical rules:
+
+**Keep a structured state, not just a transcript.** Store the verified facts — account ID, issue type, steps tried — as fields. A transcript is hard to query and easy to misread.
+
+**Summarise long histories deliberately.** When context grows, compress it with a fixed schema rather than letting the oldest turns fall out randomly. The long-context article shows why position matters.
+
+**Reset between unrelated topics.** A user who starts a new subject should not inherit assumptions from the previous one. Detect the shift or offer an explicit reset.
+
+## A worked example of a support bot
+
+The following is hypothetical and illustrative.
+
+A company deploys a support bot for a software product. It has access to a help centre and a read-only account lookup tool. It cannot issue refunds.
+
+**Cases per day:** 2,000. The design assumes:
+
+- 55% answered from the help centre with a citation and no human review.
+- 25% escalated after low confidence or an explicit request for a person.
+- 20% handled with an account lookup — for example, checking licence status — with a structured response.
+
+Three failure modes are measured:
+
+1. **Unsupported answers.** A sample of 100 auto-answered cases is checked against the cited source. If 6 contain a claim the source does not support, the knowledge boundary is leaking and the confidence threshold should rise.
+2. **Failed handoffs.** If escalated conversations lose context in 10% of cases, users repeat themselves. The handoff needs to carry the structured state, not just the chat log.
+3. **Tool overreach.** The account tool is read-only, so a request for a refund cannot be executed. The bot should say "I can't issue refunds; I'll connect you with a person" — an exact response that can be tested.
+
+The arithmetic matters less than the measurement design: each boundary has a metric, and a failing metric points to a specific fix. "Users seem happy" is not a control.
+
+## What to test before launch
+
+Four test sets cover most failures:
+
+- **In-scope questions** with known answers and the correct citation.
+- **Out-of-scope questions** where the exact refusal is the expected output.
+- **Adversarial inputs** that try to change the bot's rules or extract confidential data.
+- **Multi-turn scenarios** that test memory and topic shifts.
+
+Score each set before launch and after every change. The prompt-engineering guidance's insistence on success criteria and empirical tests applies directly to chatbots, where a single change can alter behaviour across all four sets.
+
+## What the design cannot guarantee
+
+**The model will still be wrong sometimes.** A well-designed bot makes errors visible and contained. That is the realistic standard.
+
+**Users will try to break it.** Adversarial inputs are normal traffic, not edge cases. Treat them as a test category, not an annoyance.
+
+**The knowledge base will go stale.** A bot grounded in outdated documentation gives confident wrong answers. Content ownership is part of the system.
+
+The counterargument — that a general assistant can handle anything — confuses breadth with reliability. A bounded bot that handles 80% of cases well is more useful than one that attempts 100% unpredictably.
+
+## A decision test
+
+1. **Define the knowledge boundary** and the exact refusal wording.
+2. **Define the escalation boundary** with a cheap handoff carrying structured state.
+3. **Define the action boundary** with per-tool authorisation and limits.
+4. **Keep structured state** and compress long histories deliberately.
+5. **Build four test sets** — in-scope, out-of-scope, adversarial, multi-turn.
+6. **Measure unsupported answers, failed handoffs and tool overreach.**
+7. **Review after every model or knowledge-base change.**
+
+For the use-case context, see [AI in Customer Support](/articles/ai-in-customer-support-routing-drafting-and-handoff); for the review design, see [Human in the Loop by Design](/articles/human-in-the-loop-by-design).
+
+## References & Further Reading
+
+- Anthropic. [Customer support agent guide](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Building context-aware support interactions.
+- Anthropic. [Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Success criteria and empirical testing as prerequisites.

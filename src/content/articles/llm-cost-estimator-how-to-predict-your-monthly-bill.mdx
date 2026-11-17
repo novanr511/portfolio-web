@@ -1,10 +1,101 @@
 ---
 title: "LLM Cost Estimator: How to Predict Your Monthly Bill"
-description: "Reserved high-intent title for a future NOVANDRI article: LLM Cost Estimator: How to Predict Your Monthly Bill."
+description: "A token price is not a monthly bill. Read the four inputs that determine spend, a worked estimate, and the costs that surprise teams."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - LLM
+  - Cost
+  - AI
+  - Finance
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A price list tells you the cost of a million tokens. It does not tell you what your application will cost, because that depends on how many tokens you send, how many requests you make, and what happens on retries. Teams that budget from the headline rate are routinely surprised by the invoice.
+
+**Direct answer:** Monthly LLM spend is a product of four inputs: request volume, input tokens per request, output tokens per request, and the published per-million-token price for the chosen model — plus retries, tool calls, and cached or discarded attempts. OpenAI publishes per-million-token prices and context limits for its GPT-6 tiers in its model catalogue; AWS's cost-optimization guidance supplies the broader discipline of attributing spend to a workload. The boundary: a calculation is an estimate until measured traffic confirms the assumptions.
+
+## The four inputs
+
+**Requests per month.** The denominator for everything else. A consumer app and an internal tool can differ by orders of magnitude.
+
+**Input tokens per request.** Includes the system prompt, retrieved context, conversation history, and the user's message. A long-context design can make this the dominant cost, as the long-context article shows.
+
+**Output tokens per request.** Usually cheaper per token than input on OpenAI's published tiers, but it accumulates across every response.
+
+**Price per million tokens.** Published by the provider and subject to change. Quote the date and the exact tier.
+
+The basic formula:
+
+monthly cost = requests × (input_tokens × input_price + output_tokens × output_price) / 1,000,000
+
+Three additional factors matter in practice:
+
+- **Retries.** A failed request that is re-run consumes tokens twice.
+- **Tools.** Web search, file search, and computer use may carry separate charges.
+- **Caching.** Repeated context can often be served more cheaply, which is the subject of the prompt-caching article.
+
+## A worked estimate
+
+The following combines OpenAI's published list prices with a hypothetical workload. It is a calculation, not a forecast.
+
+OpenAI lists GPT-6 Astra at $10 per million input tokens and $50 per million output tokens; GPT-6.1 Sol at $2 and $10. A product handles 1 million requests a month, averaging 2,000 input and 500 output tokens.
+
+**Astra:**
+- Input: 1M × 2,000 × $10/M = $20,000
+- Output: 1M × 500 × $50/M = $25,000
+- Total: **$45,000/month**
+
+**Sol:**
+- Input: $4,000; output: $5,000; total **$9,000/month**
+
+Now add the real-world factors:
+
+1. **Retries at 3%.** 30,000 extra requests at Astra's per-request cost of $0.045 add $1,350 — about 3% of the bill. Small, but not zero.
+2. **Context growth.** If conversation history raises input tokens from 2,000 to 6,000, Astra's input cost triples to $60,000. The model price did not change; the application did.
+3. **Routing.** Sending 70% of requests to Sol and 30% to Astra gives 0.7 × $9,000 + 0.3 × $45,000 = **$19,800**, a 56% saving, as the routing article shows in more detail.
+
+Three lessons follow:
+
+- **Input volume is the lever**, not the headline price. Cutting context often saves more than switching tiers.
+- **Model choice is a distribution decision.** A single model for all requests is rarely optimal at scale.
+- **The estimate needs a measurement loop.** Log actual token counts per request and compare with the assumption monthly.
+
+## How to turn the estimate into a budget
+
+A calculation is useful only when it becomes a number someone owns. Three habits make that transition:
+
+**Log the inputs, not just the charges.** A provider invoice tells you what you spent, not which feature generated it. Instrument each request with the feature name, input tokens, output tokens, model tier, and whether a retry occurred. Without those fields, a cost spike becomes an argument rather than a diagnosis. The pattern is the same as showback in cloud cost management: attribution precedes control.
+
+**Set a budget per feature, not per model.** A single model budget hides the fact that one expensive workflow may be consuming most of the tokens. When each feature has a monthly allowance and a measured actual, a team can see which part of the product has a viable unit economy. A summarisation feature that costs more per active user than the user pays is a product decision disguised as a technical one.
+
+**Re-estimate on a fixed cadence and on every change.** Traffic patterns shift, conversation histories grow, and providers revise prices. A monthly comparison of predicted against actual spend catches drift early. A prompt change that adds retrieved context should trigger a fresh estimate before it reaches production, because the input-token assumption is the one most likely to break.
+
+These habits turn the worked arithmetic into a management process. The formula gives you a number; the logging and ownership give you a way to keep that number honest.
+
+## The costs that do not appear in the formula
+
+**Evaluation.** Building a test set and running it after each prompt change costs engineer time, not tokens. It is still part of the programme's cost.
+
+**Engineering time.** Prompt iteration, routing logic, and monitoring are real expenses. A $9,000 token bill with a $30,000 engineering effort is a different proposition from the token number alone.
+
+**Vendor changes.** Prices and model versions change. A budget built on today's published rate should include a review trigger when the provider updates its catalogue.
+
+**Caching and batch discounts.** Both can reduce the effective price, but neither is guaranteed for your traffic pattern. Model them as scenarios, not certainties.
+
+The counterargument — that token prices are falling, so estimation does not matter — misses the scale effect. A 5× difference between tiers still exists, and at a million requests it is the difference between a viable and an unviable product.
+
+## A decision test
+
+1. **Measure actual token counts** per request from logs, including system prompt and context.
+2. **State the request volume** with its time window and source.
+3. **Use published prices** with a date and exact tier.
+4. **Add retries, tools, and cache scenarios** as explicit lines, not hidden assumptions.
+5. **Compute a blended cost** if routing across tiers.
+6. **Track predicted against actual** monthly and investigate a gap above your threshold.
+7. **Review when the provider changes prices or versions.**
+
+For the routing mechanics, see [Routing Between LLMs](/articles/routing-between-llms); for the model prices, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026).
+
+## References & Further Reading
+
+- OpenAI. [Models](https://platform.openai.com/docs/models) — Published per-million-token prices, context windows and reasoning levels for the GPT-6 tiers.
+- Amazon Web Services. [Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — The discipline of attributing spend to workloads and outcomes.

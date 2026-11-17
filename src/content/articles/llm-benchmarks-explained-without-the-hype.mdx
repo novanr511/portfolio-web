@@ -1,10 +1,86 @@
 ---
 title: "LLM Benchmarks Explained Without the Hype"
-description: "Reserved high-intent title for a future NOVANDRI article: LLM Benchmarks Explained Without the Hype."
+description: "A benchmark rank is a result under one set of conditions. Read what HELM fixed, why scenarios differ, and how to read a claim critically."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - LLM
+  - Benchmarks
+  - Evaluation
+  - AI
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A leaderboard says model A beats model B by two points. The natural conclusion is that A is better. That conclusion is only valid if both models were tested on the same tasks, under the same conditions, with the same metric — which, before HELM, they often were not.
+
+**Direct answer:** A benchmark is a measurement of a model on a defined set of scenarios with defined metrics. HELM's authors found that before their work, models "on average were evaluated on just 17.9% of the core HELM scenarios", with some prominent models sharing no scenario at all. HELM evaluated 30 models across 42 scenarios and raised shared coverage to 96.0%, measuring seven metrics including accuracy, calibration, robustness, fairness, bias, toxicity and efficiency. The boundary: even a well-designed benchmark measures those scenarios, not your application.
+
+## Why two ranks can disagree
+
+Three differences explain most contradictions:
+
+**Different scenarios.** One benchmark emphasises coding, another multiple-choice knowledge, another long-context retrieval. A model that wins on one may lose on another without anything about the model changing.
+
+**Different metrics.** Accuracy is the default, but a model can be accurate and badly calibrated — overconfident when wrong — or slow and expensive. HELM's inclusion of efficiency and trustworthiness metrics exists because "metrics beyond accuracy don't fall to the wayside".
+
+**Different conditions.** Prompt format, number of examples, decoding settings, and even the evaluation harness affect results. A score without those details is not reproducible.
+
+A benchmark is therefore a claim with a scope. Reading it critically means asking what that scope was.
+
+## What HELM changed
+
+HELM's approach was to taxonomise the space of scenarios and metrics, select a broad but feasible subset, and evaluate every model on the same core set under standardised conditions. The paper reports that the core matrix covers 16 scenarios with seven metrics "when possible (87.5% of the time)", plus targeted evaluations across 26 further scenarios.
+
+Three consequences follow:
+
+1. **Comparability improved.** With 96.0% shared coverage, a rank from HELM means more than a rank assembled from unrelated tests.
+2. **Trade-offs became visible.** Measuring calibration and robustness alongside accuracy shows where a model's strengths come with costs.
+3. **Coverage gaps were documented.** The authors explicitly note what is missing or underrepresented, such as question answering for neglected English dialects and trustworthiness metrics. A benchmark that states its gaps is more trustworthy than one that implies completeness.
+
+HELM is not the final word — models and scenarios evolve — but it is a concrete example of what a defensible benchmark looks like.
+
+## A worked example of reading a claim
+
+The following is hypothetical and illustrative.
+
+A vendor states: "Our model scores 92% on reasoning, beating the previous best by 4 points."
+
+Four questions turn this from marketing into evidence:
+
+1. **Which reasoning benchmark?** If it is a math dataset, the claim is about math, not reasoning in general. Ask for the scenario name.
+2. **How many scenarios were shared?** If the competitor was evaluated on a different set, the 4-point gap may be an artefact of test selection — the problem HELM identified.
+3. **What were the conditions?** Few-shot examples, prompt wording, and decoding settings all move scores. Were they the same for both models?
+4. **What did the other metrics do?** If accuracy rose while calibration or efficiency fell, the model is different, not simply better.
+
+Now apply a decision lens: if your application needs grounded extraction from documents and the benchmark is math word problems, the 92% is largely irrelevant. The right benchmark is the one that resembles your task — and the best evidence is your own labelled set, as the LLM evaluation article argues.
+
+Three conclusions follow:
+
+- **A rank is a summary, not a recommendation.** Use it to build a shortlist, then test on your own work.
+- **A gap smaller than the condition noise is not a result.** Without error bars or repeated runs, two points may be measurement variation.
+- **Documented limitations are a sign of quality.** A benchmark that states what it does not cover is more useful than one that claims universality.
+
+## What benchmarks cannot tell you
+
+**They are not deployment outcomes.** A model that scores well on a benchmark can still be wrong in your workflow because of data quality, tool integration, or prompt design. The capability-to-outcome gap is the central caution in the AI literature.
+
+**They age.** Models are updated, and a benchmark can become saturated or contaminated when its questions appear in training data. A score from an older version may not describe the current one.
+
+**They encode values.** Choosing which scenarios matter is a judgement. A benchmark heavy on English-language tasks will rank models differently from one balanced across languages, and neither ranking is neutral.
+
+The counterargument — that benchmarks are still better than gut feeling — is correct. The response is to use them properly: as standardised evidence with a stated scope, not as a universal hierarchy.
+
+## A decision test
+
+1. **Name the scenario** behind any score you read.
+2. **Check that compared models shared the same scenarios and conditions.**
+3. **Ask which metrics were measured** beyond accuracy.
+4. **Look for stated limitations and coverage gaps.**
+5. **Treat small gaps as noise** unless repeated runs show stability.
+6. **Map the benchmark to your task** before using it for a decision.
+7. **Validate the shortlist on your own labelled set.**
+
+For a concrete multi-metric framework, see [Evaluating LLM Applications](/articles/evaluating-llm-applications); for current model specs, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026).
+
+## References & Further Reading
+
+- Percy Liang et al., 2022. [Holistic Evaluation of Language Models](https://arxiv.org/abs/2211.09110) — The multi-metric framework, shared scenario coverage and documented gaps.
+- MLCommons. [Benchmarks](https://mlcommons.org/benchmarks/) — The discipline of fair, comparable, affordable performance measurement.

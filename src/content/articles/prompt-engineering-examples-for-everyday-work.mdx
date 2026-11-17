@@ -1,10 +1,116 @@
 ---
 title: "Prompt Engineering Examples for Everyday Work"
-description: "Reserved high-intent title for a future NOVANDRI article: Prompt Engineering Examples for Everyday Work."
+description: "Six reusable prompt patterns for real tasks — extraction, drafting, classification, review, analysis, and structured output."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - Prompt Engineering
+  - LLM
+  - AI
+  - Productivity
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Prompt advice is often given as rules without examples, which is why it fails to transfer. A pattern becomes useful when you can see it applied to a task you actually have. Anthropic's prompt-engineering overview frames the work around success criteria and empirical tests; OpenAI's GPT-4.1 prompting guide offers concrete patterns. Below are six patterns tied to everyday tasks, with the failure each one prevents.
+
+**Direct answer:** The most reusable prompt patterns are: specify the output shape, give an example of a good answer, assign the model a checking role, ask for reasoning before a conclusion, constrain the knowledge source, and separate extraction from judgement. The boundary: a pattern is a starting structure, not a guarantee — every one needs a test set drawn from your own work before you rely on it.
+
+## Pattern 1 — Specify the output shape
+
+**Task:** turn a meeting transcript into action items.
+
+> Extract action items from the transcript between `<transcript>` tags. Return a JSON array of objects with exactly these keys: `owner`, `action`, `due_date`. Use `null` when a value is not stated. Do not infer due dates. Return JSON only.
+
+**Failure prevented:** prose that looks useful but cannot be parsed. Asking for a specific structure turns the output into data a downstream system can use. The instruction "do not infer due dates" is the important part — without it the model fills gaps confidently.
+
+## Pattern 2 — Show a good answer
+
+**Task:** classify support tickets into three categories.
+
+> Classify each ticket into exactly one of: billing, technical, other. Use the examples below as the definition of each category.
+>
+> Example: "My card was charged twice" → billing
+> Example: "The app crashes on login" → technical
+> Example: "Do you ship to Norway?" → other
+>
+> Ticket: "I can't see my invoice" →
+
+**Failure prevented:** inconsistent categories. A label list is an abstraction; examples show the boundary between categories, which is where classification actually fails.
+
+## Pattern 3 — Assign a checking role
+
+**Task:** review a draft for factual support.
+
+> You are a fact-checker. For each claim in the text, identify the evidence in the provided sources that supports it. If no source supports a claim, mark it UNSUPPORTED. Do not rewrite the text. Return a table: claim | evidence | verdict.
+
+**Failure prevented:** the model polishing prose instead of checking it. Separating the checking role from the writing role makes the task measurable — a count of unsupported claims is a real metric.
+
+## Pattern 4 — Reason before concluding
+
+**Task:** decide whether a customer qualifies for a discount.
+
+> Given the policy and the customer record, first list the policy criteria that apply. Then, for each criterion, state whether the record satisfies it. Finally, give the decision as ELIGIBLE or NOT ELIGIBLE. Do not give the decision before the criterion-by-criterion assessment.
+
+**Failure prevented:** a plausible-sounding conclusion that skips the rule. Asking for the intermediate steps makes the decision auditable and shows where the model misread the policy.
+
+Anthropic's prompting guides treat extended thinking and structured reasoning as separate capabilities; this pattern is the lightweight version that works on any model.
+
+## Pattern 5 — Constrain the knowledge source
+
+**Task:** answer questions from an internal handbook.
+
+> Answer only from the handbook excerpt between `<source>` tags. If the answer is not present, reply: "Not covered in the handbook." Do not use general knowledge, even if you know the answer. Cite the section heading you used.
+
+**Failure prevented:** confident answers from parametric memory that contradict your documents. The citation requirement is a check: if the cited section does not contain the answer, the response failed.
+
+## Pattern 6 — Separate extraction from judgement
+
+**Task:** summarise customer feedback and decide what to fix.
+
+> Step 1: extract every distinct complaint from the feedback. Preserve the customer's wording. Do not group them yet.
+> Step 2: group the complaints by underlying cause.
+> Step 3: rank the causes by frequency and severity, and explain the ranking in one sentence each.
+
+**Failure prevented:** a summary that jumps to conclusions and loses the evidence. Keeping extraction separate from interpretation lets you check step 1 before trusting step 3.
+
+## A worked example of combining patterns
+
+Suppose a product team wants a weekly feedback digest. A single prompt that asks for "a useful summary" will produce different formats every week. A composed prompt uses three patterns:
+
+1. **Constrain the source** — only the feedback exported this week.
+2. **Specify the shape** — a JSON object with `themes`, `counts`, and `example_quotes`.
+3. **Separate extraction from judgement** — list themes before ranking them.
+
+The output is now comparable across weeks. A team can measure whether a theme is growing, which is impossible when each week's output is a different prose summary.
+
+Three checks make the composed prompt safe:
+
+- **No invented quotes.** Require each quote to be copied verbatim from the source.
+- **Counts have a denominator.** "12 mentions" should mean 12 of the exported records, not 12 of a sample the model chose.
+- **A held-out sample.** Have a human classify ten records and compare with the model, as the prompt-engineering prerequisite suggests.
+
+## What the patterns do not solve
+
+**No pattern fixes missing information.** If the source does not contain the answer, every pattern should lead to an honest "not found" — which is why the refusal wording matters.
+
+**No pattern removes the need for evaluation.** A prompt that works on one example is a demo. The success criteria and empirical test that Anthropic puts before prompt engineering are the actual work.
+
+**Longer prompts are not automatically better.** Each instruction should correspond to a failure you have observed. Instructions without a failure to prevent add ambiguity about priority.
+
+The counterargument — that these patterns are obvious — is fair. Their value is consistency: a team using the same six structures can compare outputs across tasks and reviewers, which is not possible with ad hoc prompting.
+
+## A decision test
+
+1. **Name the failure** the prompt is meant to prevent.
+2. **Choose the pattern** that addresses that failure.
+3. **Specify the output shape** so you can parse and compare results.
+4. **Include one good example** where category boundaries are ambiguous.
+5. **Constrain the knowledge source** and define the refusal wording.
+6. **Test on ten real cases** before relying on the prompt.
+7. **Remove instructions** that do not map to an observed failure.
+
+For the broader method, see [System Prompts](/articles/how-to-write-a-system-prompt-that-actually-works); for evaluating the result, see [Evaluating LLM Applications](/articles/evaluating-llm-applications).
+
+## References & Further Reading
+
+- Anthropic. [Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Success criteria and empirical testing as prerequisites for prompt work.
+- OpenAI. [GPT-4.1 Prompting Guide](https://cookbook.openai.com/examples/gpt4-1_prompting_guide) — Concrete prompting patterns for instruction-following models.
+- OpenAI. [Prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering) — Official guidance for GPT models.

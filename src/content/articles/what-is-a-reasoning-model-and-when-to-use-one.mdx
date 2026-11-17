@@ -1,10 +1,88 @@
 ---
 title: "What Is a Reasoning Model and When to Use One"
-description: "Reserved high-intent title for a future NOVANDRI article: What Is a Reasoning Model and When to Use One."
+description: "Reasoning models spend more compute before answering. Read the mechanism, the cost trade-off, and the tasks where that spend pays."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - LLM
+  - Reasoning
+  - AI
+  - Decision Guide
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A conventional model answers immediately. A reasoning model produces intermediate steps before its final answer, spending more compute and time on hard problems. That difference is useful on some tasks and wasteful on others, which makes "should we use one?" a question about the task rather than about which model is smarter.
+
+**Direct answer:** Reasoning models generate a chain of intermediate steps before answering — a behaviour studied in Chain-of-Thought prompting, where generating reasoning steps improved performance on reasoning tasks. Current APIs expose reasoning effort as a control: OpenAI lists levels from low to max for GPT-6 models. The boundary: extra reasoning helps when a task genuinely requires multi-step logic and hurts when the task is simple classification or extraction — it adds latency and token cost without improving the answer.
+
+## What the extra compute buys
+
+The mechanism is visible in the Chain-of-Thought paper: asking a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. The steps are not decoration; they give the model a place to work through dependencies before committing to an answer.
+
+Three consequences follow:
+
+**Hard problems improve more than easy ones.** A task that requires several dependent decisions benefits from explicit intermediate states. A task that is a single lookup does not.
+
+**Errors become inspectable.** When a model shows its steps, a reviewer can often see where it went wrong. That is an advantage for debugging, though not a guarantee that the steps reflect the model's true process.
+
+**Cost and latency rise.** More output tokens mean a larger bill and a slower response. OpenAI's published reasoning levels exist precisely so applications can choose the trade-off.
+
+## Where reasoning helps
+
+**Multi-step analysis.** Debugging a failure across several systems, evaluating a contract against multiple clauses, or planning a sequence of actions — all require holding intermediate results.
+
+**Mathematics and formal logic.** The tasks on which Chain-of-Thought was demonstrated remain a strong fit.
+
+**Ambiguous requests that need decomposition.** A vague question often conceals several sub-questions. Reasoning steps let the model surface them before answering.
+
+## Where it does not
+
+**Classification and extraction.** Labelling a ticket or pulling a date from a document does not benefit from a long chain of thought. The extra tokens are cost without quality.
+
+**High-volume, low-stakes requests.** At a million requests a month, a small per-request increase in output tokens becomes a large bill, as the cost estimator shows.
+
+**Latency-critical interfaces.** A user waiting for a chat reply experiences the extra seconds as a worse product, even if the answer is marginally better.
+
+A practical rule: use reasoning where the value of a correct answer is high and the volume is low; use a standard model where the task is simple and volume is high. The routing article shows how to combine both.
+
+## A worked example of the trade-off
+
+The following uses published price tiers with a hypothetical workload.
+
+OpenAI lists GPT-6 Astra at $10 input / $50 output per million tokens. Suppose a legal review task averages 4,000 input tokens and produces either 300 output tokens in standard mode or 2,500 output tokens in high-reasoning mode.
+
+**Standard:** per request = 4,000 × $10/M + 300 × $50/M = $0.04 + $0.015 = **$0.055**.
+**High reasoning:** per request = $0.04 + 2,500 × $50/M = $0.04 + $0.125 = **$0.165**.
+
+Three times the cost per request. At 10,000 reviews a month, that is $550 versus $1,650. Three questions decide it:
+
+1. **Does the reasoning mode reduce errors by enough?** If it cuts a 5% error rate to 1%, the 1,100 extra spend may be trivial compared with the cost of a wrong review.
+2. **Can a cheaper tier do the standard mode?** If GPT-6.1 Sol handles the non-reasoning path acceptably, the baseline cost drops further.
+3. **Is latency acceptable?** A reasoning trace may take several seconds longer. In an interactive tool, that changes the product.
+
+The lesson is not that reasoning is worth it or not. It is that the decision has explicit inputs — error cost, volume, latency — and should be made with them.
+
+## What reasoning does not guarantee
+
+**More steps are not always better.** A model can reason at length and still reach a wrong answer. The evaluation set, not the length of the trace, is the evidence.
+
+**Visible steps are not a faithful explanation.** Research on interpretability distinguishes a model's stated reasoning from the process that produced the answer. Treat the trace as an artefact, not a window into certainty.
+
+**Reasoning does not fix missing knowledge.** If the retrieved context lacks the facts, extra reasoning elaborates the gap. Retrieval quality still dominates.
+
+The counterargument — that reasoning models make prompt engineering obsolete — is wrong in direction. Clear instructions still matter; reasoning changes what happens after them.
+
+## A decision test
+
+1. **Classify the task** — multi-step logic or single-step lookup?
+2. **Price both modes** at your real token volumes, as in the worked example.
+3. **Measure error reduction** on a labelled set, not on intuition.
+4. **Check latency** against the product's expectation.
+5. **Route selectively** if only a subset of requests needs reasoning.
+6. **Ignore the trace length** as a quality signal; score the answer.
+7. **Re-test after a model update**, since reasoning behaviour changes between versions.
+
+For the model options, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026); for measuring the result, see [Evaluating LLM Applications](/articles/evaluating-llm-applications).
+
+## References & Further Reading
+
+- Jason Wei et al., 2022. [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903) — The original result on intermediate reasoning steps.
+- OpenAI. [Models](https://platform.openai.com/docs/models) — Published reasoning levels and prices for the GPT-6 tiers.
