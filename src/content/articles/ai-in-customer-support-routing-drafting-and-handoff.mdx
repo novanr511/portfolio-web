@@ -1,10 +1,91 @@
 ---
 title: "AI in Customer Support: Routing, Drafting, and Handoff"
-description: "Reserved title for a future NOVANDRI article: AI in Customer Support: Routing, Drafting, and Handoff."
+description: "Support AI works at three points: where a ticket goes, what reply is drafted, and when a person takes over. Read each with its metric."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Customer Support
+  - Operations
+  - Automation
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Support is where AI assistance is most visible and most easily measured. Three points matter: routing the ticket to the right queue, drafting a reply from the knowledge base, and deciding when a person must take over. Each has a different failure mode and a different metric, which is why treating them as one "AI support" feature produces confusing results.
+
+**Direct answer:** Use AI to classify and route tickets, draft replies grounded in the knowledge base, and flag cases for human handoff — with a distinct metric for each stage. Anthropic's customer-support agent guide is the primary use-case reference, and the O*NET task descriptions help identify what the work actually involves. The boundary: a fluent reply is not a correct one, and a handoff that loses context is worse than no automation, as the chatbot article explains.
+
+## Three points
+
+**Routing.** Classify the ticket into a queue with a confidence score. Errors are recoverable — the ticket can be rerouted — but they cost time, as the classification-pattern article explains.
+
+**Drafting.** Produce a reply from the knowledge base with a citation, so an agent can check it quickly. The reduce-hallucinations article covers the grounding mechanism. A draft sent without review is a different risk category.
+
+**Handoff.** Decide when a person must take over — low confidence, an angry customer, a money-related decision — and pass the structured state, not just the transcript, as the chatbot article recommends.
+
+## A worked workflow
+
+The following is hypothetical and illustrative.
+
+A support team handles 3,000 tickets a day. The AI workflow:
+
+1. Routes tickets into four queues with a confidence score. Low-confidence cases go to a triage queue.
+2. Drafts replies for the two highest-volume queues, with a cited source passage.
+3. Escalates to a person when confidence is low, the customer asks for a human, or the topic involves refunds.
+
+Measured over a month:
+
+- 85% of tickets routed correctly on first pass; 5% needed rerouting.
+- Drafts accepted with minor edits in 60% of eligible cases.
+- Escalation rate of 25%, with context carried in the handoff.
+
+Three checks decide the result:
+
+1. **Rerouting time** — do the 5% misrouted tickets cost more than routing saves? The workflow-automation article explains the arithmetic.
+2. **Edit distance** — are the accepted drafts genuinely close, or are agents rewriting them while marking them accepted? The evaluation-rubric article warns about proxy metrics.
+3. **Handoff quality** — do escalated tickets arrive with structured context, so customers do not repeat themselves, as the human-in-the-loop article requires.
+
+Three conclusions follow:
+
+- **Each stage needs its own metric**, and a single "AI satisfaction score" would hide a failing stage.
+- **The handoff is a control**, not a fallback, which the security checklist explains for tool boundaries.
+- **Low-confidence routing is a feature**, reducing wrong replies at the cost of more human work, as the chatbot article argues.
+
+## What to instrument
+
+A support AI system needs metrics at each stage, and the right ones differ from generic model scores. Four are worth tracking:
+
+**Routing accuracy by queue.** Aggregate accuracy hides a queue that consistently receives the wrong tickets, which the funnel article warns about for blended rates.
+
+**Draft acceptance with edit distance.** A draft marked accepted after heavy rewriting is not a saving. Measure how much text actually changed, as the evaluation-rubric article explains for proxy metrics.
+
+**Handoff completeness.** Does the escalated ticket carry the structured state — issue, attempts, sentiment — or just the chat log? The chatbot article explains why context loss is the failure to watch.
+
+**Customer effort.** Track repeat contacts on the same issue, which the retention article identifies as a leading indicator of a problem that was closed but not solved.
+
+These metrics make the combined system visible, which the evaluation article argues is the only meaningful unit of analysis.
+
+## What support AI cannot do
+
+**It cannot replace accountability.** A person must own the reply and the decision, as the governance checklist requires.
+
+**It cannot fix a weak knowledge base.** A draft grounded in outdated documentation gives confident wrong answers, which the data-governance article covers.
+
+**It cannot handle every customer.** Some conversations need empathy and judgement that a system should not simulate, as the humanizer guidance on voice would caution in a different context — here the point is simply that escalation is legitimate.
+
+The counterargument — that support AI reduces headcount — is a business framing that ignores the shift in work. Agents move from writing routine replies to handling harder cases, which may require more skill and better tools, as the future-of-work article discusses.
+
+## A decision test
+
+1. **Separate routing, drafting, and handoff** with a metric for each.
+2. **Ground drafts in a cited source** from the knowledge base.
+3. **Define escalation triggers** explicitly, including low confidence and high-stakes topics.
+4. **Carry structured context** across the handoff.
+5. **Audit the rerouted and escalated cases**, not just the successful ones.
+6. **Keep the knowledge base current** with an owner.
+7. **Measure combined-system outcomes**, as the evaluation article recommends.
+
+For the chatbot design, see [How to Build an AI Chatbot That Does Not Fail](/articles/how-to-build-an-ai-chatbot-that-does-not-fail); for the review design, see [Human in the Loop by Design](/articles/human-in-the-loop-by-design).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.

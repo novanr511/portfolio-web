@@ -1,10 +1,89 @@
 ---
 title: "AI for Contract Review: What to Automate and What to Escalate"
-description: "Reserved title for a future NOVANDRI article: AI for Contract Review: What to Automate and What to Escalate."
+description: "AI can find clauses and flag deviations, not decide legal risk. Read the split, a worked triage, and why escalation is a feature."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Legal
+  - Documents
+  - Risk
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Contract review is an attractive target for AI: the documents are long, the language is repetitive, and a first pass takes experienced time. The useful division of labour is clear — let the model find and compare clauses, and let a lawyer decide what the clauses mean for this deal. Blurring that line produces confident summaries that miss the point.
+
+**Direct answer:** Automate clause identification, comparison against a template, and extraction of key terms; escalate deviations, unusual language, and anything with material legal consequence to a qualified reviewer. Anthropic's use-case guides cover legal summarisation, and the document-processing article covers the extraction mechanics. The boundary: a model can flag that a clause differs from the standard, but it cannot judge whether that difference is acceptable given the commercial context, which is a legal and business decision.
+
+## What to automate
+
+**Clause identification.** Locate the termination, liability, indemnity, and governing-law clauses in a document. This is a retrieval-and-extraction task, as the document-processing article describes.
+
+**Template comparison.** Flag where a clause deviates from the approved standard. The comparison is mechanical — does the text match the expected pattern — and the model can do it at scale.
+
+**Key-term extraction.** Pull parties, dates, values, and renewal terms into a structured field, using a schema as the structured-output article explains.
+
+**First-pass summarisation.** Produce a short abstract for a reviewer to orient themselves, with each claim linked to the source clause, as the reduce-hallucinations article recommends for grounding.
+
+## What to escalate
+
+**Any material deviation.** A clause that differs from the template may be a negotiable point or a deal-breaker; that judgement needs context.
+
+**Unusual or novel language.** If the model has not seen a clause form before, its confidence is not evidence of meaning. The benchmark discussion of coverage applies here, as the benchmarks article argues.
+
+**Cross-clause interactions.** A liability cap and an indemnity clause may interact in a way that is only visible when read together, which the document-processing article notes as a systemic limitation.
+
+**High-value contracts.** The cost of an error scales with the deal, so the review threshold should scale too, as the risk-assessment article explains.
+
+## A worked triage
+
+The following is hypothetical and illustrative.
+
+A team reviews 500 vendor contracts a quarter. The AI pipeline:
+
+1. Extracts key terms and identifies the standard clauses.
+2. Compares each against the template and flags deviations with the source text.
+3. Produces a one-page summary for the reviewer.
+
+Outcomes on a sample quarter:
+
+- 350 contracts have no material deviations and go through a light review.
+- 120 have one or two flagged clauses and go to a lawyer with the clauses highlighted.
+- 30 have unusual language or high value and receive full legal review.
+
+Three checks decide whether the triage is safe:
+
+1. **False-negative audit.** Have a lawyer review a random sample of the 350 "clean" contracts. If a material deviation was missed, the comparison threshold is too loose, which the evaluation-rubric article explains for false negatives.
+2. **Citation accuracy.** Check that each flagged clause is quoted correctly, which the reduce-hallucinations article treats as a core check.
+3. **Review time.** Measure whether the 120 flagged contracts actually take less time with highlights, or whether reviewers re-read everything, which the workflow-automation article covers.
+
+Three conclusions follow:
+
+- **The value is in triage**, not in replacing review.
+- **False negatives are the dangerous error**, so audit the clean bucket.
+- **Legal retains the decision** on every material clause, as the human-in-the-loop article argues.
+
+## What contract AI cannot do
+
+**It cannot give legal advice.** A flag is a prompt to look, not an opinion, which the AI-governance article addresses for high-stakes domains.
+
+**It cannot read commercial intent.** Whether a liability cap is acceptable depends on the deal's value and alternatives, which are not in the document.
+
+**It stays current only if the template does.** A comparison against an outdated template produces misleading flags, which the monitoring article covers as a change trigger.
+
+The counterargument — that experienced lawyers will not use such a tool — is an adoption problem, not a capability problem. A tool that reduces the time to find clauses while keeping the decision with the lawyer is often welcomed, as the contract-review use-case guide suggests.
+
+## A decision test
+
+1. **Automate identification and comparison**, not judgement.
+2. **Cite the source clause** for every extraction and flag.
+3. **Escalate material deviations** and unusual language.
+4. **Audit the clean bucket** for false negatives.
+5. **Scale review thresholds with deal value.**
+6. **Keep the template current** with an owner.
+7. **Measure review time and missed-clause rate**, as the evaluation article recommends.
+
+For the extraction mechanics, see [AI for Document Processing](/articles/ai-for-document-processing-classification-extraction-redaction); for the governance, see [AI Governance](https://www.nist.gov/itl/ai-risk-management-framework).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Income statement - Wikipedia](https://en.wikipedia.org/wiki/Income_statement) — The structure of revenue, expenses and profit, and the difference between revenue and cash.
