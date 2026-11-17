@@ -1,10 +1,97 @@
 ---
 title: "Data Curation for LLM Pretraining: Deduplication and Quality"
-description: "Reserved title for a future NOVANDRI article: Data Curation for LLM Pretraining: Deduplication and Quality."
+description: "A model learns its training distribution. Read what deduplication changes, what quality filtering misses, and a worked curation decision."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Data
+  - Training
+  - Quality
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Pretraining data is often treated as a volume problem — collect more text and train longer. The composition of that text matters as much as its size. A corpus full of near-duplicates trains a model to memorise common passages; one with systematic gaps produces blind spots no amount of compute fills.
+
+**Direct answer:** Data curation for pretraining means removing duplicates, filtering low-quality content, and balancing the sources before training. The paper *Deduplicating Training Data Makes Language Models Better* reports that both exact and near-duplicate removal improve model quality and reduce memorisation. The boundary: curation choices are judgements about what counts as quality, and they encode values — a filtered corpus is not a neutral one, as the datasheets article explains.
+
+## Why deduplication matters
+
+Three effects follow from repeated content:
+
+**Memorisation.** A passage seen many times in training is more likely to be reproduced verbatim at inference, which raises privacy and copyright concerns.
+
+**Distorted frequencies.** If one source appears a hundred times, the model overweights its phrasing and facts. A corpus is a sample, and duplicates bias the sample.
+
+**Wasted compute.** Tokens spent re-reading the same material are tokens not spent on new information, which matters at training scale.
+
+The deduplication paper found improvements from both exact matching and near-duplicate detection, which suggests that paraphrases matter as well as identical copies.
+
+## Beyond duplicates
+
+**Quality filtering.** Removing content that is malformed, spam, or low-information. The risk is that a filter trained on one definition of quality discards legitimate material from other domains or dialects.
+
+**Source balance.** A corpus dominated by a few large sources will reflect their perspective. Balancing is a deliberate choice with consequences for what the model knows.
+
+**Toxicity and safety filtering.** Removing harmful content reduces some risks and can also remove material needed to recognise and refuse harmful requests. The trade-off belongs in the datasheet.
+
+**Provenance.** Recording where each portion came from and what processing it received, so a later evaluation can interpret the model's behaviour, as the model-collapse article argues.
+
+## A worked curation decision
+
+The following is hypothetical and illustrative.
+
+A team has 2 billion tokens of web text and a budget to curate before pretraining. Three options:
+
+- **No curation.** Train on everything. Cheap, but duplicates and low-quality pages consume capacity.
+- **Exact deduplication only.** Removes identical documents. Fast, but near-duplicates remain.
+- **Exact plus near-deduplication and source balancing.** More expensive, but the deduplication paper suggests a quality gain and reduced memorisation.
+
+Three checks decide:
+
+1. **Measure duplicate prevalence.** If 20% of the corpus is duplicated, curation frees significant capacity. If it is 1%, the effort may not pay.
+2. **Check what the filter removes.** Sample the discarded documents. If a near-duplicate filter is removing legitimate variation — different reviews of the same product, for example — the threshold is too aggressive.
+3. **Evaluate on a held-out real corpus.** A model trained on curated data should be assessed on human-written text it did not see, not on a test set drawn from the same filtered distribution.
+
+Three conclusions follow:
+
+- **Curation has a measurable cost and a measurable benefit**; decide with both in view.
+- **Filters encode values**, so record what was removed and why.
+- **A held-out human corpus is the anchor**, since a filtered test set flatters the filtered training set.
+
+## The operational side of curation
+
+Curation is a pipeline, not a one-time cleanup. Three practices keep it from drifting:
+
+**Version the corpus.** Record which documents were included, which filters were applied, and when. A model trained on version 2 should be comparable with one trained on version 3, which is impossible if the corpus changed silently.
+
+**Audit the filters periodically.** A quality filter trained on one distribution will change behaviour as the web changes. Sample what it removes each quarter and check that the rule still matches the intent.
+
+**Keep a small gold set.** A human-reviewed sample of the corpus, labelled as high or low quality, gives a stable reference for evaluating a filter change. Without it, a filter update is judged by the model's downstream behaviour, which is slow and confounded.
+
+These habits are unglamorous and decisive. Most curation failures are not a wrong algorithm but a filter nobody re-examined after the data changed.
+
+## What curation cannot do
+
+**It cannot add knowledge that was never collected.** Filtering improves a distribution; it does not create missing domains.
+
+**It cannot define quality objectively.** A filter is a model of quality with its own biases, as the datasheets paper argues.
+
+**It cannot fix a bad objective.** A well-curated corpus trained with the wrong objective still produces a model that optimises the wrong thing.
+
+The counterargument — that more data always helps — is true only under a fixed quality distribution. When composition changes, the relationship breaks, which is why model cards and datasheets exist as documentation of the data behind a system.
+
+## A decision test
+
+1. **Measure duplicate prevalence** before choosing a method.
+2. **Sample what the filter removes** and check for legitimate variation.
+3. **Balance sources deliberately** and record the reasoning.
+4. **Document provenance** for every portion of the corpus.
+5. **Evaluate on held-out human text**, not filtered data.
+6. **Record the curation decisions** in a datasheet.
+7. **Re-evaluate after a corpus change**, not only after a model change.
+
+For the failure mode, see [Model Collapse](/articles/what-is-model-collapse-and-why-it-matters); for the documentation standard, see [Datasheets for Datasets](https://arxiv.org/abs/1803.09010).
+
+## Further Reading
+
+- Katherine Lee et al., 2021. [Deduplicating Training Data Makes Language Models Better](https://arxiv.org/abs/2107.06499) — Exact and near-duplicate removal improves language models and reduces memorisation of training examples.
+- Ilia Shumailov et al., 2023. [The Curse of Recursion: Training on Generated Data Makes Models Forget](https://arxiv.org/abs/2305.17493) — The model-collapse result: training recursively on model-generated data degrades the tails of the distribution.

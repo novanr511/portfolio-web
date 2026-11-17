@@ -1,10 +1,83 @@
 ---
 title: "Mechanistic Interpretability: Reading Circuits Inside a Model"
-description: "Reserved title for a future NOVANDRI article: Mechanistic Interpretability: Reading Circuits Inside a Model."
+description: "Interpretability tries to reverse-engineer what a network computes. Read what circuits are, what the field has found, and the limits of the claim."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Interpretability
+  - Research
+  - Safety
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A model card can tell you where a system was evaluated and what it is intended for. It cannot tell you *why* the model produced a particular answer. Mechanistic interpretability aims to open the black box and describe the computations inside — not just the outputs — with the ambition of predicting and controlling behaviour from the mechanism.
+
+**Direct answer:** Mechanistic interpretability studies the internal components of a neural network — individual neurons, attention heads, and the circuits they form — to explain how a computation is performed. *Toy Models of Superposition* shows why this is hard: networks represent more features than they have dimensions, so a single unit rarely corresponds to one concept. The boundary: the field has produced convincing explanations of specific behaviours in specific models, not a general method for understanding arbitrary large systems.
+
+## What a circuit is
+
+A circuit is a set of components and connections that implements a particular function. The analogy to electronic circuits is deliberate: the goal is to identify a pathway — these heads detect a pattern, these neurons carry it forward, this component writes the result — that can be described independently of the rest of the network.
+
+Three properties make the goal difficult:
+
+**Superposition.** The toy-model paper shows that a network can store more features than it has dimensions by representing them in overlapping directions. A single neuron may respond to several unrelated features, so reading one unit does not reveal one concept.
+
+**Polysemanticity.** For the same reason, a component's apparent meaning depends on context. A neat one-neuron-one-idea story is usually wrong.
+
+**Scale.** A small model may be tractable to analyse; a frontier model has billions of parameters and many layers of interaction.
+
+## What the field has found
+
+**Features can be decomposed.** Sparse autoencoder work has identified directions in activation space that correspond to more interpretable features than individual neurons. This is a method for finding a useful basis, not proof that the model uses those features explicitly.
+
+**Circuits can be partially reverse-engineered.** Specific behaviours — such as copying a token or completing a pattern — have been traced through small models, showing how attention heads and feed-forward components cooperate.
+
+**Interventions can test hypotheses.** If a proposed circuit is correct, ablating it should change the behaviour in the predicted way. This is the causal test that separates an explanation from a story.
+
+## A worked example of an interpretability claim
+
+The following is hypothetical and illustrative, based on the method rather than a measured result.
+
+A researcher proposes that a particular attention head in a small model copies the previous token. Three tests decide whether the claim holds:
+
+1. **Activation pattern.** When the input contains repeated tokens, does the head's attention concentrate on the previous position? This is correlational.
+2. **Ablation.** If the head is disabled, does the model lose the ability to copy previous tokens while other behaviours remain intact? This is a causal test.
+3. **Generalisability.** Does the pattern hold across different prompts and token types, or only in the example used to find it? A single example is a hypothesis, not an explanation.
+
+Three outcomes are possible:
+
+- All three support the claim, which becomes a credible description of that head's role in that model.
+- Ablation has no effect, which means the head was correlated but not necessary — other components compensate.
+- The pattern appears only in one context, which means the proposed circuit is incomplete.
+
+Three lessons follow:
+
+- **Correlation is not explanation.** Activation patterns alone are suggestive, not causal.
+- **Redundancy is common.** Removing one component may do nothing because others take over, which complicates ablation studies.
+- **Scope matters.** An explanation of a small model's behaviour does not automatically transfer to a larger one.
+
+## What interpretability cannot promise
+
+**It is not the same as model cards.** Documentation reports intended use and evaluation conditions; interpretability examines internal computation. Both are useful and they answer different questions, as the model-card paper explains.
+
+**It does not establish safety.** Understanding a mechanism does not guarantee that behaviour is desirable, just as understanding a car engine does not make a driver safe.
+
+**It does not yet scale.** A convincing analysis of a small model is not a method for a frontier system. The field is honest about this limitation, which is why it is often framed as research rather than a production control.
+
+The counterargument — that black-box evaluation is enough — is fair for many applications. Interpretability becomes valuable when you need to predict behaviour in novel situations or when a high-stakes decision demands more than a statistical test.
+
+## A decision test
+
+1. **Name the specific behaviour** you want to explain.
+2. **Form a mechanistic hypothesis** about which components are involved.
+3. **Test with activation analysis**, then with causal intervention.
+4. **Check generalisation** across prompts and contexts.
+5. **Account for redundancy** — null effects may mean compensation, not irrelevance.
+6. **State the model and scale** the claim applies to.
+7. **Treat the result as explanation**, not a safety guarantee.
+
+For the documentation standard, see [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993); for the safety frame, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## Further Reading
+
+- Nelson Elhage et al., 2022. [Toy Models of Superposition](https://arxiv.org/abs/2209.10652) — Why networks represent more features than dimensions, and the interpretability challenge that creates.
+- Margaret Mitchell et al., 2019. [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) — The reporting template used to document intended use, evaluation, and limitations.

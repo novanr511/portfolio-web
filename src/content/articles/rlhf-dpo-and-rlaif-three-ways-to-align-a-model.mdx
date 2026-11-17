@@ -1,10 +1,84 @@
 ---
 title: "RLHF, DPO, and RLAIF: Three Ways to Align a Model"
-description: "Reserved title for a future NOVANDRI article: RLHF, DPO, and RLAIF: Three Ways to Align a Model."
+description: "Alignment methods differ in where the preference signal comes from and how it is applied. Read the three mechanisms and a worked choice."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Alignment
+  - Training
+  - LLM
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A pretrained model predicts text; it does not know what a useful assistant should do. Alignment methods use preferences to steer it. Three approaches dominate the discussion — RLHF, DPO, and RLAIF — and they differ in two dimensions: who provides the preference signal, and whether a separate reward model is trained.
+
+**Direct answer:** RLHF trains a reward model on human comparisons and optimises a policy against it; DPO optimises the policy directly from preference pairs without a separate reward model; RLAIF substitutes AI-generated feedback for some human feedback. The underlying papers — RLHF, DPO, and the RLAIF comparison — report different trade-offs. The boundary: these methods align a model to the preferences it was given, which is not the same as making it correct or safe in every context.
+
+## Three mechanisms
+
+**RLHF.** Collect human comparisons between outputs, train a reward model to predict them, then optimise the policy to maximise reward while staying near the original model. The Anthropic helpful-and-harmless paper is the canonical description. Three stages, three sets of hyperparameters, and a reward model that can be exploited.
+
+**DPO.** The DPO paper shows that the reward can be expressed in terms of the policy itself, allowing direct optimisation from preference pairs. No separate reward model is trained. The pipeline is simpler, and the result depends on the quality and coverage of the pairs.
+
+**RLAIF.** The RLAIF comparison asks whether AI-generated feedback can substitute for human feedback at scale. The reported result is comparable performance at lower human cost in the studied setting. The caveat is that the AI feedback inherits the values and blind spots of the model providing it.
+
+## A worked choice
+
+The following is hypothetical and illustrative.
+
+A team has 10,000 human preference pairs and a limited research budget. Three options:
+
+- **RLHF:** train a reward model, then run policy optimisation. More machinery, more tuning, and a reward model that may be gamed.
+- **DPO:** optimise directly from the 10,000 pairs. Simpler pipeline, but performance is bounded by pair coverage and quality.
+- **RLAIF:** generate additional AI-labelled pairs to expand coverage. Cheaper per pair, but the labels reflect the labelling model's judgements.
+
+Three checks decide:
+
+1. **Are the pairs representative?** If 10,000 pairs cover only a narrow slice of use cases, no method fixes the gap. Collect more where the model will actually be used.
+2. **Can the team operate RLHF's complexity?** Reward-model training and policy optimisation require infrastructure and expertise. DPO's simplicity is a real advantage for a small team, as the RLHF-vs-DPO literature discusses.
+3. **What does AI feedback add?** If it expands coverage of cases humans cannot label at volume, it helps. If it merely echoes the base model's preferences, it adds noise.
+
+Three conclusions follow:
+
+- **Method choice follows constraints**, not a universal ranking.
+- **Preference quality dominates method** — a better method on poor pairs loses.
+- **The alignment target must be examined** — the methods optimise preferences, not truth.
+
+## What to measure before choosing
+
+The three methods are not interchangeable, and the choice should follow measurement rather than fashion. Three questions help:
+
+**What is the failure you are correcting?** If the model is unhelpful on a narrow set of tasks, targeted preference data may matter more than the method. If the problem is broad tone and refusal behaviour, a larger and more varied set is needed.
+
+**What is the cost of the feedback?** Human comparisons are expensive but grounded; AI feedback is cheap but inherits the labelling model's assumptions. The RLAIF comparison is evidence for a specific setup, not a general price list.
+
+**What can the team operate?** RLHF involves a reward model and a policy loop; DPO removes the reward model but still needs careful data handling. A smaller team with good data may get further with DPO than with a half-configured RLHF pipeline.
+
+These questions turn a method debate into an engineering decision with stated constraints, which is the same discipline the build-versus-buy article applies to software.
+
+## What alignment methods do not do
+
+**They do not make the model factual.** A model can be aligned to give polite, confident answers that are wrong. The hallucination article covers the separate controls.
+
+**They do not remove the need for evaluation.** A preference-trained model still needs testing on the behaviours you care about, as the evaluation-rubric article explains.
+
+**They do not settle whose preferences count.** That is a governance question, not a technical one, which the AI-governance article addresses.
+
+The counterargument — that DPO has made RLHF obsolete — is too strong. DPO is simpler, and it depends on the preference data in a different way. The choice is empirical for your setting, not a matter of fashion.
+
+## A decision test
+
+1. **Define the behaviour** you want to change, in observable terms.
+2. **Assess preference coverage** across the cases that matter.
+3. **Match the method to team capacity** — RLHF's pipeline versus DPO's simplicity.
+4. **Check what AI feedback adds** before using RLAIF.
+5. **Evaluate on held-out behaviours**, not on the preference set.
+6. **Watch for reward exploitation** where a reward model is used.
+7. **Record whose preferences were used** and why.
+
+For the broader frame, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance); for the evaluation, see [Evaluating LLM Applications](/articles/evaluating-llm-applications).
+
+## Further Reading
+
+- Yuntao Bai et al., 2022. [Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback](https://arxiv.org/abs/2204.05862) — The RLHF pipeline with a reward model trained on human preference comparisons.
+- Rafael Rafailov et al., 2023. [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) — Optimising a policy directly from preference pairs without training a separate reward model.
+- Leandro van der Heijden et al., 2023. [RLAIF vs. RLHF: Scaling Reinforcement Learning from Human Feedback with AI Feedback](https://arxiv.org/abs/2309.00267) — Comparison of human feedback and AI-generated feedback for alignment; reports comparable results at lower human cost.
