@@ -1,70 +1,100 @@
 ---
 title: "Web3 & Blockchain: Smart Contracts, DeFi, and Tokenomics"
-description: "Web3 redefines ownership and trust. Learn smart contract fundamentals, DeFi primitives, tokenomics design, and security considerations."
+description: "Blockchain is a state machine with specific trust properties. Read what a smart contract can guarantee, what DeFi actually replaces, and why token design fails."
 date: 2026-11-16
 tags:
-  - Web3
   - Blockchain
-  - Smart Contracts
+  - Web3
   - DeFi
-  - Tokenomics
+  - Cryptography
 ---
 
-Web3 is not a product. It is a trust architecture.
+Web3 is usually described in terms of what it will change, which makes it hard to evaluate. The useful approach is to describe what the technology actually is — a replicated state machine with defined trust assumptions — and then ask which of those properties a given application needs. Many applications need none of them, and many claims about the technology depend on properties the system does not have.
 
-**Direct answer:** Web3 encompasses decentralized applications built on blockchain infrastructure. Core primitives: smart contracts (self-executing code), DeFi (decentralized finance protocols), and tokenomics (economic design of tokens). Security, scalability, and user experience remain key challenges. Understanding the stack—from consensus to application—is essential for building or evaluating Web3 systems.
+**Direct answer:** A public blockchain provides a shared ledger whose state transitions are validated by participants rather than by a single operator, and smart contracts are programs whose execution is part of that state machine. Ethereum's whitepaper is the primary technical description of the general-purpose version. Decentralised finance uses these programs to replace specific financial intermediaries — an automated market maker replaces an order book and its matching engine — and tokenomics is the design of the incentives and supply rules around a token. The limits are structural: code can be correct and still produce a bad economic outcome, external data requires oracles that reintroduce trust, and "decentralised" is a property that has to be measured rather than asserted.
 
-## Blockchain fundamentals
+## What a smart contract actually guarantees
 
-**Consensus:** PoW (Bitcoin), PoS (Ethereum, Solana), PoA, DPoS. Tradeoffs: security, decentralization, throughput.
+A smart contract is a program deployed to a chain whose execution is deterministic and whose results are recorded in the shared state. Its guarantee is that the code will execute as written, given the inputs it receives — not that the code is correct, not that its inputs are truthful, and not that the outcome is fair.
 
-**Execution:** EVM (Ethereum, L2s), SVM (Solana), Move (Aptos/Sui), WASM (Polkadot, Cosmos).
+Ethereum's whitepaper describes the general-purpose design: a blockchain with a Turing-complete scripting language that allows participants to write programs enforcing arbitrary state-transition rules. That generality is the source of both the capability and the risk. A contract can implement complex logic without a trusted intermediary, and it can also contain a bug that anyone can exploit, with no operator able to pause it.
 
-**State:** accounts (EOA, contract), storage (key-value), Merkle Patricia Trie (state root).
+Three properties matter in practice:
 
-**Gas:** computation metering. EIP-1559 (base fee + priority fee), fee markets.
+- **Determinism:** the same inputs produce the same state transition on every node, which is what makes consensus possible.
+- **Immutability in deployment:** code, once deployed, is hard or impossible to change, which is why upgrade patterns and proxies exist — and why they reintroduce a form of trust.
+- **External data dependence:** a contract cannot read the world directly. It needs an oracle, and the oracle becomes a trusted component whose failure propagates into the contract's behaviour.
 
-## Smart contracts
+The correct mental model is therefore not "trustless application" but "application with a different, and often narrower, set of trusted components".
 
-**Solidity:** primary language (EVM). Vyper (security-focused), Rust (Solana, Near), Move (Aptos/Sui).
+## What DeFi replaces, and what it does not
 
-**Patterns:** proxy (upgradeability), diamond (modular), factory (clones), multicall (batching).
+The clearest case is the automated market maker. Uniswap's whitepaper describes a constant-product design in which liquidity providers deposit assets into a pool and traders swap against the pool according to a pricing rule, rather than being matched with a counterparty's resting order.
 
-**Security:** reentrancy, integer overflow, access control, oracle manipulation, MEV, flash loans. Tools: Slither, MythX, Foundry, Echidna, formal verification.
+What this removes is the need for a central matching engine and a continuously present market maker. What it does not remove is the need for liquidity providers, who bear the risk of losses relative to simply holding the assets, or the need for price discovery, which is now driven by arbitrageurs trading against external markets. The mechanism is a different allocation of work and risk, not the elimination of either.
 
-**Standards:** ERC-20 (fungible), ERC-721 (NFT), ERC-1155 (multi-token), ERC-4337 (account abstraction), ERC-4626 (vaults).
+This is the right way to evaluate a DeFi claim: name the intermediary being replaced, then name the function it performed and check who performs it now. If the answer is "the user", the technology has shifted a cost rather than removed it.
 
-## DeFi primitives
+Three recurring failure modes follow from the architecture:
 
-**DEX:** AMM (Uniswap v2/v3/v4), orderbook (dYdX, Vertex), hybrid.
+**Smart-contract risk.** A bug in the code is a direct financial loss, and immutability makes correction difficult. Audits reduce the probability but do not establish correctness.
 
-**Lending:** overcollateralized (Aave, Compound), undercollateralized (Prime, Maple), isolated markets (Silo, Euler).
+**Oracle risk.** If the price feed is wrong or manipulated, a correctly executing contract will make the wrong decision. The contract's guarantee is about execution, not truth.
 
-**Stablecoins:** fiat-backed (USDC, USDT), crypto-collateralized (DAI, LUSD), algorithmic (FRAX), yield-bearing (sDAI, stETH).
+**Economic risk.** A mechanism can behave correctly in normal conditions and fail under stress — during a large price move, a liquidity squeeze, or a coordinated attack. The code executing as intended is not evidence that the design is sound.
 
-**Derivatives:** perpetuals (GMX, Hyperliquid), options (Lyra, Aevo), structured products.
+## Tokenomics is mechanism design, not marketing
 
-**Yield:** staking, liquid staking (Lido, Rocket Pool), restaking (EigenLayer), points/farming.
+A token is a claim or a utility within a system, and tokenomics is the design of its supply, distribution, and incentives. The field is an application of mechanism design: the rules determine what participants choose to do, and participants adapt to the rules.
 
-## Tokenomics
+Most token designs fail in predictable ways:
 
-**Design dimensions:** utility (access, governance, payment), supply (fixed, inflationary, deflationary), distribution (team, investors, community, treasury), vesting, unlocks.
+- **Incentives that reward short-term behaviour.** A reward for transient liquidity produces transient liquidity, which disappears when the reward does.
+- **Supply schedules that ignore velocity.** A fixed supply does not create scarcity if the token is spent immediately; what matters is the relationship between issuance, sinks, and holding behaviour.
+- **Governance that concentrates.** Voting power proportional to holdings concentrates control over time, which is why delegation and quadratic mechanisms exist as countermeasures.
+- **A token attached to a problem it does not solve.** If the system would work identically without the token, the token is a fundraising instrument rather than a mechanism.
 
-**Governance:** token voting (1 token = 1 vote), delegation, quadratic voting, conviction voting, futarchy.
+The honest test is to ask what behaviour the token changes and whether that behaviour improves the system's function. If the answer is "it lets early participants sell", that may be a legitimate objective, but it is not a mechanism design achievement.
 
-**Value accrual:** fee capture, buyback/burn, staking rewards, revenue share.
+## A worked example of an automated market maker
 
-**Risks:** ponzinomics, mercenary capital, regulatory (securities law), centralization.
+The constant-product rule is simple enough to work through. A pool holds 100 units of asset A and 100 units of asset B, so the product `x × y = 10,000`. A trader wants to buy 10 units of A.
 
-## Security & UX
+To keep the product constant, the pool must end with 90 A, so it must hold `10,000 / 90 = 111.11` B. The trader therefore pays 11.11 B for 10 A — an effective price of about 1.11, above the pool's 1.00 starting price. The difference is the price impact of the trade, and it grows as the trade gets larger relative to the pool.
 
-**Wallets:** EOA (seed phrase), smart contract wallets (Safe, ERC-4337), MPC (Fireblocks, Turnkey), embedded (Privy, Dynamic).
+Two consequences follow directly:
 
-**Bridging:** lock/mint, burn/mint, liquidity networks (LayerZero, Wormhole, Axelar). Risk: bridge hacks.
+**Liquidity determines execution quality.** The same 10-unit trade against a pool with 10,000 units of each asset has negligible impact. This is why liquidity providers matter: they are not passive depositors, they are the mechanism that makes the price stable.
 
-**L2s:** rollups (Optimistic: Arbitrum, Optimism; ZK: zkSync, Starknet, Polygon zkEVM), validium, volition.
+**Arbitrage is the price-discovery mechanism.** If the external market price of A is 1.00 B and the pool quotes 1.11 after the trade, an arbitrageur will sell A into the pool until the quoted price returns to 1.00. The profit is the mechanism that corrects the price, and it is paid by the trader's price impact and by liquidity providers' losses.
 
-For the related question of crypto markets, see [Commodity Markets: Oil, Gold, and Price Discovery](/articles/commodity-markets-oil-gold-and-price-discovery) and cryptocurrency, see [Cryptocurrency and the Future of Money](/articles/cryptocurrency-and-the-future-of-money).
+That last point is where much of DeFi's economic complexity lives. A liquidity provider earns fees from trades and loses value when the price moves, because the pool automatically holds more of the falling asset and less of the rising one. A provider who would have been better off simply holding the two assets has suffered an impermanent loss. The design is a transfer of risk from traders to providers in exchange for fees, not a source of free liquidity.
+
+## The energy and hardware question
+
+A public blockchain's trust model consumes real resources. Proof-of-work systems consume electricity to make block production expensive; proof-of-stake systems replace that with capital locked as collateral and introduce different failure modes, including the concentration of stake.
+
+The IEA's *Energy and AI* work provides context for the broader question of compute and electricity demand, though the comparison should be made carefully — blockchain consensus and AI training are different workloads with different growth drivers. What transfers is the discipline of measuring energy use at the level of the system rather than accepting a slogan about efficiency.
+
+For a designer, the relevant question is whether the trust property being purchased justifies the resource cost. A system that needs a shared, censorship-resistant ledger may accept the cost; one that needs a database with two mutually trusting parties should not pay it.
+
+## What anycast, storage, and identity claims get wrong
+
+The broader Web3 stack often inherits properties from different layers and attributes them to the whole. Content-addressed storage such as IPFS changes how data is located and verified, which is useful; it does not make a distributed application's state machine trustless. Decentralised identifiers change who controls an identity record, which is useful; they do not guarantee that the entity behind the identifier is who it claims.
+
+This is the same error that appears in other domains: treating a property of one component as a property of the system. A careful evaluation decomposes the system into its trust assumptions and asks which ones have actually changed.
+
+## A decision sequence
+
+1. **Name the trust assumption** the system is supposed to remove, and check whether the design removes it.
+2. **Identify who performs the functions of the displaced intermediary** — matching, custody, price discovery, dispute resolution.
+3. **Audit the contract and the oracle separately.** Correct code with a bad input still fails.
+4. **Model the economics under stress**, not only in the steady state.
+5. **State what the token changes in behaviour**, and test whether removing it changes the system.
+6. **Measure decentralisation** — distribution of validators, tokens, and development authority — rather than asserting it.
+7. **Say what the user still has to trust.** An honest list is more useful than a claim of trustlessness.
+
+For the regulatory side, see [Cryptocurrency and the Future of Money](/articles/cryptocurrency-and-the-future-of-money); for the general framing of distributed trust, see [The Hidden Infrastructure Behind Every Digital Platform](/articles/the-hidden-infrastructure-behind-every-digital-platform).
 
 ## Further Reading
 
