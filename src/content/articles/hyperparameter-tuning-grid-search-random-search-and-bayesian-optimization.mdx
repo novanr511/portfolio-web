@@ -1,65 +1,79 @@
 ---
 title: "Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization"
-description: "Hyperparameter tuning finds the best model configuration. Learn grid search, random search, Bayesian optimization, and when to use each."
+description: "Most hyperparameters do not matter much. Read the evidence on why random search beats grids and when a smarter search pays for itself."
 date: 2026-11-16
 tags:
   - Hyperparameter Tuning
   - Machine Learning
+  - AutoML
   - Optimization
-  - ML Engineering
 ---
 
-Default hyperparameters rarely win competitions. Tuning finds the edge.
+Hyperparameter tuning is often treated as a tedious but mechanical step: list the options, try them all, pick the best. The trouble is that "try them all" is impossible in any realistic space, and the choices about what to try are where most of the value — and most of the waste — sits. The best-known empirical result in this area is that the obvious strategy is usually the wrong one.
 
-**Direct answer:** Hyperparameter tuning searches the configuration space of a model to maximize a validation metric. Grid search exhaustively evaluates a predefined grid; random search samples randomly; Bayesian optimization builds a probabilistic surrogate model to guide search. The choice depends on search space dimensionality, budget, and whether evaluations are expensive.
+**Direct answer:** Grid search spends compute uniformly across a configured space, which is wasteful when only a few hyperparameters materially affect the result. Bergstra and Bengio found that "random search over the same domain is able to find models that are as good or better within a small fraction of the computation time" than grid search, and that at the same budget it "finds better models by effectively searching a larger, less promising configuration space". Bayesian and bandit-based methods go further by allocating trials adaptively, but they cost more to run and are not automatically better. The practical discipline is to decide which parameters matter and what the search budget is before choosing the algorithm.
 
-## Hyperparameters vs parameters
+## Why grid search fails
 
-**Parameters:** learned from data (weights, biases, coefficients). Estimated during training.
+A grid is defined by the user: a list of values for each hyperparameter, and every combination is evaluated. Its effort grows multiplicatively with the number of parameters, so a grid that looks modest on paper becomes enormous quickly — ten values for five parameters is 100,000 configurations.
 
-**Hyperparameters:** set before training, control the learning process. Examples:
-- **Tree-based:** n_estimators, max_depth, min_samples_split, learning_rate.
-- **Neural networks:** learning_rate, batch_size, hidden_layers, dropout, weight_decay.
-- **SVM:** C, kernel, gamma.
-- **KNN:** n_neighbors, distance_metric.
+The deeper problem is that the grid is not a representative sample of the space. If two of the five parameters matter and three do not, the grid spends most of its 100,000 evaluations on combinations that differ only in the irrelevant ones. It explores thoroughly in the directions that do not matter.
 
-## Search strategies
+Bergstra and Bengio's comparison makes the consequence concrete. Against deep belief networks configured by "a thoughtful combination of manual search and grid search", purely random search over the same 32-dimensional space "found statistically equal performance on four of seven data sets, and superior performance on one of seven". The authors conclude that "this phenomenon makes grid search a poor choice for configuring algorithms for new data sets".
 
-**Grid search:** exhaustively evaluates all combinations in a predefined grid. Guarantees finding the best in the grid, but grows exponentially with dimensions (curse of dimensionality). Use when space is small (≤ 3–4 dimensions, few values each).
+That is a strong claim, and it is bounded: it is a comparison on specific models and datasets, not a theorem that grids are always worse. What generalises is the mechanism — when few parameters matter, uniform enumeration is a bad allocation of trials.
 
-**Random search:** samples random combinations from defined distributions. More efficient than grid for high-dimensional spaces; can find good regions faster. Proven to outperform grid for same budget when only few hyperparameters matter.
+## Random search is a baseline, not a shortcut
 
-**Bayesian optimization:** builds a probabilistic surrogate model (Gaussian Process, Tree-structured Parzen Estimator/TPE, Random Forest) of the objective function. Uses acquisition function (Expected Improvement, Upper Confidence Bound) to balance exploration vs exploitation. Efficient for expensive evaluations (e.g., deep learning training). Tools: Optuna, Hyperopt, Scikit-Optimize, Ax, Ray Tune.
+Random search draws configurations from distributions over each parameter. Its virtue is that it samples broadly in every dimension, so it is more likely to find a good value for the one or two parameters that actually matter, and it goes deeper along those dimensions than a grid of the same size.
 
-**Evolutionary / genetic algorithms:** population-based, mutation/crossover. Useful for complex, non-differentiable spaces.
+Two practical consequences follow. First, the distributions matter more than the algorithm. If a learning rate is sampled uniformly between 0 and 1, almost every draw will be useless; a log-uniform distribution over a sensible range is a better search space and requires no cleverer optimiser. Second, random search is embarrassingly parallel and easy to reproduce, which makes it a strong baseline that more sophisticated methods must beat.
 
-**Hyperband / ASHA (Asynchronous Successive Halving):** multi-fidelity: run many configs with small budget, promote promising ones. Early stopping for unpromising configs. Used in Ray Tune, Optuna.
+The honest comparison is not "random versus grid" but "what does a well-chosen search space plus random sampling achieve for this budget?" Many teams adopt an optimiser without fixing the ranges, and the optimiser then spends its intelligence exploring regions that were never plausible.
 
-## Practical workflow
+## Adaptive methods and what they buy
 
-1. **Define search space:** distributions for each hyperparameter (log-uniform for LR, categorical for optimizer, int for depth).
-2. **Choose budget:** total trials or time budget.
-3. **Choose strategy:** random for quick exploration, Bayesian for expensive models, Hyperband for many cheap trials.
-4. **Cross-validation:** use stratified k-fold or time-series split for reliable estimates.
-5. **Early stopping:** integrate with training (pruning in Optuna, Hyperband).
-6. **Final training:** retrain best config on full train+val data.
+**Bayesian optimisation** builds a model of the objective — how configuration settings relate to performance — and uses it to choose the next trial, balancing exploration of uncertain regions against exploitation of promising ones. It is sample-efficient when evaluations are expensive and the space is not too high-dimensional, and it adds its own hyperparameters and assumptions.
 
-## Common pitfalls
+**Hyperband** takes a different approach. Li et al. formulate tuning as a "pure-exploration non-stochastic infinite-armed bandit problem" in which a resource such as iterations, data samples, or features is allocated to randomly sampled configurations. The method uses "adaptive resource allocation and early-stopping" to speed up random search, and the paper reports that Hyperband "can provide over an order-of-magnitude" improvement in the settings tested. Its insight is cheap and powerful: most configurations are bad, and you can find out with a small budget, so spend the full budget only on the survivors.
 
-- **Data leakage in CV:** using test data in CV folds or feature engineering before split.
-- **Overfitting to validation set:** too many trials on same validation set; use nested CV or holdout test set.
-- **Ignoring compute budget:** Bayesian optimization overhead may not pay off for cheap models.
-- **Ignoring interactions:** some hyperparameters interact (LR × batch size); joint search needed.
+**Optuna** represents a different design choice — define-by-run search spaces, where the configuration is built by the code as it runs rather than declared in a static block. Its documentation describes pruning as a first-class mechanism, which is the same early-stopping idea expressed at the framework level.
 
-## Tools
+**AutoML** systems extend this to choose models and features as well as hyperparameters. Auto-sklearn's approach combines meta-learning — using performance on similar datasets to pick a starting point — with ensemble construction. It is useful when the cost of human expertise exceeds the cost of compute, and it makes the search harder to interpret.
 
-- **Optuna:** TPE, CMA-ES, Hyperband, pruning, distributed.
-- **Hyperopt:** TPE, parallelizable via MongoDB.
-- **Ray Tune:** distributed, Hyperband/ASHA, integrates with PyTorch/TensorFlow.
-- **Optuna + MLflow / Weights & Biases:** tracking + optimization.
-- **Scikit-Optimize:** GP-based, simple API.
+## A worked budget comparison
 
-For the related question of MLOps pipelines, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and feature engineering, see [Feature Engineering: Turning Raw Data into Predictive Signals](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
+The choice of search method is easier to see with numbers. Suppose a model has five hyperparameters and a full training run costs ten minutes, with a total budget of 500 runs.
+
+- **A grid of four values per parameter** costs 4⁵ = 1,024 runs — twice the budget — and varies only four settings per parameter. If two parameters matter and three do not, roughly 96% of the runs duplicate the useful variation across irrelevant dimensions.
+- **Random search at 500 runs** samples 500 distinct five-tuples. For the two parameters that matter, it explores roughly 500 distinct combinations, and it is far more likely to find a good value for both than the grid's 16 useful combinations.
+- **Hyperband at the same budget** might start 5,000 configurations with a tenth of the training budget each, keep the best 500 after early evaluation, and spend the remaining budget on those. The expensive evaluations are concentrated on candidates that survived a cheap test.
+
+The numbers are illustrative, not a benchmark, and that is the point: the comparison can be made before any code is written. A team that knows its per-run cost and its total budget can decide how many trials it can afford and which method uses them best, rather than discovering after a week that the grid will not finish.
+
+The same arithmetic exposes a second problem. Running 500 trials and reporting the best score is a multiple-comparisons problem: with enough trials, a configuration will appear excellent by chance. The score that matters is the one on a nested held-out set, evaluated once, and the gap between the selection score and that final score is a measure of how much the search overfitted the validation set.
+
+## The evaluation that makes tuning meaningful
+
+Every tuning method needs a score, and the score is where the whole exercise can be invalidated.
+
+A configuration selected on the test set is no longer a held-out estimate; the test set has become training data. The discipline is a nested split: an outer split for the final estimate and an inner one for choosing configurations. scikit-learn's `TimeSeriesSplit` adds a further requirement for time-ordered data — expanding folds with a `gap` where labels arrive late.
+
+Tuning also amplifies leakage. If preprocessing is fitted on the full dataset before the search, every configuration is scored on an optimistic number, and the search will reliably find the configuration that exploits the leak. scikit-learn's guidance that leakage occurs when "information that would not be available at prediction time is used when building the model" applies to every trial, not just the final model.
+
+The practical rule: treat the tuning loop as part of the pipeline, and make the split boundaries impossible to cross.
+
+## A budget-first process
+
+1. **Set the budget in evaluations and wall-clock time** before choosing a method. Search complexity without a budget is not a plan.
+2. **Choose sensible distributions** for each parameter, using a log scale where the parameter spans orders of magnitude.
+3. **Run random search as the baseline** and record its best score and the time taken.
+4. **Add adaptive methods only if the baseline is insufficient**, and compare them on the same budget and splits.
+5. **Use early stopping** where a configuration can be judged cheaply, as Hyperband does.
+6. **Keep a nested evaluation** so the reported score is not the score used to select.
+7. **Check whether the gain is real.** A difference that changes with the random seed is noise, and the number of trials needed to establish it is part of the cost.
+
+For the evaluation framework, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the model families being tuned, see [Deep Learning Basics](/articles/deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases).
 
 ## Further Reading
 
