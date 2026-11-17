@@ -1,10 +1,98 @@
 ---
 title: "AI Product Management: From Use Case to Roadmap"
-description: "Reserved title for a future NOVANDRI article: AI Product Management: From Use Case to Roadmap."
+description: "An AI roadmap starts with a decision, not a model. Read the selection criteria, a worked prioritisation, and what changes at each stage."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Product Management
+  - Strategy
+  - Roadmap
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Many AI roadmaps are lists of capabilities the team wants to try — a chatbot, an agent, a summariser. That is a technology backlog, not a product roadmap. A useful roadmap starts with a decision that is currently slow or poor and asks whether AI changes it measurably.
+
+**Direct answer:** Select AI use cases by decision value, data readiness, error cost, and reversibility, then move each through stages — problem, prototype, pilot, production — with a defined metric at each. Anthropic's use-case guides provide concrete patterns, and O*NET's task descriptions help identify the work a feature changes. The boundary: a capability that does not change a decision is a demo, and a use case with high error cost and poor data is a blocked project, not a priority.
+
+## Selection criteria
+
+**Decision value.** What decision becomes better, faster, or cheaper? If nobody can name one, the use case is speculative.
+
+**Data readiness.** Does the system have the information it needs, with known quality and access rights? The data-governance article covers the prerequisites.
+
+**Error cost.** What happens when the AI is wrong? A recoverable suggestion is a better first project than an irreversible action, as the human-in-the-loop article explains.
+
+**Reversibility.** Can the feature be rolled back? A reversible pilot teaches more than a large launch, which the deployment article describes.
+
+## A worked prioritisation
+
+The following is hypothetical and illustrative.
+
+A product team has four candidate use cases. Each is scored on value, data readiness, error cost (lower is better), and reversibility:
+
+| Use case | Value | Data | Error cost | Reversible |
+| --- | --- | --- | --- | --- |
+| Support reply drafts | High | Good | Low | Yes |
+| Automated refunds | High | Good | High | No |
+| Meeting summaries | Medium | Good | Low | Yes |
+| Churn prediction | High | Poor | Medium | Yes |
+
+Three decisions follow:
+
+1. **Start with support drafts.** High value, good data, low error cost, reversible — the clearest first candidate, as the customer-support use-case article describes.
+2. **Do not start with automated refunds.** The error cost is high and the action is irreversible. It belongs after a review stage has been measured, which the tool-calling article explains.
+3. **Fix data before churn prediction.** High value is irrelevant if the data is poor, as the data-quality article argues. This is a blocked project, not a late one.
+
+The point is that the roadmap follows from constraints, not from the excitement of the ideas.
+
+## Stages and what changes
+
+**Problem.** Define the decision, the baseline, and the metric. No model work yet, as the AI-integration blueprint explains.
+
+**Prototype.** Test whether a capability can do the task on a small labelled set. The question is feasibility, not scale, which the evaluation article covers.
+
+**Pilot.** Put it in front of real users with a bounded scope and a review step. Measure the combined system, as the workflow-automation article describes.
+
+**Production.** Add monitoring, ownership, a stop condition, and a review trigger. The governance checklist covers the requirements.
+
+Each stage should be able to fail cheaply. A roadmap that proceeds from prototype to production without a pilot has no mechanism for discovering integration problems.
+
+## The metric at each stage
+
+A roadmap without metrics is a sequence of activities. Four metrics keep it honest:
+
+**Feasibility rate** at the prototype stage — how often a capability can do the task on a labelled set, which the evaluation article covers.
+
+**Adoption and usefulness** at the pilot stage — whether users actually use the feature and whether it changes their decision, as the AI-adoption article distinguishes from mere access.
+
+**Combined-system accuracy** at production — the error rate of the whole workflow, not the model alone, which the workflow-automation article explains.
+
+**Business outcome** — the decision metric the use case was chosen for in the first place, such as time per task or cost per case, which the cost-estimator article quantifies.
+
+A use case should be able to fail at any of these stages. Killing a weak pilot is a success if it prevents an expensive production build.
+
+## What a roadmap cannot do
+
+**It cannot predict model capability changes.** A model update can make a previously hard task easy or break a working one. The monitoring article explains why re-evaluation is tied to change.
+
+**It cannot remove governance.** Each feature still needs an owner, a stop condition, and documentation, as the governance checklist requires.
+
+**It cannot substitute for measurement.** A roadmap item is a hypothesis; the metric is the evidence, which the evaluation-rubric article explains.
+
+The counterargument — that a fixed roadmap is unrealistic in a fast-moving field — is fair. The response is to keep the stages but allow the order to change when evidence changes, which the decision-memo article recommends for reversible decisions.
+
+## A decision test
+
+1. **Name the decision** each use case improves.
+2. **Score value, data, error cost and reversibility.**
+3. **Start with low-error, reversible, data-ready cases.**
+4. **Move each through problem, prototype, pilot, production** with a metric per stage.
+5. **Block cases with poor data** until the data is fixed.
+6. **Keep a review step** before irreversible actions.
+7. **Re-prioritise on evidence**, not on announcements.
+
+For the selection frame, see [What LLMs Actually Solve](/articles/llm-real-world-problem-taxonomy); for the implementation sequence, see [AI Integration Into an Existing Business](/articles/ai-integration-blueprint-businesses).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.

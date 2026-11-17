@@ -1,10 +1,89 @@
 ---
 title: "AI for Code Review: What It Catches and What It Misses"
-description: "Reserved title for a future NOVANDRI article: AI for Code Review: What It Catches and What It Misses."
+description: "AI review is good at patterns and weak at intent. Read the tasks it fits, a worked example, and why human review remains."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Code Review
+  - Engineering
+  - Quality
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An AI code reviewer can spot a null check, a likely race condition, and a missing test in seconds. It cannot tell whether a change implements the right product decision. The useful way to deploy it is to assign it the pattern-matching work and leave the intent work to people.
+
+**Direct answer:** AI review helps on local, well-defined patterns — error handling, common vulnerabilities, style, test coverage — and misses issues that depend on business context, system-wide design, or trade-offs. Anthropic's use-case guides cover code-related assistance, and HELM's multi-metric approach is a reminder that performance must be measured on the specific task. The boundary: an AI reviewer's comments are suggestions, not verdicts — a false positive costs reviewer time, and a false negative is invisible until production.
+
+## What it catches
+
+**Local correctness patterns.** Missing null checks, unchecked returns, resource leaks, and off-by-one errors are often visible in a diff.
+
+**Security smells.** Hard-coded secrets, unsanitised input, weak cryptography, and common injection patterns are well-represented in training data.
+
+**Consistency.** Naming, style, and adherence to project conventions can be checked against examples, as the structured-output article explains for enforcing patterns.
+
+**Test coverage gaps.** A new branch with no corresponding test is detectable from the diff, even if the test's quality needs a person.
+
+## What it misses
+
+**Intent.** Whether the change solves the problem the ticket described requires context from the ticket, the product, and the users.
+
+**Systemic design.** A change may be locally correct and accumulate technical debt across the system, as the technical-debt article explains.
+
+**Novel bugs.** A failure mode nobody has described in text is unlikely to be in the model's pattern library.
+
+**Trade-offs.** Choosing a simpler implementation with higher latency, or a faster one with more complexity, is a decision, not a pattern.
+
+## A worked review workflow
+
+The following is hypothetical and illustrative.
+
+A team adds AI review to its pull-request pipeline on 200 pull requests a month.
+
+**Stage 1 — automated suggestions.** The AI reviewer comments on error handling, security patterns, and missing tests. Reviewers mark each comment as useful or noise.
+
+**Stage 2 — measurement.** After 100 pull requests, 300 comments were made; 60% were marked useful. The 40% noise rate is high enough that reviewers are slowing down — a problem the review-fatigue discussion in the human-in-the-loop article warns about.
+
+**Stage 3 — tuning.** The team restricts the reviewer to security patterns and test coverage, where usefulness was highest, and adds project-specific examples. False positives fall, and review time drops.
+
+Three lessons follow:
+
+1. **Precision matters more than coverage.** A reviewer that produces noise is ignored, and an ignored reviewer adds no value.
+2. **Scope should follow evidence.** The team kept the categories that worked rather than accepting all comments.
+3. **Human review remains the decision point.** The AI flags; a person judges, as the oversight article explains.
+
+## What to measure
+
+**Useful-comment rate** — what fraction of suggestions reviewers accept or act on.
+
+**Missed-issue rate** — measure periodically by having humans review a sample without AI comments, which the evaluation-rubric article recommends for catching false negatives.
+
+**Review time** — the net effect on the team's cycle time, not the number of comments generated.
+
+**Defect escape rate** — whether bugs reach production less often after the tool was introduced, which the observability article covers as an outcome metric.
+
+## What AI review cannot do
+
+**It cannot own a decision.** Responsibility for a merge stays with a person, which the governance article requires.
+
+**It cannot replace tests.** A pattern check is not an execution, as the testing discipline in the MLOps article explains.
+
+**It is not free.** Inference cost and reviewer time spent dismissing comments are real, as the cost estimator shows.
+
+The counterargument — that AI reviewers will keep improving and replace human review — is plausible at the margin and wrong about responsibility. Even a highly accurate suggestion system does not hold accountability for a merge.
+
+## A decision test
+
+1. **Choose the review categories** — start with security and missing tests.
+2. **Label usefulness** of each comment over a sample period.
+3. **Restrict scope** to categories that earn their keep.
+4. **Measure human review time** and defect escape rate.
+5. **Keep a human decision point** on every merge.
+6. **Re-evaluate after a model change**, as HELM's cross-model comparisons imply.
+7. **Document the tool's role** so reviewers know what it does not do.
+
+For the broader use cases, see [What LLMs Actually Solve](/articles/llm-real-world-problem-taxonomy); for the review design, see [Human in the Loop by Design](/articles/human-in-the-loop-by-design).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Percy Liang et al., 2022. [Holistic Evaluation of Language Models](https://arxiv.org/abs/2211.09110) — HELM's multi-metric framework: 7 metrics across 16 core scenarios, 30 models, and the finding that models were previously evaluated on only 17.9% of shared scenarios.
