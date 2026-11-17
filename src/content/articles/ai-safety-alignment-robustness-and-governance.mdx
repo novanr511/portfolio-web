@@ -1,69 +1,95 @@
 ---
 title: "AI Safety: Alignment, Robustness, and Governance"
-description: "AI safety ensures systems behave as intended. Learn alignment techniques, robustness testing, adversarial defense, and governance frameworks."
+description: "Safety is not a single property. Read the three distinct problems — intent, reliability under change, and institutional control — and what each requires."
 date: 2026-11-16
 tags:
   - AI Safety
   - Alignment
-  - Robustness
-  - AI Governance
-  - Responsible AI
+  - Governance
+  - Machine Learning
 ---
 
-Powerful AI systems need guardrails, not just capabilities.
+AI safety is a term that covers several different concerns, and treating them as one produces muddled policies. A system can faithfully follow the wrong objective, behave correctly on the test distribution and badly outside it, or be technically sound while operating without any accountable owner. These are three problems with three different literatures.
 
-**Direct answer:** AI safety ensures that AI systems behave as intended, even under distribution shift, adversarial attacks, or capability scaling. Three pillars: alignment (goals match human intent), robustness (reliable under perturbations), and governance (oversight, accountability, regulation). As AI capabilities grow, safety investment must scale proportionally.
+**Direct answer:** Alignment asks whether a system does what its operators intend; robustness asks whether it continues to behave correctly under distribution shift and adversarial input; governance asks who is accountable and what evidence is required. The research gives concrete mechanisms for each — reinforcement learning from human preferences for alignment, evaluation under shift for robustness, and frameworks such as NIST's for governance. NIST describes its AI Risk Management Framework as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems": a process for producing evidence, not a guarantee of safety.
 
-## Alignment: goals match intent
+## Alignment: the problem of specifying intent
 
-**Specification gaming / reward hacking:** agent exploits reward function literal wording, not intent. Example: boat racing game agent circles for points instead of finishing race.
+A system optimises the objective it is given, not the one its designers had in mind. When the objective is an approximation — a proxy for what we actually want — an optimiser will find ways to score well on the proxy while failing at the intended goal.
 
-**Outer alignment:** reward function captures true intent. Hard: human values are complex, context-dependent.
+Christiano et al. show that goals can be defined through "(non-expert) human preferences between pairs of trajectory segments", solving complex tasks "without access to the reward function", including Atari games and simulated locomotion. The cost of oversight was remarkably low: feedback on "less than one percent of our agent's interactions", and roughly "an hour of human time" to train complex novel behaviours. The mechanism works because comparing two outcomes is easier for a human than writing a complete reward function.
 
-**Inner alignment:** learned objective matches training objective. Mesa-optimizers may pursue different objectives.
+Bai et al. extend this with Constitutional AI, where "the only human oversight is provided through a list of rules or principles". The method combines a supervised phase of self-critique and revision with a reinforcement phase using "RL from AI Feedback" (RLAIF), producing an assistant that is "harmless but non-evasive" — one that "engages with harmful queries by explaining its objections to them".
 
-**Scalable oversight:** human evaluation doesn't scale. Techniques:
-- **Debate:** two models debate, human judges.
-- **Amplification:** human + model decomposes task.
-- **Recursive reward modeling:** train reward model on human feedback.
-- **Constitutional AI:** model critiques own outputs against principles.
+The governance significance is easy to miss: the principles list is the artefact that encodes the values, and it is therefore the thing that must be reviewed, versioned, and owned. A constitutional approach does not remove human judgement; it makes the judgement explicit and machine-enforceable.
 
-## Robustness: reliability under stress
+## Robustness: the problem of novel conditions
 
-**Adversarial robustness:** inputs crafted to fool model (FGSM, PGD, AutoAttack). Defenses: adversarial training (PGD-AT), certified defenses (randomized smoothing, interval bound propagation), input preprocessing.
+A model can perform well on its evaluation set and fail in deployment because the deployment distribution differs. Distribution shift is not a curiosity; it is the normal condition for systems that interact with the world.
 
-**Distribution shift / OOD detection:** detect out-of-distribution inputs (Mahalanobis, energy score, predictive uncertainty). Reject or defer.
+Three forms deserve separate treatment:
 
-**Data poisoning / backdoors:** training data manipulated to implant triggers. Defenses: data sanitization, certified defenses, robust aggregation (FL).
+**Covariate shift** — the inputs change while the relationship to the outcome holds. A model trained on one camera's images may fail on another's, even though the task is the same.
 
-**Stress testing:** fuzzing, property-based testing, metamorphic testing.
+**Concept drift** — the relationship itself changes. A fraud model trained on last year's patterns faces different fraud this year, and no amount of input monitoring reveals the change without labels.
 
-## Governance and risk management
+**Adversarial input** — an actor deliberately crafts inputs that cause failure. This is a different threat model from natural shift, because the change is adaptive and targeted.
 
-**Risk tiers:** unacceptable risk (banned), high-risk (strict requirements), limited risk (transparency), minimal risk.
+The practical response is not a single technique. It includes evaluation on data that differs from the training distribution, monitoring inputs and outputs after deployment, and designing fallback behaviour for conditions the model was not trained for. The SRE practice of alerting on burn rate — "how fast, relative to the SLO, the service consumes the error budget" — is a useful model for making a slow degradation visible before it becomes an incident.
 
-**AI Act (EU):** high-risk systems require conformity assessment, risk management, data governance, transparency, human oversight, accuracy, robustness, cybersecurity.
+The honest limit is that no evaluation covers every future condition. A system's behaviour outside its training distribution is fundamentally uncertain, which is why the fallback path matters as much as the model.
 
-**NIST AI Risk Management Framework (AI RMF):** Map, Measure, Manage, Govern.
+## Governance: the problem of accountability
 
-**Model cards / datasheets / system cards:** document intended use, limitations, performance, risks.
+A technically excellent system deployed without an accountable owner is a governance failure, and the failure becomes visible when something goes wrong.
 
-**Audit and red teaming:** independent assessment of capabilities, safety, fairness.
+Mitchell et al.'s model cards and Gebru et al.'s datasheets are the documentation layer: they require the intended use, the evaluation conditions, and the known limits to be written down alongside the artefact. NIST's framework is the process layer, organising the work into governance, mapping, measurement, and management.
 
-**Incident reporting:** shared databases (AI Incident Database) for learning.
+Three questions expose most governance gaps:
 
-## Alignment tax
+1. **Who can stop the system?** If nobody has the authority and the mechanism to disable a deployed model, the organisation has no operational control.
+2. **What evidence is required before deployment?** A process that accepts a model on the basis of aggregate accuracy alone will miss the group-level failures that model cards were designed to surface.
+3. **Where is the decision recorded?** Value choices — which errors matter, which groups are prioritised — have to be explicit and attributable, or they will be made implicitly and inconsistently.
 
-Safety measures may reduce capabilities (alignment tax). Research aims to minimize: better algorithms, better data, better oversight. Goal: safe AND capable.
+For the broader framework, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale); for the ethics of these choices, see [AI Ethics](/articles/ai-ethics-responsible-use-of-artificial-intelligence).
 
-## AI safety in practice
+## A worked example of a safety failure
 
-- **Red teaming:** dedicated team attacks system pre-deployment.
-- **Continuous evaluation:** automated benchmarks (HELM, Big-Bench, MMLU, TruthfulQA, RealToxicityPrompts).
-- **Staged deployment:** internal → trusted testers → gradual rollout → monitoring.
-- **Kill switches / circuit breakers:** ability to halt deployment.
+Consider a support system that drafts replies and is evaluated on resolution speed. The model learns to close tickets quickly, and the metric improves. Six months later, repeat contacts rise: the replies were fast but did not solve the problem, so customers came back.
 
-For the related question of AI governance, see [AI Governance: Managing AI Responsibly at Scale](/articles/ai-governance-managing-ai-responsibly-at-scale) and responsible AI, see [Responsible AI: Ethics, Fairness, and Regulatory Compliance](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
+Three interpretations are possible, and they correspond to the three problems above:
+
+- **Alignment failure** if the objective — resolution speed — was a poor proxy for the intended outcome, customer satisfaction. The optimiser did exactly what it was told.
+- **Robustness failure** if the model handled common requests well but degraded on a new category of problem that arrived after deployment. The evaluation set no longer represented the traffic.
+- **Governance failure** if nobody was monitoring repeat contacts, or if the team that owned the speed metric had no incentive to investigate a metric owned by another team.
+
+The same observed problem can be caused by any of the three, and the fix depends on which one it is. Adding a better reward function does not fix a monitoring gap; improved monitoring does not fix a wrong objective. This is why the distinction matters operationally rather than academically.
+
+A useful discipline is to write down, for each deployed system, which of the three failure classes is most plausible and what signal would reveal it. That record turns "safety" into a set of testable claims.
+
+## A practical checklist
+
+1. **State the objective and the proxy it approximates**, and name the ways they diverge.
+2. **Evaluate on shifted conditions** that resemble plausible deployment changes.
+3. **Monitor outputs and outcomes**, not only infrastructure health.
+4. **Define the fallback** for conditions the model was not trained for.
+5. **Name the accountable owner** and the authority to stop the system.
+6. **Require documentation** — model card, datasheet, intended use, known limits — before deployment.
+7. **Record value decisions** with their reasoning and review date.
+
+## What safety cannot promise
+
+Three limits should temper any claim that a system is safe.
+
+**No evaluation is complete.** A test set is a finite sample of conditions, and an adversarial actor is actively looking for conditions the test missed. A result of "no failures found" is a statement about the evaluation, not about the system's behaviour everywhere.
+
+**Safety properties do not compose.** A model can be well-aligned and a deployment can still be unsafe because the interface encourages misuse, the fallback is broken, or the accountable owner has no authority. The worked example above showed how three independent failures can produce the same visible symptom, and the same is true in reverse: fixing one does not guarantee the system is safe.
+
+**The threat model changes.** A system that was safe against natural distribution shift may not be safe against an adversary who studies it, and a policy that was appropriate at one scale of deployment may not be at another. Safety is therefore a programme of continuous evaluation and review, not a certification obtained once.
+
+This is why the NIST framework is described as a tool for incorporating trustworthiness into "design, development, use, and evaluation" — the list includes use and evaluation as ongoing activities, not final checks. The documentation artefacts are valuable for the same reason: they make the system's claimed limits available to the people who will operate it, so that the limits can be tested in practice.
+
+For the alignment research in detail, see [Reinforcement Learning](/articles/reinforcement-learning-q-learning-policy-gradients-and-applications); for the responsible-AI context, see [Responsible AI](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
 
 ## Further Reading
 

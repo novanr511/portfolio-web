@@ -1,72 +1,97 @@
 ---
 title: "Computer Vision Basics: CNNs, Transfer Learning, and Object Detection"
-description: "Computer vision enables machines to interpret visual data. Learn CNN architectures, transfer learning, and object detection fundamentals."
+description: "Vision models learn spatial hierarchies. Read what each architecture changed, and why transfer learning is the default rather than the exception."
 date: 2026-11-16
 tags:
   - Computer Vision
+  - Deep Learning
   - CNN
-  - Transfer Learning
   - Object Detection
 ---
 
-Images are just arrays of numbers. Computer vision makes them meaningful.
+Computer vision converts pixels into representations a model can use. The field's history is a sequence of answers to a specific question: how do you build a representation that is useful across an image, robust to where an object appears, and cheap enough to train? The architectures people memorise are solutions to that problem, not arbitrary milestones.
 
-**Direct answer:** Computer vision enables machines to interpret and understand visual data. Convolutional Neural Networks (CNNs) are the backbone, using convolutional layers to learn spatial hierarchies of features. Transfer learning adapts pretrained models (ResNet, EfficientNet, ViT) to new tasks with less data. Object detection (YOLO, Faster R-CNN, DETR) localizes and classifies multiple objects in an image.
+**Direct answer:** Convolutional neural networks learn spatial filters that build a hierarchy — edges, textures, parts, objects — while sharing weights across an image. ResNet made very deep networks trainable through residual connections; Faster R-CNN and YOLO represent the two-stage and single-stage approaches to detection; Focal Loss addressed the class imbalance that held single-stage methods back; and Vision Transformers replaced convolution with attention over image patches. Transfer learning is the default because pretrained features transfer well to new tasks with limited data, which is the situation most practitioners actually face.
 
-## Convolutional Neural Networks
+## Why convolution works
 
-**Convolutional layers:** learn spatial filters (kernels) that slide over the input, detecting edges, textures, patterns. Stacking layers builds hierarchy: edges → textures → parts → objects.
+A fully connected layer applied to an image treats every pixel as an independent input, which destroys spatial structure and produces an unmanageable number of parameters. Convolution addresses both problems.
 
-**Pooling:** reduces spatial dimensions (max/avg pooling), increases receptive field, provides translation invariance.
+A filter — a small window of weights — slides across the image and produces a response at each location. Three properties follow:
 
-**Architecture evolution:**
-- **LeNet / AlexNet:** early breakthroughs.
-- **VGG:** deep stacks of 3x3 convolutions.
-- **ResNet:** residual connections enable very deep networks (50–152 layers).
-- **EfficientNet:** compound scaling (depth, width, resolution) for efficiency.
-- **Vision Transformers (ViT):** patch-based, attention-based, large-scale pretraining.
+**Local connectivity.** Each output depends on a small region, which matches the structure of visual features: an edge is a local phenomenon.
 
-## Transfer learning
+**Weight sharing.** The same filter is applied everywhere, so a pattern learned in one part of an image is recognised in another, and the parameter count does not grow with image size.
 
-Pretrain on large dataset (ImageNet-21k, JFT-300M) → fine-tune on target task.
+**Hierarchical composition.** Stacking layers with pooling builds increasingly abstract features. Early layers respond to edges and textures, middle layers to parts, and later layers to objects. This is the spatial hierarchy the literature describes, and it is why depth matters.
 
-**Strategies:**
-- **Feature extraction:** freeze backbone, train new head only. Fast, low data needed.
-- **Fine-tuning:** unfreeze some/all layers, train with low LR. Better performance, more data/compute.
-- **Linear probing:** freeze backbone, train linear classifier on frozen features. Baseline.
+Pooling reduces spatial dimensions and provides a degree of translation invariance — moving an object slightly changes the pooled representation less than it changes the raw pixels. It also increases the receptive field of later layers, so each unit sees more of the input.
 
-**Modern practice:** pretrained on ImageNet-21k or JFT, fine-tune with low LR (1e-4 to 1e-5), use weight decay, gradient clipping, mixed precision.
+## What ResNet changed
 
-## Object detection
+Depth helps until it does not: adding layers beyond a point makes training harder, with accuracy degrading rather than improving. He et al.'s solution was the residual connection — a shortcut that lets a layer block learn a modification of its input rather than a complete transformation of it. Their paper, "Deep Residual Learning for Image Recognition", demonstrated that networks with 50 to 152 layers could be trained effectively, which is the structural claim behind the familiar depth numbers.
 
-**Two-stage (region proposal + classification):**
-- **Faster R-CNN:** Region Proposal Network (RPN) + ROI pooling + classifier/regressor. Accurate, slower.
-- **Mask R-CNN:** adds segmentation mask branch for instance segmentation.
+The general lesson is that optimisation, not expressiveness, was the constraint. A deeper network could represent more; it was simply hard to train until the architecture made the identity mapping easy to learn.
 
-**Single-stage (dense prediction):**
-- **YOLO (v3–v10):** grid-based, anchor-based or anchor-free. Very fast, real-time.
-- **SSD:** multi-scale feature maps, default boxes.
-- **RetinaNet:** focal loss for class imbalance.
+## Detection is a different problem
 
-**Transformer-based:**
-- **DETR:** set prediction with bipartite matching, transformer encoder-decoder. No NMS needed.
-- **Deformable DETR:** deformable attention for efficiency.
+Classification assigns one label to an image. Detection must find multiple objects, localise them with bounding boxes, and classify each. That adds two difficulties: where to look, and how to handle the overwhelming number of background locations that contain no object.
 
-## Key concepts
+The field split into two approaches:
 
-**IoU (Intersection over Union):** overlap between predicted and ground truth boxes.
-**mAP (mean Average Precision):** standard detection metric across IoU thresholds.
-**NMS (Non-Maximum Suppression):** removes duplicate overlapping boxes.
-**Anchor boxes:** predefined box shapes for regression targets.
+**Two-stage detectors**, exemplified by Faster R-CNN, first propose candidate regions and then classify and refine them. Ren et al.'s "Faster R-CNN" introduced a region proposal network that made the proposal stage learned rather than hand-designed, which improved both speed and accuracy. The trade-off is two passes over the image, which costs latency.
 
-## Practical tips
+**Single-stage detectors**, of which YOLO is the best-known, predict boxes and classes directly from the image in one pass. Redmon et al.'s "You Only Look Once" reframed detection as a single regression problem, which gave up some localisation accuracy in exchange for real-time speed. The approach made detection practical on video and embedded devices.
 
-- **Data augmentation:** mixup, cutmix, mosaic, copy-paste, photometric distortions.
-- **Label smoothing, mixup, cutmix:** regularization for classification.
-- **Freeze batch norm statistics** when fine-tuning with small batches.
-- **Test-time augmentation (TTA):** average predictions over augmented versions.
+For years the trade-off seemed fixed: two-stage methods were more accurate, single-stage methods were faster. Lin et al.'s "Focal Loss for Dense Object Detection" changed that by addressing the class imbalance that hurts single-stage training — most candidate locations are easy negatives, and they dominate the loss. With focal loss, a single-stage detector could match two-stage accuracy while retaining its speed advantage.
 
-For the related question of deep learning basics, see [Deep Learning Basics: Neural Networks, Backpropagation, and Practical Use Cases](/articles/deep-learning-basics-neural-networks-backpropagation-and-practical-use-cases) and deep learning for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings).
+The pattern is instructive: the bottleneck was not the architecture but the training objective, and a better loss function changed the comparison.
+
+## Transformers enter vision
+
+Dosovitskiy et al.'s "An Image is Worth 16x16 Words" treated an image as a sequence of patches and applied a transformer to them, dispensing with convolution entirely. The result showed that attention-based models could match or exceed convolutional ones given enough data.
+
+The practical difference is in inductive bias. Convolution assumes locality and translation invariance, which helps when data is limited. Attention makes fewer assumptions and can model long-range relationships, which helps at scale but requires more data to learn the structure that convolution builds in. Carion et al.'s DETR applied a transformer to detection directly, using set prediction with bipartite matching and removing the need for the non-maximum suppression step that had been a fixture of detection pipelines.
+
+The field has not simply replaced convolution; it has expanded the set of tools, with hybrid designs common in practice.
+
+## Transfer learning is the default
+
+Training a vision model from scratch requires a large labelled dataset and substantial compute. Most projects have neither. Transfer learning — starting from weights pretrained on a large dataset and adapting the final layers — is the standard approach because the early layers learn general features that transfer across tasks.
+
+Three decisions matter:
+
+1. **How much of the model to fine-tune.** With a small target dataset, freezing the backbone and training only a new head reduces overfitting. With more data, unfreezing later layers improves adaptation.
+2. **The learning rate.** Pretrained weights are useful and should not be destroyed by a large update; a smaller rate for the backbone than for the new head is standard.
+3. **Domain similarity.** Features learned on natural photographs transfer poorly to medical images or satellite data when the low-level statistics are very different. The more distant the domain, the more fine-tuning is required.
+
+The honest caveat is that pretrained models carry the biases and blind spots of their training data. A model pretrained on one population may underperform on another, which is why model cards call for evaluation across relevant groups.
+
+## A practical sequence
+
+1. **Define the task precisely** — classification, detection, or segmentation — because the architecture follows from it.
+2. **Start with a pretrained model** and a small fine-tuning setup.
+3. **Establish a baseline** before trying architectural changes.
+4. **Inspect failures by category**, not only the aggregate metric, because errors cluster in specific conditions.
+5. **Choose detector architecture by the speed-accuracy point** the application requires, not by leaderboard rank.
+6. **Check the data distribution** against the pretraining domain and fine-tune accordingly.
+7. **Report performance by relevant subgroup**, following the model-card discipline.
+
+## A worked example of detector selection
+
+The choice between detector families becomes concrete with a latency budget. Suppose a system must process a video stream at 25 frames per second, giving 40 milliseconds per frame including preprocessing and inference.
+
+A two-stage detector such as Faster R-CNN may offer strong localisation accuracy but require more than 40 milliseconds per frame on the available hardware. A single-stage model such as YOLO may process the frame in under 20 milliseconds with somewhat lower accuracy on small objects. Focal Loss narrows the accuracy gap without restoring the two-stage cost, because it improves training rather than adding a stage.
+
+The decision is therefore not "which model is most accurate?" but "which model meets the accuracy floor inside the latency budget?" Three factors decide it:
+
+1. **The size of the objects that matter.** Small objects suffer most from the coarse grids used by single-stage detectors, so an application detecting distant pedestrians has a different accuracy floor from one counting pallets.
+2. **The hardware.** A model's speed is a property of the model and the device together, and a result from a data-centre GPU says little about an embedded processor.
+3. **The cost of a missed detection.** If missing an object is expensive, accuracy takes priority and the frame rate may need to be reduced; if the system is advisory, latency may dominate.
+
+The same arithmetic applies to accuracy targets: a reported mean average precision averages across object sizes and conditions, and an application may care much more about one category. Reporting performance by category and by object size is more informative than a single number, and it is the vision equivalent of the model-card discipline.
+
+For the evaluation framework, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the deployment constraints, see [Edge AI](/articles/edge-ai-model-compression-quantization-and-on-device-inference).
 
 ## Further Reading
 
