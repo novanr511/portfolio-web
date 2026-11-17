@@ -11,19 +11,17 @@ tags:
 
 Style debates about APIs are usually settled by fashion rather than analysis, and the reason is that the question is framed wrongly. REST, GraphQL, and gRPC are not competing answers to one problem; they place the complexity in different parts of the system. Which one is right depends on who calls the API, how often, over what network, and who has to change it when the business changes.
 
-**Direct answer:** REST organises an API as resources addressed by URLs with standard methods, and Google's published design guide gives the convention concrete form with dedicated rules for resource names, standard methods, custom methods, versioning and backward compatibility. GraphQL lets clients request the exact shape of the response, moving query complexity to the server. gRPC uses a schema and binary encoding, buying efficiency and strong typing at the cost of browser and human readability. An API gateway handles cross-cutting concerns — authentication, rate limiting, routing — and safe retries require idempotency, which Stripe implements with client-generated keys: "The API supports idempotency for safely retrying requests without accidentally performing the same operation twice."
+**Direct answer:** REST organises an API as resources addressed by URLs with standard methods; the durable-contract side of that choice is covered in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). GraphQL lets clients request the exact shape of the response, moving query complexity to the server. gRPC uses a schema and binary encoding, buying efficiency and strong typing at the cost of browser and human readability. An API gateway handles cross-cutting concerns — authentication, rate limiting, routing — and safe retries require idempotency, which Stripe implements with client-generated keys: "The API supports idempotency for safely retrying requests without accidentally performing the same operation twice."
 
-## REST is about predictability
+## REST is the baseline
 
-REST's advantage is not performance. It is that a client can predict the shape of an endpoint it has never seen. Google's API design guide encodes this as resource-oriented design, with separate rules for resource names, standard methods (Get, List, Create, Update, Delete), custom methods, versioning and backward compatibility.
+REST's advantage is not performance. It is that a client can predict the shape of an endpoint it has never seen, which is why it remains the default for public APIs. That predictability comes from a resource model and consistent standard methods — the subject of [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems), which covers resource naming, the failure contract, and versioning in depth.
 
-That convention is the practical value. When an API uses standard methods consistently, a client library can be generic, documentation can be shorter, and an integrator's assumptions are usually right. Custom methods are the escape hatch for operations that do not fit the resource model — and their proliferation is a warning that the resource model is wrong.
-
-REST also maps naturally onto HTTP semantics, which is why status codes matter. RFC 9110 defines the shared semantics, and RFC 6585 adds `429 Too Many Requests` for rate limiting: the response may include a `Retry-After` field, defined in RFC 9110 as an HTTP date or a non-negative delay in seconds. The ambiguity left to the implementer is whether the limit applies per account, IP, or service — and an API that does not document this leaves the client unable to back off sensibly.
+What matters for the style decision here is narrower: REST maps onto HTTP semantics, so it inherits HTTP's caching, status codes, and tooling. That makes it a strong default when clients are external and varied. The alternative styles are best understood as answers to cases where that baseline does not fit.
 
 ## GraphQL moves the work
 
-GraphQL lets a client specify which fields it wants, and the server resolves exactly that shape. The benefit is real for clients with varied needs — a mobile app and a reporting tool can ask for different fields from the same endpoint — and it reduces the number of round trips needed to assemble a screen.
+GraphQL lets a client specify which fields it wants, and the server resolves exactly that shape — the query language and type system are defined in the [GraphQL specification](https://spec.graphql.org/). The benefit is real for clients with varied needs — a mobile app and a reporting tool can ask for different fields from the same endpoint — and it reduces the number of round trips needed to assemble a screen.
 
 The costs are also real. Query complexity moves to the server, which now has to parse and authorise arbitrary selections and may need to defend against expensive queries. Caching is harder because responses are request-specific, and the familiar HTTP caching model applies less directly. A GraphQL endpoint that becomes the single entry point for every client can turn into a distributed monolith with a schema that is difficult to evolve.
 
@@ -31,7 +29,7 @@ The question to ask is whether clients genuinely need different shapes. If they 
 
 ## gRPC is about the contract and the wire
 
-gRPC uses a schema to define services and messages, and a binary encoding for transport. The benefits are strong typing, generated clients, and efficient serialisation — particularly valuable for service-to-service communication over a controlled network.
+gRPC uses a schema to define services and messages, and a binary encoding for transport, as described in the [official gRPC documentation](https://grpc.io/docs/). The benefits are strong typing, generated clients, and efficient serialisation — particularly valuable for service-to-service communication over a controlled network.
 
 The costs are that the protocol is not human-readable in the way JSON over HTTP is, browser support requires additional machinery, and debugging needs appropriate tools. It is a good fit for internal services where both sides are owned by the same organisation and the schema can be versioned deliberately. It is usually the wrong fit for a public API whose clients you do not control.
 
@@ -41,7 +39,7 @@ An API gateway terminates client connections and routes them to backend services
 
 Doing these once at the boundary is better than reimplementing them in every service, and it is also where a new class of failure appears: the gateway becomes a single point of failure and a bottleneck, and its configuration becomes a critical part of the system. A gateway that enforces a limit based on a client identifier it cannot reliably determine will rate-limit the wrong party, which is why the identity dimension has to be explicit.
 
-Rate limiting itself is a policy decision, not a technical setting. OWASP's API Security Top 10 lists "API4:2023 - Unrestricted Resource Consumption" and notes that satisfying API requests requires "network bandwidth, CPU, memory, and storage", with some resources "made available by service providers via API integrations... and paid for per request". A limit that ignores a per-request cost can be economically wrong even when it is technically correct.
+Rate limiting itself is a policy decision, not a technical setting. OWASP's API Security Top 10 treats unrestricted resource consumption as a design failure, and the economics behind the limit belong in the failure contract described in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). A limit that ignores per-request cost can be economically wrong even when it is technically correct.
 
 ## Idempotency is what makes retries safe
 
@@ -53,13 +51,15 @@ That last detail matters: using a customer's email as an idempotency key would m
 
 ## A worked versioning problem
 
+The policy side of versioning is covered in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). This example shows what such a policy actually has to decide.
+
 Suppose an API returns a `customer` object with a `name` field that clients display. The business now needs separate given and family names. Three changes are possible, and they have very different consequences:
 
 - **Add `given_name` and `family_name` while keeping `name`.** Older clients work unchanged; new clients use the structured fields. This is backward-compatible, and Google's design guide treats adding fields as a compatibility question precisely because some clients reject unknown fields. A client that strictly validates the response will still break, so "compatible" is a property of the client population, not of the server change alone.
 - **Rename `name` to `full_name`.** Every client that reads `name` now receives nothing. This is a breaking change regardless of how carefully it is announced.
 - **Change the meaning of `name`** to mean only the given name. Nothing about the schema changed, so no versioning policy catches it, and every client silently displays the wrong thing. This is the most dangerous of the three because it is invisible to contract testing.
 
-The lesson is that a versioning policy has to cover semantics as well as structure. Google's guide has separate rules for versioning and backward compatibility for good reason: they are different decisions, and a change can violate one without violating the other.
+The lesson is that a versioning policy has to cover semantics as well as structure. A change can violate backward compatibility without being a version bump at all, which is why the policy must define ownership of field meanings.
 
 A practical policy therefore states: which changes are permitted without a version bump, how long previous versions are supported, what notice clients receive, and how a deprecated version is removed. It should also define ownership of field meanings, because the third case above cannot be solved by a version number at all.
 
@@ -73,11 +73,10 @@ A practical policy therefore states: which changes are permitted without a versi
 6. **Write the versioning and compatibility policy**, including what counts as a breaking change.
 7. **Test the failure paths** — timeouts, retries, limit breaches — as carefully as the happy path.
 
-For the protocol underpinnings, see [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean) and [HTTP 429 Too Many Requests](/articles/http-429-too-many-requests-how-to-debug-and-retry).
+For the protocol underpinnings, see [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean) and [HTTP 429 Too Many Requests](/articles/http-429-too-many-requests-how-to-debug-and-retry). For the shared foundations — resource naming, the failure contract, HTTP semantics, and the OWASP API Security Top 10 — see [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems), which is the canonical home for that material.
 
 ## Further Reading
 
-- Google, 2026. [Google API Design Guide](https://cloud.google.com/apis/design) — Practical resource naming, pagination, and error-model conventions.
-- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
-- OWASP Foundation, 2023. [OWASP API Security Top 10 (2023)](https://owasp.org/API-Security/editions/2023/en/0x11-t10/) — Object-level authorisation and excessive data exposure are the two most common API findings.
+- GraphQL Foundation, 2026. [GraphQL Specification Versions](https://spec.graphql.org/) — The published specification for the query language and type system that the GraphQL section describes.
+- gRPC Authors, 2026. [Documentation | gRPC](https://grpc.io/docs/) — Primary documentation for the schema-driven, binary-encoded RPC framework discussed in the gRPC section.
 - Stripe, 2026. [Idempotent requests](https://docs.stripe.com/api/idempotent_requests) — First-party documentation of idempotency-key semantics in a payment API.

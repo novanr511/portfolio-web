@@ -55,13 +55,9 @@ Beyond the split, three habits produce misleading evaluations. Splitting by user
 
 None of this is fixable by a better model. It is fixed by an evaluation design that matches the deployment, which is why the evaluation step usually deserves more attention than the architecture step.
 
-## Cold start, and the part that never goes away
+## Cold start is a standing constraint
 
-New users and new items break collaborative methods by construction. The published responses fall into three groups: use content-based signals to bootstrap the first interaction; use popularity or editorial priors for items with no interaction history; and ask for a little explicit signal, which is what "onboarding" means in practice.
-
-None of these is fully automatic, and each has a cost. Explicit onboarding costs user attention, which is the scarcest resource you have. Content-based bootstrap degrades when the catalogue's metadata is thin or generic. Popularity priors are a blunt instrument that flattens exploration.
-
-And the problem never fully disappears, because items keep being added. A catalogue is a stream, not a set, and a recommender that was evaluated on a static snapshot is being evaluated on a condition that will not hold in production.
+New users and new items break collaborative methods by construction, and the problem never fully disappears because a catalogue is a stream rather than a set. The strategies, their costs, and a worked onboarding example are covered in [Cold Start in Recommender Systems](/articles/cold-start-problem-in-recommender-systems-strategies-for-new-users-and-items), which treats that question in depth. For the present purpose, the point is that a recommender evaluated on a static snapshot is being evaluated on a condition that will not hold in production — so the time-ordered split below is not optional.
 
 ## A decision sequence that works
 
