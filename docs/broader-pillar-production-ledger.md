@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Master Prompt Reference:** `docs/technical-seo-article-generation-prompt.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 172 tracked articles — 115 `Ready`, 58 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 173 tracked articles — 116 `Ready`, 58 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -186,6 +186,7 @@
 | **P-180** | Site Reliability Engineering: SLOs, Error Budgets, Incident Response | Technology & The Digital World | Deep Dive | `Ready` | `src/content/articles/site-reliability-engineering-slos-error-budgets-and-incident-response.mdx` | 2026-11-16 | Rewritten to 1105 words with verified sources (Google SRE book and workbook, Principles of Chaos Engineering, Git docs, GitHub Actions, Google API Design Guide, OWASP API Top 10, RFC 6585/9110). Promote — sources re-checked. |
 | **P-181** | Technical Writing: Documentation, API Docs, and Developer Experience | Career, Productivity & Professional Development | Deep Dive | `Drafted` | `src/content/articles/technical-writing-documentation-api-docs-and-developer-experience.mdx` | 2026-11-16 | Expand to the 900–1,300 word band (currently 541 words): explain the mechanism, add a worked example with sourced figures, and close with a decision or test. Verified sources ready in `docs/further-reading-registry.json` (3 mapped). |
 | **P-182** | How to Actually Start Learning AI as a Developer in 2026 | Career, Productivity & Professional Development | Deep Dive | `Drafted` | `src/content/articles/how-to-start-learning-ai.mdx` | 2026-11-16 | Expand to the 900–1,300 word band (currently 1692 words): explain the mechanism, add a worked example with sourced figures, and close with a decision or test. Verified sources ready in `docs/further-reading-registry.json` (3 mapped). |
+| **P-183** | Web3 & Blockchain: Smart Contracts, DeFi, and Tokenomics | Technology & The Digital World | Deep Dive | `Ready` | `src/content/articles/web3-blockchain-smart-contracts-defi-and-tokenomics.mdx` | 2026-11-17 | Rewritten to 1,654 words with a worked constant-product AMM example and verified sources (Ethereum and Uniswap whitepapers, IPFS, Bitcoin whitepaper). Promote — sources re-checked. |
 
 ---
 
