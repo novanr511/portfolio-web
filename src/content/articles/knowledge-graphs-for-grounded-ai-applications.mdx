@@ -1,10 +1,91 @@
 ---
 title: "Knowledge Graphs for Grounded AI Applications"
-description: "Reserved title for a future NOVANDRI article: Knowledge Graphs for Grounded AI Applications."
+description: "A knowledge graph stores relationships explicitly. Read when that structure beats vector retrieval, a worked example, and the maintenance cost."
 date: 2026-11-17
 tags:
-  - Planned
+  - Knowledge Graphs
+  - RAG
   - AI
+  - Data
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Vector retrieval finds passages that look similar to a query. It does not know that a particular person reports to a particular manager, or that one drug contraindicates another. When an application needs relationships rather than similarity, a knowledge graph can supply structure that embeddings cannot.
+
+**Direct answer:** A knowledge graph stores entities and the relations between them as triples, allowing queries that traverse connections rather than rank passages. The knowledge-graph overview provides the structural reference, and the RAG article covers the retrieval pattern it can complement. The boundary: a graph is only as good as its data — building and maintaining the entities and relations is the real cost, and many applications need both a graph and vector retrieval.
+
+## Structure versus similarity
+
+Three differences matter:
+
+**Explicit relations.** A graph states that A works for B. A vector index can find documents mentioning both, but it does not assert the relationship.
+
+**Traversal.** You can ask "which projects report to this director through two levels of management?" — a question that is awkward to answer by similarity search.
+
+**Provenance.** Each edge can carry a source and a date, which makes the answer traceable. That matters in regulated domains, as the governance article explains.
+
+The complement is important: a graph is poor at open-ended similarity, and vectors are poor at exact relationships. Many systems use both.
+
+## A worked example of a graph query
+
+The following is hypothetical and illustrative.
+
+A company stores an organisational graph: people, teams, projects, and the relations "reports to", "member of", and "owns". A user asks: "Which projects are owned by teams whose lead reports to the CTO?"
+
+A vector system retrieves documents mentioning the CTO and projects, then asks the model to infer the chain. It may return a plausible but incomplete list.
+
+A graph system traverses: find people whose "reports to" is the CTO; find teams they lead; find projects those teams own. The result is exact given the graph, and each edge can be cited.
+
+Three checks decide whether the result is trustworthy:
+
+1. **Completeness.** Are all relevant reporting relationships in the graph? A missing edge produces a missing project with no warning.
+2. **Freshness.** A reorganisation last week may not be reflected. Edges need dates and an update process, as the data-governance article explains.
+3. **Entity resolution.** Two records for the same person produce two partial answers. Deduplication is a graph problem before it is an AI problem.
+
+Three decisions follow:
+
+- **Use the graph for exact relationships**, not for general document search.
+- **Invest in entity resolution and provenance** before adding clever query logic.
+- **Combine with vector retrieval** for questions that mix structure and text.
+
+## When a graph pays
+
+**Multi-hop questions** that traverse several relationships.
+
+**Regulated domains** where the source of each claim must be shown.
+
+**Stable schemas** where the entity types and relations are known in advance.
+
+## When it does not
+
+**Unstructured exploration** where the reader does not know what to ask.
+
+**Rapidly changing domains** where edges go stale faster than they can be maintained.
+
+**Small corpora** where a passage search is sufficient and a graph is overhead.
+
+The counterargument — that a model can infer relationships from text — is true for simple cases and unreliable for multi-hop ones. A model that has to hold several relations in working memory can make mistakes that a traversal would not.
+
+## What a graph cannot do
+
+**It cannot be complete by accident.** Every entity and edge must be sourced and maintained, which is why graph projects often fail on data work rather than query logic.
+
+**It cannot answer without a schema.** Someone must decide what an entity and a relation are, which is a modelling choice that can be wrong.
+
+**It cannot replace text.** The graph tells you a project is owned by a team; the documents tell you why. Both are usually needed, as the RAG article explains.
+
+## A decision test
+
+1. **Identify the questions that need relationships**, not similarity.
+2. **List the entity types and relations** required to answer them.
+3. **Check the data exists** and can be kept current, with an owner.
+4. **Resolve entities** before adding edges.
+5. **Store provenance** on each edge.
+6. **Combine with vector retrieval** for mixed questions.
+7. **Measure answer correctness** on real queries before expanding the schema.
+
+For the retrieval context, see [Retrieval-Augmented Generation](/articles/rag-explained); for the maintenance discipline, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
+
+## Further Reading
+
+- Wikipedia contributors, 2026. [Knowledge graph - Wikipedia](https://en.wikipedia.org/wiki/Knowledge_graph) — The structure of entities, relations and triples in a knowledge graph; a secondary reference.
+- Nils Reimers and Iryna Gurevych, 2019. [Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks](https://arxiv.org/abs/1908.10084) — The bi-encoder recipe behind modern semantic search and RAG retrieval.

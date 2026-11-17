@@ -1,10 +1,102 @@
 ---
 title: "Reranking in Retrieval Pipelines: When and Why It Pays"
-description: "Reserved title for a future NOVANDRI article: Reranking in Retrieval Pipelines: When and Why It Pays."
+description: "A first-stage retriever finds candidates; a reranker orders them. Read the two-stage mechanism, a worked quality example, and the cost test."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - RAG
+  - Retrieval
+  - LLM
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A vector index is fast because it approximates similarity, which also means its top results can be wrong. A reranker is a second stage that scores a small set of candidates more carefully, using the query and the document together. The combination — broad recall first, precise ordering second — is one of the most reliable improvements available in a retrieval pipeline.
+
+**Direct answer:** Reranking takes the top k documents from a first-stage retriever and rescoring them with a more expensive model that considers the query-document pair jointly. Cohere's reranking documentation describes the two-stage pattern, and the MTEB benchmark covers the first-stage models. The boundary: reranking cannot recover a document the first stage failed to retrieve, so it only pays when recall@k is already high and precision at the top is the problem.
+
+## Why two stages
+
+**First stage — vector search.** Embeds the query, finds nearest neighbours in an index. Fast and scalable, but it compresses each document into one vector before seeing the query, which loses detail.
+
+**Second stage — reranking.** Takes the query and each candidate document as a pair and produces a relevance score. It is slower and cannot run over the whole corpus, which is why it operates on a small candidate set.
+
+Three consequences follow:
+
+- **Recall comes from stage one.** If the right document is not in the top k, the reranker never sees it.
+- **Precision comes from stage two.** The reranker reorders candidates so the best one appears first.
+- **The costs add.** Reranking is an extra inference step per query, which matters at high volume.
+
+## A worked example of the gain
+
+The following is hypothetical and illustrative.
+
+A retrieval system returns 20 candidate documents. Evaluation on 300 queries shows:
+
+- Relevant document in the top 20: 94% — recall@20 is good.
+- Relevant document in the top 5: 61% — precision at the top is poor.
+
+A reranker rescores the 20 candidates and lifts top-5 accuracy to 78%. Three readings follow:
+
+1. **The gain came from ordering, not discovery.** The document was already in the candidate set 94% of the time. The reranker moved it up.
+2. **The ceiling is recall@20.** Even a perfect reranker could not exceed 94%. If the ultimate goal is 95% top-5 accuracy, the first stage needs work instead.
+3. **The cost is 20 extra scoring operations per query.** At 10,000 queries a day, that is 200,000 pairwise scores. The improvement must justify the bill, as the cost estimator shows.
+
+Three decisions follow:
+
+- **Measure recall@k before adding a reranker.**
+- **Tune k** — a larger candidate set raises the ceiling and the cost.
+- **Evaluate the final prompt**, because the generator's behaviour determines whether better ordering actually improves answers, as the RAG article explains.
+
+## When it pays
+
+**High recall, low precision** — the right material is found but buried.
+
+**Long documents** where a single vector cannot represent every relevant detail.
+
+**Domains with subtle distinctions**, such as legal or technical support, where two similar passages differ in applicability.
+
+## When it does not
+
+**Low recall@20.** The first stage is the bottleneck; fix chunking or embeddings first, as the embedding-selection article covers.
+
+**Latency-critical applications.** An extra scoring pass adds time to every request.
+
+**Simple queries with one obvious answer.** The reranker's ordering adds little.
+
+The counterargument — that a better embedding model makes reranking unnecessary — is partly true and misses the structural point. A better first stage raises recall, which makes the reranker more valuable, not less.
+
+## Choosing a reranker
+
+Three properties matter when evaluating a reranking model:
+
+**Quality on your pairs.** A benchmark on general web queries may not transfer to legal documents or product manuals. Score the candidate on your own query-document pairs, as the embedding-selection article recommends for the first stage.
+
+**Latency at k.** Reranking cost scales with the number of candidates. Measure it at the k you actually plan to use, not at a default from the documentation.
+
+**Failure behaviour.** A reranker that confidently promotes an irrelevant passage is worse than one that leaves the ordering unchanged, because the generator will trust the top result. Inspect mistakes by category, not only the aggregate score.
+
+These criteria favour a model that is good enough on your data and fast enough for your volume, rather than the highest-scoring model on a public leaderboard.
+
+## What reranking cannot do
+
+**It cannot fix a missing document.** That is retrieval's job.
+
+**It cannot interpret the answer.** A well-ordered passage can still be misused by the generator, which is why evaluation must cover the full pipeline.
+
+**It is not free.** Pairwise scoring costs compute and latency on every query. The budget is part of the design.
+
+## A decision test
+
+1. **Measure recall@20** on real queries before anything else.
+2. **Measure precision at the top** to confirm ordering is the problem.
+3. **Add a reranker** over a bounded candidate set.
+4. **Tune k** against the recall ceiling and cost.
+5. **Evaluate the final answer**, not only the ordering.
+6. **Price the extra inference** at your query volume.
+7. **Re-measure after an embedding or model change.**
+
+For the first stage, see [Vector Databases](/articles/vector-databases-embeddings-ann-search-and-rag-applications); for the full pipeline, see [Retrieval-Augmented Generation](/articles/rag-explained).
+
+## Further Reading
+
+- Cohere, 2026. [An Overview of Cohere Rerank Model | Cohere](https://docs.cohere.com/docs/reranking) — How a second-stage reranker scores query-document pairs after an initial retrieval pass.
+- Niklas Muennighoff et al., 2022. [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316) — A broad benchmark of embedding models across retrieval and semantic tasks, showing that no single model wins everything.

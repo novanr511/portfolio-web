@@ -1,10 +1,102 @@
 ---
 title: "Embedding Model Selection: A Task-Driven Evaluation"
-description: "Reserved title for a future NOVANDRI article: Embedding Model Selection: A Task-Driven Evaluation."
+description: "A leaderboard rank is not a choice. Read how to evaluate an embedding model on your retrieval task with a worked example."
 date: 2026-11-17
 tags:
-  - Planned
+  - Embeddings
+  - RAG
   - AI
+  - Evaluation
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Embedding models are often chosen by leaderboard position. That is a reasonable shortlist, not a decision, because a benchmark averages across tasks and your application has one. The MTEB benchmark exists precisely because different models excel at different things — no single model wins everything.
+
+**Direct answer:** Select an embedding model by measuring retrieval quality on your own queries and documents, with a defined metric and a fixed corpus. MTEB provides the broad comparison; the SBERT paper established the bi-encoder pattern most retrieval embeddings use. The boundary: a model that wins on a public benchmark may underperform on your domain, language, or document length — the only direct evidence is your own evaluation.
+
+## What the benchmark tells you
+
+MTEB evaluates embedding models across many tasks — retrieval, semantic similarity, classification, and others. Three lessons follow:
+
+**Different tasks, different winners.** A model optimised for symmetric similarity may be poor at asymmetric retrieval, where a short query must match a long document.
+
+**Averages hide domains.** Performance on general text says little about legal contracts, medical notes, or code.
+
+**The benchmark is a snapshot.** New models appear, and a rank from an older evaluation may be outdated.
+
+Use MTEB to build a shortlist of three to five candidates, then stop relying on it.
+
+## A worked evaluation
+
+The following is hypothetical and illustrative.
+
+A company has 20,000 internal documents and 300 real user queries with known relevant documents. It compares three embedding models on the same corpus and the same queries.
+
+**Metrics:**
+
+- Recall@10 — is the relevant document in the top ten?
+- MRR — how high does it rank?
+- Latency — milliseconds to embed a query and search the index.
+- Cost — per million tokens embedded.
+
+Three results:
+
+- Model A: Recall@10 92%, MRR 0.71, 40 ms, highest cost.
+- Model B: Recall@10 88%, MRR 0.65, 15 ms, medium cost.
+- Model C: Recall@10 84%, MRR 0.60, 12 ms, lowest cost.
+
+Three decisions follow:
+
+1. **If recall@10 is the priority**, Model A wins, and the cost may be justified by fewer retrieval misses — as the RAG article explains, a miss cannot be fixed by the generator.
+2. **If latency dominates**, Model B offers a middle ground with a small recall loss.
+3. **The gap between A and C is only eight points** on this set. If the set is small or the labels noisy, that difference may not be stable — repeat with more queries before deciding.
+
+Three cautions apply: the 300 queries must represent real traffic, not convenient examples; the relevant-document labels must be agreed by someone who knows the domain; and the index configuration (distance metric, chunking) must be identical across models.
+
+## What to hold constant
+
+**Chunking strategy.** A different chunk size changes the corpus, which changes the result. Use the same chunks for all candidates.
+
+**Distance metric.** Cosine similarity is common, but if a model expects a different metric, document that and apply it consistently.
+
+**Query preprocessing.** If you expand or rewrite queries, do so identically for all models.
+
+**The evaluation set.** Keep a held-out portion that is not used for any tuning. A model tuned on the full set will score well there by construction, as the evaluation article warns.
+
+## Building the evaluation set
+
+The quality of the decision depends on the quality of the queries and labels. Three practices make the set defensible:
+
+**Sample from real traffic.** Take queries from logs or support tickets, with sensitive details removed. A set invented by the team reflects what the team thinks users ask, which is often wrong.
+
+**Agree on relevance before scoring.** Two reviewers will disagree about whether a document answers a query. Define a rule — this document contains the answer, not merely a related topic — and resolve disagreements before comparing models.
+
+**Keep a held-out portion.** Reserve a share of queries that is not used for any tuning or threshold choice. A model selected on the full set has been optimised on the test, which inflates the result — the same leakage problem the data-pipeline article warns about.
+
+A set of 200 well-labelled queries is more useful than 2,000 careless ones. The effort spent on labels is repaid every time a model or index configuration changes.
+
+## What evaluation cannot tell you
+
+**It does not measure the full system.** A better embedding model with a poor reranker or prompt may produce worse answers than a worse model in a better pipeline. The reranking article covers the next stage.
+
+**It does not guarantee transfer.** A model chosen for English queries may behave differently in another language, even if the benchmark includes multilingual tasks.
+
+**It goes stale.** Documents and queries change. Re-run the evaluation when the corpus or the traffic changes materially.
+
+The counterargument — that a public benchmark is good enough for most teams — is fair when the task is generic and the stakes are low. It stops being fair when retrieval quality determines whether the system can answer at all.
+
+## A decision test
+
+1. **Collect real queries** with known relevant documents.
+2. **Build a shortlist** from MTEB, not a winner.
+3. **Hold corpus, chunking and metrics constant** across candidates.
+4. **Measure recall and ranking quality** plus latency and cost.
+5. **Keep a held-out set** for final confirmation.
+6. **Evaluate the full pipeline**, not only retrieval.
+7. **Re-run on change** in corpus, language, or traffic.
+
+For the retrieval system, see [Vector Databases](/articles/vector-databases-embeddings-ann-search-and-rag-applications); for the next stage, see [Reranking](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays).
+
+## Further Reading
+
+- Niklas Muennighoff et al., 2022. [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316) — A broad benchmark of embedding models across retrieval and semantic tasks, showing that no single model wins everything.
+- Nils Reimers and Iryna Gurevych, 2019. [Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks](https://arxiv.org/abs/1908.10084) — The bi-encoder recipe behind modern semantic search and RAG retrieval.
