@@ -85,6 +85,12 @@ for (const file of files) {
   if (!date || Number.isNaN(Date.parse(date))) add(file, "invalid-date");
   if (!tags) add(file, "missing-tags");
 
+  // Reserved titles are placeholders, not publishable articles. They keep
+  // valid frontmatter but are not scored on reading list, links or length
+  // until the content is actually written (remove the marker to opt in).
+  const isPlanned = body.includes("PLANNED TITLE");
+  if (isPlanned) continue;
+
   // Reading-list section with real links.
   const reading = body.match(/^##\s+(Further Reading|References\s*&\s*Further Reading)\s*$/m);
   if (!reading) {
