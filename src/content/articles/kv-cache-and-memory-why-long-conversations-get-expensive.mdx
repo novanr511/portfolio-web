@@ -1,10 +1,87 @@
 ---
 title: "KV Cache and Memory: Why Long Conversations Get Expensive"
-description: "Reserved title for a future NOVANDRI article: KV Cache and Memory: Why Long Conversations Get Expensive."
+description: "Every token in a conversation carries cached attention state. Read how the KV cache grows, a worked memory calculation, and the mitigations."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - LLM
+  - Inference
+  - Memory
+  - Performance
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A long conversation feels cheap because each new message is short. The model, however, has been carrying the entire history in a growing key-value cache, and that cache consumes GPU memory for every token in the context. At some point the conversation ends not because the model forgot, but because the memory ran out.
+
+**Direct answer:** The KV cache stores the attention keys and values computed for previous tokens so they need not be recomputed at each generation step. Its size grows linearly with context length and with the number of concurrent requests. FlashAttention reduces the memory cost of computing attention but does not eliminate the KV cache itself. The boundary: a large context window is a capacity limit, not a free resource — every token stored has a memory cost that affects throughput and cost.
+
+## What the cache holds
+
+During generation, each layer of a transformer produces a key and a value vector for every token so far. These are stored so the next token can attend to all previous ones without recomputing them. Three properties follow:
+
+**It grows with context.** Twice the tokens means roughly twice the cache.
+
+**It is per-request.** Each concurrent conversation has its own cache. A server handling 100 conversations holds 100 caches.
+
+**It is distinct from model weights.** Weights are fixed; the cache is working memory that grows with use.
+
+This is why long-context serving is a memory problem as much as a compute problem, which the GPU article explains at the hardware level.
+
+## A worked memory calculation
+
+The following is hypothetical and illustrative.
+
+A model has 32 layers, 32 attention heads, and a per-head dimension of 128. Each key and value element is stored in 2 bytes.
+
+Bytes per token = 2 (K and V) × 32 layers × 32 heads × 128 dim × 2 bytes = **524,288 bytes**, about 0.5 MB per token.
+
+Three scenarios:
+
+- **4,000-token context:** roughly 2 GB per request.
+- **32,000-token context:** roughly 16 GB per request.
+- **100 concurrent requests at 4,000 tokens:** roughly 200 GB of cache, before model weights.
+
+Three lessons follow:
+
+1. **Context length multiplies memory aggressively.** Moving from 4k to 32k tokens uses eight times the cache.
+2. **Concurrency is the hidden multiplier.** A single request may fit; a hundred do not.
+3. **Model weights are only part of the budget.** A server planner that counts weights but not cache will be surprised at high context lengths.
+
+The arithmetic is simplified — implementations vary in precision and layout — but the linear relationship is the point.
+
+## Mitigations
+
+**Compression of history.** Summarise old turns into a structured state, as the context-engineering article describes, so the token count stays bounded.
+
+**Sliding windows.** Keep only the most recent tokens in the attention window, accepting that very old context is no longer directly available.
+
+**Cache eviction and offloading.** Move less-used caches to cheaper memory. This trades latency for capacity.
+
+**Fewer concurrent long requests.** Route long-context work to a separate pool so it does not starve short requests.
+
+**Multi-query or grouped-query attention.** Some model architectures share keys and values across heads, reducing cache size. That is a model design choice, not something an application can change at runtime.
+
+## What the cache is not
+
+**It is not persistent memory.** It disappears when the session ends. Long-term memory must be stored elsewhere and retrieved.
+
+**It is not the same as prompt caching.** Prompt caching, as the previous article explains, reuses computation across requests and is billed by the provider. The KV cache is the in-session working state.
+
+**It is not eliminated by FlashAttention.** FlashAttention makes attention computation memory-efficient by avoiding the full attention matrix; the KV cache still holds the per-token keys and values needed for future steps.
+
+The counterargument — that larger GPUs solve the problem — is true up to a point. Memory capacity grows, but so do context lengths and concurrency, and the linear relationship remains.
+
+## A decision test
+
+1. **Estimate cache bytes per token** for your model from its architecture.
+2. **Multiply by context length and concurrency** to get the real memory budget.
+3. **Measure cache utilisation** on your serving stack.
+4. **Bound conversation length** with deliberate compression.
+5. **Separate long-context traffic** from short requests.
+6. **Check precision settings** — lower precision reduces memory with accuracy trade-offs.
+7. **Re-estimate after a model change**, since architecture affects cache size.
+
+For the attention mechanism, see [FlashAttention](/articles/flashattention-and-attention-variants-what-they-actually-optimize); for the cost implications, see [Prompt Caching](/articles/prompt-caching-reducing-cost-on-repeated-context).
+
+## Further Reading
+
+- Tri Dao et al., 2022. [FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness](https://arxiv.org/abs/2205.14135) — IO-aware exact attention that avoids materialising the full attention matrix in memory.
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.

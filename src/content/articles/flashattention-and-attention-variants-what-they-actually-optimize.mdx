@@ -1,10 +1,98 @@
 ---
 title: "FlashAttention and Attention Variants: What They Actually Optimize"
-description: "Reserved title for a future NOVANDRI article: FlashAttention and Attention Variants: What They Actually Optimize."
+description: "Attention is a memory-movement problem as much as a compute problem. Read what FlashAttention changes, what it leaves alone, and when it matters."
 date: 2026-11-17
 tags:
-  - Planned
-  - AI
+  - LLM
+  - Attention
+  - Performance
+  - Architecture
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Attention is often described by its quadratic cost in sequence length. That is true of the arithmetic, and it is only half the story. On modern hardware, moving data between memory levels is often more expensive than the multiplication itself, which is why an algorithm that changes *where* data is read can be faster without changing the mathematics.
+
+**Direct answer:** FlashAttention is an IO-aware attention algorithm that computes exact attention while avoiding the materialisation of the full attention matrix in high-bandwidth memory. The paper reports speedups and memory savings on standard benchmarks. The boundary: it changes the implementation, not the function — attention still has quadratic arithmetic in sequence length, and the KV cache still exists for generation.
+
+## The memory problem
+
+A standard attention implementation computes a score matrix of size n × n for a sequence of length n, writes it to memory, applies softmax, and reads it back to compute the output. For long sequences, that matrix is enormous: 32,000 tokens produce over a billion entries per head.
+
+Three consequences follow:
+
+**Memory bandwidth dominates.** Reading and writing the score matrix repeatedly costs more time than the arithmetic on fast accelerators.
+
+**Memory capacity limits sequence length.** If the matrix does not fit, the implementation fails or must use slower strategies.
+
+**The result is exact.** None of this is about approximating attention; it is about computing the same function with fewer memory round trips.
+
+## What FlashAttention changes
+
+The algorithm tiles the computation into blocks that fit in fast on-chip memory. It computes attention scores for a block, applies the softmax incrementally, and accumulates the output — never writing the full score matrix to high-bandwidth memory.
+
+Three properties follow:
+
+**Exact output.** The algorithm computes the same attention as the standard version, up to numerical differences.
+
+**Less memory traffic.** Fewer reads and writes to the large, slow memory pool.
+
+**Lower peak memory.** No n × n matrix is materialised, which allows longer sequences on the same hardware.
+
+The original paper and its successors are implementation advances, not new model architectures. They make existing attention cheaper to run.
+
+## A worked example of the memory difference
+
+The following is hypothetical and illustrative.
+
+A sequence of 32,000 tokens with 32 attention heads and 2-byte values:
+
+- Full score matrix: 32,000 × 32,000 × 32 × 2 bytes ≈ **65 GB per layer**.
+- With tiled computation, the working set is a few blocks that fit in on-chip memory — orders of magnitude less.
+
+Three lessons follow:
+
+1. **The matrix size explains why long sequences were impractical** even when compute was available.
+2. **The saving is in peak memory and traffic**, which is why speedups appear even though the arithmetic is unchanged.
+3. **This is separate from the KV cache.** The cache stores keys and values across generation steps; FlashAttention reduces the temporary score matrix during a pass. Both matter, and the KV-cache article covers the other half.
+
+## Where it matters
+
+**Long sequences** where the score matrix would dominate memory.
+
+**Training and prefill** on long documents, where the full sequence is processed in parallel.
+
+**Hardware with limited memory bandwidth** relative to compute, which describes many accelerators.
+
+## Where it matters less
+
+**Short sequences** where the matrix is small and overhead dominates.
+
+**Inference with short outputs** where decoding, not prefill, is the bottleneck. The KV cache and speculative decoding articles cover that regime.
+
+**Applications that never approach the memory limit.** The algorithm is a foundation, not a setting every team must tune. Most practitioners benefit through their serving framework rather than implementing it.
+
+## What attention variants do not settle
+
+**Quadratic arithmetic remains.** Tiling reduces memory traffic; it does not make attention linear in sequence length. Long-context designs still pay a cost.
+
+**Accuracy is preserved, not improved.** FlashAttention makes the same computation cheaper. It does not change what the model knows or how it reasons.
+
+**Implementation quality varies.** A reported speedup depends on hardware, precision, and the baseline implementation. Treat benchmark numbers as evidence for the tested setup.
+
+The counterargument — that hardware improvements make IO-aware algorithms unnecessary — is wrong in direction. Faster compute makes memory bandwidth relatively more important, which is why these algorithms persist.
+
+## A decision test
+
+1. **Separate prefill from decoding** when diagnosing attention cost.
+2. **Estimate the score-matrix size** for your sequence length and head count.
+3. **Check whether memory or compute is the bottleneck** on your hardware.
+4. **Use a serving stack that includes IO-aware attention** rather than implementing it yourself.
+5. **Remember the KV cache** is a separate memory consumer during generation.
+6. **Treat benchmark speedups as hardware-specific.**
+7. **Re-measure after a model or hardware change.**
+
+For the original transformer, see [Attention Is All You Need](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers); for position handling, see [RoPE and Position Encoding](/articles/rope-and-position-encoding-how-models-understand-order).
+
+## Further Reading
+
+- Tri Dao et al., 2022. [FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness](https://arxiv.org/abs/2205.14135) — IO-aware exact attention that avoids materialising the full attention matrix in memory.
+- Ashish Vaswani et al., 2017. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — The transformer architecture that the NLP and LLM sections build on.

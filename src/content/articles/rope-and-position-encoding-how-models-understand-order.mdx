@@ -1,10 +1,88 @@
 ---
 title: "RoPE and Position Encoding: How Models Understand Order"
-description: "Reserved title for a future NOVANDRI article: RoPE and Position Encoding: How Models Understand Order."
+description: "Attention has no built-in sense of order. Read how rotary position embedding encodes relative distance, and why it matters for long context."
 date: 2026-11-17
 tags:
-  - Planned
+  - LLM
+  - Architecture
+  - Math
   - AI
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A transformer processes all tokens in parallel, which is why it is fast and why it cannot tell, by itself, which token came first. Position encoding supplies that information. Rotary Position Embedding, or RoPE, does it by rotating the query and key vectors according to their position, which makes attention depend on relative distance.
+
+**Direct answer:** RoPE applies a position-dependent rotation to queries and keys so that their dot product encodes how far apart two tokens are. The RoFormer paper introduced the method, and it became a default in many later models. The boundary: RoPE encodes position, not meaning — a model can know two tokens are far apart without knowing what to do with that fact, and long-context behaviour still depends on training and data.
+
+## Why position needs encoding
+
+Attention computes relationships between tokens without regard to order. Without additional information, "the cat sat on the mat" and "the mat sat on the cat" produce the same set of token-to-token relationships. Three properties are needed:
+
+**A sense of order** — which token precedes which.
+
+**Relative distance** — how far apart two tokens are, which matters for grammar and reference.
+
+**Generalisation beyond training length** — ideally, the scheme should behave sensibly on sequences longer than those seen in training.
+
+Early approaches added absolute position vectors to token embeddings. RoPE changes the queries and keys instead, which has a useful consequence for relative distance.
+
+## How RoPE works
+
+For each token at position m, RoPE rotates its query and key vectors by an angle proportional to m. Different dimensions rotate at different frequencies, which gives the encoding a multi-scale structure. Three results follow:
+
+**Absolute information is present.** Each vector carries a position-dependent rotation.
+
+**Relative information emerges in the dot product.** When a query at position m is compared with a key at position n, the rotation difference depends on m − n, so the attention score carries relative distance.
+
+**The computation is cheap.** Rotation is a small elementwise operation applied to vectors the model already computes.
+
+The RoFormer paper reports that this scheme performs well and can extrapolate better than some absolute encodings, which is why it was adopted widely.
+
+## A worked intuition of frequencies
+
+The following is illustrative rather than a measured result.
+
+Suppose a vector has pairs of dimensions rotating at different rates — one slow, one fast. For two tokens five positions apart:
+
+- The slow pair rotates by a small angle, preserving a coarse sense of "nearby".
+- The fast pair rotates by a larger angle, distinguishing five positions from six.
+
+Three consequences follow:
+
+1. **Multiple scales encode both coarse and fine distance.** A single frequency would conflate different separations.
+2. **The rotation is periodic.** At some distance the pattern repeats, which is one reason very long contexts can behave oddly without additional treatment.
+3. **Extrapolation is not magic.** A model trained at 4,000 tokens may use RoPE at 100,000, but whether it uses the information well is an empirical question, as the long-context article explains.
+
+## Where RoPE matters
+
+**Relative reasoning** — resolving references, grammar, and order-dependent meaning.
+
+**Long-context models** — where the encoding must remain meaningful over thousands of positions.
+
+**Model design** — RoPE is a default in many architectures, so understanding it helps interpret claims about context length and extension techniques.
+
+## What position encoding cannot do
+
+**It cannot create knowledge.** A model that knows two tokens are ten positions apart still needs to learn what that implies.
+
+**It does not solve long-context use.** The "Lost in the Middle" finding shows that models do not reliably use all positions in a long input. Encoding position is necessary, not sufficient.
+
+**It is not the only scheme.** Absolute encodings, learned position embeddings, and alternatives exist. RoPE is common, not universal.
+
+The counterargument — that position encoding is a low-level detail practitioners need not know — is fair for most application work. It becomes relevant when evaluating claims about context extension, where the mechanism determines what "extending the window" actually means.
+
+## A decision test
+
+1. **Separate position from meaning** when diagnosing an order-related failure.
+2. **Check the model's position scheme** when evaluating long-context claims.
+3. **Treat training length and inference length as different** facts.
+4. **Test position sensitivity** — move relevant information and measure, as the long-context article recommends.
+5. **Do not infer capability from encoding alone.** Evaluate behaviour.
+6. **Re-test after a model change**, since position handling varies.
+7. **Keep the mechanism in the background** for application work unless the task is specifically about order.
+
+For the mechanism it supports, see [Attention Is All You Need](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers); for the practical limit, see [Long Context Windows](/articles/long-context-windows-what-they-buy).
+
+## Further Reading
+
+- Jianlin Su et al., 2021. [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864) — Rotary position embedding, which encodes relative position by rotating queries and keys.
+- Ashish Vaswani et al., 2017. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — The transformer architecture that the NLP and LLM sections build on.
