@@ -1,0 +1,103 @@
+---
+title: "Credit Spreads: What Corporate Bond Yields Add to the Risk-Free Rate"
+description: "A corporate yield is a risk-free rate plus compensation for default and liquidity risk. Read how to compute the spread and what a change in it means."
+date: 2026-11-17
+tags:
+  - Fixed Income
+  - Credit
+  - Markets
+  - Risk Management
+---
+
+A corporate bond yields more than a government bond of the same maturity. The extra yield is not a bonus; it is payment for risks the government bond does not carry. When that extra yield widens, the market is asking for more compensation to hold the company's debt — which is information about perceived credit conditions, not just about interest rates.
+
+**Direct answer:** A credit spread is the difference between the yield on a risky bond and the yield on a comparable risk-free or benchmark bond. Wikipedia's overview describes the spread as the difference between a risky yield and a comparable risk-free yield, and bond ratings are the market's structured view of the issuer's creditworthiness. FRED publishes dated spread series that combine a corporate yield with a Treasury benchmark, so the number can be checked at a point in time. The boundary: a spread is a market quotation, not a forecast of default, and it mixes credit risk with liquidity and other factors.
+
+## Why a spread exists
+
+Three components are usually bundled into the quoted spread:
+
+**Default risk** — the possibility that the issuer misses interest or principal payments. This is the component most people think of, and bond ratings are an attempt to summarise it.
+
+**Loss given default** — how much would be lost if default occurred. Two issuers with the same default probability can have different spreads if the expected recovery differs.
+
+**Liquidity and other premia** — a bond that is hard to trade requires compensation, and a spread can widen because liquidity dried up rather than because default risk rose.
+
+Investor.gov's bond material is a useful reminder of the foundation: a bond is a debt obligation under which the issuer commits to pay interest and, in most cases, return principal at maturity. The spread is the extra yield demanded over a benchmark for taking on the risk that those payments will not arrive as promised.
+
+## Computing and reading a spread
+
+The calculation is simple; the interpretation is not.
+
+Suppose a ten-year corporate bond yields 6.2% and a ten-year government benchmark yields 4.0%. The spread is 2.2 percentage points, or 220 basis points.
+
+Three checks make the number meaningful:
+
+1. **Compare like maturities.** A ten-year corporate against a two-year government yield mixes credit and term-structure effects. The benchmark should match the maturity and, where possible, the currency.
+2. **Check the date and the series.** FRED's spread series are dated observations from specific sources, with release histories. A spread "today" should be quoted with the date and the exact series used, because different indices cover different issuers.
+3. **Read the direction, not just the level.** A spread that widens from 120 to 220 basis points means the market is demanding more compensation. It does not say by how much default probability rose, because the other components may have moved too.
+
+## A worked example of spread and price
+
+The following numbers are hypothetical and illustrative.
+
+An investor holds a five-year corporate bond with a 5% annual coupon, priced at par when its yield was 5% — equal to the government benchmark at the time, so the spread was zero.
+
+**Case 1 — the bond's credit deteriorates** while the risk-free rate stays at 5%. The market now demands a 2% spread, so the required yield is 7%. Discounting the five annual coupons of 50 and the principal of 1,000 at 7%:
+
+- Coupons: 50 × [1 − (1.07)^−5] / 0.07 ≈ 50 × 4.100 ≈ 205.0
+- Principal: 1,000 / (1.07)^5 ≈ 713.0
+- Price ≈ **918.0**, a fall of about 8.2%.
+
+**Case 2 — the risk-free rate rises** to 7% and the spread stays at zero. The required yield is again 7%, and the price falls to the same 918.0 — but the reason is entirely different. In case one the market re-priced the company's credit; in case two it re-priced the general level of rates.
+
+**Case 3 — both move.** The risk-free rate rises to 6% and the spread widens to 1%, giving the same 7% yield and the same price. A holder seeing only the price would not know that two different things happened.
+
+Three lessons follow:
+
+1. **The spread isolates the credit component** only if you separately observe the benchmark. Yield alone cannot tell you why a bond moved.
+2. **Duration still applies.** The 8.2% price fall from a 2-point yield move is roughly consistent with the bond's duration, as in any fixed-income calculation.
+3. **A spread widening is not a default forecast.** It is the price the market is willing to pay to avoid the risk, which reflects liquidity and sentiment as well as credit analysis.
+
+## Why spreads widen
+
+Three distinct causes produce the same visible movement in a spread, and they call for different responses.
+
+**Firm-specific deterioration.** Earnings miss, leverage rises, or a major customer is lost. The spread on that issuer widens relative to its peers. This is the case where credit analysis adds the most value, because the change is about the company.
+
+**Sector or market-wide stress.** A shock affects an entire industry or all risky credit. Spreads widen across many issuers at once, and the relative ordering may stay the same while the absolute level rises. Here the signal is about conditions, not a particular company.
+
+**Liquidity withdrawal.** Market makers step back and the cost of trading rises. Quoted spreads widen even when the underlying credit outlook is unchanged. This is the case most often mistaken for a credit event, and it is why a spread should be read alongside trading volumes and bid-ask widths.
+
+A practical way to separate them is to compare the issuer's spread against both a broad index and a sector index. A spread that widens against all three is a market story; one that widens only against the broad index is likely a sector story; one that widens against the sector too is likely firm-specific. None of these is a precise decomposition, but the comparison is more informative than a single number.
+
+## What the spread does not tell you
+
+Three limits deserve clear statement.
+
+**It is not a probability.** Inverting a spread into an implied default rate requires assumptions about recovery and risk premia. Without those, the number is a yield difference, not a forecast.
+
+**Ratings lag.** Bond credit ratings are structured opinions that can change after market prices have moved. A stable rating alongside a widening spread is information, not a contradiction.
+
+**Indices are not your bond.** A published spread series covers a basket of issuers. The spread on a specific company's bond can differ substantially, especially if its maturity, seniority, or liquidity differs from the index.
+
+The counterargument to watching spreads at all — that the market is noisy and often wrong — is partly fair. The useful response is to treat a spread as a signal to investigate the issuer and the liquidity conditions, not as a verdict to trade on.
+
+## A decision test
+
+1. **Quote the spread with its benchmark** — same maturity and currency, with the date and series named.
+2. **Separate a rate move from a credit move** before interpreting a price change.
+3. **Check the rating and its recent changes**, and note when it disagrees with the spread.
+4. **Consider liquidity** — ask whether the spread widened because of credit or because the bond became harder to trade.
+5. **Use dated data** from a primary source such as FRED, not an undated quote.
+6. **Treat the spread as a signal** to investigate, not as a default probability.
+7. **Distinguish the index from your holding** before applying a market-level observation to a specific bond.
+
+For the fixed-income mechanics, see [Fixed Income Markets](/articles/fixed-income-markets-bonds-yields-and-duration-risk); for the broader rate context, see [Central Banking](/articles/central-banking-monetary-policy-inflation-targeting-and-financial-stability).
+
+## Further Reading
+
+- Wikipedia contributors, 2026. [Credit spread - Wikipedia](https://en.wikipedia.org/wiki/Credit_spread) — The difference between a risky bond yield and a comparable risk-free yield, and what a widening spread signals; a secondary reference used with FRED and investor-education material.
+- Wikipedia contributors, 2026. [Bond credit rating - Wikipedia](https://en.wikipedia.org/wiki/Bond_credit_rating) — How ratings express creditworthiness and how rating changes relate to yield spreads.
+- Federal Reserve Bank of St. Louis, 2026. [FRED economic data](https://fred.stlouisfed.org/) — The primary time-series database used for macro indicators.
+- FINRA, 2026. [Introduction to Investing (SEC Investor.gov)](https://www.investor.gov/introduction-investing) — Regulator explanation of market mechanics, bonds, and investor protection.

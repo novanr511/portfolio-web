@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 185 tracked articles — 185 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 186 tracked articles — 186 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -199,6 +199,7 @@
 | **P-193** | Technical Interviews That Test Systems Thinking, Not Recall | Career, Productivity & Professional Development | Analysis / Decision Guide | `Ready` | `src/content/articles/technical-interviews-that-test-systems-thinking.mdx` | 2026-11-17 | New article: 1,256 words. Structured interviewing from Google re:Work, task grounding from O*NET; worked four-candidate rubric; failure modes and limits; decision test. One new source verified. |
 | **P-194** | Retail Media Networks: When the Retailer Becomes the Advertising Channel | Industry Insights, Retail & Consumer Trends | Analysis / Decision Guide | `Ready` | `src/content/articles/retail-media-networks.mdx` | 2026-11-17 | New article: 1,286 words. First-party data, point-of-purchase context and onsite/offsite/in-store split from IAB and secondary industry overview; labeled worked CTR/revenue example with incrementality caveat; decision test. Three new sources verified. |
 | **P-195** | Returns and Reverse Logistics: The Hidden Cost of Online Shopping | Industry Insights, Retail & Consumer Trends | Analysis / Decision Guide | `Ready` | `src/content/articles/returns-and-reverse-logistics.mdx` | 2026-11-17 | New article: 1,361 words. Five-stage reverse chain and disposition routes from reverse-logistics overview; labeled worked return-cost example (20% rate, 15% contribution reduction) with Census Q2 2026 channel context; decision test. One new source verified. |
+| **P-196** | Credit Spreads: What Corporate Bond Yields Add to the Risk-Free Rate | Markets, Economics & Emerging Industries | Analysis / Decision Guide | `Ready` | `src/content/articles/credit-spreads-what-corporate-yields-add.mdx` | 2026-11-17 | New article: 1,384 words. Spread = risky yield minus benchmark; worked price example separating rate from credit moves (both to a 7% yield); three causes of widening; decision test. Two new sources verified. |
 
 ---
 
@@ -221,6 +222,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AR (New article titles, final cluster — 2026-11-17):** The ninth and final title from the gap-analysis shortlist drafted: *Credit Spreads*, using FRED, investor-education material and secondary references for spread and rating structure. All nine titles from the shortlist are now drafted with labeled hypothetical worked examples and decision tests. Two new sources added; all 227 verify.
 - **Batch AQ (New article titles, cluster 6 — 2026-11-17):** Two retail articles drafted. *Retail Media Networks* uses IAB and a secondary industry overview; *Returns and Reverse Logistics* uses a reverse-logistics overview with dated Census channel data. Both use labeled hypothetical worked examples and close with a decision test. Three new sources added; all 225 verify.
 - **Batch AP (New article titles, cluster 5 — 2026-11-17):** Two new articles drafted. *Reading Financial Statements* uses stable secondary references for statement structure with a clearly labeled hypothetical example; *Technical Interviews* uses Google re:Work and O*NET. Both close with a decision test. Five new sources added; all 222 verify.
 - **Batch AO (New article titles, cluster 4 — 2026-11-17):** Two new articles drafted. *Human in the Loop by Design* anchors on NIST AI RMF, the Microsoft CHI guidelines and model cards; *Build, Buy, or Integrate* on AWS Well-Architected, OpenSSF and O*NET. Both use labeled hypothetical worked examples and close with a decision test. One new source added; all 217 verify.
