@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 183 tracked articles — 183 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 185 tracked articles — 185 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -197,6 +197,8 @@
 | **P-191** | Build, Buy, or Integrate: A Decision Framework for Software Capabilities | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/build-buy-or-integrate-decision-framework.mdx` | 2026-11-17 | New article: 1,351 words. Control/maintenance/switching-cost frame using AWS Well-Architected, OpenSSF and O*NET; labeled three-year cost example; compliance as a floor; decision test. No new sources. |
 | **P-192** | Reading Financial Statements Without an Accounting Background | Business, Strategy & Entrepreneurship | Analysis / Decision Guide | `Ready` | `src/content/articles/reading-financial-statements-without-an-accounting-background.mdx` | 2026-11-17 | New article: 1,331 words. Three statements and the accounting equation; labeled worked profit-versus-cash example (200k profit, -80k operating cash); notes-reading guide; decision test. Four new sources verified. |
 | **P-193** | Technical Interviews That Test Systems Thinking, Not Recall | Career, Productivity & Professional Development | Analysis / Decision Guide | `Ready` | `src/content/articles/technical-interviews-that-test-systems-thinking.mdx` | 2026-11-17 | New article: 1,256 words. Structured interviewing from Google re:Work, task grounding from O*NET; worked four-candidate rubric; failure modes and limits; decision test. One new source verified. |
+| **P-194** | Retail Media Networks: When the Retailer Becomes the Advertising Channel | Industry Insights, Retail & Consumer Trends | Analysis / Decision Guide | `Ready` | `src/content/articles/retail-media-networks.mdx` | 2026-11-17 | New article: 1,286 words. First-party data, point-of-purchase context and onsite/offsite/in-store split from IAB and secondary industry overview; labeled worked CTR/revenue example with incrementality caveat; decision test. Three new sources verified. |
+| **P-195** | Returns and Reverse Logistics: The Hidden Cost of Online Shopping | Industry Insights, Retail & Consumer Trends | Analysis / Decision Guide | `Ready` | `src/content/articles/returns-and-reverse-logistics.mdx` | 2026-11-17 | New article: 1,361 words. Five-stage reverse chain and disposition routes from reverse-logistics overview; labeled worked return-cost example (20% rate, 15% contribution reduction) with Census Q2 2026 channel context; decision test. One new source verified. |
 
 ---
 
@@ -219,6 +221,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AQ (New article titles, cluster 6 — 2026-11-17):** Two retail articles drafted. *Retail Media Networks* uses IAB and a secondary industry overview; *Returns and Reverse Logistics* uses a reverse-logistics overview with dated Census channel data. Both use labeled hypothetical worked examples and close with a decision test. Three new sources added; all 225 verify.
 - **Batch AP (New article titles, cluster 5 — 2026-11-17):** Two new articles drafted. *Reading Financial Statements* uses stable secondary references for statement structure with a clearly labeled hypothetical example; *Technical Interviews* uses Google re:Work and O*NET. Both close with a decision test. Five new sources added; all 222 verify.
 - **Batch AO (New article titles, cluster 4 — 2026-11-17):** Two new articles drafted. *Human in the Loop by Design* anchors on NIST AI RMF, the Microsoft CHI guidelines and model cards; *Build, Buy, or Integrate* on AWS Well-Architected, OpenSSF and O*NET. Both use labeled hypothetical worked examples and close with a decision test. One new source added; all 217 verify.
 - **Batch AN (New article titles, cluster 3 — 2026-11-17):** Two new statistics articles drafted. *Confidence Intervals and p-values* uses NIST and the ASA statement; *Missing Data* uses pandas, scikit-learn and the leakage guidance. Both use labeled hypothetical worked examples and close with a decision test. Four new sources added; all 216 verify. The GDPR registry URL was switched to a stable HTML rendering after EUR-Lex began returning empty titles to automated checks.
