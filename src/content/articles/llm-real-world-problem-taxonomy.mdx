@@ -1,0 +1,94 @@
+---
+title: "What LLMs Actually Solve in the Real World: A Task Taxonomy"
+description: "LLMs are useful on specific shapes of work, not on jobs in general. Read six task types with vendor-documented examples, a worked support workflow, and the limits."
+date: 2026-11-17
+tags:
+  - LLM
+  - AI
+  - Automation
+  - Business
+---
+
+The claim "AI will transform work" is too broad to be useful. A more practical question is which *tasks* on a given day are the shape of problem a language model can actually solve — and what happens to the ones it cannot. The answer is a taxonomy of task types, not a list of job titles.
+
+**Direct answer:** LLMs are useful on work that involves classifying text, extracting or summarising it, generating a constrained first draft, conversing with context, reasoning over multiple steps with tools, and writing or reviewing code. Anthropic publishes production guides for "ticket routing", "customer support agents", "content moderation", "legal summarization" and "commerce agents" — concrete instances of these types. The boundary: adoption is not the same as productivity, and a METR randomized trial found early-2025 tools made experienced developers slower before later data reversed that result. A task taxonomy tells you where to look; measurement tells you whether it works.
+
+## Six task types
+
+**1. Classification and routing.** Assign a label to an input and send it somewhere. Anthropic's ticket-routing guide describes "using Claude to classify and route customer support tickets at scale". This is a good first LLM task because the output is small, the error is recoverable, and accuracy can be measured against existing labels.
+
+**2. Extraction and summarisation.** Pull structured facts out of unstructured text or condense a long document. The "legal summarization" guide describes summarising documents "to extract key information and expedite research". The value is highest when the alternative is a person reading everything.
+
+**3. Constrained generation.** Produce a first draft within a defined format and tone — a reply, a product description, a report section. The key word is *first*: a human checks it. Generated text that goes out unreviewed is a different risk category.
+
+**4. Contextual conversation.** Maintain a coherent exchange using prior context and tools. The "customer support agent" guide covers "intelligent, context-aware chatbots". The difficulty is not producing a plausible answer but knowing when to hand off to a person.
+
+**5. Multi-step agentic work.** Decide a sequence of actions, call tools, and use results to continue. The "commerce agent" guide offers an open-source blueprint built on the Messages API and the Claude Agent SDK. This type has the largest upside and the largest failure surface — each step can fail, and errors compound.
+
+**6. Code assistance.** Generate, explain, review, and debug code. The capability is real and so is the caution: METR's trial of early-2025 tools found a 19% slowdown among experienced open-source developers, with the authors later noting that newer data no longer showed the same effect. Both findings are evidence for measuring your own workflow.
+
+## What adoption data does and does not show
+
+Bick, Blandin and Deming's NBER working paper reports that "as of late 2024, nearly 40 percent of the U.S. population age 18-64 uses generative AI", with "23 percent of employed respondents" having used it for work at least once in the previous week and 9% every workday. The paper adds that work adoption was "as fast as the personal computer", and overall adoption faster than PCs or the internet.
+
+Three cautions follow:
+
+- **Use is not transformation.** Trying a tool at work and redesigning a workflow around it are different events. The 23% figure measures the former.
+- **Adoption is not productivity.** The METR result is the clearest counterexample: under the right conditions, using the tool slowed experienced workers down.
+- **Averages hide distribution.** An aggregate time saving can coexist with some roles becoming much harder, as the jobs-and-AI literature discussed elsewhere shows.
+
+An Anthropic guide is also a statement of possibility, not a deployed result: it shows how to build a ticket router, not that every organisation's router will work.
+
+## A worked example of a support workflow
+
+The following numbers are hypothetical and illustrative.
+
+A support team handles 3,000 tickets a day. Manual handling averages 12 minutes per ticket — 36,000 minutes, or 600 hours, requiring about 75 agents at 8 productive hours each.
+
+A proposed LLM workflow classifies and drafts replies, with a human reviewing before sending. Assume the classifier handles 70% of tickets in a route that takes 5 minutes of human review, while the remaining 30% stay at 12 minutes:
+
+- Routed: 2,100 × 5 = 10,500 minutes.
+- Complex: 900 × 12 = 10,800 minutes.
+- Total: 21,300 minutes ≈ 355 hours, about 44 agents.
+
+A saving of roughly 31 agents looks compelling. Now add three realistic frictions:
+
+1. **Misrouting.** If 5% of the routed tickets go to the wrong queue and need rework averaging 5 minutes, add 2,100 × 0.05 × 5 ≈ 525 minutes — about 9 hours.
+2. **Review quality.** If reviewers skim because the queue is moving faster, the effective review time drops and the system starts sending weak replies. The "human in the loop" design problem reappears at this point.
+3. **Setup and maintenance.** Classification rules, prompt changes, and evaluation take engineering time that does not appear in the per-ticket arithmetic.
+
+Three decisions follow:
+
+- **Measure the combined system's error rate**, not the model's classification accuracy in isolation. A 95% accurate router that feeds a 90% accurate draft is not a 95% accurate workflow.
+- **Keep the handoff cheap.** If escalating to a person is slow, complex tickets become the bottleneck.
+- **Pilot on one queue.** A narrow, high-volume category with recoverable errors is a better first test than support in general.
+
+## Where the taxonomy breaks
+
+Three limits matter.
+
+**Tasks are not jobs.** A role is a bundle of tasks, and automating one changes the others. Removing drafting time may leave a person handling only the hardest cases, which is a different — and possibly more demanding — job.
+
+**Errors are not symmetric.** A wrong label in a moderation queue and a wrong figure in a legal summary have very different costs. The taxonomy says a model *can* do both; it cannot tell you whether you should let it.
+
+**The environment changes.** A workflow tuned today faces new policies, products, and adversaries tomorrow. Agentic systems in particular need monitoring and a defined stop condition, because their behaviour is not fixed at deployment.
+
+The counterargument — that these tools will keep improving, so design for the future — is reasonable. The response is not to reject current limits but to build workflows whose failure is detectable and recoverable, so improvement can be adopted safely.
+
+## A decision test
+
+1. **Name the task type** — classification, extraction, generation, conversation, agency, or code — before discussing the tool.
+2. **Check the failure cost** and whether an error is recoverable.
+3. **Find a documented example** of the same task type from a primary source.
+4. **Measure the combined system** on a labelled set of your own work.
+5. **Budget for review, handoff and maintenance**, not just inference.
+6. **Start with one narrow queue** where errors are cheap and volume is high.
+7. **Re-measure after any model change**, since the metric that mattered may move.
+
+For the current model options, see [LLM Model Landscape 2026](/articles/llm-model-landscape-2026); for the organisation-side question, see [Why AI Adoption Is Harder Than Building an AI Model](/articles/why-ai-adoption-is-harder-than-building-an-ai-model).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Erik Brynjolfsson, Danielle Li, and Lindsey R. Raymond, 2024. [The Rapid Adoption of Generative AI](https://www.nber.org/papers/w32966) — Workforce-level adoption data and the productivity-gap evidence.
+- Joel Becker, Nate Rush, Beth Barnes, David Rein (METR), 2025. [Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) — Randomized trial finding early-2025 AI tools made experienced developers 19% slower, with a 2026 update; used as a caution against assuming adoption equals productivity.

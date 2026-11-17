@@ -1,0 +1,99 @@
+---
+title: "LLM Model Landscape 2026: Comparing Flagships Without Benchmark Theatre"
+description: "The current flagships differ in price, context and modality. Read the published specs, a routing cost example, and why leaderboard rank is the wrong question."
+date: 2026-11-17
+tags:
+  - LLM
+  - AI
+  - Models
+  - Strategy
+---
+
+Choosing a model in 2026 is less like picking the smartest assistant and more like designing a portfolio. The leading models from Anthropic, OpenAI, and Google are all capable; they differ in published price, context capacity, reasoning controls, and the modalities they accept. A team that compares them only by benchmark rank will miss the variables that actually determine whether a product works and stays affordable.
+
+**Direct answer:** The current flagships are Claude Opus 5 with Claude Fable 5.2 for demanding reasoning, GPT-6 Astra with cheaper Sol and Luna tiers, and Gemini 4 Carbon with Argon and Hydrogen variants. Anthropic's docs state that "all current models support text and image input, text output, multilingual capabilities, vision, and tool use"; OpenAI publishes list prices of 10/50 dollars per million input/output tokens for Astra and 2/10 for GPT-6.1 Sol; Google lists a 1M-token context across the Gemini 4 family with text, image, audio, video and PDF inputs. The boundary: these are published specifications, not proof that any model will perform well on *your* task — that requires your own evaluation.
+
+## What the three families actually publish
+
+**Anthropic.** The model overview names Claude Opus 5 as the default recommendation, with "Claude Fable 5.2" for "demanding reasoning and long-horizon agentic work". The lineup also includes Sonnet 5.5 and Haiku 5.5. The docs group model selection, cost optimisation, version migration and deprecation under the same section — a reminder that choosing a model is a lifecycle decision, not a one-time choice.
+
+**OpenAI.** The model catalogue is explicit about trade-offs. GPT-6 Astra is "our most capable model for the most demanding work", with input at $10 per million tokens, output at $50, a 128K maximum output, a 1.05M context window, a knowledge cutoff of 30 April 2026, and reasoning levels from low to max. Tools include functions, web search, file search and computer use. GPT-6.1 Sol is described as "near-Astra performance for complex work at a lower cost" at $2 input and $10 output per million tokens. GPT-6 Luna targets "cost-sensitive, high-volume workloads".
+
+**Google.** The Gemini 4 family leads with Carbon, "our strongest reasoning model, built for complex software engineering, multimodal knowledge work, scientific reasoning, and cybersecurity defense". Argon is the "efficient frontier reasoning model, delivering faster responses and lower token spend per turn" than Carbon. Hydrogen brings "cutting-edge intelligence to everyone" for everyday coding and agentic workflows. All three list 1M-token context, 64K/1M maximum output, and text, image, audio, video and PDF modalities.
+
+Three patterns are visible across the families:
+
+1. **Tiering is the norm.** Each provider offers a premium reasoning model and cheaper variants for volume work. The choice is no longer one model per vendor.
+2. **Context is large everywhere.** A million-token window is available across the families, so context size has stopped being a differentiator and become a baseline.
+3. **Reasoning is a control, not a hidden property.** OpenAI exposes discrete reasoning levels; Anthropic routes demanding work to a specialised model. Both treat reasoning effort as a setting you choose and pay for.
+
+## Why benchmark rank is the wrong question
+
+A leaderboard measures a model on a fixed set of tasks under fixed conditions. Your application has a different distribution, different failure costs, and different latency and budget constraints. A model that wins on aggregate reasoning may be the wrong choice for high-volume ticket classification, and a cheaper tier may be indistinguishable from the flagship on a narrow task.
+
+The useful comparison asks four questions:
+
+- **What does the task actually require** — extraction, classification, generation, or long-horizon agency?
+- **What does a failure cost?** A misrouted support ticket is recoverable; a wrong legal summary is not.
+- **What are the latency and volume constraints?** A frontier reasoning model may be too slow for an interactive product.
+- **What do the published prices imply** at your token volumes, before any volume discounts?
+
+Benchmarks are a starting point for a shortlist. They are not evidence of deployment fit.
+
+## A worked example of model routing
+
+The following uses the published list prices from OpenAI's model catalogue and a hypothetical workload. It is a cost calculation, not a performance claim.
+
+Suppose an application consumes 10 million input tokens and 2 million output tokens a month.
+
+**All Astra:** 10 × $10 + 2 × $50 = $100 + $100 = **$200/month**.
+
+**All Sol:** 10 × $2 + 2 × $10 = $20 + $20 = **$40/month**.
+
+The price difference is 5× on list rates. If an evaluation shows Sol is acceptable for 70% of requests and the remaining 30% genuinely need Astra's capability, the blended cost is:
+
+0.3 × $200 + 0.7 × $40 = $60 + $28 = **$88/month**, a saving of $112 or 56%.
+
+Three qualifications matter:
+
+1. **The split is an assumption.** It has to come from a labelled evaluation of your own traffic, not from a vendor's description of "near-Astra performance".
+2. **Routing has its own cost.** A classifier that decides which tier to use consumes tokens and can misroute. Its errors have to be counted.
+3. **Prices change.** These are published list prices at the time of writing; volume agreements, batch pricing, and regional differences are not included.
+
+The lesson is not "always route to the cheaper model". It is that tiering turns model selection into an engineering decision with measurable inputs — which is a better position than accepting a single flagship's bill.
+
+## What else should be in the comparison
+
+**Context capacity.** A 1M-token window allows a whole codebase or a long document set in one prompt, but capacity is not the same as reliable use of everything in the window. The retrieval literature's "lost in the middle" finding remains a caution: put the material that matters where the model can use it.
+
+**Modality.** Google lists audio and video inputs alongside text and PDF; Anthropic and OpenAI list text and image input plus vision. If your product needs to read a scanned contract or interpret a screenshot, the modality list decides the shortlist before any benchmark does.
+
+**Operational controls.** Reasoning levels, tool use, and deprecation policies belong in the evaluation. A model that is retired on short notice creates a migration project you did not plan.
+
+## What the comparison cannot settle
+
+Three limits deserve clear statement.
+
+**Specifications are not behaviour.** A published context window or reasoning level describes what the API offers, not how reliably the model will perform a specific task. Only an evaluation on your data answers that.
+
+**The landscape moves.** These lineups were current when checked; providers revise models, prices and deprecation dates. Any article — including this one — should be read with its date attached.
+
+**Cheap is not a strategy.** Choosing purely on price ignores the cost of failure, the latency of escalation, and the engineering time spent maintaining a routing layer. The blended-cost example is useful because it makes those trade-offs explicit, not because the cheapest number wins.
+
+## A decision test
+
+1. **Write the task and its failure cost** before shortlisting models.
+2. **Check the official specs** — price, context, modalities, tools, reasoning controls — with a date.
+3. **Build a small labelled evaluation set** from your own traffic.
+4. **Test the cheaper tier first** and escalate only where the evaluation shows a real gap.
+5. **Compute blended cost** with the routing assumption stated, as in the worked example.
+6. **Check latency and deprecation policy** alongside quality.
+7. **Re-run the evaluation** when the provider updates the model, not when a leaderboard changes.
+
+For the task-level view of what LLMs do well, see [What LLMs Actually Solve](/articles/llm-real-world-problem-taxonomy); for how these models are trained, see [How AI Models Are Trained](/articles/how-ai-models-are-trained-from-data-to-deployment).
+
+## Further Reading
+
+- Anthropic, 2026. [Models overview - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/models/overview) — The current Claude model lineup (Opus 5, Fable 5.2, Sonnet 5.5, Haiku 5.5), supported inputs and the official model-selection guidance.
+- OpenAI, 2026. [Models | OpenAI API](https://platform.openai.com/docs/models) — The GPT-6 lineup with published per-million-token input and output prices, context windows, reasoning levels and knowledge cutoffs.
+- Google, 2026. [Models - Gemini API | Google AI Studio](https://ai.google.dev/gemini-api/docs/models) — The Gemini 4 family (Carbon, Argon, Hydrogen), 1M-token context and multimodal inputs including audio, video and PDF.
