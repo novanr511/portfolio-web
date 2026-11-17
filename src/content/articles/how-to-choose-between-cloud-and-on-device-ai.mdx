@@ -1,10 +1,77 @@
 ---
 title: "How to Choose Between Cloud and On-Device AI"
-description: "Reserved high-intent title for a future NOVANDRI article: How to Choose Between Cloud and On-Device AI."
+description: "The choice trades capability, cost, privacy, and latency. Read the four constraints, a worked decision, and why hybrid is often the answer."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Edge AI
+  - Infrastructure
+  - Decision Guide
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+The cloud-versus-device debate is usually framed as privacy versus capability. That is only two of four constraints. Latency, cost, and operational capacity matter just as much, and the right answer is often a split: small tasks on device, hard tasks in the cloud.
+
+**Direct answer:** Choose on-device when data residency, offline availability, or tight latency dominates and a sufficiently small model can do the task. Choose cloud when capability, model freshness, or elastic scale matters more. Google lists 1M-token context and multimodal inputs in its Gemini 4 family, which illustrates the capability available in the cloud; AWS's cost guidance supplies the discipline for attributing the expense. The boundary: a hybrid design is usually better than a single choice, provided the routing between tiers is measured.
+
+## Four constraints
+
+**Capability.** Frontier models offer reasoning, long context, and multimodal input that a device model cannot match. If the task needs those, the cloud is effectively the only option.
+
+**Privacy and residency.** Some data cannot leave a boundary, by policy or by law. On-device processing removes the transfer, though the device itself still needs protection. The data-privacy article covers the regulatory side.
+
+**Latency and availability.** A local model has no network round trip and works offline. A cloud model depends on connectivity and provider availability.
+
+**Cost and operations.** Cloud inference is metered with no hardware to manage; on-device requires hardware, model updates, and a maintenance path. The GPU article and the cost estimator cover the economics.
+
+## A worked decision example
+
+The following is hypothetical and illustrative.
+
+A company builds a note-taking app with two AI features: automatic transcription of voice notes and summarisation of long documents.
+
+**Feature 1 — transcription.** The model runs on the device. Data stays local, the feature works offline, and latency is low. A smaller model is sufficient for the task. Cost per user is a one-time hardware requirement rather than an ongoing charge.
+
+**Feature 2 — document summarisation.** The model runs in the cloud. Documents can be long, the task benefits from frontier reasoning, and summaries are requested less frequently. The 1M-token context available in current cloud models makes a whole-document approach possible, as the long-context article discusses.
+
+Three decisions follow:
+
+1. **Split by task, not by product.** A single architecture for both features would either sacrifice privacy on transcription or accept weak summarisation.
+2. **Route explicitly.** The app must decide where each request goes based on task type, with a fallback when the cloud is unavailable.
+3. **Measure both paths.** On-device latency and cloud cost need separate metrics. A hybrid design with no measurement is two unmanaged systems.
+
+The trade-off is clear: the company accepts cloud cost and data transfer for summarisation to gain capability, and accepts device constraints for transcription to gain privacy and offline use.
+
+## What on-device does not solve
+
+**It does not remove security obligations.** A device can be lost or compromised. Local models and cached data need protection.
+
+**It does not stay current for free.** Updates must be delivered and applied. A model that ages on a device produces stale behaviour.
+
+**It is not always cheaper.** The hardware cost is borne per user, and low utilisation wastes it. The cloud's metered model can be cheaper for infrequent tasks.
+
+## What the cloud does not solve
+
+**It does not remove latency.** Network round trips and provider queuing affect response time, as the HTTP/3 article explains at the transport layer.
+
+**It does not remove accountability.** A provider's outage or model change is still your product's problem. The stop condition and owner in the governance checklist apply to external models too.
+
+**It does not guarantee better answers on every task.** A small, task-specific local model can outperform a frontier model on a narrow, well-defined job, as the task-taxonomy article argues.
+
+The counterargument — that devices will soon run frontier models — is plausible and does not change the method. Re-evaluate the four constraints when hardware changes; do not assume the answer is permanent.
+
+## A decision test
+
+1. **Name the task** and its capability requirement.
+2. **Check residency and privacy constraints** before anything else.
+3. **Measure latency** on the actual device and network.
+4. **Price both paths** at your real volume, as in the worked example.
+5. **Assess operational capacity** for model updates and monitoring.
+6. **Split by task** where a hybrid fits, and define the routing rule.
+7. **Re-evaluate when hardware or models change.**
+
+For the deployment context, see [Edge AI](/articles/edge-ai-model-compression-quantization-and-on-device-inference); for the cost side, see [Cloud Cost Optimization](/articles/cloud-cost-optimization-finops-right-sizing-and-reserved-instances).
+
+## References & Further Reading
+
+- Google. [Gemini API Models](https://ai.google.dev/gemini-api/docs/models) — Current cloud-model context and modality specifications.
+- Amazon Web Services. [Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — The discipline of attributing cloud spend to workloads.

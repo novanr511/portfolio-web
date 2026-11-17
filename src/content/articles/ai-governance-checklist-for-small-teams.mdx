@@ -1,10 +1,91 @@
 ---
 title: "AI Governance Checklist for Small Teams"
-description: "Reserved high-intent title for a future NOVANDRI article: AI Governance Checklist for Small Teams."
+description: "Governance is not a department. Read the seven decisions a small team must make before deploying AI, with a worked example."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Governance
+  - Risk
+  - Management
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Small teams often treat governance as something a larger company does later. The result is a system with no owner, no record of its limits, and no way to stop it when it fails. NIST's AI Risk Management Framework is voluntary and lightweight by design, which makes it usable without a compliance department.
+
+**Direct answer:** A small team needs seven decisions recorded: the use case, the accountable owner, the evaluation evidence, the known limits, the stop condition, the review trigger, and the documentation that travels with the system. NIST's framework is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems"; model cards supply the artefact for recording intended use and evaluation conditions. The boundary: a checklist creates evidence and accountability, not safety — the decisions still have to be honest.
+
+## Seven decisions
+
+**1. Use case and boundary.** What decision does the system support, and where does it stop? A clear boundary makes every other decision easier.
+
+**2. Accountable owner.** A named person who can answer for the system and has authority to stop it. Without this, escalation stalls.
+
+**3. Evaluation evidence.** What was measured, on what set, and with what result? A demo is not evidence; a labelled test set is.
+
+**4. Known limits.** Where does performance degrade, which groups were underrepresented, and what conditions were not tested? A model card records this alongside intended use.
+
+**5. Stop condition.** What observable signal means the system should be paused? A threshold on an error metric is better than a feeling.
+
+**6. Review trigger.** What event causes re-evaluation — a model update, a data change, a new regulation? Tie it to change, not a calendar.
+
+**7. Documentation that travels.** The card and the evaluation result must be reachable from where the system is used, not filed elsewhere.
+
+## A worked example
+
+The following is hypothetical and illustrative.
+
+A five-person team deploys an assistant that drafts customer replies. The governance record is one page:
+
+- **Use case:** draft replies for Tier-1 billing questions; no autonomous sending.
+- **Owner:** the support lead, who can disable the tool.
+- **Evidence:** 200 labelled historical questions; 92% of drafts accepted without factual change; refusal rate on out-of-scope questions 98%.
+- **Limits:** not evaluated for non-English queries; performance on refund disputes below the acceptance threshold.
+- **Stop condition:** accepted-without-change rate falls below 85% for two consecutive weeks, or any compliance complaint traces to a draft.
+- **Review trigger:** any model version change or knowledge-base update.
+- **Documentation:** the page is linked in the support tool next to the draft button.
+
+Three properties make this work:
+
+1. **Every entry is checkable.** "Accepted-without-change rate" is a metric; "generally works well" is not.
+2. **The stop condition is observable.** A team does not have to debate whether things are bad enough.
+3. **The limits name a specific gap.** "Not evaluated for non-English" tells the support lead what to watch, rather than implying universal coverage.
+
+Three consequences follow from having the record: an incident can be traced to a decision, a new team member can understand the system in minutes, and a model update triggers a defined re-test instead of an argument.
+
+## Keeping the record alive
+
+A one-page record is easy to write and easy to forget. Three practices keep it useful:
+
+**Review it at change points.** Tie the review to a model update, a new data source, or a change in the product's scope. These are the moments when the original decisions stop matching the system. A calendar review that happens without a change produces a document nobody reads.
+
+**Keep the evidence beside the claim.** If the record says 92% acceptance, link to the evaluation run that produced the number. A figure without its method becomes folklore after one staff change.
+
+**Make the stop condition visible in the tool.** A threshold recorded in a document is easy to ignore; a dashboard next to the feature is harder to miss. The design principle is the same as in observability: put the signal where the decision happens.
+
+These practices are small, but they distinguish a governance record from a governance performance. The point is not to have a page; it is to have decisions that can be checked when something goes wrong.
+
+## What a checklist cannot do
+
+**It cannot make a bad system good.** If the evaluation is weak, the checklist records that weakness honestly — which is useful, but not the same as fixing it.
+
+**It is not certification.** NIST's framework is voluntary. Calling a system "governed" because a page exists would repeat the mistake the framework's measurement emphasis is meant to prevent.
+
+**It needs an owner who acts.** A stop condition that nobody enforces is a sentence in a document. The authority to stop is part of the decision, not an assumption.
+
+The counterargument — that small teams move too fast for governance — is backwards. A one-page record with seven decisions takes an hour and prevents the expensive kind of slowing down: an incident with no explanation and no owner.
+
+## A decision test
+
+1. **Write the use case and its boundary** in one sentence.
+2. **Name the owner** and confirm their authority to stop the system.
+3. **Record the evaluation** with its set size and result.
+4. **List the limits** with specific conditions, not general caveats.
+5. **Define a stop condition** that can be observed.
+6. **Name the review triggers** tied to change.
+7. **Place the documentation** where the system is used.
+
+For the framework, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale); for the artefact, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## References & Further Reading
+
+- NIST. [AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — The voluntary framework for trustworthiness across design, development, use and evaluation.
+- Margaret Mitchell et al., 2019. [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) — Intended use, evaluation conditions and known limits as a documented artefact.

@@ -1,10 +1,97 @@
 ---
 title: "AI Translation: Where It Works and Where It Fails"
-description: "Reserved high-intent title for a future NOVANDRI article: AI Translation: Where It Works and Where It Fails."
+description: "Machine translation is reliable for some content and risky for others. Read the failure modes, a worked quality check, and where to keep a human."
 date: 2026-11-17
 tags:
-  - Planned
-  - HighIntent
+  - AI
+  - Translation
+  - NLP
+  - Localization
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Machine translation works well enough that teams often treat it as solved, then discover a contract with the wrong legal term or a support article that instructs users to do the opposite. The technology is uneven: it is strong on common language pairs and routine content, and weak where context, terminology, or stakes are high.
+
+**Direct answer:** Neural machine translation, built on the transformer architecture described in "Attention Is All You Need", produces fluent translations by learning patterns from parallel text. Current multimodal models extend this across formats. The boundary: fluency is not accuracy — translations can be confident and wrong, especially with rare terminology, ambiguous source text, or domain-specific content — so quality assessment and human review remain necessary.
+
+## Where it works
+
+**High-volume, low-stakes content.** Product descriptions, internal documentation, and routine support articles translate well when the source is clear and the terminology is simple.
+
+**Common language pairs with abundant training data.** The quality of a translation system depends heavily on the amount of parallel text available for the pair.
+
+**Gisting.** Understanding the broad meaning of a foreign-language document is a task machines do well, even when a publishable translation would need work.
+
+## Where it fails
+
+**Ambiguous source text.** A sentence with two plausible meanings will be translated according to the model's guess. The ambiguity was in the source, and the translation hides it.
+
+**Domain terminology.** Legal, medical, and technical terms have precise equivalents that general-purpose systems may render with a plausible but wrong word. A term base and reviewed examples help.
+
+**Culture and register.** A translation can be correct and inappropriate — wrong level of formality, unsuitable examples, or an idiom that does not travel.
+
+**Low-resource languages.** Less parallel text means weaker models. Quality varies sharply by language pair, which is why a single global quality claim is meaningless.
+
+The transformer architecture gives the model a way to attend across the source sentence, which is why modern translation is fluent. It does not give the model knowledge of your domain or your reader.
+
+## A worked quality check
+
+The following is hypothetical and illustrative.
+
+A company translates 500 support articles into three languages. A full human translation costs 50 per article; machine translation with review costs 12.
+
+A quality process has three steps:
+
+1. **Automated check on terminology.** A list of 40 product terms must appear with their approved equivalents. Any deviation is flagged.
+2. **Human review of a sample.** 10% of articles are reviewed by a native speaker against a rubric: accuracy, terminology, register, and completeness.
+3. **Back-translation spot check.** A sample is translated back to the source language and compared, to catch omissions that a reviewer might miss when reading only the target.
+
+Three outcomes are possible:
+
+- If the terminology check passes and the sample review scores above the threshold, publish the machine translation with light review.
+- If terminology fails, fix the term base and re-run — this is a configuration problem, not a model problem.
+- If register or completeness fails, increase the human review share for that language pair, since the model is not reliable there.
+
+Three lessons follow:
+
+- **Quality is measured per language pair**, not globally.
+- **The term base is the highest-leverage control** for domain content.
+- **A review sample is cheaper than full review** and gives evidence for where full review is needed.
+
+## Choosing a workflow by stakes
+
+The cost of a wrong translation varies enormously, and the workflow should follow it:
+
+**Gisting workflows** — understanding the general meaning of incoming messages — need no human review. The risk of a wrong nuance is low because the reader is using the translation to decide what to do next, not to quote it.
+
+**Routine publication** — help articles, marketing copy, product descriptions — needs a sampled review and a term base. Errors here are visible to customers and damage trust, but they can be fixed after discovery.
+
+**Contractual and regulated content** — terms, policies, safety information, legal text — needs full human review by a qualified translator. The cost of a wrong term is not proportional to the size of the text; one word can change an obligation.
+
+A team that applies one workflow to all three either overspends on gisting or under-protects contractual content. Splitting by stakes is the practical application of the worked example above, and it is why a blanket "we use AI translation" policy is not a decision.
+
+## What translation quality means
+
+**Fluency and adequacy are different.** A translation can read smoothly and convey the wrong meaning. A rubric should score them separately, as the evaluation-rubric article argues.
+
+**Back-translation is a diagnostic, not a proof.** It catches omissions and gross errors; it can also produce a smooth round trip that hides a shared mistake.
+
+**Human review needs context.** A reviewer who knows the product and the audience catches errors a general bilingual reviewer misses.
+
+The counterargument — that translation quality has improved enough to skip review — is true for some content and false where errors are expensive. The decision should be based on a measured sample, not on the model's reputation.
+
+## A decision test
+
+1. **Classify the content** by stakes — gisting, routine publication, or contractual.
+2. **Measure quality per language pair** on a sample from your own content.
+3. **Build a term base** for domain-specific vocabulary.
+4. **Score fluency and adequacy separately.**
+5. **Use back-translation as a diagnostic** for omissions.
+6. **Keep human review** for high-stakes and low-resource pairs.
+7. **Re-measure after a model update**, since quality changes between versions.
+
+For the localization context, see [International Expansion](/articles/international-expansion-localization-gtm-adaptation-and-compliance); for the evaluation method, see [How to Write an AI Evaluation Rubric](/articles/how-to-write-an-ai-evaluation-rubric).
+
+## References & Further Reading
+
+- Ashish Vaswani et al., 2017. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — The transformer architecture that underpins modern neural translation.
+- Google. [Gemini API Models](https://ai.google.dev/gemini-api/docs/models) — Current multimodal model specifications relevant to translation across formats.
