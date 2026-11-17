@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 200 tracked articles — 200 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 202 tracked articles — 202 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -214,6 +214,8 @@
 | **P-208** | Brand Consistency Across Channels: What Must Match | Marketing, Growth & Consumer Psychology | Analysis / Decision Guide | `Ready` | `src/content/articles/brand-consistency-across-channels.mdx` | 2026-11-17 | New article: 1,267 words. Promise/voice/identifiers frame with brand-management and marketing-communications overviews; hypothetical six-touchpoint audit; ownership patterns; decision test. Two new sources verified. |
 | **P-209** | Working Capital: The Cash Constraint Growth Companies Miss | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/working-capital-management-growth.mdx` | 2026-11-17 | New article: 1,180 words. Cash conversion cycle from working-capital references; worked growth example (55-day cycle, 2.75m to 4.125m tied up) with three levers; financing options; decision test. Three new sources verified. |
 | **P-210** | Cost of Capital for Private Companies: A Practical Estimate | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/cost-of-capital-private-companies.mdx` | 2026-11-17 | New article: 1,191 words. WACC components from Wikipedia and Damodaran; worked private-company estimate (9.85%) with size-premium sensitivity; uses of the estimate; decision test. Three new sources verified. |
+| **P-211** | Revenue Recognition: What Investors Watch in the Notes | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/revenue-recognition-investors.mdx` | 2026-11-17 | New article: 1,254 words. IFRS 15 five-step model and recognition principle; worked bundled-contract example (120k allocated, 80k year-one revenue); disclosure red flags; decision test. Two new sources verified. |
+| **P-212** | How Inflation Affects Valuation Multiples | Finance & Markets | Analysis / Decision Guide | `Ready` | `src/content/articles/inflation-and-valuation-multiples.mdx` | 2026-11-17 | New article: 1,147 words. Three inflation channels into P/E, worked depreciation-adjusted example (15x to 18.75x), nominal/real consistency; decision test. Five new sources verified. |
 
 ---
 
@@ -236,6 +238,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AZ (Expanded focus, cluster 8 — 2026-11-17):** Two finance articles drafted. *Revenue Recognition* uses IFRS 15 and a secondary overview with a bundled-contract example; *Inflation and Valuation Multiples* uses valuation, P/E and inflation references with a depreciation-adjustment example. Five new sources added; all 262 verify.
 - **Batch AY (Expanded focus, cluster 7 — 2026-11-17):** Two finance articles drafted. *Working Capital* and *Cost of Capital for Private Companies* use secondary references plus Damodaran data, each with a labeled worked calculation and sensitivity analysis. Five new sources added; all 257 verify.
 - **Batch AX (Expanded focus, cluster 6 — 2026-11-17):** Two brand and strategy articles drafted. *Category Design* uses blue-ocean and product-category overviews with Porter; *Brand Consistency* uses brand-management and communications overviews. Both include labeled worked audits and decision tests. Four new sources added; all 252 verify.
 - **Batch AW (Expanded focus, cluster 5 — 2026-11-17):** Two marketing articles drafted. *Email Deliverability* is built on IETF RFCs and a provider guideline; *Influencer Marketing Measurement* on secondary overviews with an explicit attribution-versus-incrementality frame. Both include labeled worked examples and decision tests. Six new sources added; all 248 verify.
