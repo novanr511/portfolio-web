@@ -1,64 +1,69 @@
 ---
 title: "Reinforcement Learning: Q-Learning, Policy Gradients, and Applications"
-description: "Reinforcement learning trains agents to make sequential decisions. Learn Q-learning, policy gradients, actor-critic, and real-world applications."
+description: "RL learns behaviour from consequences, not examples. Read the two families, the sample-efficiency problem, and where the method actually applies."
 date: 2026-11-16
 tags:
   - Reinforcement Learning
-  - Q-Learning
-  - Policy Gradients
-  - AI
   - Machine Learning
+  - Deep Learning
+  - AI
 ---
 
-RL learns by interacting with an environment, not from static datasets.
+Reinforcement learning is usually introduced with games, and the examples are memorable, but they obscure the method's actual shape. An RL agent is not given the right answer; it is given a measure of how well it is doing and must discover behaviour that improves that measure. That makes the central problem different from supervised learning: the data depends on the actions the agent chooses, so the agent has to decide what to try as well as what to learn.
 
-**Direct answer:** Reinforcement Learning (RL) trains an agent to maximize cumulative reward through trial-and-error interaction with an environment. Core approaches: value-based (Q-learning, DQN), policy-based (REINFORCE, PPO), and actor-critic (A2C, A3C, SAC). RL excels in sequential decision-making: robotics, games, trading, recommendation, resource allocation.
+**Direct answer:** The field divides broadly into value-based methods, which learn how good it is to take an action in a state, and policy-gradient methods, which learn a parameterised behaviour directly. Deep Q-learning established that control policies can be learned from raw sensory input; PPO made policy gradients practical by allowing multiple updates per batch of experience; and human-preference methods showed that the reward signal can come from comparisons rather than a hand-written function. The binding constraint across all of them is sample efficiency — how much interaction is needed to learn something useful — which is why most real-world applications are in simulation or in domains where mistakes are cheap.
 
-## RL fundamentals
+## The loop and the credit problem
 
-**Markov Decision Process (MDP):** states (S), actions (A), transition dynamics P(s'|s,a), reward function R(s,a), discount factor γ ∈ [0,1].
+An RL loop has a small number of parts: an agent observes a state, takes an action, receives a reward and a new state, and repeats. The objective is not the immediate reward but the discounted sum of future rewards, which introduces the central difficulty — credit assignment.
 
-**Objective:** maximize expected discounted return G = Σ γ^t r_t.
+If a chess player wins on move forty, which of the preceding moves deserved the credit? The same problem appears in any sequential task where consequences arrive late. Value-based and policy-gradient methods attack it from different directions.
 
-**Value functions:** V(s) = expected return from state s. Q(s,a) = expected return from state s taking action a.
+**Value-based methods** learn a value function: the expected return from a state, or from a state-action pair. The Q-learning line learns an action-value function directly, and the agent chooses actions by reference to it. Mnih et al. demonstrated the approach at scale with a convolutional neural network whose "input is raw pixels and whose output is a value function estimating future rewards". They applied the same architecture and learning algorithm to seven Atari 2600 games "with no adjustment", reporting that it "outperforms all previous approaches on six of the games and surpasses a human expert on three of them". The significance was not any single game; it was that one learning procedure handled seven different tasks without per-task engineering.
 
-**Bellman equations:** recursive relationships for optimal value functions.
+**Policy-gradient methods** skip the value function as the primary object and optimise the policy directly. The difficulty is that a single trajectory gives a noisy estimate, and standard methods make one gradient update per data sample, which is wasteful.
 
-## Value-based methods
+## What PPO changed
 
-**Q-learning:** off-policy TD learning. Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') - Q(s,a)].
+Schulman et al.'s Proximal Policy Optimization addresses that waste directly. The methods "alternate between sampling data through interaction with the environment, and optimizing a surrogate objective function using stochastic gradient ascent", and the paper's key contribution is "a novel objective function that enables multiple epochs of minibatch updates" — where standard policy gradients would perform one update per sample.
 
-**DQN (Deep Q-Network):** neural network approximates Q(s,a). Key innovations: experience replay (breaks correlation), target network (stabilizes targets), ε-greedy exploration.
+The result, the authors report, is a method with "some of the benefits of trust region policy optimization (TRPO), but... much simpler to implement, more general, and have better sample complexity (empirically)". Their experiments covered "simulated robotic locomotion and Atari game playing", where PPO "outperforms other online policy gradient methods".
 
-**Extensions:** Double DQN (reduces overestimation), Dueling DQN (separate value/advantage streams), Rainbow (combines improvements).
+The engineering significance is that PPO made policy gradients usable in practice, not that it introduced a new theoretical idea. Simplicity and sample efficiency are what let a method spread, and the paper's emphasis on both is why it became a default.
 
-## Policy gradient methods
+## When the reward cannot be written down
 
-**REINFORCE:** directly optimize policy π(a|s;θ) via gradient ascent: ∇θ J(θ) = E[∇θ log π(a|s;θ) G_t]. High variance, use baselines.
+Many real tasks are easy to recognise and hard to specify. "Write a helpful assistant" or "drive comfortably" are not reward functions, and a hand-written approximation is usually gamed by the optimiser.
 
-**Actor-Critic:** combines value function (critic) with policy (actor). Critic reduces variance. A2C (synchronous), A3C (asynchronous parallel).
+Christiano et al. show that goals can be defined by "(non-expert) human preferences between pairs of trajectory segments", and that the approach can solve complex RL tasks "without access to the reward function", including Atari games and simulated robot locomotion. The decisive number is the cost of oversight: feedback on "less than one percent of our agent's interactions with the environment", enough to make the approach "practically applied to state-of-the-art RL systems". They also report training "complex novel behaviors with about an hour of human time".
 
-**PPO (Proximal Policy Optimization):** clipped objective prevents large policy updates. Industry standard for continuous control.
+That result reframes human involvement. In supervised learning, humans label the answer; in preference-based RL, they compare outcomes, which is easier to provide and cheaper to scale. The method does not remove the human — it relocates the human to a comparison task that fits their actual ability.
 
-**SAC (Soft Actor-Critic):** off-policy, entropy regularization for exploration. State-of-the-art for continuous control.
+Bai et al. push the idea further in Constitutional AI: "the only human oversight is provided through a list of rules or principles". The method has a supervised phase of self-critique and revision and a reinforcement phase using "RL from AI Feedback" (RLAIF), producing an assistant that is "harmless but non-evasive" and "engages with harmful queries by explaining its objections to them". The governance consequence is that the principles become the artefact to review — a subject this publication covers in [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale).
 
-## Applications
+## Why sample efficiency dominates everything
 
-- **Games:** AlphaGo/Zero (MCTS + RL), Dota 2, StarCraft II.
-- **Robotics:** sim-to-real transfer, dexterous manipulation.
-- **Trading:** portfolio optimization, execution.
-- **Recommendation:** sequential recommendation, slate optimization.
-- **Resource scheduling:** data center cooling, traffic control.
+In a simulated game, an agent can take millions of actions. In a real factory, a hospital, or a trading system, each action has a cost and some are irreversible. That gap is why RL's most visible successes are in simulation, and why a model that learns well in simulation can fail when transferred.
 
-## Challenges
+Three properties determine whether RL is feasible in a given domain:
 
-- **Sample efficiency:** RL needs many environment interactions.
-- **Reward design:** sparse/reward shaping, specification gaming.
-- **Exploration vs exploitation:** ε-greedy, entropy regularization, curiosity-driven.
-- **Sim-to-real:** domain randomization, domain adaptation.
-- **Safety:** safe RL, constrained RL, human-in-the-loop.
+**Can you simulate it?** A sufficiently accurate simulator turns an impossible data requirement into a computable one — at the price of simulation bias, which is the risk that the agent learns to exploit the simulator rather than the task.
 
-For the related question of MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline) and model monitoring, see [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
+**Are mistakes cheap?** If a wrong action can harm a person or destroy capital, exploration has to be constrained, which removes much of the method's advantage.
+
+**Can you measure the outcome?** A reward that is delayed, sparse, or contested makes learning slow and the resulting behaviour hard to evaluate. Preference learning helps when the outcome is recognisable but not specifiable.
+
+## A decision sequence
+
+1. **State the reward in one sentence**, and check whether you can actually write it as a function. If not, consider preference-based methods.
+2. **Estimate the interaction budget.** How many actions can the system take before the cost is unacceptable?
+3. **Check whether a simulator exists**, and how closely it matches the real environment.
+4. **Choose the family deliberately** — value-based for discrete action spaces and simpler settings, policy gradients for continuous control and stochastic policies.
+5. **Start with the simplest baseline**, including a non-learning heuristic. RL should beat it, not merely run.
+6. **Evaluate on held-out episodes and on the real system separately.** Simulation performance is a design signal, not a deployment result.
+7. **Instrument the reward itself.** An optimiser will find any loophole in the objective, and the first sign is usually a metric that improves while the task does not.
+
+For the training mechanics behind these systems, see [How AI Models Are Trained](/articles/how-ai-models-are-trained-from-data-to-deployment); for the governance of reward design, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
 
 ## Further Reading
 

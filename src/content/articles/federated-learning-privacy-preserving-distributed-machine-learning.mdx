@@ -1,0 +1,107 @@
+---
+title: "Federated Learning: Privacy-Preserving Distributed Machine Learning"
+description: "Federated learning moves training to the data. Read what it actually protects, where it fails, and why it is more than a distributed system."
+date: 2026-11-16
+tags:
+  - Federated Learning
+  - Machine Learning
+  - Privacy
+  - Distributed Systems
+---
+
+Federated learning is often described as "training on data without collecting it", which is a fair slogan and an incomplete description. The data stays on the devices or institutions that collected it; what moves are model updates. That difference changes where the risk sits — and it turns out that model updates are not as inert as the slogan implies.
+
+**Direct answer:** Federated learning keeps training data distributed and learns a shared model by aggregating locally computed updates. McMahan et al. describe the motivation precisely: mobile devices hold "a wealth of data suitable for learning models", but that data "is often privacy sensitive, large in quantity, or both, which may preclude logging to the data center". Their method "leaves the training data distributed on the mobile devices, and learns a shared model by aggregating locally-computed updates" through "iterative model averaging". The limitation is that this protects the data from being collected, not necessarily from being inferred — gradients can leak information, and the system has to handle clients that are slow, unreliable, or behave differently from one another.
+
+## Why centralising is the default, and why it fails
+
+The standard ML pipeline assumes data can be moved to a place with compute. That assumption fails in three situations, all of which the founding paper names: the data is privacy-sensitive, it is too large to transfer efficiently, or it is generated on devices that are not continuously connected.
+
+A speech-recognition model improves from the text people type on their phones, and a photo model improves from the images they take. Centralising those examples means copying intimate data into a data centre, which is a legal and ethical problem as well as a technical one. Federated learning changes the direction of travel: send the model to the data, train locally, send back an update.
+
+The practical consequence is that the communication pattern is a first-class design constraint. Devices are intermittently available, connections are slow and asymmetric, and the server cannot assume it can query every client on demand. This is why the method is called *communication-efficient* — the number and size of update rounds are part of the objective, not an implementation detail.
+
+## How the aggregation actually works
+
+The founding method is iterative model averaging: a central server sends the current global model to a selection of clients, each trains locally on its own data, and the server aggregates the resulting updates — typically by averaging weighted by the amount of local data.
+
+That simplicity is the appeal and the source of the difficulty. Averaging works cleanly when clients' data are drawn from the same distribution. In practice they are not. A phone belonging to someone who writes in Japanese produces different language data from one used mostly in English; a hospital's patient mix differs from another's. This non-IID condition is the field's central technical problem, because averaging updates from heterogeneous clients can produce a global model that is worse than locally trained models.
+
+Li et al.'s FedProx addresses one version of the problem by adding a proximal term that keeps local updates closer to the global model. Kairouz et al. survey the field more broadly, framing federated learning's guarantees, privacy limits and open problems — the right starting point for understanding what the method does and does not promise.
+
+## Privacy is not automatic
+
+The most important correction to the slogan is this: keeping raw data on device does not make the resulting model private.
+
+Updates are computed from data, and a determined analyst can sometimes reconstruct information about the training examples from gradients or parameter changes. The literature on federated learning treats this as an open problem rather than a solved one, which is why secure aggregation, differential privacy, and careful handling of update metadata are often combined with the basic protocol.
+
+Three distinctions matter for a practitioner:
+
+- **Data locality** is what the method guarantees directly. Raw records are not uploaded.
+- **Update privacy** is a separate property that requires additional mechanisms.
+- **Inference privacy** concerns what the final model reveals about the population it was trained on, and it persists after training ends.
+
+A deployment that claims "privacy-preserving" because training is federated has answered only the first of these. The governance framing in [AI Ethics](/articles/ai-ethics-responsible-use-of-artificial-intelligence) applies here as elsewhere: state the property you actually provide.
+
+## The systems problems are not smaller
+
+Federated learning is a distributed system with unusually awkward constraints:
+
+**Availability.** Clients may drop out mid-round. An aggregation method that requires every client to respond will not work at scale.
+
+**Stragglers.** A slow device can determine the round time unless the system is designed to tolerate partial participation.
+
+**Selection bias.** The clients available at a given time are not a random sample of the population, which can skew the model toward the behaviour of people whose devices are awake and connected.
+
+**Communication cost.** Even small updates multiply across millions of devices, so compression, quantisation, and fewer rounds are active research concerns rather than optimisations.
+
+These are systems problems, and they interact with the statistical ones: a method that handles non-IID data well but requires many rounds may be infeasible on a slow network.
+
+## A worked example of the communication budget
+
+The arithmetic of federated learning is dominated by rounds, not by local compute. Suppose a model has one million parameters and each is transmitted as 32 bits. A full model update is four megabytes in each direction. With ten million participating devices, selecting one percent per round means 100,000 devices × 4 MB = 400 GB of upstream traffic in a single round — before compression, before error reporting, and before any retries.
+
+That number explains why the founding paper's title emphasises *communication efficiency*, and why real systems train locally for many steps between aggregation rounds. If each device performs enough local work that ten rounds reach the accuracy that a centralised model reaches in one pass over the same total data, the network cost falls by an order of magnitude. The price is the non-IID problem: longer local training on heterogeneous data pushes each client's model further from the global optimum before averaging.
+
+Two design levers follow:
+
+- **Reduce what is sent.** Quantisation, sparsification, and sending only the layers that changed reduce payload size, at the cost of approximation error in the aggregate.
+- **Reduce how often it is sent.** More local epochs per round reduce traffic, at the cost of client drift on non-IID data.
+
+A useful way to reason about the trade-off is to write down both numbers before choosing an architecture: the total bytes that must cross the network to reach a target accuracy, and the wall-clock time implied by the slowest participating clients. A design that is optimal on accuracy and infeasible on either of those is not a design.
+
+## Cross-device and cross-silo are different problems
+
+The term federated learning covers two settings whose constraints differ enough that methods do not transfer cleanly.
+
+**Cross-device** means millions of clients — phones, browsers, sensors — each with small amounts of data, intermittent availability, and no control over participation. The dominant problems are selection bias, stragglers, and communication cost. A cross-device system must assume that most clients are unavailable at any moment and that the available ones are not representative.
+
+**Cross-silo** means a small number of institutions — hospitals, banks, research centres — each with substantial data and reliable infrastructure. Here the clients are identifiable, the data is large, and the hard problems are organisational: what the shared objective is, how contributions are valued, how results are governed, and who is accountable for the model. Kairouz et al. treat these as distinct settings in their survey, and the distinction matters when evaluating a method reported in the literature.
+
+A technique that works in cross-silo — for example, requiring every participant to complete each round — is simply not available in cross-device. Conversely, a method designed for millions of unreliable clients is usually over-engineered for five hospitals with stable connections.
+
+## Where it is the right choice
+
+Federated learning fits when three conditions hold: the data genuinely cannot be centralised, the clients can compute locally, and the value of a shared model justifies the coordination cost.
+
+The clearest cases are mobile keyboard and language models, where the data is intimate and generated on-device, and cross-institution settings such as healthcare or finance, where regulation or competitive constraints prevent pooling. In the latter case the practical difficulty is often organisational — agreeing on what the shared model should optimise — rather than algorithmic.
+
+It is the wrong choice when the data can be centralised legally and cheaply. A centralised pipeline is simpler, easier to debug, and usually more accurate for the same compute. Federated learning is a cost paid for a constraint, not an upgrade.
+
+## A decision sequence
+
+1. **State the constraint** that prevents centralisation. If there is none, stop.
+2. **Separate the privacy properties**: data locality, update privacy, and inference privacy need different mechanisms.
+3. **Characterise client heterogeneity** — what makes one client's data different from another's, and how much?
+4. **Budget the communication**, not just the compute. Count rounds and payload size.
+5. **Plan for partial participation** from the first design, not as a later patch.
+6. **Evaluate against a locally trained and a centralised baseline**, and accept the accuracy cost explicitly.
+7. **Audit the final model** for what it reveals about the participating population.
+
+For the privacy framework this connects to, see [Data Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design); for the training pipeline underneath, see [How AI Models Are Trained](/articles/how-ai-models-are-trained-from-data-to-deployment).
+
+## References & Further Reading
+
+- H. Brendan McMahan et al., 2017. [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://arxiv.org/abs/1602.05629) — The motivation, the iterative model-averaging method, and the communication-efficiency framing.
+- Tian Li et al., 2020. [Federated Optimization in Heterogeneous Networks (FedProx)](https://arxiv.org/abs/1812.06127) — The proximal term approach to non-IID clients.
+- Peter Kairouz et al., 2021. [Advances and Open Problems in Federated Learning](https://arxiv.org/abs/1912.04977) — The survey of guarantees, privacy limits and open problems.

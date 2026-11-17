@@ -1,81 +1,100 @@
 ---
 title: "Edge AI: Model Compression, Quantization, and On-Device Inference"
-description: "Edge AI runs ML on devices. Learn quantization, pruning, distillation, and frameworks for efficient on-device inference."
+description: "Running a model on a device is a budget problem in memory, compute, and power. Read what each compression method actually trades away."
 date: 2026-11-16
 tags:
   - Edge AI
   - Model Compression
   - Quantization
-  - On-Device Inference
-  - ML Engineering
+  - Machine Learning
 ---
 
-Cloud is not always the answer. Edge brings intelligence to the device.
+A model that runs well in a data centre is often unusable on a phone, a camera, or a microcontroller. The obstacle is not a single limitation but a combination — memory, compute, bandwidth, heat, and battery — and the techniques that make a model fit are not interchangeable. Each one spends a different resource and introduces a different failure mode.
 
-**Direct answer:** Edge AI deploys ML models directly on devices (phones, IoT, sensors, vehicles) instead of relying on cloud inference. Benefits: low latency, privacy (data stays local), offline capability, bandwidth savings, cost reduction. Core techniques: quantization (INT8/INT4), pruning, knowledge distillation, efficient architectures. Frameworks: TensorFlow Lite, PyTorch Mobile, ONNX Runtime, Core ML, TensorRT.
+**Direct answer:** Edge AI makes models small and cheap enough to run locally. Han et al.'s deep-compression pipeline — "pruning, trained quantization and Huffman coding" — reduced storage requirements "by 35x to 49x without affecting their accuracy", with pruning cutting connections "by 9x to 13x" and quantisation reducing the bits per connection "from 32 to 5". Integer-only quantisation goes further by making inference executable on hardware without floating-point support. The constraint behind all of these is that compression is not free: it changes the numerical behaviour of the model, and the only honest evaluation is on the target hardware under the target power budget.
 
-## Why Edge AI
+## Why the data centre model does not fit
 
-- **Latency:** sub-ms inference for real-time (AR, robotics, autonomous driving).
-- **Privacy:** raw data never leaves device (face unlock, health monitoring).
-- **Bandwidth:** no video/audio upload to cloud.
-- **Availability:** works offline (maps, translation, voice assistants).
-- **Cost:** no cloud GPU inference bills.
+A modern network carries millions or billions of parameters, typically stored at 32-bit floating-point precision. At four bytes per parameter, a billion-parameter model needs roughly four gigabytes just for weights — before activations, runtime, or any other process on the device. Most phones have far less memory they can devote to one task, and embedded devices have orders of magnitude less.
 
-## Model compression techniques
+Compute is the second constraint. A data-centre accelerator performs trillions of operations per second with abundant power; a phone must run inference without draining the battery or becoming hot enough to throttle. The third constraint is connectivity: if every inference requires a round trip to a server, the system has latency, privacy, and availability problems that local inference would avoid.
 
-**Quantization:** reduce weight/activation precision.
-- **Post-training quantization (PTQ):** INT8 dynamic, static, full integer. No retraining. 4x size reduction, 2-4x speedup.
-- **Quantization-Aware Training (QAT):** simulate quantization during training. Recovers accuracy. INT4/INT2 emerging.
-- **Mixed precision:** sensitive layers FP16/INT8, others INT4/INT8.
+These constraints explain why the goal is not merely a smaller file. It is a model that fits in memory, runs within a latency budget, and stays within a thermal and power envelope — measured on real hardware.
 
-**Pruning:** remove redundant weights.
-- **Unstructured:** zero individual weights (sparse). Needs sparse hardware support.
-- **Structured:** remove channels/filters/heads (dense). Compatible with dense kernels.
-- **Iterative pruning:** prune → fine-tune → repeat.
+## The three stages of deep compression
 
-**Knowledge distillation:** train small student to mimic large teacher. Soft labels (logits) + hard labels. Temperature scaling. Self-distillation (teacher = student ensemble).
+Han et al.'s pipeline is the clearest map of the available levers:
 
-**Efficient architectures:** MobileNetV3, EfficientNet-Lite, GhostNet, ShuffleNet, MobileViT, FastViT. Designed for mobile NPUs.
+**Pruning** removes connections that contribute little. Their result reduced the number of connections "by 9x to 13x", and the mechanism is straightforward: train, identify the important weights, remove the rest, then retrain the remaining network to recover accuracy. A pruned network is sparse, and sparse computation is only faster if the hardware and runtime can exploit sparsity — otherwise the file is smaller but the work is not.
 
-## Quantization details
+**Quantisation** reduces the numerical precision of the weights. Han et al. reduced the representation of each connection "from 32 to 5 bits", with weight sharing so multiple connections use the same quantised value. The retraining step matters: they "retrain the network to fine tune the remaining connections and the quantized centroids" after the first two stages. Quantisation is usually the largest single gain in memory and often the largest gain in speed, because lower-precision arithmetic is cheaper on most hardware.
 
-**INT8 symmetric:** int8 weights, uint8/INT8 activations. Per-tensor or per-channel scale.
-**INT4:** 4-bit weights, 8-bit activations. 2x smaller than INT8. Requires GEMM support (ARM NEON, Apple Neural Engine, Qualcomm Hexagon).
-**Mixed precision:** sensitive layers (first/last, attention) higher precision.
+**Huffman coding** exploits the distribution of the quantised values. It is a lossless compression step on top of the others, so it reduces storage without further changing the model's behaviour.
 
-**Calibration:** static quantization needs representative dataset for activation ranges. ~100-500 samples.
+The combined result — 35–49× less storage without affecting accuracy — is the headline, and the qualification "without affecting accuracy" is the part to scrutinise. It applies to the tasks and models the authors evaluated, which is why a team must reproduce the measurement on its own workload.
 
-## Frameworks and deployment
+## Integer-only inference
 
-| Framework | Platform | Quantization | Hardware Acceleration |
-|---|---|---|---|
-| TensorFlow Lite | Android, iOS, Linux | PTQ, QAT | GPU, NNAPI, Hexagon, Core ML delegate |
-| PyTorch Mobile | Android, iOS | PTQ, QAT | Metal, NNAPI |
-| ONNX Runtime | Cross-platform | PTQ, QAT | CPU, GPU, TensorRT, Core ML, NNAPI |
-| Core ML | iOS/macOS | PTQ, QAT | Neural Engine |
-| TensorRT | NVIDIA GPU | PTQ, QAT | Tensor Cores |
-| TVM / Apache TVM | Cross-platform | Auto-tuning | CPU, GPU, NPU |
+Jacob et al. address the next constraint: what if the device's hardware cannot do floating-point arithmetic efficiently? Their scheme allows "inference to be carried out using integer-only arithmetic", which "can be implemented more efficiently than floating point inference on commonly available integer-only hardware".
 
-## Deployment workflow
+The difficulty is that quantisation changes the numbers, and a naive conversion loses accuracy. Their response is to "co-design a training procedure to preserve end-to-end model accuracy post quantization" — the quantisation-aware training path. The result "improves the tradeoff between accuracy and on-device latency", with improvements described as significant "even on MobileNets, a model family known for run-time efficiency", demonstrated on ImageNet classification and COCO detection on common CPUs.
 
-1. Train model (PyTorch/TensorFlow).
-2. Export to ONNX / SavedModel.
-3. Quantize (PTQ or QAT).
-4. Convert to target format (TFLite, ONNX, Core ML).
-5. Benchmark on target device (latency, memory, accuracy).
-6. Profile: Nsight, Instruments, Perfetto.
-7. Iterate: prune → distill → quantize.
+That last detail is instructive. A model already designed for efficiency still gained from the technique, which means quantisation is not only a remedy for bloated models — it is a general tool for the accuracy-latency trade-off.
 
-## Challenges
+## Distillation is a different lever
 
-- **Accuracy drop:** aggressive quantization hurts. QAT + mixed precision mitigates.
-- **Operator support:** custom ops may not quantize. Fallback to FP32.
-- **Hardware fragmentation:** diverse NPUs, drivers, APIs.
-- **Model size vs accuracy:** Pareto frontier.
-- **Security:** model extraction, adversarial attacks on device.
+Hinton et al.'s distillation trains a small model to reproduce a larger model's outputs, including the "soft" probabilities that carry information about how close the large model's alternatives were. It is a way of transferring behaviour rather than compressing weights, and it can produce a small model that behaves like an ensemble — the paper notes that ensembles are accurate but "cumbersome" and expensive to serve.
 
-For the related question of model compression for recommendations, see [Deep Learning for Recommendations: Neural Collaborative Filtering and Embeddings](/articles/deep-learning-for-recommendations-neural-collaborative-filtering-and-embeddings) and MLOps, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline).
+Distillation complements pruning and quantisation: you can distil a large model into a small architecture, then quantise the result. The trade-off is that the small model inherits the large model's blind spots, and the teacher's biases become the student's.
+
+## A worked memory budget
+
+The arithmetic of fitting a model on a device is simple enough to do before writing any code. Consider a model with 20 million parameters stored at 32-bit precision:
+
+- **Weights:** 20 million × 4 bytes = 80 MB.
+- **Activations:** these depend on the input and layer widths, and for a large input can be comparable to the weights in peak memory.
+- **Runtime and framework:** often tens of megabytes that do not appear in any model diagram.
+- **Other processes:** the operating system and the rest of the application still need memory.
+
+On a device with 1 GB available to the application, an 80 MB weight file is not automatically a problem — but a vision pipeline with large intermediate activations can push peak memory far beyond the file size. Applying 8-bit quantisation reduces the weight term from 80 MB to about 20 MB, and pruning before quantisation can reduce it further, which is why the combined pipeline reports such large storage savings.
+
+The latency arithmetic is different. A four-times-smaller model is not necessarily four times faster: speed depends on whether the hardware can perform the narrower arithmetic efficiently and on whether memory bandwidth or compute is the bottleneck. If the device must convert 8-bit values back to floating point in software, quantisation can even slow inference down. This is why the measurement has to happen on the target hardware, not on a development machine.
+
+## Where the compression fails
+
+Three failure modes are specific enough to plan for:
+
+**Calibration mismatch.** Quantisation chooses how continuous values map onto a small set of levels, usually by observing a sample of data. If that sample does not represent production inputs — a different camera, lighting condition, or language — the mapping is wrong for the cases that matter, and accuracy falls in a subgroup that the aggregate metric did not reveal.
+
+**Sparsity that is not exploited.** A pruned model is smaller on disk, but most hardware performs dense arithmetic. Unless the runtime and the chip can skip the zeroed connections, the inference cost is unchanged and the pruning has bought only storage.
+
+**Thermal throttling.** A device can meet its latency target for the first minute and fall well short after ten, because sustained inference raises temperature and the system reduces clock speed. A benchmark that runs once is a best case, not an operating point.
+
+Each of these is a reason to treat compression as a measurement problem rather than a transformation applied once at the end of training.
+
+## What to measure on the target
+
+The error that teams make is evaluating compression on the training machine. A model that is four times smaller on disk may run no faster if the runtime cannot exploit sparsity, and a quantised model that matches accuracy on one dataset may fail on a subgroup that was underrepresented in the calibration set.
+
+A practical evaluation needs:
+
+- **Accuracy on the real task**, including the subgroups that matter, after every compression step.
+- **Peak memory**, not just file size, measured on the target device.
+- **Latency** for a representative input, including cold start and sustained inference — sustained matters because thermal throttling changes the result over time.
+- **Energy per inference**, which is what battery life actually depends on.
+- **Numerical behaviour under distribution shift**, especially for quantised models whose calibration was based on a limited sample.
+
+## A sequence that works
+
+1. **Define the budget first** — memory, latency, energy, and accuracy floor, on the actual hardware.
+2. **Start with a model designed for efficiency** rather than compressing an arbitrary large one.
+3. **Apply quantisation with quantisation-aware training**, and measure the accuracy cost.
+4. **Add pruning only if the runtime can exploit sparsity.** Otherwise it reduces file size, not inference cost.
+5. **Consider distillation** when a smaller architecture cannot match the larger model's behaviour.
+6. **Measure sustained, not just initial, performance.** Heat changes everything on a small device.
+7. **Re-check calibration after any data change**, because quantisation depends on the distribution seen during calibration.
+
+For the deployment context, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the privacy side of local inference, see [Federated Learning](/articles/federated-learning-privacy-preserving-distributed-machine-learning).
 
 ## Further Reading
 
