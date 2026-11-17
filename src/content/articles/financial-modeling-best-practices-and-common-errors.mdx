@@ -1,13 +1,61 @@
 ---
 title: "Financial Modeling Best Practices and Common Errors"
-description: "Reserved title for a future NOVANDRI article: Financial Modeling Best Practices and Common Errors."
+description: "A model is a set of assumptions made visible. Read the practices that make it usable, the errors that break it, and a worked check."
 date: 2026-11-17
 tags:
-  - Planned
   - Finance
+  - Modeling
+  - Analysis
+  - Process
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A spreadsheet can be a rigorous model or a collection of unverified guesses formatted in blue and black. The difference is not the number of tabs but whether assumptions are explicit, logic is traceable, and the result can be challenged. A model that cannot be audited is a decoration for a decision already made.
+
+**Direct answer:** Separate inputs from calculations, state every assumption with its source and date, use consistent formulas, and test what happens when a key input changes. Damodaran's valuation work is the reference for explicit assumptions, and the financial-statement article explains why the underlying numbers need definitions. The boundary: a well-built model reduces error but cannot remove uncertainty about the future, which the scenario-analysis article treats as the reason to model ranges.
+
+## The practices
+
+**Separate inputs from logic.** Assumptions live in one clearly marked area, with a source and a date for each. Everything else is a formula, which the data-governance article requires for any record people will rely on. A model with hard-coded numbers scattered across tabs cannot be reviewed, as the technical-debt article warns about systems that outgrow informal handling.
+
+**Use consistent units and signs.** A model mixing millions with thousands, or outflows with inflows, will produce a plausible-looking wrong answer, which the cash-flow article treats as a definitional problem. A unit check on every row is cheap insurance.
+
+**Make dependencies visible.** A reader should be able to trace a result back through the formulas to the input. The explainability article argues for the same property in ML systems, where a conclusion without a trace is hard to trust.
+
+**Test the model against a known case.** If a model cannot reproduce last year's actuals from last year's inputs, it is not ready for a forecast, which the evaluation article recommends as a baseline test.
+
+## A worked check
+
+The following is hypothetical and illustrative. A valuation model produces a company value of 200 million. Three checks decide whether to trust it.
+
+First, an input audit: the discount rate is 9%, the terminal growth rate 3%, and the revenue growth 12% for five years. Each input needs a source and a date, which the cost-of-capital and valuation articles require. Second, a logic check: a single formula for terminal value is copied across columns, but one copy references the wrong cell, which the present-value article treats as a structural error. A trace of the result exposes it. Third, a sensitivity test: if terminal growth falls to 2%, value drops to 165 million, and if the discount rate rises to 10%, it drops further, as the sensitivity-analysis article recommends for identifying dominant assumptions.
+
+Three conclusions follow. The point estimate was fragile, which the valuation article treats as a reason to report a range. The error was in the logic, not the assumptions, which the worked check found before the model was used. And the decision should be recorded with the range and the drivers, as the decision-memo article requires.
+
+## The discipline of a traceable model
+
+A model earns trust by being checkable. When a result is questioned, the reviewer should be able to follow a path from the output back through formulas to a named input with a source and date, which the data-governance article requires for relied-upon records. A model that fails this test is often still usable, but only by the person who built it, which makes it a fragile asset as soon as that person leaves or the decision becomes consequential.
+
+This is why a unit and sign check is worth doing before any sophisticated analysis. A model that mixes millions with thousands, or treats an outflow as positive in one tab and negative in another, will produce numbers that look entirely plausible, as the cash-flow article explains for the same problem in statements. The error tends to be found late, when the result is compared with reality, which the monitoring article treats as a failed control.
+
+Finally, a model should have an owner who decides when it is reviewed. Markets, tax rules, and business conditions change, and a model that was correct last year can be wrong today, as the inflation article treats dated data as essential to any real calculation. The owner does not need to rebuild it often; they need to know what event triggers a review, which the risk-assessment article frames as a change trigger.
+
+## What a model cannot do
+
+It cannot know the future, which investor education states explicitly for all investments. It cannot replace judgement about which assumptions matter, which the sensitivity-analysis article treats as a ranking problem. And it cannot fix bad data: a rigorous model fed with unverified figures produces a precise error, which the data-quality article argues for correcting upstream.
+
+The counterargument that a spreadsheet is good enough for a simple decision is fair at the very start and becomes costly as assumptions accumulate, which the technical-debt article treats as accumulated complexity.
+
+## A decision test
+
+1. Put all assumptions in one area with sources and dates.
+2. Check units and signs on every row.
+3. Trace the result back to its inputs.
+4. Reproduce a known period from known inputs.
+5. Run a sensitivity test on the dominant assumptions.
+6. Document the range and the drivers, as the valuation article requires.
+7. Review after any change to logic or inputs, as the monitoring article advises.
+
+For the assumptions, see [Cost of Capital for Private Companies](/articles/cost-of-capital-private-companies); for the test, see [Sensitivity Analysis](/articles/sensitivity-analysis-that-changes-a-decision).
 
 ## Further Reading
 
