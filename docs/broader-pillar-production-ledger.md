@@ -6,7 +6,7 @@
 **Language:** English only across the publication, as decided by the owner.
 **Editorial Standard Reference:** `docs/publication-wide-editorial-standard.md`
 **Total Planned:** Open — the idea bank in the knowledge hub plan is a seed list, not an approved backlog.
-**Current Progress:** 177 tracked articles — 177 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
+**Current Progress:** 179 tracked articles — 179 `Ready`, 0 `Drafted` (reading list attached, depth rewrite outstanding)
 
 ---
 
@@ -191,6 +191,8 @@
 | **P-185** | Kubernetes Requests and Limits: Why Pods Get Evicted Under Load | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/kubernetes-requests-and-limits-why-pods-get-evicted.mdx` | 2026-11-17 | New article: 1,477 words. Requests vs limits, CPU throttling vs OOM kills, QoS classes and node-pressure eviction from official Kubernetes docs; labeled hypothetical node example; PDB caveat; decision test. Six new sources verified. |
 | **P-186** | Database Indexes and Query Plans: Why the Same Query Gets Slow | Technology & The Digital World | Analysis / Decision Guide | `Ready` | `src/content/articles/database-indexes-and-query-plans.mdx` | 2026-11-17 | New article: 1,378 words. Planner choice, selectivity, EXPLAIN/EXPLAIN ANALYZE and write overhead from official PostgreSQL docs; labeled hypothetical selectivity/stale-statistics example; decision test. Two new sources verified. |
 | **P-187** | Prompt Injection in LLM Applications: A Threat Model, Not a Patch | Artificial Intelligence & Future Innovation | Analysis / Decision Guide | `Ready` | `src/content/articles/prompt-injection-llm-applications-threat-model.mdx` | 2026-11-17 | New article: 1,314 words. Direct/indirect split from OWASP LLM01:2025, Greshake et al. and NIST AI 100-2e2025; labeled refund-tool worked example; tool-boundary defences; decision test. Three new sources verified. |
+| **P-188** | Confidence Intervals and p-values: What They Do and Do Not Support | Data, Analytics & Decision Science | Analysis / Decision Guide | `Ready` | `src/content/articles/confidence-intervals-and-p-values.mdx` | 2026-11-17 | New article: 1,218 words. Repeated-sampling definition of confidence level from NIST and the ASA statement on p-values; labeled worked example showing the same lift passing/failing with 2,000 vs 8,000 per group; multiple-testing and stopping caveats; decision test. Two new sources verified. |
+| **P-189** | Missing Data: When Dropping Rows Changes the Answer | Data, Analytics & Decision Science | Analysis / Decision Guide | `Ready` | `src/content/articles/missing-data-when-dropping-rows-changes-the-answer.mdx` | 2026-11-17 | New article: 1,341 words. pandas sentinels, drop vs univariate/multivariate imputation from scikit-learn, leakage rule; labeled worked bias example (complete-case mean 50k vs full-sample 47k); decision test. Four new sources verified. |
 
 ---
 
@@ -213,6 +215,7 @@ Every source in `docs/further-reading-registry.json` is checked by `scripts/veri
 - P-06 is the only draft whose central claim rests on an original computation by the author. The computation is fully reproducible from a pinned dataset version and the snippet is included in the article, but it still requires a re-run before publication.
 
 ## Batch Execution Log
+- **Batch AN (New article titles, cluster 3 — 2026-11-17):** Two new statistics articles drafted. *Confidence Intervals and p-values* uses NIST and the ASA statement; *Missing Data* uses pandas, scikit-learn and the leakage guidance. Both use labeled hypothetical worked examples and close with a decision test. Four new sources added; all 216 verify. The GDPR registry URL was switched to a stable HTML rendering after EUR-Lex began returning empty titles to automated checks.
 - **Batch AM (New article titles, cluster 2 — 2026-11-17):** Two new titles drafted from the gap-analysis shortlist. *Database Indexes and Query Plans* is built on official PostgreSQL documentation; *Prompt Injection in LLM Applications* on OWASP LLM01:2025, the indirect prompt injection paper and NIST AI 100-2e2025. Both use labeled hypothetical worked examples and end with a decision test. Five new sources added; all 212 verify. No duplicate title, slug or context introduced.
 - **Batch AL (New article titles from gap analysis — 2026-11-17):** Two new titles drafted from a corpus-wide gap audit that checked all 206 articles for duplicate titles, slugs and discussion context. *Passkeys and WebAuthn* and *Kubernetes Requests and Limits* were written at decision-guide scope with verified primary sources (FIDO Alliance, WebAuthn Guide, NIST SP 800-63B, and three official Kubernetes documentation pages). Six new sources were added to the registry; all 207 verify. No duplicate title, slug or context was introduced.
 

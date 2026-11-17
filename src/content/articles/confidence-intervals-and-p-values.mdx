@@ -1,0 +1,91 @@
+---
+title: "Confidence Intervals and p-values: What They Do and Do Not Support"
+description: "A 95% interval is a statement about a procedure, not a 95% chance about your result. Read what each number means and how sample size changes both."
+date: 2026-11-17
+tags:
+  - Statistics
+  - Inference
+  - Experimentation
+  - Decision Science
+---
+
+A dashboard reports "p = 0.04" and a team treats it as proof that a feature worked. Another report shows a confidence interval that crosses zero and the same team concludes there is no effect. Both readings are common and both misstate what the numbers say. The problem is not the arithmetic; it is the interpretation attached to it.
+
+**Direct answer:** A confidence interval is a range of values "which is likely to contain the population parameter of interest", constructed at a level such as 95% — which means that if the same population were sampled repeatedly, about 95% of the intervals produced would contain the true parameter. A p-value measures how compatible the observed data are with a specified null model; it is "not the probability that the studied hypothesis is true". The boundary, stated by the American Statistical Association, is that a threshold alone should not drive a conclusion or a decision, and a p-value does not measure the size of an effect.
+
+## What the confidence level actually claims
+
+NIST's engineering handbook gives the repeated-sampling definition directly: if "the same population is sampled on numerous occasions and interval estimates are made on each occasion, the resulting intervals would bracket the true population parameter in approximately 95% of the cases". The handbook also notes that "a confidence stated at a `1-α` level can be thought of as the inverse of a significance level, `α`" — the two are different views of the same construction.
+
+Three consequences follow:
+
+**The claim is about the procedure.** A 95% confidence procedure produces intervals that capture the truth 95% of the time over repeated sampling. For the single interval you computed, the parameter is either inside it or not; the procedure's long-run property is what the 95% describes.
+
+**Width is a function of sample size.** The handbook's formula for a normal population with known standard deviation is `Y-bar ± z(1-α/2) × σ/√N`. The `√N` in the denominator is the point: to halve the width of an interval, you need roughly four times the sample. Precision is expensive.
+
+**One-sided and two-sided differ.** A two-sided interval "brackets the population parameter from above and below"; a one-sided interval "furnishes an upper or lower bound to its magnitude". Choosing one after seeing the data changes the meaning of the level.
+
+## What the p-value does not claim
+
+The ASA's 2016 statement was written because p-values are routinely over-interpreted. Its central points include that a p-value does not give the probability that a hypothesis is true or that the data arose by chance alone; that a conclusion should not rest only on whether a value passes a specific threshold; and that a p-value does not measure the size of an effect or the importance of a result.
+
+In practice, a p-value answers a narrow question: *if the null model were correct, how surprising would data at least this extreme be?* A small answer means the data are uncomfortable under that model. It does not identify which assumption is wrong, and it does not tell you whether the effect is large enough to matter.
+
+This is why "statistically significant" and "important" are not synonyms. A tiny effect measured on millions of observations can produce a very small p-value and no practical consequence. A large effect measured on a handful of observations can produce an unimpressive p-value and still be worth investigating.
+
+## A worked example of sample size and significance
+
+The following numbers are hypothetical and illustrative, using the normal approximation for a difference in proportions.
+
+Suppose a product test compares two variants. Variant A converts at 10% and variant B at 11% — a 1 percentage-point lift. Each variant is shown to 2,000 users.
+
+The standard error of the difference is approximately:
+
+SE = √(0.10 × 0.90 / 2000 + 0.11 × 0.89 / 2000) ≈ √(0.00009395) ≈ 0.0097
+
+- **Difference:** 0.01.
+- **95% interval:** 0.01 ± 1.96 × 0.0097 ≈ 0.01 ± 0.0190 → **[-0.009, 0.029]**.
+- The interval includes zero, and the corresponding z-statistic is about 1.03 — not significant at the 5% level.
+
+Now keep the *same* 1-point lift but increase each group to 8,000 users:
+
+- SE ≈ √(0.09/8000 + 0.0979/8000) ≈ 0.0048.
+- **95% interval:** 0.01 ± 1.96 × 0.0048 ≈ 0.01 ± 0.0095 → **[0.0005, 0.0195]**.
+- The interval now excludes zero, and the result clears the 5% threshold.
+
+Nothing about the underlying effect changed. Only the sample size did, and the √N in the denominator is the mechanism. Three lessons follow:
+
+1. **Significance is partly a function of sample size.** The same lift can fail or pass a threshold depending on N, which is why a p-value alone is a poor statement of effect size.
+2. **The interval is more informative.** It shows both the plausible magnitude and the uncertainty; the reader can decide whether 0.05 percentage points or 2 points matters commercially.
+3. **A wide interval is not "no effect".** It is a statement that the data cannot distinguish a range of possibilities, including zero. The honest conclusion is "we do not know", not "there is no difference".
+
+The normal approximation here is a teaching device; a production analysis should use a method appropriate to the outcome and check its assumptions.
+
+## Where both numbers fail together
+
+Three problems survive correct arithmetic.
+
+**Multiple comparisons.** Testing many metrics or many segments at the 5% level produces false positives by construction. The 95% property applies to each procedure, not to the family of procedures you actually ran.
+
+**Optional stopping.** Checking significance repeatedly as data arrives and stopping when p crosses 0.05 breaks the repeated-sampling interpretation the level depends on. The procedure that was actually run is not the one the threshold describes.
+
+**Selection and reporting.** The ASA's call for "full reporting and transparency" matters because the numbers that get shown are often the ones that cleared a threshold. An unreported null result is invisible to the reader assessing the evidence.
+
+The counterargument — that thresholds are still useful as a decision rule — is fair. They are useful as *rules*, provided the organisation knows what the rule does and does not establish. The error is treating a rule as a fact about the world.
+
+## A decision test
+
+1. **Report the interval alongside the p-value**, and lead with the magnitude, not the threshold.
+2. **Ask whether the plausible range includes effects that matter** to the decision, not just whether it includes zero.
+3. **State the sample size and the method** so the precision can be judged.
+4. **Declare the tests you ran** and account for multiple comparisons where relevant.
+5. **Fix the stopping rule before looking** at the data.
+6. **Separate statistical from practical significance** in the conclusion.
+7. **Treat "not significant" as uncertainty**, not as evidence of no effect.
+
+For the experimentation context, see [A/B Testing](/articles/ab-testing-making-decisions-with-experiments); for the causal caveat, see [Correlation vs Causation](/articles/correlation-vs-causation-the-most-common-mistake-in-data-analysis).
+
+## Further Reading
+
+- NIST/SEMATECH e-Handbook of Statistical Methods, 2026. [7.1.4. What are confidence intervals?](https://www.itl.nist.gov/div898/handbook/prc/section1/prc14.htm) — The definition of a confidence level, the repeated-sampling interpretation, and the one- and two-sided interval formulas.
+- American Statistical Association, 2016. [American Statistical Association Releases Statement on Statistical Significance and P-Values](https://www.amstat.org/asa/files/pdfs/p-ValueStatement.pdf) — The ASA statement on p-values: a p-value does not measure the probability that a hypothesis is true, and a threshold alone should not drive conclusions or decisions.
