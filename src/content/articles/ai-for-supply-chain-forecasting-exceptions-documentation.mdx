@@ -1,10 +1,89 @@
 ---
 title: "AI for Supply Chain: Forecasting, Exceptions, Documentation"
-description: "Reserved title for a future NOVANDRI article: AI for Supply Chain: Forecasting, Exceptions, Documentation."
+description: "Supply chain AI works on forecasts and exceptions, not on judgement. Read a worked planning example and the controls that keep stock moving."
 date: 2026-11-17
 tags:
-  - Planned
   - AI
+  - Supply Chain
+  - Operations
+  - Forecasting
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Supply chains generate the data that ML methods like: long time series, repeated patterns, and clear outcomes. They also punish errors with empty shelves or excess inventory. AI is useful here for forecasting demand, flagging exceptions, and assembling the documentation planners need — with people making the calls that balance risk.
+
+**Direct answer:** Use AI for demand forecasting, exception detection, and summarising the context behind a planning decision. Anthropic's use-case guides cover analysis patterns, and the time-series article explains the forecasting methods. The boundary: a forecast is a conditional estimate, not an order, and a flagged exception is a prompt to investigate — the planner owns the decision, as the human-in-the-loop article argues.
+
+## Three uses
+
+**Forecasting.** Predict demand at a level useful for planning, with uncertainty rather than a single number. The time-series article covers ARIMA and deep methods and the importance of a time-ordered split, which the cross-validation article explains.
+
+**Exception detection.** Flag a shipment likely to be late, a supplier whose lead time is drifting, or an item whose forecast is unreliable. This is anomaly detection, which the anomaly-detection article covers, and the metric is alert quality, not model accuracy.
+
+**Documentation.** Assemble the context behind a planning decision — the forecast, the constraints, the rationale — into a short record, as the decision-memo article recommends.
+
+## A worked planning example
+
+The following is hypothetical and illustrative.
+
+A retailer plans stock for 500 products. The AI workflow:
+
+1. Produce a 12-week demand forecast per product with a prediction interval.
+2. Flag products where the interval is unusually wide or demand has shifted from the forecast.
+3. Draft a planning note for the flagged products summarising the evidence.
+
+Outcomes on a sample cycle:
+
+- 400 products have stable forecasts and follow the standard reorder rule.
+- 80 are flagged for planner review because the interval widened.
+- 20 are flagged because recent demand broke from the pattern.
+
+Three checks decide whether it works:
+
+1. **Forecast accuracy by segment** — is the model better than the seasonal baseline on the products that matter, as the time-series article recommends for model selection?
+2. **Exception quality** — of the 100 flagged, how many were real issues? A high false-positive rate wastes planner time, which the anomaly-detection article covers as alert fatigue.
+3. **Decision record completeness** — does each flagged product have a note that a planner can act on, as the decision-memo article argues?
+
+Three conclusions follow:
+
+- **The forecast is an input**, not an order, which the planning article explains for business decisions.
+- **Wide intervals are informative** — they say where judgement is needed, which the confidence-interval article explains.
+- **The planner owns the call**, which the human-in-the-loop design requires.
+
+## The data behind the forecast
+
+A forecast is only as good as the data feeding it. Three checks matter more than model choice:
+
+**Demand history must be comparable.** A promotion, a stockout, or a change in product definition changes what historical demand means, which the time-series article covers under non-stationarity. A model trained on a stockout period learns zero demand, which is wrong.
+
+**Lead times need dates.** Supplier lead times drift, and averaging them over a year hides a recent change. The monitoring article recommends tracking distributions and change points, not just averages.
+
+**External signals need provenance.** Holidays, competitor actions, and weather can improve a forecast, but each source needs a date and a definition, as the data-governance article requires for any relied-upon input.
+
+These checks are the work of a planner, not a model setting, which is why the human role remains central.
+
+## What supply chain AI cannot do
+
+**It cannot eliminate uncertainty.** Demand is affected by events the data does not contain, which the forecasting article's caveats cover.
+
+**It cannot fix a broken process.** If supplier data is late or incomplete, a better model will not repair it, which the data-quality article argues.
+
+**It cannot make the trade-off.** Holding more stock costs money; holding less risks a stockout. That decision depends on margin and strategy, as the inventory-management article explains.
+
+The counterargument — that algorithms will replace planners — is a category error. The role shifts from producing forecasts to interpreting them and handling exceptions, which the future-of-work article discusses.
+
+## A decision test
+
+1. **Compare forecasts with a simple baseline** before adding complexity.
+2. **Report uncertainty**, not a point estimate, as the forecasting article recommends.
+3. **Measure exception quality** to avoid alert fatigue.
+4. **Keep a decision record** with an owner, as the decision-memo article requires.
+5. **Check data freshness** as a change trigger, which the monitoring article covers.
+6. **Keep the planner accountable** for the final order, as the oversight article argues.
+7. **Re-evaluate after a demand shock**, which the risk-assessment article frames as a change event.
+
+For the forecasting methods, see [Time Series Forecasting](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models); for the inventory trade-off, see [Inventory Management](/articles/inventory-management-balancing-stock-and-cash-flow).
+
+## Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.
