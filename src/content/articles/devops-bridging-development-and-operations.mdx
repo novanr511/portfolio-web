@@ -1,76 +1,63 @@
 ---
 title: "DevOps: Bridging Development and Operations"
-description: "DevOps is a set of practices that unify software development and IT operations. Learn how it improves delivery speed, reliability, and collaboration."
+description: "DevOps is a set of feedback loops, not a team name. Read how the loops work and why renaming a group does not create them."
 date: 2026-11-16
 tags:
-  - Technology
   - DevOps
-  - Software Engineering
-  - Operations
+  - Engineering Culture
+  - CI/CD
+  - Reliability
 ---
 
-DevOps is not a team. It is a way of working.
+DevOps is often introduced with a diagram of a loop between development and operations, and the diagram is correct. What it leaves out is the mechanism: the loop is made of specific artefacts — version control, automated tests, deployment pipelines, shared metrics, and blameless review — and a team that adopts the word without those artefacts has renamed a boundary rather than removed it.
 
-**Direct answer:** DevOps is a set of practices, cultural norms, and tools that unify software development (Dev) and IT operations (Ops). The goal is to shorten the systems development life cycle and provide continuous delivery with high software quality. DevOps works because it removes the wall between the people who write code and the people who run it—making delivery faster, more reliable, and less blame-driven.
+**Direct answer:** DevOps works when the feedback from production reaches the people who write the code, quickly and without a translation layer, and when the path from a commit to production is automated enough that deployment is routine. The practical instruments are continuous integration, automated deployment, shared service objectives, and incident review that produces changes to the system rather than conclusions about individuals. The test is simple: how long does it take a developer to learn that their change caused a problem, and can they fix it without asking another team for permission?
 
-## The problem DevOps solves
+## The loops, not the org chart
 
-Traditionally, developers and operators had different goals:
+Three feedback loops matter, and each can be measured.
 
-- **Developers** wanted to ship features quickly. Their incentive was change.
-- **Operators** wanted stable systems. Their incentive was stability.
+**From code to production.** The time from a commit to a running system. A long, manual release process means the team learns about integration problems late, and fixes are expensive. Automation is not an end in itself; it is what makes the loop short enough that the person who wrote the change still remembers the context when something breaks.
 
-This created conflict. Developers threw code over the wall to operators. Operators rejected changes that risked stability. Releases were infrequent, risky, and painful.
+**From production back to code.** Observability, alerts, and incident data that reach the developers directly. If operations files a ticket and a developer picks it up days later, the loop is long and the learning is lost. The SRE practice of defining service level objectives and alerting on burn rate is one way of making the signal actionable rather than noisy.
 
-DevOps removes the wall. The same people (or closely collaborating teams) build, deploy, and operate the software. Responsibility is shared.
+**From incidents to the system.** A review that changes something — a test, a deployment guard, a rollback path, a design — rather than assigning a cause to a person. Without this loop, the same class of failure recurs, and each recurrence is handled as a new surprise.
 
-## The DevOps practices
+## What automation is for
 
-**Continuous Integration (CI).** Developers merge code changes frequently, often multiple times per day. Each change is automatically built and tested. Problems are caught early, when they are cheap to fix.
+Continuous integration is where the first loop is shortened. Every change is built and tested automatically, which means the question "does this work together?" is answered at the moment of the change rather than at a release meeting.
 
-**Continuous Delivery (CD).** Every change that passes tests is ready to be deployed to production. Deployment can happen at any time, with a button click or automatically.
+Continuous delivery extends that to deployment. The important property is not frequency for its own sake but small batch size: a change that touches twenty lines is easy to diagnose and easy to roll back; a release that touches twenty thousand is neither. Small, frequent changes reduce risk in a way that careful manual review of a large release does not.
 
-**Continuous Deployment.** Every change that passes tests is deployed to production automatically. No manual gate. This requires high confidence in testing and monitoring.
+Git hooks and CI configuration are the enforcement layer, and Git's own documentation describes hooks as scripts that run automatically on events such as commit and push. They are useful for cheap checks — formatting, a fast test, a secret scan — and the heavier checks belong in CI, where they run in a consistent environment rather than on a developer's laptop.
 
-**Infrastructure as Code.** Servers, networks, and environments are defined in code, not configured by hand. This makes infrastructure versionable, testable, and reproducible.
+The failure mode of automation is a pipeline nobody trusts: tests that fail intermittently, a build that takes an hour, a deployment that cannot be rolled back. A slow, unreliable pipeline is worse than a manual process, because it adds ceremony without adding confidence.
 
-**Monitoring and Observability.** Systems emit logs, metrics, and traces. Teams can see what is happening in real time and detect problems before users do.
+## Shared objectives are the cultural part
 
-**Automated Testing.** Tests run on every change. Unit, integration, and end-to-end tests provide confidence that changes do not break existing behavior.
+The reason "throw it over the wall" fails is not a lack of friendliness. It is that the two groups are measured on different things. If developers are rewarded for feature velocity and operations for uptime, the boundary is rational and the loop cannot form.
 
-## The cultural shift
+Shared service level objectives change the incentives. When both groups own the same availability target and the same error budget, a decision to ship becomes a joint judgement about risk rather than a negotiation between competing goals. This is the practical meaning of "bridging" — a common measure, not a common Slack channel.
 
-DevOps is not primarily about tools. It is about culture:
+Blameless incident review is the companion practice. The purpose is to find the conditions that allowed a human action to cause an outage — a missing guard, an ambiguous interface, an unclear rollout — because those are the things that can be changed. A review that ends with "be more careful next time" has not produced a learning artefact.
 
-- **Shared responsibility.** Developers are on call for their code in production. Operators participate in design discussions.
-- **Blameless postmortems.** When incidents happen, the goal is to learn, not to punish. Focus on system causes, not individual errors.
-- **Small, frequent changes.** Large releases are risky. Small changes are easier to test, deploy, and roll back.
-- **Feedback loops.** Production data informs development. Development constraints inform operations.
+## What to measure, and what not to
 
-## The benefits
+The useful measures are about the loops: lead time from commit to production, deployment frequency, change failure rate, and time to restore service. These four together are more informative than any single one — optimising deployment frequency alone can produce a system that fails more often and recovers slowly.
 
-Organizations that practice DevOps well:
+The measures to distrust are activity metrics: number of pipelines, number of tickets closed, number of deploys in a week without a failure-rate denominator. A team can improve all of those while the system becomes less reliable.
 
-- **Deploy more often.** Multiple times per day, not once per quarter.
-- **Recover faster.** Incidents are detected and fixed in minutes, not days.
-- **Have lower change failure rates.** Automated testing catches problems before users see them.
-- **Ship higher quality.** Quality is built in, not inspected at the end.
+## A starting sequence
 
-## The investment
+1. **Put the build and tests in CI**, on every change, in a consistent environment.
+2. **Make deployment repeatable and reversible** before making it frequent.
+3. **Define one service objective** shared by development and operations.
+4. **Route production signals to the developers**, with alerting that is selective enough to be trusted.
+5. **Run incident reviews that produce changes**, and track whether the changes happened.
+6. **Measure the four loop metrics together**, so one cannot be improved at the expense of another.
+7. **Remove one manual approval at a time**, replacing it with an automated check where the risk is real.
 
-DevOps requires investment:
-
-- **Tooling:** CI/CD platforms, container orchestration, monitoring, feature flags.
-- **Training:** teams need new skills.
-- **Time:** automation and refactoring take effort upfront.
-
-The return comes in faster delivery, fewer incidents, and happier teams.
-
-## When DevOps is not the priority
-
-Very small teams with simple software may not need full DevOps. A single developer deploying a static site does not need Kubernetes. The practices should match the scale and complexity of the system.
-
-For the related question of how operating systems manage resources, see [How Operating Systems Shape the Modern Computing Experience](/articles/how-operating-systems-shape-the-modern-computing-experience) and how APIs connect systems, see [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems).
+For the reliability practice these loops support, see [Site Reliability Engineering](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response); for deterministic builds and data pipelines, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline).
 
 ## Further Reading
 

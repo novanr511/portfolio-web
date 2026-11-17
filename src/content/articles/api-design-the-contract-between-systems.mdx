@@ -1,86 +1,61 @@
 ---
 title: "API Design: The Contract Between Systems"
-description: "An API is a contract between systems. Learn how to design APIs that are stable, usable, and easy to evolve."
+description: "An API is a long-lived promise. Read what resource-oriented design decides for you and where the contract becomes expensive."
 date: 2026-11-16
 tags:
-  - Technology
-  - API
-  - Software Engineering
-  - Systems
+  - API Design
+  - Software Architecture
+  - Web Development
+  - Engineering
 ---
 
-An API is not just code. It is a promise.
+An API is a contract with a long lifetime and an unusual property: the other party does not have to read your code to use it, and cannot be relied on to adapt when you change it. That makes design decisions about naming, versioning, and error behaviour more consequential than similar decisions inside a single program.
 
-**Direct answer:** API design is the practice of defining how systems communicate with each other. A good API is stable, predictable, easy to use, and easy to evolve without breaking clients. API design decisions—naming, structure, versioning, error handling, documentation—determine whether integration is smooth or painful. Because APIs are contracts, changing them affects everyone who depends on them.
+**Direct answer:** Good API design makes the contract legible and boring: resources with consistent names, a small set of standard methods, predictable errors, and a versioning policy that says what may change. Google's published design guidance is resource-oriented, with dedicated rules for resource names, standard methods (Get, List, Create, Update, Delete), custom methods, and versioning. The point of the convention is not aesthetics — it is that a client can predict the shape of an endpoint it has never seen, which is what makes an API cheap to use and safe to evolve.
 
-## What an API is
+## Why resource-oriented design won
 
-An API (Application Programming Interface) defines the rules for interaction between software systems. It specifies:
+The dominant convention treats an API as a collection of **resources** — named things with state — manipulated by a small set of **methods**.
 
-- **Endpoints:** where requests go.
-- **Methods:** what actions are available (read, create, update, delete).
-- **Parameters:** what information must be sent.
-- **Responses:** what information comes back, and in what format.
-- **Errors:** what goes wrong and how it is communicated.
+Google's guidance points to specific AIPs for each part: resource-oriented design, resource names, standard methods, custom methods, versioning, and backward compatibility. The existence of separate, numbered rules for each of these is itself the lesson: the surface of an API has many independent decisions, and a convention is a way of making them consistently rather than freshly each time.
 
-The API hides internal complexity. Clients interact with the interface, not the implementation.
+The benefit to a client is predictability. If `GET /projects/123` returns a project, a client can reasonably expect `GET /projects/123/tasks` to return its tasks, and `DELETE /projects/123` to remove it. That expectation reduces the documentation burden and the chance of a subtle mistake — which is why consistency is worth more in an API than novelty.
 
-## Principles of good API design
+Custom methods are the escape hatch, and their existence is a warning. When an operation does not fit Create, Read, Update, or Delete, it may need a custom method, and each one is an exception a client must learn. A proliferation of custom methods usually means the resource model is wrong.
 
-**Clarity.** Names should be intuitive. `GET /users/123/orders` is clearer than `GET /fetchUserOrderData?id=123`.
+## The contract includes failure
 
-**Consistency.** Similar resources behave similarly. If one endpoint uses snake_case, all should. Error formats should be uniform.
+A large share of API design is deciding what happens when things go wrong, and `429 Too Many Requests` is a good example. RFC 6585 defines it for a client that has sent too many requests in a given time. A response may include `Retry-After` to indicate how long to wait — RFC 9110 defines its value as an HTTP date or a non-negative delay in seconds — and the status code itself does not disclose whether the limit applies per account, per IP, or across a service.
 
-**Stability.** Clients build on the API. Breaking changes force clients to update, which costs time and trust. Changes should be backward compatible whenever possible.
+That ambiguity is a design decision left to the implementer, and leaving it undocumented is a common failure. A client that receives 429 and does not know the scope of the limit cannot implement a sensible backoff, and a team that changes the limit silently can break clients that were relying on it. The contract has to say which dimension is limited and what the recommended behaviour is, or the status code is only half a signal.
 
-**Documentation.** An API without documentation is an API nobody uses. Examples, authentication details, rate limits, and error codes belong in docs.
+The same applies to error bodies, pagination, and the meaning of a partially successful response. None of these is interesting when everything works, and all of them are what a client integrator actually has to code against.
 
-**Versioning.** When breaking changes are necessary, version the API (`/v1/`, `/v2/`) and support old versions for a defined period.
+## Security is part of the surface
 
-## Common API styles
+OWASP's API Security Top 10 catalogues the failures that recur in practice, and several are design failures rather than implementation bugs. API1:2023 is broken object-level authorization — the system lets a user access an object they should not, because the API never checked. API3:2023 combines excessive data exposure and mass assignment, and OWASP describes the root cause as "the lack of or improper authorization validation at the object property level". API4:2023 is unrestricted resource consumption, with the note that satisfying API calls requires "network bandwidth, CPU, memory, and storage".
 
-**REST:** resource-oriented, uses HTTP methods and status codes. Most common for web APIs.
+Each of these is a decision about what the API exposes, and each has to be made at design time. Adding authorization after endpoints exist is possible, but it tends to produce inconsistent checks and gaps, because the surface was not designed around a single model of who may see what.
 
-**GraphQL:** clients request exactly the data they need. Reduces over-fetching but increases complexity.
+## Versioning and the cost of change
 
-**gRPC:** high-performance, contract-first using Protocol Buffers. Common for internal service-to-service communication.
+The hardest property of an API contract is that clients keep using old versions after you would like them to stop. A versioning policy is therefore not a formality; it is the statement of how long you will support a promise and what counts as breaking it.
 
-**Webhooks:** server-to-client notifications for events. Useful for asynchronous updates.
+Google's guidance has separate rules for versioning and backward compatibility, which is the right distinction: adding a field may be compatible for most clients and breaking for one that rejects unknown fields; renaming a field is breaking for everyone. A policy that says "we avoid breaking changes" is not a policy until it says which changes count.
 
-The style should match the use case, not the trend.
+Prices, URLs, and schemas all age. The way you retire a version — deprecation notices, overlapping support, a documented removal date — is part of the contract, and clients will judge the API by it.
 
-## Versioning and evolution
+## A design checklist
 
-APIs evolve. Requirements change. Fields are added, removed, or renamed. The question is how to change without breaking clients:
+1. **Model the resources** before defining endpoints, and keep custom methods rare.
+2. **Use consistent names and standard methods** so a client can predict an unseen endpoint.
+3. **Specify the failure contract** — status codes, error bodies, and rate-limit scope with recommended backoff.
+4. **Decide authorisation at the object and property level**, guided by the OWASP categories.
+5. **Write the versioning and backward-compatibility policy**, including what counts as breaking and how long support lasts.
+6. **Make the contract testable** with a small set of example requests and responses, including failures.
+7. **Change it deliberately.** A new field, a new limit, or a new error shape is a contract change even if the code change is small.
 
-- **Additive changes** (new optional fields, new endpoints) are safe.
-- **Breaking changes** (removed fields, renamed endpoints, changed types) require versioning or migration.
-- **Deprecation policy:** announce changes, support old versions for a set period, then retire.
-
-The best APIs evolve without forcing clients to rewrite constantly.
-
-## Error handling
-
-Errors should be informative, consistent, and machine-readable. A good error response includes:
-
-- A machine-readable code.
-- A human-readable message.
-- What the client can do about it (retry, fix input, contact support).
-
-HTTP status codes should be used correctly: 400 for client errors, 500 for server errors, 200 for success.
-
-## Documentation as interface
-
-Documentation is part of the API. It should include:
-
-- Authentication and rate limits.
-- Endpoint reference with examples.
-- Error codes and meanings.
-- SDKs or client libraries where useful.
-
-Good documentation reduces support requests and integration time.
-
-For the related question of how systems communicate, see [How the Internet Actually Works: From DNS to Global Connectivity](/articles/how-the-internet-actually-works-from-dns-to-global-connectivity) and how operating systems manage resources, see [How Operating Systems Shape the Modern Computing Experience](/articles/how-operating-systems-shape-the-modern-computing-experience).
+For theHTTP semantics behind status codes, see [HTTP 429 Too Many Requests](/articles/http-429-too-many-requests-how-to-debug-and-retry); for the low-level protocol, see [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean).
 
 ## Further Reading
 

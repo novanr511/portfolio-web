@@ -1,104 +1,61 @@
 ---
-title: "Site Reliability Engineering: SLOs, Error Budgets, Incident Response"
-description: "SRE applies software engineering to operations. Learn SLOs, error budgets, toil reduction, incident response, and building reliable systems at scale."
+title: "Site Reliability Engineering: SLOs, Error Budgets, and Incident Response"
+description: "SRE replaced vague reliability goals with measured objectives and a budget for failure. Read how the mechanism actually works."
 date: 2026-11-16
 tags:
   - SRE
-  - Site Reliability Engineering
-  - SLO
-  - Error Budget
-  - Incident Response
+  - Reliability
+  - Operations
+  - DevOps
 ---
 
-SRE is what happens when you ask a software engineer to design an operations team.
+Most organisations say they want high availability, and almost none can say what that means in a number, over what window, measured how. Site reliability engineering starts by making that sentence precise, and the precision changes the conversation — because once reliability has a number, the organisation can decide how much unreliability it can afford.
 
-**Direct answer:** Site Reliability Engineering (SRE) applies software engineering principles to operations. Core practices: define SLOs (Service Level Objectives), track error budgets, eliminate toil through automation, conduct blameless postmortems, and design for reliability from day one. SRE bridges the gap between development velocity and system reliability.
+**Direct answer:** An SLO is a target for a service level indicator — the Google SRE book defines an SLI as "a carefully defined quantitative measure of some aspect of the level of service that is provided" — and an error budget is the amount of failure the SLO permits. The budget is not a ceiling to hide under; it is a currency that funds change. When the budget is intact, the team can ship; when it is exhausted, reliability work takes priority until it recovers. That is the mechanism that stops reliability and velocity from being opposing slogans.
 
-## SRE principles
+## The terms do real work
 
-- **Embrace risk:** 100% reliability is impossible. Define acceptable risk via SLOs.
-- **SLOs > SLAs:** SLOs are internal targets; SLAs are external contracts with penalties.
-- **Error budgets:** 1 - SLO = budget for innovation. Spend it on releases; pause when exhausted.
-- **Toil elimination:** manual, repetitive, no enduring value, scales linearly. Automate it.
-- **Automation > manual:** runbooks → scripts → self-service → platform.
+The SRE book is unusually careful about language, and the distinction matters. An **SLI** is a measurement — availability, latency, error rate, whatever can be quantified from the system's behaviour. An **SLO** is the target for that measurement. An **SLA** is an agreement with consequences, usually external.
 
-## Service Level Objectives (SLOs)
+The book notes that "the term SLA is overloaded and has taken on a number of meanings depending on context", which is why the vocabulary has to be fixed before a team can reason about it. Saying "we have a 99.9% SLA" when what exists is an internal target with no contractual consequence confuses the three, and the confusion shows up in incident discussions.
 
-**SLI (Service Level Indicator):** measurable metric (latency, availability, throughput, correctness, durability).
+Choosing an SLI is the first substantive decision. It has to measure what users experience, not what is convenient to instrument: a server's CPU load is not an availability signal, and a synthetic check that polls a healthy endpoint is not the same as a user completing a purchase. The book's guidance is to use "intuition, experience, and an understanding of what users want" — which is a reminder that the definition is a product decision, not a monitoring default.
 
-**SLO:** target for SLI over a window (e.g., 99.9% requests < 200ms over 30 days).
+## The error budget is the actual invention
 
-**Choosing SLIs:**
-- **User-facing:** latency, availability, correctness.
-- **Internal:** throughput, durability, freshness.
+An SLO of 99.9% over a month permits roughly 43 minutes of unavailability. That number is an error budget, and its value is not that it measures failure but that it allocates it.
 
-**Window:** rolling 30 days (standard), 7 days (fast feedback), 90 days (strategic).
+The allocation works in both directions. A team that has used little of its budget can take risks — deploy more often, run experiments, accept that a change might cause a short incident. A team that has exhausted it stops feature work and spends the next period on reliability, because another incident would breach the objective. This is a pre-agreed decision rule, and it removes the argument about whether "now" is a good time to be careful.
 
-**Multiple SLOs:** critical user journeys get tighter SLOs.
+The budget also makes a uncomfortable question answerable: is 99.9% the right target? If the team never spends the budget, the objective is too loose and users are getting less reliability than they could. If it is permanently exhausted, the objective is too strict for the system's current design, and the answer is engineering work or a renegotiation — not a heroic effort to avoid incidents.
 
-## Error budgets
+## Alerting on symptoms and burn rate
 
-**Error budget = 1 - SLO.** 99.9% SLO = 0.1% error budget = 43.2 min/month.
+A budget that is reviewed monthly is too slow to prevent a breach. The SRE Workbook's chapter on alerting introduces burn rate: "Burn rate is how fast, relative to the SLO, the service consumes the error budget." A burn rate of 1 exhausts the budget exactly at the end of the window; a burn rate of 10 exhausts it in a tenth of the time.
 
-**Burn rate:** how fast budget consumed.
-- **1x:** on track (consumes budget over window).
-- **2x:** half window left.
-- **14.4x:** 2%/hour = page (consumes monthly budget in 1 hour).
+The point is behavioural. A slow, low-level failure should not page anyone — it will show up in the monthly review. A fast failure should page immediately, because at that rate the budget will be gone in hours. Alerting on burn rate rather than on a fixed error threshold gives detection time and precision at the same time, which is the stated goal of the approach.
 
-**Multi-window, multi-burn-rate alerting (Google SRE workbook):**
-- Fast burn (5m, 1h): page.
-- Slow burn (6h, 1d, 3d): ticket.
+It also discourages the common failure of alert fatigue: dozens of cause-based alerts that fire on harmless fluctuations and teach the team to ignore them. The principle is to alert on symptoms — what users experience — and on the rate at which the agreed budget is being spent.
 
-**Budget policies:** freeze deployments when budget < threshold, prioritize reliability work.
+## Chaos engineering tests the assumption
 
-## Toil elimination
+An SLO describes what should happen; chaos engineering tests what actually happens when something fails. The Principles of Chaos Engineering describe the discipline as experimenting "to uncover systemic weaknesses", and list failure modes that include "retry storms from improperly tuned timeouts" and "cascading failures when a single point of failure crashes".
 
-**Toil characteristics:** manual, repetitive, automatable, no enduring value, scales with system.
+The method starts by defining "steady state as some measurable output of a system that indicates normal behavior", then introduces a real failure and checks whether steady state holds. That is an experiment with a hypothesis and an observable result, not a game day with a script.
 
-**Examples:** manual deployments, manual scaling, manual ticket routing, manual certificate renewal, manual log rotation.
+The relevance to SLOs is direct: a chaos experiment tells you whether your measured SLI actually captures the failure mode you care about, and whether the fallback you assumed works under realistic conditions. Many organisations discover that their availability metric stayed green during a test while users could not complete a transaction — which means the SLI was wrong, not the system.
 
-**Automation ladder:**
-1. **Runbook:** documented steps.
-2. **Script:** executable runbook.
-3. **Self-service:** UI/CLI for common tasks.
-4. **Platform:** self-healing, auto-scaling, auto-remediation.
+## A sequence that works
 
-**Measure toil:** % time spent on toil vs project work. Target: < 25% toil.
+1. **Choose one SLI per user journey** that can be measured from real requests.
+2. **Set an SLO over a defined window**, and write down why that target.
+3. **Derive the error budget** and make it visible to the whole team.
+4. **Agree the policy in advance**: what the team may do while budget remains, and what it must do when the budget is gone.
+5. **Alert on burn rate**, with a short-window alert for fast failures and a long-window one for slow ones.
+6. **Run chaos experiments** against the assumptions behind the SLI and the fallback paths.
+7. **Review the target periodically.** A budget that is never spent is a target that should be tighter; one that is always spent is a design problem.
 
-## Incident response (SRE style)
-
-**Roles:** Incident Commander (IC), Communications Lead, Operations Lead, Scribe.
-
-**Phases:**
-1. **Detect:** alert fires, on-call paged.
-2. **Triage:** severity (SEV-1/2/3), impact assessment, IC assigned.
-3. **Mitigate:** stop bleeding (rollback, scale, failover, blocklist).
-4. **Resolve:** root cause fixed, service restored.
-5. **Postmortem:** blameless, timeline, root cause, action items, share widely.
-
-**Blameless postmortem:** focus on systems, not people. "What happened" not "who failed."
-
-**Action items:** specific, assigned, tracked, reviewed.
-
-## Reliability patterns
-
-**Capacity planning:** demand forecasting, headroom (20-30%), load testing.
-
-**Chaos engineering:** GameDays, fault injection (Chaos Mesh, Litmus, Gremlin). Hypothesis → experiment → learn.
-
-**Disaster recovery:** RTO (Recovery Time Objective), RPO (Recovery Point Objective). Backup/restore tested quarterly.
-
-**Release safety:** canary, progressive delivery, feature flags, automated rollback on SLO breach.
-
-## SRE team models
-
-- **Embedded:** SREs in product teams.
-- **Centralized:** platform SRE team, consulted by product teams.
-- **Hybrid:** platform SRE + embedded for critical services.
-
-**Staffing:** 1 SRE per ~8-12 developers (varies by maturity).
-
-For the related question of observability, see [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) and incident response, see [Crisis Management: PR Crises, Product Recalls, and Reputation Recovery](/articles/crisis-management-pr-crises-product-recalls-and-reputation-recovery).
+For the automation side, see [DevOps](/articles/devops-bridging-development-and-operations); for the statistical idea of alerting quality, see [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
 
 ## Further Reading
 
