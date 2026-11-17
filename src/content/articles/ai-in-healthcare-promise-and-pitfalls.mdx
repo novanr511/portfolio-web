@@ -1,62 +1,89 @@
 ---
 title: "AI in Healthcare: Promise and Pitfalls"
-description: "AI can improve diagnosis, drug discovery, and administration in healthcare. Learn where it helps, where it fails, and why the stakes are higher than in other industries."
+description: "Clinical AI has documented capability and documented failure modes. Read why validation, data provenance, and accountability decide whether it works."
 date: 2026-11-16
 tags:
   - AI
   - Healthcare
-  - Medicine
-  - Technology
+  - Machine Learning
+  - Regulation
 ---
 
-AI in healthcare is not like AI in advertising. The stakes are human lives.
+Healthcare is the domain where the promise of AI is most compelling and the cost of failure highest. A system that reads images, predicts deterioration, or drafts clinical documentation could relieve real pressure on clinicians. The same system applied carelessly can harm a patient, and the harm is difficult to detect because the model's confidence is not evidence of correctness.
 
-**Direct answer:** AI in healthcare can improve diagnosis, accelerate drug discovery, automate administration, and personalize treatment. But healthcare AI faces higher stakes than consumer AI: errors can harm patients, data is sensitive and fragmented, and regulation is strict. The promise is real, but successful adoption requires clinical validation, careful integration, and human oversight—not just technical performance.
+**Direct answer:** Clinical AI succeeds or fails on three things that are not the model architecture: whether the evaluation reflects the population and workflow where it will be used, whether the data and the model's limits are documented, and whether a named clinician remains accountable. Model cards call for "benchmarked evaluation in a variety of conditions" across relevant groups, and datasheets document a dataset's "motivation, composition, collection process, recommended uses". NIST's AI RMF is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products". Those are the instruments that turn a promising result into a deployable system.
 
-## Where AI helps in healthcare
+## Where the promise is real
 
-**Diagnosis and imaging.** AI models can analyze medical images (X-rays, MRIs, pathology slides) to detect anomalies, sometimes matching or exceeding specialist accuracy. They are best used as a second reader, flagging cases for human review.
+The capability is not hypothetical. Models can detect patterns in images and text at a scale that assists clinical work, and they can process routine documentation so clinicians spend less time on administration.
 
-**Drug discovery.** AI can screen molecules, predict protein structures, and identify candidates faster than traditional methods. This reduces early-stage research time, though clinical testing still takes years.
+The value is clearest when the task has a verifiable output and a defined boundary. An image classification system that flags a suspicious region for a radiologist to review is assisting a decision, not making one. A model that drafts a discharge summary for a clinician to approve is reducing a repetitive task, not replacing judgement. In both cases the system's output is checked by a person who is accountable for the result.
 
-**Administration.** AI can transcribe notes, code claims, schedule appointments, and summarize records—reducing the documentation burden on clinicians.
+This is the right frame for most clinical applications: augmentation with a clear review step, not autonomous action. The systems that fail are often the ones where the review step was assumed rather than designed — a clinician is nominally "in the loop" but has neither the time nor the information to check the model's output meaningfully.
 
-**Personalized treatment.** AI can analyze genetics, lifestyle, and history to suggest treatment plans. This is promising but requires rigorous validation.
+## The validation gap
 
-## Where AI fails in healthcare
+The most common failure is a model that performs well in a paper and poorly in a hospital.
 
-**Data fragmentation.** Healthcare data is scattered across hospitals, clinics, insurers, and pharmacies, in incompatible formats. A model trained on one hospital's data may not generalize to another.
+**Population shift.** A model trained on images from one institution may not generalise to another, because the equipment, patient mix, and imaging protocols differ. The reported accuracy is a property of the evaluation set, not of the disease.
 
-**Bias in data.** Training data often underrepresents certain populations (race, gender, age, income). Models trained on such data can misdiagnose or undertreat those groups.
+**Workflow mismatch.** Retrospective evaluation uses clean, complete data. Clinical practice is messy — missing fields, conflicting measurements, time pressure — and a model that requires inputs nobody records at the point of care will not be used, or will be used on guessed inputs.
 
-**False positives and negatives.** A false alarm causes unnecessary anxiety and procedures. A missed diagnosis delays treatment. Both are costly.
+**Label uncertainty.** The "ground truth" in clinical data is often a clinician's judgement, which varies, or a billing code, which is an administrative category rather than a diagnosis. A model evaluated against a noisy label can appear accurate for the wrong reason.
 
-**Context is missing.** A model sees lab values, not the patient's life, preferences, or social context. Medicine is not just pattern matching.
+scikit-learn's guidance on data leakage is relevant: leakage occurs when "information that would not be available at prediction time is used when building the model". In clinical data this can be subtle — a note written after the outcome, a test ordered because the outcome was suspected — and it produces results that collapse in prospective use.
 
-**Liability.** If an AI recommendation leads to harm, who is responsible—the developer, the hospital, or the clinician who followed it?
+The discipline that addresses this is prospective validation in the actual workflow, with the same population and the same messy inputs the system will face. A retrospective result is a reason to run that study, not a reason to deploy.
 
-## Why healthcare adoption is slower
+## Documentation is a clinical instrument
 
-Healthcare is regulated for good reason. New tools require clinical validation, regulatory approval (FDA or equivalent), and integration into existing workflows. Doctors will not use a tool they do not trust, especially when they are liable for outcomes.
+Model cards and datasheets are usually presented as governance paperwork, and in healthcare they have a more direct function: they are the only way a clinician can know what a system was trained on and where it is likely to fail.
 
-Integration is also difficult. Electronic health record systems are often rigid. AI must fit into clinical workflows, not add steps.
+A model card reports performance across relevant groups and conditions, along with the intended use and the evaluation procedure. A datasheet documents the dataset's composition, collection process, and recommended uses. Together they answer the questions a clinician should ask before trusting an output: was this validated on patients like mine, what was the outcome measured, and what is outside the system's scope?
 
-## Human-in-the-loop is essential
+Three properties matter:
 
-In healthcare, AI should recommend; clinicians should decide. The model provides information; the human applies judgment, context, and responsibility. This is not a limitation of AI—it is a safeguard.
+- **The documentation must travel with the model.** A card filed separately from the deployed system will not be consulted when a clinician needs it.
+- **It must name the failures**, including groups where performance was worse and conditions that were not evaluated. Absence of evidence is not evidence of safety.
+- **It must be dated and versioned.** A model that has been retrained is a different system, and the previous card describes a model that no longer exists.
 
-The most successful healthcare AI applications are invisible: they support clinicians without disrupting care, and they never make the final call alone.
+The NIST RMF's structure — governance, mapping, measurement, management — is a way of organising these artefacts into a programme rather than a folder. Its voluntary status is worth stating plainly: it is a framework for producing evidence, not a regulatory approval.
 
-## Ethical considerations
+## Who is accountable
 
-Healthcare AI raises specific ethical questions:
+A model cannot be responsible for a clinical decision. The accountable party must be a person or an institution with the authority to act on the system's output and to stop using it.
 
-- **Equity:** does the system work for all patients, or only those well-represented in training data?
-- **Privacy:** health data is among the most sensitive information there is.
-- **Consent:** do patients know when AI is involved in their care?
-- **Access:** will AI improve care for everyone, or only for those who can afford it?
+Three questions expose weak governance:
 
-For the related question of AI ethics more broadly, see [AI Ethics: Responsible Use of Artificial Intelligence](/articles/ai-ethics-responsible-use-of-artificial-intelligence) and the limits of AI, see [The Limits of AI: What Machines Cannot Do](/articles/the-limits-of-ai-what-machines-cannot-do).
+1. **Who reviews the output, and do they have time to do it properly?** A review step that takes longer than the task saves is not a real control.
+2. **What happens when the model and the clinician disagree?** The escalation path has to be defined before deployment, not invented during an incident.
+3. **Can the system be switched off?** If the model is embedded in a workflow with no override, the organisation has ceded control of a clinical process.
+
+This is an ethical and legal question as much as a technical one. For the broader treatment, see [AI Ethics](/articles/ai-ethics-responsible-use-of-artificial-intelligence) and [Responsible AI](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
+
+## A worked example of a validation failure
+
+Suppose a model predicts sepsis risk from electronic health record data and reports 90% accuracy on a retrospective set. Before deployment, four questions decide whether that number means anything:
+
+- **What is the prevalence?** If sepsis occurs in 2% of the set, a model that predicts "no sepsis" for everyone achieves 98% accuracy. The headline figure may be measuring the class balance rather than clinical skill.
+- **When were the inputs recorded?** If a lab result that was ordered because sepsis was suspected is included as a feature, the model is reading the clinician's suspicion, not predicting it — a form of leakage.
+- **Which patients were in the set?** If it excludes the elderly or the very young, performance on those groups is unknown, which matters because they are often at highest risk.
+- **What is the false-positive rate at the chosen threshold?** A system that alerts frequently will be ignored, and an ignored alert system has no clinical value regardless of its metric.
+
+The point is that the accuracy figure is the least informative part of the evaluation. Prevalence, timing, population, and the cost of errors are the substance, and all four require judgement about the clinical context.
+
+## A practical checklist
+
+1. **Define the intended use and the review step** before selecting a model.
+2. **Check the data provenance** with a datasheet: composition, collection, and known gaps.
+3. **Audit for leakage** with particular attention to time-ordered clinical events.
+4. **Evaluate on the deployment population** and report by relevant subgroup.
+5. **State the error profile**, not only the aggregate metric.
+6. **Produce a model card** with intended use, evaluation conditions, and limitations.
+7. **Name the accountable clinician** and define the override path.
+8. **Validate prospectively** before the system influences care.
+
+For the evaluation discipline, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the documentation standard, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale).
 
 ## Further Reading
 

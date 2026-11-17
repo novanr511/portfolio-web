@@ -164,6 +164,37 @@ Not every article needs the same headings or all devices. The argument and evide
 - Be fair to opposing views. Represent the strongest relevant counterargument before answering it; do not straw-man.
 - Read the draft aloud or perform a line edit for clarity, repetition, unsupported transitions, and sentences that sound authoritative but say little.
 
+### Human voice and narrative craft
+
+“Human” does not mean informal slang, autobiographical framing, or a fabricated first-person voice. It means the article feels observed, considered, and written for a real person: specific details carry meaning, the writer makes choices, and the reasoning has a visible human point of view.
+
+- **Begin with something particular.** When appropriate, open on a real moment, object, decision, surprising result, customer problem, system failure, or contradiction. Give the reader a reason to care before widening to the abstract idea. For analytical articles, a sharply framed question or tension can do this work without a scene.
+- **Let the idea emerge through evidence.** A scene or example should change what the reader understands. Move from concrete detail to interpretation, then test that interpretation against evidence, limits, or a counterexample. Do not add an anecdote as decoration.
+- **Create honest narrative movement.** Where the material supports it, show a question, pressure, decision, consequence, and changed understanding. In a tutorial, that movement can be symptom → investigation → diagnosis → fix → verification. In analysis, it can be claim → evidence → complication → revised conclusion. These are options, not mandatory templates.
+- **Use first person with provenance.** “I saw,” “I built,” “I tested,” and “in my experience” are factual claims. Use them only when true and specific; say what happened, under what conditions, and what cannot be generalized. If no first-hand experience exists, write with a clear analytical voice and attribute the evidence honestly.
+- **Prefer revealing details over piles of adjectives.** One exact behavior, constraint, interface detail, number, quote, or decision can make an explanation vivid. Include only details that were observed, sourced, or clearly labeled as hypothetical.
+- **Use analogy to clarify, not decorate.** A strong comparison makes an unfamiliar mechanism easier to picture, then returns to the real mechanism and its limits. Do not let a metaphor stand in for evidence or stretch it beyond the point where it remains accurate.
+- **Let sentence rhythm follow thought.** Mix developed sentences with short ones when emphasis is earned. Use fragments and one-line paragraphs sparingly; repeated dramatic beats become mannerism rather than voice.
+- **Make the conclusion feel earned.** Return to the opening question or image only if the argument has changed its meaning. End with the real implication, decision, or unresolved tension—not a generic recap or slogan.
+- **Keep the writer present through judgment, not performance.** Select what matters, explain why, acknowledge uncertainty, and make the reasoning legible. Do not manufacture vulnerability, outrage, certainty, personal confession, or a “relatable” voice.
+
+Before finalizing, ask:
+1. Could this opening belong to hundreds of unrelated articles? If so, make it more specific.
+2. Which concrete example carries the argument, and what does it help the reader see?
+3. Is the writer’s interpretation distinguishable from the source’s finding?
+4. Does the piece change or sharpen the reader’s understanding, or merely deliver information?
+5. Which paragraph sounds smooth but could have been written without reading the evidence? Rework or remove it.
+6. Does any first-person or emotional detail claim experience the author did not have?
+
+### Craft studies: what to learn, and what not to copy
+
+These pieces were read as craft examples, not as current universal rankings or factual authorities for NOVANDRI topics. Medium recommendation counts and editorial tastes vary by time and audience. Learn from transferable choices—specificity, movement, voice, structure—not from a writer’s signature phrasing or a story’s popularity.
+
+- [“The Crossroads of Should and Must” — Elle Luna](https://medium.com/p/90c75eb7c5b0): builds an organizing contrast, grounds it in a recurring white-room image and concrete decisions, then returns to the central idea with a usable action. Its lesson is to make a concept memorable through a coherent image and progression—not to force every article into a binary metaphor.
+- [“Slack’s $2.8 Billion Dollar Secret Sauce” — Andrew Wilkinson](https://medium.com/p/5c5ec7117908): earns authority by disclosing the writer’s direct role, opens with a question he has repeatedly faced, and turns product details into an explanation readers can picture. It also explicitly qualifies the limits of hindsight. Its lesson is to show the basis of a viewpoint and connect mechanism to experience—not to treat a participant’s interpretation as independent proof.
+- [“The Web We Have to Save” — Hossein Derakhshan](https://medium.com/p/2eb1fe15a426): begins from a consequential personal return to blogging, then uses that experience to frame a larger argument about the web. Its lesson is to let lived context establish stakes before analysis, while keeping the argument and evidence responsible for the broader claim.
+- [“How Quitting My Corporate Job for My Startup Dream F*cked My Life Up” — Ali Mese](https://medium.com/p/3b6b3e29b318): the accessible opening uses a dated text message, a named flight, and a recurring work routine to make the trade-off tangible before stating the conflict. The article is member-gated, so only the accessible opening was reviewed; do not treat this as a full-text analysis.
+
 ## 6. SEO, GEO, and on-page publishing standard
 
 Search optimization supports discoverability and comprehension; it does not override accuracy, editorial judgment, or reader intent. No specific structure guarantees ranking, snippets, traffic, or AI citations.
@@ -231,7 +262,7 @@ Score each dimension 0–2 (`0 = fails`, `1 = partial`, `2 = passes`). Explain a
 5. **Analysis and original value:** contributes synthesis, demonstration, decision method, or insight beyond source summaries.
 6. **Practical or intellectual payoff:** reader can decide, test, implement, interpret, or think more clearly after reading.
 7. **Nuance and scope:** uncertainty, counterarguments, trade-offs, and generalizability are calibrated; no overclaiming.
-8. **Structure and craft:** coherent argument, useful headings, clear prose, no filler/repetition, examples serve the point.
+8. **Structure, voice, and craft:** coherent argument, useful headings, clear prose with a specific human point of view; no filler/repetition; examples serve the point and have honest provenance.
 9. **SEO/GEO and on-page hygiene:** matches intent naturally; title/description/links/structure are helpful and accurate; no manipulative optimization or visibility guarantees.
 10. **Publication readiness:** valid CMS/MDX, metadata, source list, links, visual provenance, and technical checks reported honestly.
 
