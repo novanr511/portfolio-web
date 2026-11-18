@@ -1,10 +1,84 @@
 ---
 title: "AI Approval Gates Best Practices"
-description: "Reserved title for a future NOVANDRI article: AI Approval Gates Best Practices."
-date: 2026-11-17
+description: "An approval gate should stop a real risk. Read the practices, a worked example, and why a gate that slows everything is a gate nobody uses."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Governance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Approval gates are often added to AI systems as a general precaution, which produces rubber stamps and delay. The Wikipedia entry describes formal approval as authorisation, and the Anthropic agent guidance discusses checkpoints in agent workflows. The practices concern where a gate belongs.
+
+**Direct answer:** Place a gate where an action is consequential or hard to reverse, give the reviewer authority and evidence, and review whether the gate changes anything. The sources describe authorisation and checkpoints; the rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented concepts from local judgements about which actions warrant a gate.
+
+## The mechanism
+
+The first practice is selecting actions. The approval entry describes formal authorisation, which implies a decision with consequences. A gate on a low-risk read operation slows work without reducing risk, while a missing gate on a consequential write is a gap. Classifying actions is the first work.
+
+The second practice is evidence. The agent guidance describes checkpoints where state is available for inspection. A reviewer who sees only a request to approve has nothing to evaluate, which makes the gate a formality. The evidence should include what the system found and what it intends to do.
+
+The third practice is authority. A reviewer who cannot decline has no real role, and a system that routes around a declined approval defeats the gate. Defining who can decide and what happens after a refusal is part of the design.
+
+The sequence is: classify actions, define evidence, assign authority, then review whether the gate changed a decision. The definitions are local, so the conclusions are `inferred`; the concepts are `source-reported`.
+
+## A worked example
+
+*Illustrative.* An assistant can issue refunds and draft replies.
+
+Three checks decide. First, which action is consequential enough to warrant a gate — the refund, not the draft? Second, does the reviewer see the policy citation and the amount, or only a yes-or-no prompt? Third, can the reviewer decline, and does the system respect that decision?
+
+The outcome is a single well-placed gate. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Approval is a formal authorisation | `source-reported` | Wikipedia, Approval | 2026-11-18 | Definition changes |
+| Agents can pause at checkpoints | `source-reported` | Anthropic agent guidance | 2026-11-18 | Guidance changes |
+| Gate consequential actions with evidence | `inferred` | Derived from both | 2026-11-18 | Actions change |
+
+## Why a gate everywhere helps less
+
+A gate on every step trains reviewers to click through, which removes the value of the gate where it matters. Concentration on consequential actions preserves attention, and it is the practical reason to be selective.
+
+A further constraint is time. A gate that makes a urgent decision wait for a reviewer has a cost, and the design should say what happens when the reviewer is unavailable. An explicit fallback with a record is better than an implicit bypass that nobody admits to.
+
+The gate also cannot make the reviewer an expert. If the decision requires knowledge the reviewer does not have, the evidence should include enough context to decide or the gate should be placed differently. Approving something without understanding it is a formality, whatever the workflow says.
+
+Finally, a gate that is never reviewed can outlive the risk it was built for. A periodic check of whether it still changes decisions is part of good practice, not an optional improvement.
+
+A gate with no authority behind it is a formality, whatever the workflow describes.
+
+An urgent decision needs a defined fallback when the reviewer is unavailable.
+
+The gate should be reviewed after a material change, since the risk it addressed may no longer exist.
+
+A reviewer with no evidence is only a signature, which is why the context belongs at the gate.
+
+A consequential action deserves a gate that a person can genuinely refuse.
+
+## What it cannot do
+
+It cannot make a reviewer correct. It does not guarantee that the evidence shown is complete. And it cannot remove the need to monitor what happens after approval.
+
+The counterargument that more gates are safer is fair for high-risk actions and incomplete when the gates are routinely waved through.
+
+## A decision test
+
+1. Classify actions by consequence.
+2. Define the evidence for each gate.
+3. Assign authority to decide.
+4. Handle refusals explicitly.
+5. Review whether gates changed decisions.
+6. Record the design and recheck condition.
+
+For the starting point, see [AI Approval Gates](/articles/getting-started-with-ai-approval-gates).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Approval - Wikipedia](https://en.wikipedia.org/wiki/Approval) — Formal authorisation of a decision or action.
+- Anthropic, 2026. [Building effective AI agents](https://www.anthropic.com/engineering/building-effective-agents) — Guidance on agent design including checkpoints and human oversight.

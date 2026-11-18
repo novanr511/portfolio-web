@@ -1,10 +1,78 @@
 ---
 title: "What DPO Alignment Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What DPO Alignment Actually Measures."
-date: 2026-11-17
+description: "DPO optimises preferences in a dataset. Read what it measures, a worked example, and why a better score is not a better assistant."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Alignment
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Direct preference optimisation is often described as making a model safer, which overstates what the method measures. The DPO paper describes optimising against preference pairs, and the NIST AI RMF frames trustworthiness across governance and measurement. The question is what a preference dataset actually captures.
+
+**Direct answer:** Treat DPO as a method for aligning a model with a specific preference dataset, then evaluate the behaviour that matters outside that dataset. The sources describe the method and the frame; the evaluation rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented method from local judgements about what preferences represent.
+
+## The mechanism
+
+The first point is that preferences are data. The DPO paper describes learning from pairs of preferred and dispreferred responses, which means the result reflects what the annotators chose. A dataset that rewards brevity will produce a brief model, whether or not brevity is what users need, and the cause is in the labels rather than the algorithm.
+
+The second point is the gap between the dataset and the deployment. The NIST RMF treats measurement as a distinct function, which means a preference score is not the same as trustworthy behaviour in use. A model can score well on held-out pairs and still fail when a user asks something the annotators never considered.
+
+The third point is coverage. A preference dataset has boundaries, and a model optimised within them may behave worse outside them. Testing on cases drawn from real use, rather than from the same distribution as the labels, is the check that reveals the gap.
+
+The sequence is: define what the preferences represent, test beyond the dataset, measure the behaviour that matters, then state the limits. The definitions are local, so the conclusions are `inferred`; the method is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team trains a support assistant with preference pairs and reports a higher win rate.
+
+Three checks decide. First, what did the annotators prefer — correctness, tone, or brevity — and does that match what users need? Second, does the model still perform on cases outside the preference set, including refusals and edge cases? Third, has the change altered behaviour that was previously acceptable?
+
+The outcome is a qualified assessment rather than a win rate. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| DPO optimises against preference pairs | `source-reported` | DPO paper | 2026-11-18 | Method changes |
+| Trustworthiness needs measurement | `source-reported` | NIST AI RMF | 2026-11-18 | Framework changes |
+| Evaluate beyond the preference set | `inferred` | Derived from both | 2026-11-18 | Use changes |
+
+## Why a better score is not a better assistant
+
+A preference score measures agreement with a set of labels. If the labels encode a narrow view of good behaviour, a higher score means the model has become more narrowly compliant, which is not the same as more useful or safer in general.
+
+A further issue is that preference data is expensive to refresh, and a model aligned to last year's preferences may not match current expectations. Recording when the data was collected gives a review condition that a score alone cannot provide.
+
+The method also interacts with the base model. A change in the underlying model can alter how a preference dataset affects behaviour, which means an evaluation should be repeated after an upgrade. Assuming that the same training data guarantees the same result is a mistake the record should prevent.
+
+Finally, preference optimisation says little about factual accuracy. A model can be trained to give answers people prefer while being wrong, and the two qualities need separate tests. Treating a preference win as a correctness result is the error this article exists to correct.
+
+A preference score should be reported with the dataset it came from, since a different set of labels could produce a different conclusion.
+
+Correctness and preference deserve separate tests, since one does not imply the other.
+
+## What it cannot do
+
+It cannot create values that are absent from the data. It does not guarantee that a preference generalises. And it cannot replace evaluation in real conditions.
+
+The counterargument that a preference-optimised model is aligned is fair relative to the dataset and incomplete beyond it.
+
+## A decision test
+
+1. Define what the preferences represent.
+2. Test beyond the dataset.
+3. Measure behaviour that matters.
+4. Check previously acceptable cases.
+5. State the boundaries.
+6. Record the evaluation and recheck date.
+
+For the frame, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## References & Further Reading
+
+- Rafael Rafailov et al., 2023. [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) — Optimising a policy directly from preference pairs without training a separate reward model.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

@@ -1,10 +1,90 @@
 ---
 title: "MLOps Examples"
-description: "Reserved title for a future NOVANDRI article: MLOps Examples."
-date: 2026-11-17
+description: "MLOps is the practice of keeping a model working after training. Read worked examples, a worked deployment, and why a notebook is not a system."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+MLOps is often described as tooling, which hides the practices that determine whether a model keeps working. The Wikipedia entry describes deploying and maintaining machine-learning systems, and the SRE book covers the reliability practices around services. The examples show where those practices matter.
+
+**Direct answer:** Treat a model as a service with versioned data, reproducible training, monitoring, and a rollback path. The sources describe the domain; the method is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked deployment, separating documented practices from local choices about controls.
+
+## The mechanism
+
+The first practice is versioning. The MLOps entry describes maintaining systems, which requires knowing which data and code produced a given model. A model that cannot be rebuilt from a record is a one-off result, and a failure cannot be diagnosed properly.
+
+The second practice is monitoring. The SRE book treats signals as evidence from a running system. A model's inputs and outcomes change after deployment, and monitoring is how those changes become visible before users are affected.
+
+The third practice is rollback. A new model can be worse in ways a test set did not reveal, which is why a return to the previous version must be possible. Treating deployment as reversible is a design choice, not a feature of the platform.
+
+The sequence is: version the inputs, deploy behind a signal, monitor, then keep a rollback path. The choices are local, so the conclusions are `inferred`; the practices are `source-reported`.
+
+## A worked deployment
+
+*Illustrative.* A team moves a model from a notebook into a production service.
+
+Three checks decide. First, can the training data and code be identified for the deployed version? Second, which signal will show that the model is behaving differently in production? Third, can the team return to the previous version quickly if that signal turns bad?
+
+The outcome is a deployment plan with evidence and a reversal path. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| MLOps covers deployment and maintenance | `source-reported` | Wikipedia, MLOps | 2026-11-18 | Definition changes |
+| Signals come from a running system | `source-reported` | Google SRE book | 2026-11-18 | Practice changes |
+| Version, monitor and keep rollback | `inferred` | Derived from both | 2026-11-18 | System changes |
+
+## Why a notebook is not a system
+
+A notebook produces a result once, which is enough for exploration and not enough for a service. The work of keeping a model correct under changing input is the system, and it begins after the training run ends.
+
+A further point is that a rollback path depends on the previous version remaining available. A system that deletes old artefacts cannot revert, and the limitation appears only when a rollback is needed. Keeping the previous version is a small cost that should be planned.
+
+The monitoring also needs a baseline. Without knowing what normal behaviour looked like, a signal cannot be interpreted, and a model card or a recorded period provides that reference. Treating monitoring as a dashboard without a baseline is a common source of false confidence.
+
+Finally, MLOps cannot fix a model that was never fit for purpose. Good deployment makes a model's behaviour visible and reversible, which is valuable only when the underlying model does something worth deploying.
+
+A signal without a baseline cannot be interpreted, which is why the baseline belongs in the record.
+
+A model card gives the baseline that makes a production signal interpretable.
+
+Versioning makes a result reproducible, which is the precondition for diagnosing a failure later.
+
+A model that was never fit for purpose remains so after good deployment, which is a limit of the practice.
+
+A deployment should be measured against the behaviour it was meant to preserve.
+
+The record should name which data and code produced the deployed version.
+
+Rollback is a design decision, not an emergency improvisation.
+
+Monitoring without a baseline produces numbers that cannot be interpreted.
+
+## What it cannot do
+
+It cannot guarantee that a model stays accurate. It does not remove the need for evaluation. And it cannot make a poor model useful through good deployment.
+
+The counterargument that deployment tooling solves the problem is fair for repeatability and incomplete for the decisions about what to monitor.
+
+## A decision test
+
+1. Version data and code.
+2. Deploy behind a signal.
+3. Monitor inputs and outcomes.
+4. Keep a rollback path.
+5. Review after a change.
+6. Record the design and recheck condition.
+
+For the monitoring side, see [Model Monitoring Examples](/articles/model-monitoring-examples).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [MLOps - Wikipedia](https://en.wikipedia.org/wiki/MLOps) — Practices for deploying and maintaining ML systems.
+- Betsy Beyer et al., 2016. [Google SRE - Site Reliability Engineering book Google Index](https://sre.google/sre-book/table-of-contents/) — The book that defined SRE practice, including SLOs and error budgets.
