@@ -1,0 +1,63 @@
+---
+title: "Ensemble Methods: Stacking, Blending, and the Case for a Simple Champion"
+description: "A stack is a model that learns which models to trust. When stacking earns its complexity, how inner validation should choose the weights, and why a zero-parameter rule can remain the champion."
+date: 2026-11-18
+tags:
+  - Machine Learning
+  - Model Evaluation
+  - Analytics
+---
+
+An ensemble combines several models to produce one prediction. That sounds like free accuracy, and sometimes it is. Often it is a way of hiding the fact that none of the individual models found much signal.
+
+**Direct answer:** Stacking is useful only when the weights that combine members are learned out of sample and the resulting stack beats a simple alternative on data it has not seen. Complexity must earn its place; if a one-line rule ties the stack, prefer the rule.
+
+## What an ensemble is actually estimating
+
+Different models make different mistakes. A linear model misses interactions; a shallow tree misses smooth trends; a boosted tree overfits noise if left unchecked. Combining them can reduce variance and partially cancel errors. The combination is an estimate of which model to trust in which regime — and that estimate is itself a model, with its own risk of overfitting.
+
+This is why an ensemble of seven weak models is not automatically better than one decent model. It is only better if the errors are genuinely different and the combination weights are estimated honestly.
+
+## Bagging, boosting, and stacking are three different ideas
+
+**Bagging** trains members on resampled data and averages them. It mainly reduces variance, which is why random forests are hard to beat on tabular data with little tuning.
+
+**Boosting** trains members sequentially, each focused on the errors of the last. It mainly reduces bias, which makes it powerful and easy to overfit. Regularisation and shallow trees are not timidity; they are the controls that make boosting usable.
+
+**Stacking** learns a meta-model over the outputs of the base models. A logistic regression on member logits is a common choice. The meta-model is the ensemble's opinion about which members are reliable.
+
+These are not interchangeable. Choosing among them is a decision about the error you expect to reduce, not a matter of taste.
+
+## Stacking weights must be learned out of sample
+
+A meta-model fitted on the same predictions used to train the base models will learn which members happened to get the training rows right. That is leakage in a familiar disguise. The weights must come from an inner validation loop: train base models inside each fold, generate out-of-fold predictions, fit the meta-model on those, then evaluate on a holdout that was never used for either stage.
+
+For time-ordered data, the inner loop must also respect chronology. Expanding folds — train on the past, score the next block, extend the window — mirror the deployed task. Random folds let the meta-model see the future. The mechanics are covered in [Time Series Forecasting](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models), and the general tuning problem in [Hyperparameter Tuning](/articles/hyperparameter-tuning-grid-search-random-search-and-bayesian-optimization).
+
+## The champion test
+
+Here is the part many pipelines skip: put a simple rule in the competition. If the task is to classify a direction, a rule based on the sign of the move so far may be a serious contender. If the rule wins, or ties, the stack should not ship.
+
+A tie should be resolved in favour of the simpler model. The reason is practical as much as statistical: a zero-parameter rule has no training variance, no stale artifacts, and no hidden dependence on a particular fitting window. It is easier to audit and easier to explain.
+
+This is not an argument against ensembles. It is an argument for giving them a real competitor. For how to compare models fairly once they are on the same holdout, see [Classification Metrics Beyond Accuracy](/articles/classification-metrics-beyond-accuracy).
+
+## Skill guards and abstention
+
+A model does not have to emit a signal on every row. A skill guard — refuse to predict unless the model beats the majority rule and clears a minimum validation score — converts a weak classifier into a selective one. It also makes evaluation closer to deployment, where declining to act is a legitimate outcome.
+
+Selective prediction has a cost: coverage falls. Report how often the model abstains, otherwise accuracy on the remaining rows is easy to misread.
+
+## A decision test
+
+- What error are you trying to reduce: variance, bias, or combination risk?
+- Were stacking weights fitted on out-of-fold predictions?
+- Does the inner validation respect time order?
+- Did a simple rule compete, and who won the tie?
+- How often does the model abstain?
+
+## References & Further Reading
+
+- [Hyperparameter Tuning: Grid Search, Random Search, and Bayesian Optimization](/articles/hyperparameter-tuning-grid-search-random-search-and-bayesian-optimization).
+- [Classification Metrics Beyond Accuracy: Baselines, ROC-AUC, and Paired Tests](/articles/classification-metrics-beyond-accuracy).
+- [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).

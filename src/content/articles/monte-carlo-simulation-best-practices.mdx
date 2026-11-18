@@ -1,10 +1,60 @@
 ---
-title: "Monte Carlo Simulation Best Practices"
-description: "Reserved title for a future NOVANDRI article: Monte Carlo Simulation Best Practices."
-date: 2026-11-17
+title: "Monte Carlo Simulation Best Practices for Forecasts"
+description: "A simulation is only as honest as its sampling design. How to choose the resampling unit, keep volatility and drift separate, refit at each origin, and read probability bias before trusting the output."
+date: 2026-11-18
 tags:
-  - Planned
+  - Statistics
+  - Machine Learning
   - Finance
+  - Analytics
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Monte Carlo simulation is the practice of generating many possible futures instead of one. It is useful precisely where a single forecast is misleading: when the distribution matters more than the point. It is also easy to misuse, because a simulation will happily produce thousands of beautiful paths from a badly specified model.
+
+**Direct answer:** The design choices matter more than the number of paths. Choose a resampling unit that matches the dependence in the data, separate volatility scaling from drift, refit the model at every backtest origin, and evaluate the bias of the implied probabilities before using them.
+
+## A simulation is a model of uncertainty, not a forecast machine
+
+A simulation does not discover the future. It propagates the assumptions you give it. If the resampling scheme assumes independent daily returns while the data is volatile in clusters, the resulting fan chart will be too narrow in turbulent periods and too wide in calm ones.
+
+That is why the output should be read as a range of plausible paths under a stated model, not as a probability distribution handed down by nature. The distinction matters most when the paths are used in a decision with asymmetric costs.
+
+## Choose the resampling unit before the code
+
+The resampling unit is the smallest block that is resampled as a whole. Single observations assume independence. Blocks of 20 or 30 observations preserve short-range dependence and volatility clustering. Blocks that are too long destroy the variety of regimes you are trying to sample; blocks that are too short erase the structure you were trying to keep.
+
+For a monthly forecast built from daily data, a 30-day block in log space is a reasonable starting point. It respects the fact that volatility persists over weeks, and working in logs keeps prices positive. The choice should be justified by the data and checked by comparing simulated autocorrelation with observed autocorrelation — not chosen because it makes the chart look tidy.
+
+For a discussion of when simulation is the right tool at all, see [Scenario Analysis and Monte Carlo](/articles/scenario-analysis-and-monte-carlo-when-to-use-each).
+
+## Volatility scaling and drift are different operations
+
+Scaling returns by volatility changes their amplitude. Removing the mean changes their centre. Doing these in the wrong order can silently inject a drift that the data did not support.
+
+A common mistake is to de-mean returns first and then rescale them, which can reintroduce a small non-zero mean through the scaling step. If the model is meant to be driftless in log space, the de-meaning should happen *after* scaling, and the residual mean should be checked explicitly. A fan chart whose centre drifts upward when you intended no drift is a bug, not a market view.
+
+## Refit at every origin
+
+A backtest with 24 forecast origins should involve 24 fits, not one. A model fitted once on the full sample has already seen the outcomes of the later origins, so the backtest quietly becomes an in-sample exercise. Refitting before each origin is more expensive and much more honest.
+
+This applies to every fitted transformation — scaling, imputation, feature selection — not just the final estimator. Keeping them inside a pipeline is the practical way to enforce it. See [Data Leakage in Machine Learning](/articles/data-leakage-in-machine-learning) for the general rule.
+
+## Read the bias before the probabilities
+
+Directional accuracy from a simulated path is often close to a coin flip, even when the price ranges are useful. That is not a contradiction: a distribution can describe uncertainty well while having no ability to call direction.
+
+Check the probability bias — the difference between the model's stated chance of an up move and the observed share of up moves. A systematic negative bias means the model is too pessimistic about up moves, and any downstream decision that consumes the probability will inherit that error. If the bias is large, use the ranges and discard the probabilities. For the statistical background, see [Confidence Intervals and p-values](/articles/confidence-intervals-and-p-values).
+
+## A decision test
+
+- Does the resampling unit match the dependence you observe in the data?
+- Is the de-meaning done after volatility scaling, and is residual drift checked?
+- Was the model refitted at every backtest origin?
+- Are probabilities bias-checked before they are used?
+- Is the output presented as a range under assumptions, not as a forecast?
+
+## References & Further Reading
+
+- [Scenario Analysis and Monte Carlo: When to Use Each](/articles/scenario-analysis-and-monte-carlo-when-to-use-each).
+- [Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models).
+- [Data Leakage in Machine Learning](/articles/data-leakage-in-machine-learning).

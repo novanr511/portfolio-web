@@ -27,9 +27,9 @@ The conclusion is that 92% is `P(GREEN | move so far this month)` —a descripti
 
 ## 1. Introduction
 
-In popular accounts, forecasting models are often judged by a single accuracy figure. A high number is read as evidence that the model "can predict the market". Two errors are embedded in that reading. First, accuracy is meaningless without stating when the prediction was made: the information available at the start of a month and on day 25 are fundamentally different. Second, accuracy is not the same as a tradable edge; establishing that requires an economic evaluation that accounts for execution price, costs, and capacity.
+In popular accounts, forecasting models are often judged by [a single accuracy figure](/articles/classification-metrics-beyond-accuracy). A high number is read as evidence that the model "can predict the market". Two errors are embedded in that reading. First, accuracy is meaningless without stating when the prediction was made: the information available at the start of a month and on day 25 are fundamentally different. Second, accuracy is not the same as a tradable edge; establishing that requires an economic evaluation that accounts for execution price, costs, and capacity.
 
-This study begins with a failure. The first version was a single XGBoost model with an expanding window: 55.7% accuracy, equal to the "always predict GREEN" baseline of 57.1%, and 0.392 ROC-AUC. There was no signal. Instead of changing architectures, the author changed the question asked of the data.
+This study begins with a failure. The first version was a single [XGBoost](/articles/ensemble-methods-stacking-vs-blending) model with an expanding window: 55.7% accuracy, equal to the "always predict GREEN" baseline of 57.1%, and 0.392 ROC-AUC. There was no signal. Instead of changing architectures, the author changed the question asked of the data.
 
 The research questions are:
 
@@ -59,7 +59,7 @@ The definition is simple, but it forces a decision about when `y_t` may be known
 | `D10`, `D13`, `D20`, `D25`, `D27` | Day `d` of month `t` | `MS` + month-to-date price movement through day `d` |
 | `EOM` | End of month `t` | **Lookahead** — audit only, not a forecast |
 
-This changes the meaning of the metric. Accuracy at `MS` is a genuine forecast: no information from the target month is used. Accuracy at `D25` is an estimate of `P(GREEN | information through day 25)`. Accuracy at `EOM` is not forecasting at all —it uses the outcome— and is included only to test whether a model "wins" because of information leakage.
+This changes the meaning of the metric. Accuracy at `MS` is a genuine forecast: no information from the target month is used. Accuracy at `D25` is an estimate of `P(GREEN | information through day 25)`. Accuracy at `EOM` is not forecasting at all —it uses the outcome— and is included only to test whether a model "wins" because of [information leakage](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models).
 
 Formally, the same model is trained and evaluated for each `F_d`; the only change is which feature block is admitted. Differences in accuracy across sets can therefore be attributed to *when the question is asked*, not to the algorithm.
 
@@ -83,11 +83,11 @@ All data is downloaded once into `data/raw/`; the pipeline can be re-run with `-
 
 ### 3.1 Release dating as a leakage control
 
-BLS macro data is an example of leakage that is invisible unless you look for it: the CPI figure for month `t` is released roughly 15 days after that month ends. If the CPI value for month `t` is used to predict `y_t` at `MS` or `D10`, the model sees information that did not exist at prediction time. The study applies *release dating*: every macro series is shifted to its release date, so a forecast on day `d` may only use releases that had already occurred. This is a data decision, not a hyperparameter.
+BLS macro data is [an example of leakage](/articles/data-leakage-in-machine-learning) that is invisible unless you look for it: the CPI figure for month `t` is released roughly 15 days after that month ends. If the CPI value for month `t` is used to predict `y_t` at `MS` or `D10`, the model sees information that did not exist at prediction time. The study applies *release dating*: every macro series is shifted to its release date, so a forecast on day `d` may only use releases that had already occurred. This is a data decision, not a hyperparameter.
 
 ### 3.2 Conflicting price feeds
 
-Labels come from Returnsview while the month-to-date features come from Bitstamp. These are independent sources and they do not always agree:
+Labels come from Returnsview while the month-to-date features come from Bitstamp. These are [independent sources](/articles/why-data-quality-matters-more-than-model-complexity) and they do not always agree:
 
 - median return difference: **0.17 *pp***;
 - maximum difference: **18.6 *pp*** during 2011–2013;
@@ -99,7 +99,7 @@ Those three months are dropped (`outputs/source_alignment.json`). From 196 avail
 
 ## 4. Feature Engineering and Leakage Control
 
-Each panel carries 144–155 features, grouped as follows:
+Each panel carries 144–155 [features](/articles/feature-engineering-turning-raw-data-into-predictive-signals), grouped as follows:
 
 1. **Momentum, volatility, drawdown, RSI** across multiple windows;
 2. **Cross-asset returns** from 19 Yahoo Finance series;
@@ -120,7 +120,7 @@ p_normal(d)     = Phi(mtd_z(d))
 
 where `H` is the number of days in the month and `Phi` is the standard normal CDF. `p_normal(d)` is the "normal-model P(GREEN)" under the assumption that the remaining move is directionless. It serves as the analytic champion that competes with the learned models (Section 5).
 
-**Pipeline discipline.** Scaling, imputation, and feature selection live inside a scikit-learn `Pipeline` and are fitted only on the training window. No transformer ever sees test data. This enforces leakage control structurally: correctness does not depend on the researcher remembering a rule during an experiment.
+**Pipeline discipline.** Scaling, imputation, and feature selection live inside a scikit-learn [`Pipeline`](/articles/mlops-from-experiment-to-production-pipeline) and are fitted only on the training window. No transformer ever sees test data. This enforces leakage control structurally: correctness does not depend on the researcher remembering a rule during an experiment.
 
 Ablation is then used to test which feature block actually contributes (Section 7.5).
 
@@ -146,7 +146,7 @@ sources → daily panel → monthly panel → walk-forward
         → forecast → dashboard / agent
 ```
 
-**Inner expanding validation.** Inside each training window, chronological inner validation selects stacking weights, the decision threshold, and a meta-learner (logistic regression on member logits). Inner validation never touches test data.
+**Inner expanding validation.** Inside each training window, chronological inner validation selects [stacking weights](/articles/ensemble-methods-stacking-vs-blending), the decision threshold, and a meta-learner (logistic regression on member logits). Inner validation never touches test data.
 
 **Skill guard.** The model is forbidden from emitting a signal unless it beats the majority prediction and its inner-validation ROC-AUC is at least 0.53. This prevents spurious signals from models that are not statistically better than a guess.
 
@@ -161,11 +161,11 @@ sources → daily panel → monthly panel → walk-forward
 The protocol is designed to answer RQ2 with defensible statistics.
 
 - **Split:** 60 initial training months followed by expanding walk-forward; 133 out-of-sample months.
-- **Metrics:** directional accuracy and ROC-AUC per information set.
+- **Metrics:** directional accuracy and [ROC-AUC](/articles/classification-metrics-beyond-accuracy) per information set.
 - **Paired test:** McNemar's test for differences in paired proportions (model vs sign rule).
-- **Multiple-testing correction:** Holm's procedure applied across all comparisons. Without it, one fortuitous significant comparison would look like a finding.
-- **Diebold–Mariano test:** an additional check for comparative predictive accuracy.
-- **Ablation:** one feature block removed at a time to locate the source of signal.
+- **Multiple-testing correction:** [Holm's procedure](/articles/confidence-intervals-and-p-values) applied across all comparisons. Without it, one fortuitous significant comparison would look like a finding.
+- **[Diebold–Mariano test](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models):** an additional check for comparative predictive accuracy.
+- **Ablation:** one [feature block](/articles/feature-engineering-turning-raw-data-into-predictive-signals) removed at a time to locate the source of signal.
 - **Holdout:** the last 12 months opened once, after all design decisions are frozen.
 
 The study deliberately does **not** compute PnL, Sharpe ratio, slippage, or transaction costs. Consequently, no economic edge can be claimed from these results —and none is claimed.
@@ -274,7 +274,7 @@ To test whether the directional finding is task-specific or a symptom of a broad
 
 ### 9.1 Price-range model
 
-The price distribution model uses LightGBM quantile regression at the 5/10/25/50/75/90/95% levels, with conformal calibration (Romano et al., 2019). It is compared against a Gaussian band calibrated conformally in the same way. The metric is CRPS (continuous ranked probability score), where lower is better.
+The price distribution model uses LightGBM quantile regression at the 5/10/25/50/75/90/95% levels, with [conformal calibration](/articles/conformal-prediction-and-prediction-intervals) (Romano et al., 2019). It is compared against a Gaussian band calibrated conformally in the same way. The metric is [CRPS](/articles/conformal-prediction-and-prediction-intervals) (continuous ranked probability score), where lower is better.
 
 | Cut-off | Model CRPS | Naive band CRPS | Winner |
 |---|---|---|---|
@@ -285,7 +285,7 @@ The learned model loses at both published timings, so the deployed baseline is t
 
 ### 9.2 12-month path forecast
 
-The path model uses 300 Monte Carlo paths with a 30-day block bootstrap of log returns, with de-meaning performed **after** volatility scaling. Macro features are carried forward. The backtest uses 24 origins, with **refitting before each origin** —without refitting, the evaluation would optimistically use parameters that had already seen the future.
+The path model uses 300 [Monte Carlo paths](/articles/monte-carlo-simulation-best-practices) with a 30-day block bootstrap of log returns, with de-meaning performed **after** volatility scaling. Macro features are carried forward. The backtest uses 24 origins, with **refitting before each origin** —without refitting, the evaluation would optimistically use parameters that had already seen the future.
 
 <figure className="my-10 overflow-hidden rounded-xl border border-border">
   <img
@@ -306,9 +306,9 @@ Directional accuracy ranges from **30% to 65%** —close to a coin flip— with 
 
 Three product layers keep the research from ending in a notebook.
 
-**BI dashboard.** FastAPI + Plotly.js, seven pages, a star-schema cube with cross-filtering, URL state, PNG/CSV export, vendored Plotly for offline use, light/dark themes, and a **STALE DATA** badge when data or the cut-off is old.
+**BI dashboard.** FastAPI + Plotly.js, seven pages, a [star-schema cube](/articles/power-bi-for-business-analytics-data-modeling-dax-and-dashboard-best-practices) with cross-filtering, URL state, PNG/CSV export, vendored Plotly for offline use, light/dark themes, and a **STALE DATA** badge when data or the cut-off is old.
 
-**Research agent.** LangGraph + RAG combining BM25 and TF-IDF with reciprocal rank fusion over project artifacts. An OpenAI-compatible LLM with an offline fallback, SQLite checkpoints, a run registry, and a `number_audit` module that verifies every percentage in a memo against retrieved context.
+**Research agent.** [LangGraph](/articles/langchain-to-langgraph) + [RAG](/articles/rag-explained) combining BM25 and TF-IDF with reciprocal rank fusion over project artifacts. An OpenAI-compatible LLM with an offline fallback, SQLite checkpoints, a run registry, and a `number_audit` module that verifies every percentage in a memo against retrieved context.
 
 **Audit script.** 193 checks ensure numbers in the dashboard and reports still match the pipeline files. The point to emphasize: the audit guarantees **consistency**, not **method validity**. It answers "does the article match the outputs?", not "is the method correct?". Keeping these separate prevents a helper tool from being mistaken for scientific evidence.
 
@@ -325,7 +325,7 @@ The limitations must be stated alongside the results:
 1. **Small sample.** 133 out-of-sample months for a single asset; confidence intervals are wide and generalization to other assets is untested.
 2. **Post-hoc protocol.** Some exploration preceded the final protocol; this weakens statistical inference even though the holdout was frozen.
 3. **No vintage data.** BLS macro values are final/revised figures, not the values available at the historical release date. Release dating fixes availability in time, not later revisions.
-4. **No economic evaluation.** No PnL, Sharpe, costs, or capacity —so no claim of tradability.
+4. **No economic evaluation.** No PnL, [Sharpe](/articles/sharpe-ratio-metrics-that-matter), costs, or capacity —so no claim of tradability.
 5. **Late-month accuracy is descriptive.** Figures at D25/D27 are `P(GREEN | move so far)`, not a signal executable at the prior month's close.
 6. **Not financial advice.** All results are research experiments, not investment recommendations.
 

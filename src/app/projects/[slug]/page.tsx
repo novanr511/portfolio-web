@@ -193,12 +193,11 @@ export default async function ProjectStudyPage({
               </header>
             </Reveal>
 
-            {/* Body */}
-            <Reveal delay={120}>
-              <div className="prose prose-lg prose-article mt-12 max-w-none prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
-                <Study />
-              </div>
-            </Reveal>
+            {/* Body — no reveal wrapper: long content would stay hidden until
+                10% of its height entered the viewport. */}
+            <div className="prose prose-lg prose-article mt-12 max-w-none prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
+              <Study />
+            </div>
 
             {/* Footer navigation */}
             <Reveal>
