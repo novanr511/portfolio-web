@@ -1,10 +1,82 @@
 ---
 title: "Structured Outputs: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Structured Outputs: Common Questions."
-date: 2026-11-17
+description: "A schema constrains shape, not truth. Read the common questions, a worked example, and why valid JSON can still be wrong."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Structured outputs are often treated as a guarantee of correctness, which confuses format with meaning. The OpenAI structured-output guide describes schema enforcement, and the Anthropic use-case guides cover production patterns. The common questions concern what a schema can and cannot do.
+
+**Direct answer:** Use a schema to make output machine-readable, then validate the values against the task. The sources describe the mechanism; the rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented format behaviour from local judgements about correctness.
+
+## The mechanism
+
+The first point is what a schema enforces. The structured-output guide describes constraining generation to a format, which means the result can be parsed. It does not mean the values are true, complete, or appropriate, and the difference matters when the output drives a decision.
+
+The second point is schema design. The use-case guides describe models in production, where the output is consumed by another system. A schema that is too loose produces values that need interpretation, while one that is too strict omits uncertainty, which is a design decision rather than a technical detail.
+
+The third point is validation. A field that must be an integer can still contain the wrong integer, and a required field can be filled with a guess. Checking the output against the task, with a sample of real cases, is the step that turns a format into a reliable interface.
+
+The sequence is: define the consumer, write the schema, add validation, then evaluate on real cases. The choices are local, so the conclusions are `inferred`; the mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A system extracts invoice fields into a structured record.
+
+Three checks decide. First, does the schema match what the consuming system needs, including missing values? Second, are the values checked against the source document, not only against the types? Third, what happens when the model is uncertain, and does the output represent that uncertainty?
+
+The outcome is an interface with a validation rule. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Schemas constrain output format | `source-reported` | OpenAI structured outputs | 2026-11-18 | API changes |
+| Models support defined production tasks | `source-reported` | Anthropic use-case guides | 2026-11-18 | Capabilities change |
+| Validate values beyond types | `inferred` | Derived from both | 2026-11-18 | Task changes |
+
+## Why valid JSON can be wrong
+
+A format check passes when the shape is correct, which is independent of whether the content is right. Treating a parseable response as a correct one is the error this article exists to correct, and the remedy is a value check against the source.
+
+A further consideration is how uncertainty is represented. A schema with no field for "unknown" forces the model to guess, and a guess that looks like a value is harder to catch than an explicit gap. Allowing a missing value is a design choice that preserves honesty.
+
+The schema also has to evolve with the consumer. A new field added downstream can break an old parser, and an old field that nobody reads still costs tokens. Reviewing the schema when the consumer changes is part of maintaining the interface, not an optional cleanup.
+
+The third limitation is that a schema cannot make a model understand the task. A model that misreads the input will produce a well-formed wrong answer, and validation against the source is the only way to detect it. The structure helps the system, not the reasoning.
+
+A schema that cannot express uncertainty forces a guess, and a guess looks like a value.
+
+The consumer of the output should be defined before the schema, since a field nobody reads still costs tokens.
+
+A parseable response is evidence about format, not about whether the model understood the input.
+
+The schema should be reviewed when the consuming system changes, since an old field can become an error.
+
+Validation against the source is the only way to catch a well-formed wrong value.
+
+A format check is not a correctness check, and the two belong in separate tests.
+
+A required field with no way to express uncertainty will be filled with a guess.
+
+## A decision test
+
+1. Define what consumes the output.
+2. Write a schema that represents uncertainty.
+3. Validate values against the source.
+4. Check on real cases.
+5. Review the schema when the consumer changes.
+6. Record the design and recheck date.
+
+For the output contract, see [Structured Output](/articles/structured-output-and-constrained-decoding-for-production-apis).
+
+## References & Further Reading
+
+- OpenAI, 2026. [Structured model outputs | OpenAI API](https://platform.openai.com/docs/guides/structured-outputs) — The official guide to constrained decoding and schema-enforced model outputs.
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
