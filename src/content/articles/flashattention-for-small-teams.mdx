@@ -1,10 +1,63 @@
 ---
 title: "FlashAttention for Small Teams"
-description: "Reserved title for a future NOVANDRI article: FlashAttention for Small Teams."
-date: 2026-11-17
+description: "FlashAttention is mostly a serving-stack decision, not a project to implement. Read what changes, a worked example, and what to measure."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Infrastructure
+  - Performance
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Small teams rarely implement FlashAttention themselves, which is a good thing. It is a low-level attention algorithm that matters through the serving framework a team chooses, and the practical decision is whether the stack includes it and whether the workload benefits. Treating it as a project to hand-write is a mistake, as the build-versus-buy article argues for software capabilities generally.
+
+**Direct answer:** FlashAttention computes exact attention with fewer memory reads and lower peak memory, which matters for long sequences and prefill. The paper is the primary source, and the serving-frameworks article explains how IO-aware techniques reach an application through infrastructure. The boundary: it does not change model capability, does not remove the KV cache, and its benefit depends on sequence length and hardware, as the KV-cache article explains for the separate memory consumer.
+
+## The framework decision in practice
+
+For most teams, the choice is not whether to use FlashAttention but which serving stack to adopt. A framework that includes IO-aware attention and continuous batching gives the benefit without a custom kernel, which the serving-frameworks article explains for how infrastructure techniques reach an application. The evaluation should therefore compare frameworks on the team's workload, as the benchmarks article advises for results that transfer to a specific setup.
+
+The comparison should include the parts that do not change. Model weights and the KV cache still determine whether a model fits in memory, as the KV-cache article explains for generation, and prompt caching addresses a different cost, as the prompt-caching article describes. A framework that speeds attention but leaves the team unable to serve the desired concurrency is not a solution, which the GPU article treats as a capacity question.
+
+Finally, the gain should be reported honestly. A throughput improvement at a fixed latency target is a measurable result, which the batching-economics article specifies, while a benchmark from another hardware setup is a claim, as the benchmarks article warns about context. The distinction is the same one the publication standard requires for all performance statements.
+
+## What it changes
+
+**Memory traffic.** The algorithm tiles attention so the full score matrix is never written to high-bandwidth memory, which the paper describes as IO awareness. For long sequences this is the difference between a matrix that fits and one that does not, as the attention-variants article explains for the memory problem.
+
+**Speed.** Fewer memory round trips can speed up attention even though the arithmetic is unchanged, as the paper reports. The gain is workload-specific, which the benchmarks article warns about applying a result from one setup to another.
+
+**No output change.** It computes the same function up to numerical differences, which is why it belongs in the serving layer, as the serving-frameworks article describes. A team should not expect a quality improvement from enabling it, which the evaluation article treats as a separate measurement.
+
+Three consequences follow. The practical choice is a framework that supports IO-aware attention, as the serving article recommends. The workload should have sequences long enough for the gain to matter, which the long-context article treats as a trade-off. And memory planning must still account for the KV cache, as the KV-cache article explains for generation.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team serves a model with 4,000-token prompts on a GPU with limited memory and sees slow prefill.
+
+Three checks decide whether FlashAttention helps. First, does the serving stack use an IO-aware attention implementation, which the serving-frameworks article asks for in a self-hosted setup? If not, upgrading the framework is the change, not writing a kernel. Second, is the bottleneck memory or compute, which the GPU article requires for diagnosing performance? A memory-bound workload is where the algorithm pays. Third, does throughput improve at the same latency target, which the batching-economics article specifies as the right measure?
+
+Three conclusions follow. The gain comes from the framework, which the serving article explains. The KV cache remains a separate constraint during generation, as the KV-cache article warns. And the result should be measured on the team's own traffic, as the benchmarks article advises for any performance claim.
+
+## What it cannot do
+
+It cannot make a model fit if the weights and KV cache exceed memory, which the GPU article treats as a capacity problem. It does not shorten context or reduce the cost of long prompts, as the prompt-caching article explains for a different mechanism. And it does not guarantee a speedup on short sequences, which the paper's scope makes clear, as the benchmarks article warns about generalising results.
+
+The counterargument that a small team should ignore low-level attention entirely is fair for most applications and wrong about the choice of serving framework, which the serving article treats as a decision with real throughput consequences.
+
+## A decision test
+
+1. Identify whether you self-host and which framework you use, as the serving-frameworks article advises.
+2. Check that the stack supports IO-aware attention.
+3. Confirm the workload's sequence length makes the gain relevant.
+4. Distinguish memory from compute as the bottleneck, as the GPU article requires.
+5. Measure throughput at a fixed latency target, as the batching-economics article specifies.
+6. Remember the KV cache remains, as the KV-cache article warns.
+7. Re-test after a model or hardware change, as the monitoring article advises.
+
+For the mechanism, see [FlashAttention and Attention Variants](/articles/flashattention-and-attention-variants-what-they-actually-optimize); for the serving layer, see [Serving Frameworks](/articles/serving-frameworks-what-vllm-style-batching-changes).
+
+## Further Reading
+
+- Tri Dao et al., 2022. [FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness](https://arxiv.org/abs/2205.14135) — IO-aware exact attention that avoids materialising the full attention matrix in memory.
+- Ashish Vaswani et al., 2017. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — The transformer architecture that the NLP and LLM sections build on.
