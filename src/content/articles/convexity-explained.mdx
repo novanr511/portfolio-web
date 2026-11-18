@@ -1,13 +1,82 @@
 ---
 title: "Convexity Explained"
-description: "Reserved title for a future NOVANDRI article: Convexity Explained."
-date: 2026-11-17
+description: "Convexity describes how a bond's sensitivity changes. Read what it adds to duration, a worked example, and why a linear estimate breaks."
+date: 2026-11-18
 tags:
-  - Planned
   - Finance
+  - Method
+  - Fixed Income
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Duration is often presented as a complete measure of interest-rate sensitivity, which is true only for small moves. The Wikipedia entry describes curvature, and the yield-curve entry covers the relationship between yields and maturities. Convexity is the correction that duration cannot provide.
+
+**Direct answer:** Use convexity to refine a duration-based estimate when yields move enough that the linear approximation fails. The sources describe the concepts; the method is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented mathematics from local choices about when the correction matters.
+
+## The mechanism
+
+The first point is that duration is a first-order estimate. The convexity entry describes curvature, which is the second-order term. For a small change in yield, the linear estimate is close; for a larger one, it misses the way sensitivity itself changes.
+
+The second point is asymmetry. A bond's price response to a fall in yields is not the mirror of its response to a rise, because the curve bends. A linear estimate treats the two as symmetric, which is where the error appears.
+
+The third point is context. The yield-curve entry describes how yields vary with maturity, which affects how much convexity matters for a given bond. The mathematical treatment belongs in the reference literature; the decision here is when to use the correction.
+
+The sequence is: compute the duration estimate, judge the size of the yield move, then apply the correction if the move is large. The judgement is local, so the conclusions are `inferred`; the concepts are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A bond's yield moves by a large amount and a duration-based estimate predicts a price change.
+
+Three checks decide. First, is the move small enough that a linear estimate is sufficient? Second, does the bond have meaningful curvature, given its maturity and coupon? Third, does the corrected estimate change a decision, or only the precision of a figure?
+
+The outcome is a decision about which estimate to use. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Convexity describes curvature in a relationship | `source-reported` | Wikipedia, Convexity | 2026-11-18 | Definition changes |
+| Yields vary with maturity | `source-reported` | Wikipedia, Yield curve | 2026-11-18 | Definition changes |
+| Apply the correction for larger moves | `inferred` | Derived from the approximation | 2026-11-18 | Method changes |
+
+## Why the linear estimate fails
+
+A linear estimate assumes sensitivity is constant. In a bond, sensitivity changes as yield changes, which is the curvature the correction captures. The error grows with the size of the move, which is why small changes are often handled by duration alone.
+
+A further consideration is that the correction assumes a well-behaved relationship. Real bonds can have embedded options that change their behaviour when rates move, and a standard convexity figure may not capture that. Reading the instrument's terms is part of knowing whether the correction applies.
+
+The estimate also depends on the yield data used. A dated source matters because yields move, and a figure calculated from an old curve can misstate the current sensitivity. Recording the source and date makes the estimate reproducible, which is the difference between a calculation and an assertion.
+
+For a practitioner, the decision is often simpler than the mathematics suggests. If the yield move is small relative to the position, duration is sufficient. If it is large, the correction is worth computing, provided the instrument is simple enough for the model to apply. Knowing which case applies is the useful skill.
+
+The correction should be applied only where the instrument's terms make the model appropriate, since embedded options change the relationship.
+
+A dated yield source makes the estimate reproducible, which matters more than extra decimal places.
+
+The instrument's terms determine whether the standard correction is meaningful at all.
+
+The correction is most useful where a duration estimate would change a decision, not where extra precision is merely reassuring.
+
+The yield move should be judged against the position, since a small percentage can still matter on a large holding.
+
+## What it cannot do
+
+It cannot predict yields. It does not remove credit or liquidity risk. And it cannot make an estimate exact.
+
+The counterargument that duration is enough is fair for small moves and incomplete for large ones.
+
+## A decision test
+
+1. Compute the duration estimate.
+2. Judge the size of the yield move.
+3. Check the bond's curvature.
+4. Apply the correction where it changes the decision.
+5. Use dated yield data.
+6. Record the assessment and recheck condition.
+
+For the base measure, see [Fixed Income Markets](/articles/fixed-income-markets-bonds-yields-and-duration-risk).
 
 ## References & Further Reading
 

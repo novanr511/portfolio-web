@@ -1,6 +1,13 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import GithubSlugger from "github-slugger";
 import matter from "gray-matter";
+
+export type TocHeading = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
 
 export type ProjectStudy = {
   slug: string;
@@ -11,6 +18,7 @@ export type ProjectStudy = {
   tags: string[];
   inLanguage: string;
   readingTime: string;
+  headings: TocHeading[];
 };
 
 const studiesDir = path.join(process.cwd(), "src", "content", "projects");
@@ -57,11 +65,43 @@ async function loadStudies(): Promise<ProjectStudy[]> {
           ? new Date(data.updated as string).toISOString().slice(0, 10)
           : undefined,
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-        inLanguage: String(data.inLanguage ?? "id"),
+        inLanguage: String(data.inLanguage ?? "en"),
         readingTime: `${minutes} min read`,
+        headings: extractHeadings(content),
       };
     })
   );
 
   return studies.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/**
+ * Section headings for the on-page table of contents. IDs are generated with
+ * the same slugger rehype-slug uses, so the anchors resolve against the IDs
+ * injected into the rendered MDX headings.
+ */
+function extractHeadings(content: string): TocHeading[] {
+  const slugger = new GithubSlugger();
+  const headings: TocHeading[] = [];
+  let inFence = false;
+
+  for (const line of content.split("\n")) {
+    if (/^\s*```/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+
+    const match = /^(#{2,3})\s+(.+?)\s*$/.exec(line);
+    if (!match) continue;
+
+    const text = match[2].replace(/\*\*/g, "").replace(/`/g, "").trim();
+    headings.push({
+      id: slugger.slug(text),
+      text,
+      level: match[1].length as 2 | 3,
+    });
+  }
+
+  return headings;
 }

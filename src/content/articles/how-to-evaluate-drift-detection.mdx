@@ -1,13 +1,80 @@
 ---
 title: "How to Evaluate Drift Detection"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Drift Detection."
-date: 2026-11-17
+description: "Drift detection is useful only if it finds meaningful change. Read how to evaluate it, a worked example, and why sensitivity has a cost."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - AI
+  - Method
+  - Evaluation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Drift detection is often evaluated by whether it fires, which ignores the alerts that were wrong. The concept-drift entry describes changes in the relationship a model learned, and the model-card literature documents what a model is expected to do. The evaluation question is whether the detector helps.
+
+**Direct answer:** Evaluate drift detection against known changes and known stability, measuring false alarms alongside detection. The sources describe the concepts; the method is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented concepts from local choices about thresholds.
+
+## The mechanism
+
+The first requirement is a baseline. The model-card entry describes what should be documented about a model, which includes the behaviour it was expected to show. A detector evaluated without a baseline has nothing to compare against, and any change will look like drift.
+
+The second requirement is known cases. The concept-drift entry describes changes in relationships, which can be simulated or drawn from past incidents. A detector tested only on stable data will never fire; one tested only on changes will fire everywhere. Both cases are needed to measure its behaviour.
+
+The third requirement is a cost for false alarms. A detector that fires on normal variation will train the team to ignore it, which is worse than having no detector. The threshold should reflect the cost of an investigation versus the cost of a missed change, which is a decision rather than a statistical default.
+
+The sequence is: document the baseline, build known cases, measure detection and false alarms, then set a threshold with a cost. The decisions are local, so the conclusions are `inferred`; the concepts are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team tests a detector on six months of stable data and two known shifts.
+
+Three checks decide. First, does it remain quiet on the stable period? Second, does it fire on both shifts, and how long after each? Third, what is the cost of the investigations it would have triggered in the stable period?
+
+The outcome is a threshold with a recorded trade-off. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Concept drift is change in a learned relationship | `source-reported` | Wikipedia, Concept drift | 2026-11-18 | Definition changes |
+| Model cards document expected behaviour | `source-reported` | Model Cards paper | 2026-11-18 | Practice changes |
+| Test against stability and known change | `inferred` | Derived from the concepts | 2026-11-18 | Model changes |
+
+## Why sensitivity has a cost
+
+A detector can be made more sensitive, but each additional alert consumes attention. The right sensitivity is where the value of a detected change equals the cost of the false alarms, which is a decision that depends on the use of the model.
+
+A further complication is that drift can be gradual. A sudden change is easier to detect than a slow shift, and a test built only on abrupt cases will overstate performance. Including gradual changes in the evaluation gives a more realistic picture, though it requires constructing cases with care.
+
+The baseline also ages. A model that was stable last quarter may have been retrained, and a detector evaluated against the old behaviour will produce irrelevant alerts. Rebuilding the evaluation after a model change is part of maintaining the detector, not an optional improvement.
+
+None of this removes the need for human review. A detector points to a possible change; deciding whether it matters requires someone who understands the model's use. Treating an alert as a finding is the mistake the evaluation is meant to prevent.
+
+An alert is a prompt for investigation, not a finding, and the distinction should be visible in the report.
+
+A detector should be re-evaluated after a model change, since the baseline it learned no longer applies.
+
+A false alarm has a cost in attention, which belongs in the threshold decision.
+
+Sensitivity without a plan for the alerts produces noise rather than detection.
+
+## What it cannot do
+
+It cannot tell whether a detected change matters. It does not replace investigation. And it cannot guarantee that all drift is caught.
+
+The counterargument that an alert is better than silence is fair for critical systems and incomplete where false alarms are common.
+
+## A decision test
+
+1. Document the expected behaviour.
+2. Build stable and changed cases.
+3. Measure detection and false alarms.
+4. Set a threshold with a cost.
+5. Review alerts by cause.
+6. Record the evaluation and recheck date.
+
+For the monitoring context, see [Model Monitoring Examples](/articles/model-monitoring-examples).
 
 ## References & Further Reading
 

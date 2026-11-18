@@ -1,13 +1,80 @@
 ---
 title: "Agent Observability Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Agent Observability Trade-Offs."
-date: 2026-11-17
+description: "An agent's reasoning is only partly observable. Read the trade-offs, a worked example, and why more traces can mean less clarity."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Observability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Agent observability is often treated as capturing everything, which produces large volumes of data that are hard to use. The Anthropic agent guidance describes checkpoints, and the SRE alerting workbook relates signals to objectives. The trade-off is between detail and usefulness.
+
+**Direct answer:** Observe the steps that change a decision — tool calls, escalations, and outputs — with a clear purpose for each signal. The sources describe checkpoints and objectives; the selection rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented agent patterns from local choices about what to record.
+
+## The mechanism
+
+The first consideration is what the trace is for. The agent guidance describes checkpoints, which give places to record state. A trace that records everything is easy to produce and hard to read, which makes it less useful in the moment a decision is needed.
+
+The second consideration is the signal-to-objective link. The alerting workbook relates signals to objectives, and the same discipline applies here. A signal that does not correspond to a decision should be questioned, because collecting it has a cost in storage and attention.
+
+The third consideration is interpretation. An agent's internal reasoning is not a reliable explanation of what happened, which is a limitation of the system. Observing the tools called, the data retrieved, and the actions taken is more verifiable than reading a narrative the model produced about itself.
+
+The sequence is: define the decision, choose the signals that bear on it, record them at checkpoints, then review against an outcome. The choices are local, so the conclusions are `inferred`; the patterns are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team instruments an agent that answers questions from documents.
+
+Three checks decide. First, which decisions need review — a wrong answer, an unnecessary tool call, or a missed escalation? Second, which signals reveal those decisions, and at which checkpoint? Third, can a reviewer use the trace to decide what changed, without reconstructing the whole run?
+
+The outcome is a small set of useful signals. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Agent guidance describes checkpoints | `source-reported` | Anthropic agent guidance | 2026-11-18 | Guidance changes |
+| Alerting relates signals to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Record signals that bear on decisions | `inferred` | Derived from both | 2026-11-18 | Agent changes |
+
+## Why more traces can help less
+
+A large trace can hide the few events that matter, which is the opposite of observability's purpose. A smaller set of signals tied to decisions is more useful, because a reviewer can act on it without further analysis.
+
+A further constraint is that recorded signals can be misleading. An agent may call the right tool with the right arguments and still produce a wrong answer, which a trace of tool calls alone will not show. The output has to be evaluated separately, and the trace supports that evaluation rather than replacing it.
+
+There is also a cost to retention. Storing detailed traces for long periods consumes resources and raises questions about the data they contain, which may include user content. A retention rule should be set deliberately, with a reason for the chosen period rather than an default.
+
+Finally, observability does not create accountability. Someone has to review the signals and decide what to change. A system that records everything and has no owner for the review has produced data without learning, which is a common outcome when instrumentation is treated as the goal.
+
+A trace is evidence of what was recorded, not a complete account of what the system did.
+
+A retention rule should reflect the sensitivity of the data recorded, not a default setting.
+
+The value of a signal is measured by the decision it enables, not by the volume of data it produces.
+
+The signals worth keeping are those a reviewer will actually consult after an incident.
+
+## What it cannot do
+
+It cannot make an agent's reasoning fully transparent. It does not guarantee that the recorded signals are sufficient. And it cannot replace evaluation.
+
+The counterargument that everything should be logged is fair for debugging and incomplete for ongoing review.
+
+## A decision test
+
+1. Define the decision to support.
+2. Choose signals that bear on it.
+3. Record at checkpoints.
+4. Review against outcomes.
+5. Remove signals nobody uses.
+6. Record the design and recheck condition.
+
+For the design, see [AI Fallback Design](/articles/ai-fallback-design-explained).
 
 ## References & Further Reading
 
