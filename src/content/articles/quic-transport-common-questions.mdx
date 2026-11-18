@@ -1,13 +1,82 @@
 ---
 title: "QUIC Transport: Common Questions"
-description: "Reserved title for a future NOVANDRI article: QUIC Transport: Common Questions."
-date: 2026-11-17
+description: "QUIC moves HTTP over UDP with its own handshake and recovery. Read the common questions, a worked diagnosis, and why a blocked UDP port still matters."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Reference
+  - Networking
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+QUIC is often described simply as "HTTP/3 over UDP", which hides what changed. RFC 9114 defines the HTTP mapping, and RFC 9110 defines the HTTP semantics that still apply. The practical questions concern connectivity, fallback, and what a failure actually looks like.
+
+**Direct answer:** Treat QUIC as a transport with its own connection setup and loss recovery, verify UDP reachability separately from HTTPS, and keep the HTTP semantics in view. The RFCs define the protocol; the diagnostic sequence is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked diagnosis, separating normative statements from the local checks used to interpret a failure.
+
+## The mechanism
+
+Three points matter:
+
+- **Transport and application are distinct.** RFC 9110 defines HTTP semantics that remain relevant regardless of transport. RFC 9114 maps HTTP onto QUIC.
+- **UDP reachability is a precondition.** A network that blocks UDP will prevent a QUIC connection before HTTP is involved.
+- **Fallback is normal.** A client can fall back to TCP-based HTTP when QUIC is unavailable. A successful page load does not prove QUIC worked.
+
+The sequence is: verify UDP reachability, confirm which protocol negotiated, then inspect application behaviour. The checks are local practice, so they are `inferred`; the protocol definitions are `source-reported`.
+
+## A worked diagnosis
+
+*Illustrative.* A site works for most users but a small group reports slow first loads.
+
+Three checks decide. First, can those users reach the server over UDP at all, or is the network filtering it? Second, did the browser negotiate HTTP/3 or fall back to HTTP/2, as the response metadata would show? Third, if fallback occurred, is the slowness caused by the extra negotiation rather than by the application?
+
+The outcome is a specific conclusion about transport versus application. The conditions are hypothetical; the sequence is the contribution.
+
+## Why the negotiated protocol is the first datum
+
+Before asking why a page is slow, a diagnosis should establish which protocol was used. A browser that could not establish QUIC and fell back to HTTP/2 is describing a network condition, not an application problem. A browser that negotiated HTTP/3 and still shows a delay is describing a different system. Treating the two as the same event makes the investigation much longer than necessary.
+
+The connection setup is a separate source of delay. QUIC combines transport and cryptographic handshakes, which is one of its advantages when it works. When a network filters UDP, the client must wait to conclude that QUIC is unavailable before trying TCP, and that wait appears as latency. Monitoring that records only final success cannot see the time spent in the failed attempt.
+
+## What to record
+
+A useful record includes the negotiated protocol, the path, and the time to first response. With those three values, a team can tell whether the problem is reachability, negotiation, or the application. Without them, the same symptom can be attributed to any layer, and the fix is guesswork.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| HTTP/3 is defined as a mapping over QUIC | `source-reported` | RFC 9114 | 2026-11-18 | RFC updated |
+| HTTP semantics are defined independently of transport | `source-reported` | RFC 9110 | 2026-11-18 | RFC updated |
+| Verify UDP and negotiated protocol before blaming the app | `inferred` | Derived from protocol layering | 2026-11-18 | Network changes |
+
+## Why fallback obscures the cause
+
+A fallback is designed to be invisible to users, which is good for reliability and awkward for diagnosis. When everything eventually loads, monitoring that records only success will show no problem. The extra time spent failing over is real, but it is hidden inside a normal page-load metric.
+
+The first useful observation is therefore the negotiated protocol, not the outcome. Once that is known, the question narrows: either the client could not use QUIC, or it could and the problem lies elsewhere. This is cheaper than optimising an application that was never the cause.
+
+A related question is whether the measurement path can see the protocol at all. Some monitoring tools record only the application result and discard connection metadata. In that case the first datum is unavailable, and the team must add a synthetic check from a representative network before the diagnosis can proceed. That is a tooling decision, but it follows directly from the layering described above.
+
+The distinction matters because a transport problem and an application problem call for different fixes, and only one of them belongs in the application backlog.
+
+## What it cannot do
+
+It cannot make a blocked network reachable. It does not guarantee lower latency, which depends on the path and the workload. And it cannot replace application-level measurement.
+
+The counterargument that the browser handles all of this is fair for users and incomplete for operators who need to explain a slow path.
+
+## A decision test
+
+1. Verify UDP reachability.
+2. Record the negotiated protocol.
+3. Separate transport failure from application delay.
+4. Check fallback behaviour.
+5. Use dated measurements.
+6. Record the finding and the recheck condition.
+
+For the performance context, see [Web Performance](/articles/web-performance-from-dns-to-browser-find-the-slow-layer).
 
 ## References & Further Reading
 

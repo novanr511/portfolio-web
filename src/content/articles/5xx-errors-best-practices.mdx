@@ -1,13 +1,83 @@
 ---
 title: "5xx Errors Best Practices"
-description: "Reserved title for a future NOVANDRI article: 5xx Errors Best Practices."
-date: 2026-11-17
+description: "A 5xx is server-side feedback, not a cause. Read the practices, a worked response, and why a status code alone never explains an incident."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A 5xx response tells a client that the server failed to fulfil a valid request. RFC 9110 defines the class, and the SRE alerting workbook ties error signals to service objectives. The useful work begins after the status is observed.
+
+**Direct answer:** Treat 5xx as a symptom: tie the rate to an objective, locate the failing layer with logs and traces, contain the impact, then fix and verify. The RFC defines the signal; the response sequence is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked response, separating the protocol definition from the operational choices made during an incident.
+
+## The mechanism
+
+Three distinctions matter:
+
+- **Protocol feedback.** RFC 9110 defines 5xx as server-side failure. It does not say which component failed.
+- **Signal versus objective.** The SRE workbook argues for alerting tied to service objectives. A single error is noise; a sustained rate against an objective is a signal.
+- **Containment before cause.** The incident-handling lifecycle treats containment as an early step. A fix that waits for full understanding can be too late.
+
+The sequence is: confirm the status class, measure against an objective, inspect logs and traces, contain, then fix and verify. The first is `source-reported`; the rest are operational practice, so they are `inferred`.
+
+## A worked response
+
+*Illustrative.* A deploy is followed by a sustained rise in 503 responses.
+
+Three checks decide. First, is the rate above the agreed objective over a sustained window? Second, do logs and traces point to the application, a dependency, or the deploy itself? Third, is there a tested rollback path that can contain the impact while investigation continues?
+
+The outcome is a containment decision followed by a cause. The conditions are hypothetical; the sequence is the contribution.
+
+## Why the window matters more than the spike
+
+A short burst of server errors and a sustained rise are different events, even when both produce the same status code. A burst may reflect a deploy or a brief dependency failure; a sustained rise usually means the system is still in a bad state. The window used for alerting therefore decides what a responder is called to investigate.
+
+Defining the window before an incident has a second benefit: it removes argument during the incident. A team that agrees in advance on the threshold and duration can act without debating whether the signal is real. The debate is better held when nobody is under pressure.
+
+## What to write down
+
+The incident record should contain the signal that fired, the layer identified, the containment action, and the verification that recovery occurred. It should also state what was not known at the time. That last item is often the most useful part in a later review, because it separates a wrong decision from a decision made with incomplete information.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| 5xx denotes server-side failure | `source-reported` | RFC 9110 | 2026-11-18 | RFC updated |
+| Alerting should relate to service objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice updated |
+| Contain before completing the diagnosis | `inferred` | Derived from incident handling | 2026-11-18 | Process changes |
+
+## Why a status is not an explanation
+
+A status code is the server's answer to the client. It says that something failed, not what failed. Treating the code as a cause leads to fixes aimed at the response rather than the system producing it. The layer that returned the error has to be identified from logs, traces, and recent changes.
+
+The rate matters as much as the code. A single failure is expected in most systems. A sustained rate above an objective is a different event, and it deserves a response. This is why the signal should be defined before the incident, when the team can agree on a threshold without pressure.
+
+A final point concerns the relationship between the signal and the user. An error rate that looks small in aggregate can be concentrated in one customer or one region, where it is experienced as a complete outage. Reading the distribution alongside the average is therefore part of a good response, not an optional refinement. It changes both severity assessment and the choice of containment.
+
+The same reasoning applies to dependencies: a dependency that fails for one region is a different incident from one that fails everywhere.
+
+## What it cannot do
+
+It cannot identify the failing component. It does not guarantee a clean recovery. And it cannot replace monitoring, which must observe the system after the fix.
+
+The counterargument that a low error rate is harmless is fair for a snapshot and incomplete for a sustained trend.
+
+## A decision test
+
+1. Confirm the status class.
+2. Compare the rate with an objective.
+3. Inspect logs and traces.
+4. Check recent changes.
+5. Contain with a tested path.
+6. Fix the cause and verify.
+7. Record the decision and residual risk.
+
+For the symptom view, see [5xx Errors: Common Questions](/articles/5xx-errors-common-questions).
 
 ## References & Further Reading
 

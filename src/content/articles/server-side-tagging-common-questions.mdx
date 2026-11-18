@@ -1,13 +1,82 @@
 ---
 title: "Server-side Tagging: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Server-side Tagging: Common Questions."
-date: 2026-11-17
+description: "Server-side tagging moves collection off the browser. Read the common questions, a worked example, and why it does not fix a bad definition."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Analytics
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Server-side tagging is often presented as a fix for blocked cookies and unreliable browsers. The Google Tag Manager documentation describes the container model, and the web-widget entry covers embedded third-party components. The change moves where a request is made, not what the request means.
+
+**Direct answer:** Use server-side tagging to control collection and reduce browser-side dependencies, but define the event and its purpose first. The sources describe the mechanism; the sequencing rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating the documented capability from the local decisions that determine whether the data is useful.
+
+## The mechanism
+
+Three points matter:
+
+- **The request originates elsewhere.** A server-side container receives an event and forwards it, which changes the path but not the definition of the event.
+- **Third-party scripts still have a place.** The web-widget entry describes embedded components. Moving some collection server-side does not remove the need to govern them.
+- **Consent and purpose remain.** The documentation describes configuration, not the legal basis for collecting data. That remains a separate decision.
+
+The sequence is: define the event, decide which parts need server-side handling, then verify the data against a known action. The decision is local, so it is `inferred`; the container model is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A site moves purchase events from the browser to a server-side container.
+
+Three checks decide. First, is the event definition identical before and after the move, including currency and value fields? Second, which requests still come from third-party scripts, and do they need to? Third, do the collected events match a known set of purchases in the same period?
+
+The outcome is a verification decision, not a migration success. The conditions are hypothetical; the check sequence is the contribution.
+
+## Why verification needs a known reference
+
+A migration can change the data without changing the dashboard. The clearest way to detect this is to compare the pipeline against a set of actions that are known independently, such as a day's orders in the commerce system. If the two disagree after the move, the difference belongs to the collection path, not to customer behaviour.
+
+Field definitions are the first place to look. A value field that used one currency before the move and another after it will produce a total that looks plausible and is wrong. Checking a handful of events by hand against the source system is more informative than reading a summary chart, because summaries hide the exact errors that matter.
+
+## What still belongs in the browser
+
+Not everything should move. Scripts that render visible components, handle user interaction, or depend on browser state still run in the browser. Removing them from the page changes the experience, which is a different decision from moving measurement. A sensible plan lists what stays, what moves, and why each item was placed where it is.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Server-side containers can receive and forward events | `source-reported` | Google Tag Manager docs | 2026-11-18 | Product changes |
+| Web widgets are embedded third-party components | `source-reported` | Wikipedia, Web widget | 2026-11-18 | Definition revised |
+| Define the event before choosing the collection path | `inferred` | Derived from measurement practice | 2026-11-18 | Event set changes |
+
+## Why the path is not the measurement
+
+Moving collection server-side can improve reliability and reduce browser dependencies, but it cannot make a poorly defined event meaningful. If the field that records value uses different units across pages, the same error will be delivered more reliably. The first job is therefore a definition, not a migration.
+
+Comparison is the verification method. A known set of actions, such as a day's orders, provides a reference that the analytics pipeline should match. A mismatch after migration tells you whether the move changed the data, which is the central question and one that platform dashboards cannot answer by themselves.
+
+A final question is ownership. A server-side container is infrastructure, and infrastructure needs an owner who understands both the configuration and the event definitions it forwards. Without that ownership, the container becomes a place where changes are made by whoever last touched the dashboard, and verification stops happening. Assigning the owner is part of the design, not an administrative afterthought.
+
+The record should also state when the container configuration was last reviewed, since a definition that is never revisited will eventually drift from the business it describes.
+
+## What it cannot do
+
+It cannot create consent. It does not remove the need to govern scripts that remain in the browser. And it cannot guarantee that a forwarded event is correct.
+
+The counterargument that server-side tagging solves tracking is fair for delivery and incomplete for definition and purpose.
+
+## A decision test
+
+1. Define the event and its purpose.
+2. Decide which collection needs a server path.
+3. Keep third-party scripts governed.
+4. Verify against known actions.
+5. Check consent obligations.
+6. Record the decision and the recheck date.
+
+For the browser-side context, see [Third-party Scripts](/articles/third-party-scripts-examples).
 
 ## References & Further Reading
 
