@@ -1,10 +1,86 @@
 ---
 title: "Docker Images: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Docker Images: Common Questions."
-date: 2026-11-17
+description: "An image is a layered artefact with a build recipe. Read the common questions, a worked example, and why a small image is not always a better one."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Containers
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Docker images are often described as lightweight virtual machines, which hides what they actually are. The Wikipedia entry describes images and layers, and the Open Container Initiative defines the specifications behind the format. The common questions concern layers, reproducibility, and size.
+
+**Direct answer:** Treat an image as a layered artefact with a defined base and a reproducible build recipe, then verify that it contains what the runtime needs. The sources define the format; the verification rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented format facts from local build decisions.
+
+## The mechanism
+
+Three points matter:
+
+- **Layers accumulate.** The Wikipedia entry describes how instructions add layers. A later instruction that overwrites a file does not remove the earlier layer from the image history.
+- **The base is inherited.** A base image brings its own contents and their history. Choosing it is a supply decision as much as a technical one.
+- **Specifications define portability.** The OCI entry describes the standard format. Conformance makes an image usable across runtimes that support the specification.
+
+The sequence is: choose the base, write a reproducible recipe, inventory the contents, then test behaviour. Choosing the base is judgement, so it is `inferred`; the format is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team builds an image from a general-purpose base and wonders why it is large.
+
+Three checks decide. First, what does the base contain that the application does not use? Second, does the build recipe leave temporary files in earlier layers? Third, does a smaller base change runtime behaviour, tested against the same cases?
+
+The outcome is a build decision with a recorded trade-off. The scenario is hypothetical; the check sequence is the contribution.
+
+## Why layers explain the surprises
+
+A build instruction that creates a temporary file and a later instruction that deletes it do not cancel out. The first layer still contains the file, and the image includes both layers. This surprises people who think of the build as a sequence of edits to a final state, and it is the reason a large image can contain material that appears to have been removed.
+
+The base image is the other source of surprises. It contributes its own layers and its own history, which the application did not choose. Reading the base is therefore part of understanding the final image, not an optional step after something goes wrong.
+
+## Why reproducibility is the real question
+
+A image that builds differently on two machines is not a controlled artefact. Reproducibility depends on pinning the base, the toolchain, and any sources fetched during the build. Testing reproducibility is simpler than it sounds: build twice from a clean state and compare the result. A difference is a defect in the recipe, not a quirk of the environment.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Images are composed of layers | `source-reported` | Wikipedia, Docker | 2026-11-18 | Format changes |
+| OCI defines portable image specifications | `source-reported` | Open Container Initiative | 2026-11-18 | Specification updated |
+| Verify behaviour after changing the base | `inferred` | Derived from the layer model | 2026-11-18 | Runtime changes |
+
+## Why size is not the whole story
+
+A smaller image has fewer components, which can reduce surface area and transfer time. It can also omit a library the runtime needs, which produces a failure that a larger image would not have had. The relevant measure is whether the image works on the cases that matter, with size treated as a secondary goal.
+
+A final question is what the image assumes about its runtime. Environment variables, mounted files, and network access are part of the contract, and an image that works only with a specific combination of them is less portable than the format suggests. Documenting those assumptions is part of building the image, not a separate task for the person deploying it.
+
+The same applies to updates. A base image that is never refreshed accumulates known issues, while one that is always refreshed can change without warning. Pinning a digest and reviewing updates deliberately is a better pattern than either ignoring the base or following its latest tag blindly.
+
+The inventory should be part of the build review, since a component nobody recognizes is easier to remove before release than after.
+
+A reproducible build is also easier to audit, because the same recipe produces the same contents every time it runs.
+
+## What it cannot do
+
+It cannot guarantee a secure runtime. It does not replace scanning or inventory. And it cannot fix a build recipe that is not reproducible.
+
+The counterargument that the smallest image is always best is fair for transfer time and incomplete for functionality.
+
+## A decision test
+
+1. Choose the base deliberately.
+2. Make the recipe reproducible.
+3. Inventory the contents.
+4. Test behaviour after changes.
+5. Keep a rollback path.
+6. Record the decision and recheck trigger.
+
+For the build context, see [Docker Images Without the Hype](/articles/docker-images-without-the-hype).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Docker (software) - Wikipedia](https://en.wikipedia.org/wiki/Docker_(software)) — Container images and the tooling around them.
+- Open Container Initiative, 2026. [Open Container Initiative - Open Container Initiative](https://opencontainers.org/) — The open specifications behind container images.

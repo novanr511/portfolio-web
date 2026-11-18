@@ -1,10 +1,83 @@
 ---
 title: "What Data Governance Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What Data Governance Actually Measures."
-date: 2026-11-17
+description: "Governance is measured by whether decisions can be traced, not by the number of policies. Read what it measures, a worked example, and why a document is not a control."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Business
+  - Method
+  - Data
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Data governance is often measured by the number of policies written, which says little about whether anyone can answer a question about a figure. The Wikipedia entry describes governance as accountable ownership of data, and GDPR Article 6 sets conditions for lawful processing. The measure is whether those responsibilities are real in practice.
+
+**Direct answer:** Measure governance by traceability: can you identify the owner, source, definition, and permitted use of a relied-upon figure? The sources define the obligations; the measurement rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked trace, separating documented obligations from the local checks that decide whether governance works.
+
+## The mechanism
+
+Three elements matter:
+
+- **Ownership.** The governance entry describes accountability. A figure with no owner cannot be challenged or corrected.
+- **Provenance.** A relied-upon record needs a source and a date. This is the practical form of traceability.
+- **Permitted use.** GDPR Article 6 describes lawful bases for processing. A policy that exists on paper does not establish that a particular use is permitted.
+
+The sequence is: pick a figure, trace it to a source, identify the owner, and check the permitted use. Tracing is local work, so it is `inferred`; the obligations are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A dashboard reports a monthly active user figure used in a board deck.
+
+Three checks decide. First, can you find the definition and the query that produced it? Second, who is accountable for the figure when someone challenges it? Third, is the processing that produced it covered by a documented lawful basis?
+
+A failure in any check is a governance gap, regardless of how many policies exist. The scenario is hypothetical; the trace method is the contribution.
+
+## Why the trace is the test
+
+A governance framework can be complete on paper and still fail in practice, because the paper describes how things should work rather than how a number was produced. The trace is a test that anyone can run: start from a figure someone relies on and ask where it came from. If the answer requires three people and a guess, the framework is not governing that figure.
+
+Ownership is the first thing the trace reveals. A figure with a named owner can be challenged, corrected, and retired. A figure maintained by nobody accumulates authority simply by appearing in reports, which is how a stale number becomes a decision input. Assigning an owner is therefore a control, not an administrative detail.
+
+The second thing the trace reveals is definition drift. Two teams can use the same label for different calculations, and a report that combines them will produce a number that matches neither. Finding the definition attached to the figure is the only way to know what is being discussed.
+
+## Why lawful basis belongs in the trace
+
+A figure can be well-defined and still be produced unlawfully. The conditions in GDPR Article 6 concern the processing itself, not the quality of the output. Including the lawful basis in the trace makes that dimension visible alongside provenance and ownership, which is the point of treating governance as measurable rather than aspirational.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Data governance concerns accountability for data | `source-reported` | Wikipedia, Data governance | 2026-11-18 | Definition revised |
+| Lawful bases are required for processing | `source-reported` | GDPR Article 6 | 2026-11-18 | Law changes |
+| Trace a figure to test governance | `inferred` | Derived from the obligations | 2026-11-18 | Data flows change |
+
+## Why documents are not controls
+
+A policy document is evidence of intent. It becomes a control only when a specific figure can be checked against it. The trace is the test that makes the difference, because it uses the same path a reader would use to challenge a number.
+
+A trace also has a date. A figure that was traceable last quarter can become untraceable after a system change, and the framework that was adequate then may no longer describe the current flow. Repeating the trace on a schedule is what keeps governance from becoming a historical record. The result of each trace is a small piece of evidence, and together they show whether accountability is being maintained or slowly eroding.
+
+The practical takeaway is that governance is a property of a working system, not a collection of documents. A framework that cannot answer a simple question about a figure is a framework on paper, however complete its policies appear.
+
+## What it cannot do
+
+It cannot guarantee compliance, which depends on the specific use. It does not remove the need for access control. And it cannot make a figure correct, only traceable.
+
+The counterargument that a written policy is sufficient is fair for communication and incomplete for accountability.
+
+## A decision test
+
+1. Pick a relied-upon figure.
+2. Find its source and definition.
+3. Identify the owner.
+4. Check the permitted use.
+5. Record the result and the recheck date.
+
+For the system view, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data governance - Wikipedia](https://en.wikipedia.org/wiki/Data_governance) — Policies and accountable ownership of data.
+- GDPR Info, 2016. [Art. 6 GDPR – Lawfulness of processing - General Data Protection Regulation (GDPR)](https://gdpr-info.eu/art-6-gdpr/) — The lawful bases for processing personal data under GDPR.
