@@ -1,10 +1,57 @@
 ---
 title: "AI for Healthcare Operations Pitfalls"
-description: "Reserved title for a future NOVANDRI article: AI for Healthcare Operations Pitfalls."
-date: 2026-11-17
+description: "Clinical AI gets the attention, but operations AI touches scheduling, coding, and documentation. Read the failure modes and the controls."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Healthcare
+  - Operations
+  - Risk
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Most discussion of AI in healthcare focuses on diagnosis, which is the highest-stakes and most regulated application. The operational uses — scheduling, coding, prior authorisation, documentation — are less dramatic and more widespread. They still touch patient care indirectly, which means the failure modes deserve the same seriousness.
+
+**Direct answer:** Apply AI to healthcare operations where the output is checkable, the clinical boundary is explicit, and a person remains accountable. Health informatics provides the systems context, and the AI RMF frames governance. The boundary: an operational tool that produces a wrong code or a missed escalation can harm a patient indirectly, which the clinical-AI article treats as a reason for validation, as the risk-assessment article requires for known failure modes.
+
+## The pitfalls
+
+**Hidden clinical effect.** A scheduling model that optimises throughput may change how much time a clinician has with a patient, which is a clinical consequence of an operational decision, as the health-informatics article treats the system as interconnected. The metric should include that effect, which the evaluation-rubric article argues for measuring more than the target number.
+
+**Automation bias in documentation.** A model that drafts notes can introduce a plausible but wrong detail, and a clinician who reviews under time pressure may accept it, as the reduce-hallucinations article warns about confident text. The control is a real review step, which the human-in-the-loop article describes for high-impact outputs.
+
+**Coding and billing drift.** Automated coding trained on historical patterns can encode past errors or inconsistencies, which the data-quality article treats as a problem with training data, as the provenance guidance requires records of origin.
+
+**Privacy and provenance.** Health data has strict obligations, which the data-privacy article makes jurisdiction-specific, and the model's inputs and outputs must be recorded, as the data-governance article requires for relied-upon systems.
+
+Three consequences follow. The tool's boundary should be written down — what it decides and what it only suggests, which the clinical-AI article argues for defining intended use. Evaluation should include indirect effects, as the health-informatics context implies. And an accountable person should own the output, as the governance checklist requires.
+
+## A worked example
+
+The following is hypothetical and illustrative. A hospital deploys a model that drafts discharge summaries for clinician approval.
+
+Three checks decide whether it is safe. First, factual grounding: does every statement in the draft trace to the record, as the reduce-hallucinations article requires for citations? Second, review quality: do clinicians have time to check, and do they actually change errors, as the human-in-the-loop article asks for a meaningful review? Third, indirect effect: has documentation time fallen without reducing the detail a receiving clinician needs, which the health-informatics article treats as a system-level measure?
+
+Three conclusions follow. A faster draft that introduces unchecked detail is a net harm, which the clinical-AI article's validation argument implies. The review step is the control, not the model's fluency, as the oversight article argues. And the result should be recorded with the limits, as the decision-memo article requires.
+
+## What operational AI cannot do
+
+It cannot replace clinical judgement, which the clinical-AI article treats as a boundary, as the governance article requires an accountable person. It cannot fix a broken workflow; it can accelerate a process that is already wrong, which the workflow-automation article warns about automating failure. And it does not remove privacy duties, which the data-privacy article makes a legal obligation.
+
+The counterargument that operational AI is low-risk because it does not diagnose misses the indirect path from a wrong code to a wrong care decision, which the health-informatics context makes visible, as the risk-assessment article argues for tracing consequences.
+
+## A decision test
+
+1. Define the clinical boundary and what the tool may suggest, as the clinical-AI article advises.
+2. Check factual grounding of outputs, as the reduce-hallucinations article requires.
+3. Design a review with time and authority, as the oversight article requires.
+4. Measure indirect effects on care, as the health-informatics context implies.
+5. Record provenance of data and model changes, as the governance article requires.
+6. Check privacy obligations with current law, as the privacy article advises.
+7. Review after any model or workflow change, as the monitoring article recommends.
+
+For the clinical context, see [AI in Healthcare](/articles/ai-in-healthcare-promise-and-pitfalls); for the oversight design, see [Human in the Loop](/articles/human-in-the-loop-by-design).
+
+## Further Reading
+
+- Wikipedia contributors, 2026. [Health informatics - Wikipedia](https://en.wikipedia.org/wiki/Health_informatics) — The discipline of using data and information systems in healthcare delivery.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.
