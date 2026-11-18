@@ -1,10 +1,92 @@
 ---
 title: "Error Budgets Pitfalls"
-description: "Reserved title for a future NOVANDRI article: Error Budgets Pitfalls."
-date: 2026-11-17
+description: "An error budget is a decision rule, not a target to spend. Read the pitfalls, a worked example, and why a budget without a consequence is decoration."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Error budgets are often treated as a number to aim for, which inverts their purpose. The SRE material defines an error budget in relation to a service objective, and the alerting workbook ties signals to objectives. The value is in the decision the budget triggers.
+
+**Direct answer:** Define the objective, derive the budget, and attach a consequence when it is exhausted. The sources describe the mechanism; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented SRE practice from local choices about the consequence.
+
+## The mechanism
+
+Three points matter:
+
+- **The objective comes first.** The SRE material defines an error budget from a service objective. A budget without an objective is an arbitrary threshold.
+- **The budget is a resource.** It represents how much failure users will tolerate over a period. Spending it is a decision, not a failure.
+- **Exhaustion needs a consequence.** The alerting workbook relates signals to objectives. If nothing changes when the budget is gone, the budget has no effect.
+
+The sequence is: set the objective, derive the budget, monitor it, then apply the consequence. The consequence is a local policy, so it is `inferred`; the mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A service has a budget for failed requests and exhausts it halfway through a month.
+
+Three checks decide. First, is the budget derived from a stated objective, or chosen as a round number? Second, what decision follows — a feature freeze, extra testing, or a review? Third, who has the authority to apply it?
+
+The outcome is an enforced decision rather than a dashboard. The scenario is hypothetical; the method is the contribution.
+
+## Why the consequence is agreed in advance
+
+A budget that exhausts during an incident will be interpreted by people under pressure, who have an incentive to treat the moment as exceptional. Agreeing the consequence beforehand removes that negotiation from the incident. It also makes the budget credible, because a team that enforces it once will take it seriously thereafter.
+
+## What a review should ask
+
+A review of a budget should ask whether the objective still matches user expectations and whether the consequence was applied. A budget that is never exhausted may be too generous; one that is always exhausted may be unrelated to the service's actual behaviour. Both are signals that the objective needs revisiting.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Error budgets derive from service objectives | `source-reported` | Google SRE book | 2026-11-18 | Practice changes |
+| Signals should relate to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Attach a consequence to exhaustion | `inferred` | Derived from the budget's purpose | 2026-11-18 | Policy changes |
+
+## Why a budget needs a consequence
+
+A budget that is monitored but never acted on is a metric. The consequence is what converts it into a decision rule, and it must be agreed before the budget is spent, when nobody is under pressure.
+
+A budget also cannot measure user experience directly. A service can stay within its error budget while users have a poor time, because the metric captures only one dimension. Treating the budget as a complete picture of reliability is the limit that the SRE material itself warns against when it distinguishes signals from objectives.
+
+None of this removes the need for judgment when the consequence is applied. A budget that triggers a freeze during a period of urgent work creates its own trade-off, and the team must decide whether to honour it or record an explicit exception. The exception belongs in the record, because repeated exceptions reveal that the objective was wrong.
+
+The review should record whether the consequence was applied or waived, since a pattern of waivers is evidence that the objective no longer reflects the team's actual priorities.
+
+An exception should state when it expires, so a temporary waiver does not become a permanent change to the objective by default.
+
+A budget is a tool for deciding whether to ship, and it works only when the decision it informs is made explicitly and recorded.
+
+The objective and its budget should be reviewed together, because changing one without the other breaks the rule they form.
+
+A waiver that is never recorded cannot be distinguished from a rule that was quietly abandoned.
+
+A budget works only when the team believes the consequence will actually follow, which makes consistency more important than precision.
+
+## What it cannot do
+
+It cannot make a system reliable by itself. It does not replace monitoring. And it cannot guarantee that the objective was well chosen.
+
+The counterargument that a budget is just a metric is fair for tracking and incomplete for governance.
+
+## A decision test
+
+1. State the service objective.
+2. Derive the budget.
+3. Monitor against it.
+4. Define the consequence in advance.
+5. Assign authority to apply it.
+6. Record the decision and recheck condition.
+
+For the alerting, see [Alerting on SLOs](/articles/slos-metrics-that-matter).
+
+## References & Further Reading
+
+- Google, 2016. [Google SRE - Defining SLO: Service Level Objective Meaning](https://sre.google/sre-book/service-level-objectives/) — How to define SLIs and SLOs that are actually useful.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.
