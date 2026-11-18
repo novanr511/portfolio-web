@@ -1,13 +1,72 @@
 ---
 title: "SLOs Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: SLOs Metrics that Matter."
-date: 2026-11-17
+description: "An SLO is a promise about experience. Read what to measure, a worked example, and why a target without a consequence is decoration."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A service level objective is often written as a percentage, which hides the decision it is meant to support. The SRE material defines objectives in terms of user experience, and the alerting workbook ties signals to those objectives. The measure of an SLO is whether it changes behaviour.
+
+**Direct answer:** Set an SLO from the experience users need, measure it at the user's boundary, and attach a consequence when it is missed. The sources describe the practice; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented SRE concepts from local choices about targets.
+
+## The mechanism
+
+The first question is where the objective is measured. A metric taken deep in the system can look healthy while users have a poor experience, because it misses the parts of the request path that matter to them. The SRE material emphasises measuring at the boundary where users are affected, which is a design decision rather than a technical detail. A target measured in the wrong place will be met while the problem persists.
+
+The second question is what the percentage means in practice. An availability target describes the proportion of successful requests over a window, which translates into an allowance for failure. That allowance is the error budget, and it is the connection between the objective and decisions about shipping. Without making that connection, the target is a number in a document.
+
+The third question is the consequence. The alerting workbook relates signals to objectives, but an alert only leads to action if someone is authorised to act. The consequence of missing an objective — a freeze, extra testing, or a review — should be agreed before the miss occurs, when nobody is under pressure. A target without a consequence is a preference, not a control.
+
+The sequence is: define the user experience, choose a measurable signal, set the target and window, then attach the consequence. Each step involves judgement that belongs to the team, which is why the reasoning should be recorded alongside the number.
+
+## A worked example
+
+*Illustrative.* A team sets an availability target for a checkout service.
+
+Three checks decide. First, is the signal measured where users experience it, rather than at an internal health endpoint? Second, does the target and window reflect how often users actually use the service? Third, what happens when the budget is exhausted, and who can apply it?
+
+The outcome is an objective with a decision attached. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Objectives concern user experience | `source-reported` | Google SRE | 2026-11-18 | Practice changes |
+| Alerting relates signals to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Attach a consequence to a missed objective | `inferred` | Derived from the practice | 2026-11-18 | Policy changes |
+
+## Why the measurement point matters
+
+A target measured at the wrong layer can be achieved while users fail. A request that reaches an application and returns quickly is not a successful experience if the page never renders for the user. Choosing the measurement point is therefore the most consequential decision in setting an objective, and it should be revisited when the architecture changes.
+
+An objective also has a cost. Tightening a target improves the promise but requires more capacity or more careful engineering, and the trade-off belongs in the decision. A target chosen without that comparison is a preference that the team may not be able to honour.
+
+The measurement should be reviewed when the product changes. A signal that represented the user experience for one architecture can stop doing so after a redesign, and an objective measured at the old boundary will report success while users struggle. Revisiting the measurement point is therefore part of maintaining the objective.
+
+The target should be stated where the team can see it, so a decision to ship can be compared against it without asking someone to find a document.
+
+## What it cannot do
+
+It cannot guarantee a good experience. It does not replace monitoring of other dimensions. And it cannot make a poorly chosen target useful.
+
+The counterargument that a round number is easier to communicate is fair for communication and incomplete for accuracy.
+
+## A decision test
+
+1. Define the user experience.
+2. Choose a measurement point.
+3. Set the target and window.
+4. Derive the error budget.
+5. Attach a consequence.
+6. Record the reasoning and recheck date.
+
+For the alerting, see [Error Budgets Pitfalls](/articles/error-budgets-pitfalls).
 
 ## References & Further Reading
 
