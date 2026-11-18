@@ -1,13 +1,82 @@
 ---
 title: "Model Routing Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: Model Routing Metrics that Matter."
-date: 2026-11-17
+description: "Routing sends each request to a model. Read the metrics, a worked example, and why average cost hides the expensive tail."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Model routing is often evaluated by average cost savings, which hides both failures and the requests that dominate the bill. The routing paper describes learned selection between models, and the serving paper covers the cost of running them. The metric should reflect the decision the routing supports.
+
+**Direct answer:** Measure routing by cost per successful answer, with failure and escalation rates reported separately. The sources describe the mechanism; the metric rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked comparison, separating documented routing behaviour from the local choice of objective.
+
+## The mechanism
+
+Three points matter:
+
+- **Selection has a goal.** The routing paper describes choosing between models. The goal can be cost, latency, or quality, and the metric follows from that choice.
+- **Failures are not free.** A cheap model that fails and escalates costs more than its price suggests. The serving paper describes the cost of inference, which still applies to retries.
+- **Averages hide the tail.** A few expensive requests can dominate the bill while the average looks good.
+
+The sequence is: define the objective, measure cost and quality by route, count escalations, then inspect the tail. The objective is local judgement, so it is `inferred`; the routing mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A system routes simple questions to a small model and complex ones to a large model.
+
+Three checks decide. First, does the small model succeed on the questions routed to it, or do many escalate? Second, what is the total cost including those escalations? Third, which requests account for the largest share of the bill, and were they routed correctly?
+
+The outcome is a routing adjustment with a recorded objective. The scenario is hypothetical; the measurement method is the contribution.
+
+## Why the objective decides the metric
+
+A router can optimise for cost, latency, or quality, and each objective produces a different design. A system that always chooses the cheapest model will save money and fail more often; one that always chooses the best model will rarely fail and cost more. Naming the objective before measuring is what makes the result interpretable.
+
+The distribution of requests matters as much as the average. A small number of very long prompts can account for most of the spend, and an average cost figure will hide them. Inspecting the tail shows whether routing is doing what it was designed to do on the requests that matter financially.
+
+## Why escalation is a first-class metric
+
+A route that sends a request to a cheap model and then escalates it has not saved the cost of that request. Counting escalations separately makes the true cost visible. It also identifies a design problem: if a particular class of request always escalates, it should probably be routed to the larger model in the first place.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Models can be selected per request | `source-reported` | RouteLLM paper | 2026-11-18 | Methods change |
+| Serving consumes memory and compute | `source-reported` | PagedAttention paper | 2026-11-18 | Stack changes |
+| Measure cost per successful answer | `inferred` | Derived from routing objective | 2026-11-18 | Pricing changes |
+
+## Why escalation decides the saving
+
+A router that sends difficult requests to a cheap model and then escalates them pays twice. Counting escalations is therefore more informative than counting model calls. A route that appears cheap on paper can be the most expensive in practice once the retry path is included.
+
+A final consideration is how the router is evaluated. A test set built only from easy requests will make the cheap model look excellent, because the difficult cases never appear. Including ambiguous and long requests deliberately is what reveals whether the routing rule holds under the conditions that drive cost.
+
+The routing decision also needs a review condition. Model capabilities and prices change, and a rule that was optimal last quarter can be wrong today. Recording when the rule was last evaluated, and what would trigger a new evaluation, keeps the metric useful over time.
+
+The choice of objective also shapes what gets reported. A team measured on average cost will optimise the average, even when the tail is where the money goes. Publishing the distribution alongside the headline figure is a small change that aligns the metric with the decision it was meant to support.
+
+## What it cannot do
+
+It cannot remove the need for evaluation, which applies to both routes. It does not guarantee that the chosen model is best for a request. And it cannot predict how prices will change.
+
+The counterargument that average cost is enough is fair for stable traffic and incomplete when a tail dominates spend.
+
+## A decision test
+
+1. Define the routing objective.
+2. Measure quality by route.
+3. Count escalations.
+4. Compute cost per successful answer.
+5. Inspect the expensive tail.
+6. Record the decision and recheck trigger.
+
+For the trade-offs, see [Model Routing Trade-offs](/articles/model-routing-trade-offs).
 
 ## References & Further Reading
 
