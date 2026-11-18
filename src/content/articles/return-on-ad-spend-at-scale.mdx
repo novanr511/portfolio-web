@@ -1,10 +1,84 @@
 ---
 title: "Return on Ad Spend at Scale"
-description: "Reserved title for a future NOVANDRI article: Return on Ad Spend at Scale."
-date: 2026-11-17
+description: "ROAS counts attributed revenue, not profit or incrementality. Read what it measures, a worked example, and why a high ratio can hide a loss."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Method
+  - Measurement
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Return on ad spend is often treated as a verdict on a campaign, which overstates what an attributed ratio can tell you. Google's measurement documentation describes how conversions are credited, and the causal-attribution literature distinguishes credit from cause. The question is what the ratio leaves out.
+
+**Direct answer:** Read ROAS as attributed revenue per unit of spend, then check margin and incrementality before drawing a conclusion. The sources describe the measurement; the rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented credit rules from local judgements about profit.
+
+## The mechanism
+
+The first point is attribution. The measurement documentation describes how a platform assigns credit to a campaign, which depends on rules chosen by the platform. A high ratio can include customers who would have bought anyway, and the credit rule does not distinguish them.
+
+The second point is margin. The causal-attribution literature is about whether an outcome was caused, but a business decision also needs to know the value of that outcome. Revenue with a low margin can produce a strong ratio and a weak result, which is a separate calculation.
+
+The third point is scale. A ratio that holds at a small budget can fall as spend grows, because the easiest conversions are captured first. Reading the marginal return, rather than the average, is the correction when deciding whether to increase spend.
+
+The sequence is: identify the credit rule, compute contribution, check incrementality, then read the marginal return. The judgements are local, so the conclusions are `inferred`; the measurement is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A campaign reports a ROAS of five and the team wants to double the budget.
+
+Three checks decide. First, does the credit window assign purchases that would have happened without the campaign? Second, what is the contribution after the cost of goods and the discount, not just revenue? Third, what happened to the ratio as spend grew in the last two periods?
+
+The outcome is a decision based on contribution and marginal return. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Platforms document conversion credit rules | `source-reported` | Google Ads measurement docs | 2026-11-18 | Product changes |
+| Credit differs from causation | `source-reported` | Causal attribution literature | 2026-11-18 | Method changes |
+| Read contribution and marginal return | `inferred` | Derived from both | 2026-11-18 | Margin changes |
+
+## Why a high ratio can hide a loss
+
+A ratio built on attributed revenue and low-margin sales can look strong while the business loses money on each order. Adding a discount to close the sale makes the ratio worse in a way the platform report may not show, which is why contribution is the necessary check.
+
+A further consideration is that attribution windows differ between platforms, and a comparison across them will partly measure the rules. Aligning the window before comparing is a small step that prevents a large misinterpretation.
+
+The ratio also treats all conversions alike, which is wrong when some customers are worth much more than others. Reporting contribution by cohort gives a more useful picture than a single aggregate, and it is the view that supports a budget decision.
+
+Finally, a campaign can look strong while crowding out a cheaper channel. Reading the portfolio together, rather than each channel in isolation, is the discipline that prevents a ratio from being optimised at the expense of the whole.
+
+The marginal return is the number that matters when a budget grows, since the average includes sales that would have happened anyway.
+
+Contribution should be reported beside the ratio, since revenue alone cannot answer the decision.
+
+A ratio that rises while contribution falls is a sign that the credit rule is being optimised rather than the business.
+
+The credit window should be stated with the ratio, since it determines what the number includes.
+
+Attribution is a rule, and a decision to spend more should not rest on it alone.
+
+## What it cannot do
+
+It cannot prove incrementality. It does not measure profit. And it cannot guarantee that the same return holds at a larger budget.
+
+The counterargument that a simple ratio is easy to manage is fair for tracking and incomplete for a decision to spend more.
+
+## A decision test
+
+1. Identify the credit rule.
+2. Compute contribution.
+3. Check incrementality with a comparison.
+4. Read the marginal return.
+5. Use dated figures.
+6. Record the decision and recheck date.
+
+For the causal test, see [Incrementality](/articles/how-to-evaluate-incrementality-testing).
+
+## References & Further Reading
+
+- Google Ads Help, 2026. [About attribution models - Google Ads Help](https://support.google.com/google-ads/answer/6259715) — First-party documentation of attribution models and their limits.
+- Kai Zhang et al., 2019. [Explaining Visual Models by Causal Attribution](https://arxiv.org/abs/1909.08891) — The argument that observational-only explanations cannot compute the effects of altering a feature.
