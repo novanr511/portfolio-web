@@ -1,10 +1,82 @@
 ---
 title: "How to Evaluate AI-assisted Code Review"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate AI-assisted Code Review."
-date: 2026-11-17
+description: "AI can find patterns in a diff, not judge intent. Read how to evaluate it, a worked example, and why found bugs are not the only measure."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI-assisted code review is often measured by the number of issues it finds, which rewards noise. Anthropic's use-case guides describe what models can do in production, and the engineering blog material covers code review practice. The evaluation question is whether the tool improves the review.
+
+**Direct answer:** Evaluate AI review by the precision of its findings, the issues it misses, and the time reviewers spend acting on it. The sources describe capability and practice; the method is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented capability from local choices about what counts as a useful finding.
+
+## The mechanism
+
+The first consideration is precision. The use-case guides describe what a model can identify, but a finding that is wrong costs reviewer time and teaches the team to ignore the tool. Precision matters more than volume, and it should be measured on the codebase in question.
+
+The second consideration is misses. A tool that finds many style issues while missing a logic error has not improved the review, and a count of findings will not reveal it. Comparing against known defects in past changes is the way to measure what the tool misses.
+
+The third consideration is reviewer time. The engineering material treats review as a practice with a purpose, and a tool that adds comments requiring investigation can slow it down. Measuring the total time to merge, not just the number of findings, captures the effect.
+
+The sequence is: define what a useful finding is, test on known changes, measure precision and misses, then check the effect on review time. The definitions are local, so the conclusions are `inferred`; the context is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team adds an assistant that comments on every pull request.
+
+Three checks decide. First, on a set of past changes with known defects, how many did it identify, and how many comments were false positives? Second, did reviewers act on the findings, or dismiss most of them? Third, did the time to merge fall, stay the same, or rise?
+
+The outcome is a decision about where the tool helps. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Models support defined production tasks | `source-reported` | Anthropic use-case guides | 2026-11-18 | Capabilities change |
+| Code review is a defined engineering practice | `source-reported` | Engineering guidance | 2026-11-18 | Practice changes |
+| Measure precision, misses and review time | `inferred` | Derived from the practice | 2026-11-18 | Codebase changes |
+
+## Why findings are not the result
+
+A finding is useful only if it leads to a better change. A tool that generates many comments which reviewers dismiss has produced activity, not improvement, and the distinction is visible in the time to merge.
+
+A further issue is that the tool's findings can be correct and unhelpful. A comment that points to a real style violation may still be lower priority than a design concern the reviewer noticed, and a tool that surfaces many small issues can crowd out the important ones. Prioritisation is part of the evaluation, not an afterthought.
+
+The test set also ages. A codebase changes, and a tool that performed well on last year's patterns may miss the mistakes that appear in new code. Repeating the evaluation after significant changes is what keeps the result meaningful.
+
+Finally, a review tool cannot take responsibility for a change. The reviewer who approves remains accountable, and the design should make that clear rather than implying that the tool has certified the code.
+
+The tool's findings should be prioritised, since a correct comment can still crowd out a more important concern.
+
+The evaluation should be repeated after a significant change to the codebase, since the patterns it learned may no longer apply.
+
+A clean diff is not a correct change, and the reviewer remains the person who decides.
+
+Findings should be measured against known defects, not counted on their own.
+
+## What it cannot do
+
+It cannot judge whether a change fits the system's intent. It does not replace a reviewer. And it cannot guarantee that a bug-free diff is a correct one.
+
+The counterargument that any automation helps is fair for routine checks and incomplete for the judgement that review requires.
+
+## A decision test
+
+1. Define a useful finding.
+2. Test on changes with known defects.
+3. Measure precision and misses.
+4. Check reviewer behaviour.
+5. Measure time to merge.
+6. Record the evaluation and recheck date.
+
+For the broader use, see [AI Build Versus Buy](/articles/ai-build-versus-buy-explained).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- GitHub, 2026. [GitHub Engineering Blog](https://github.blog/engineering/) — Primary engineering write-ups on developer tooling and productivity.

@@ -1,10 +1,78 @@
 ---
 title: "How to Evaluate Incrementality Testing"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Incrementality Testing."
-date: 2026-11-17
+description: "Incrementality tests measure what a campaign caused. Read how to evaluate one, a worked example, and why a tracked conversion is not a causal result."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Method
+  - Measurement
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An incrementality test is often judged by whether it produced a positive result, which ignores whether the design could have detected anything. Google's experiment guidance describes a comparison approach, and the causal-attribution literature treats the difference between credit and cause. The evaluation question is whether the test was capable of answering the question.
+
+**Direct answer:** Evaluate an incrementality test by the validity of its comparison, the power of its sample, and the clarity of its result. The sources describe the method; the evaluation rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented method from local choices about design.
+
+## The mechanism
+
+The first consideration is the comparison. The experiment guidance describes holding out a group from the campaign, which creates the counterfactual that credit-based measurement lacks. A comparison that is contaminated — where the holdout also sees the campaign — cannot answer the question, and checking that contamination is part of the evaluation.
+
+The second consideration is power. A test with too few observations will fail to detect a real effect, and a null result from such a test says nothing. Estimating the required sample before launching is the control, and it depends on the variation in the outcome.
+
+The third consideration is attribution. The causal-attribution literature distinguishes a caused outcome from one merely associated with the campaign. A result reported by a platform is a credit rule, and the incrementality test exists to check it, not to reproduce it.
+
+The sequence is: define the outcome, check the comparison, estimate power, then read the result against the credit report. The choices are local, so the conclusions are `inferred`; the method is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A campaign reports strong tracked conversions, and a holdout test shows a small lift.
+
+Three checks decide. First, was the holdout genuinely excluded from the campaign, and for how long? Second, was the sample large enough to detect the lift being claimed? Third, how does the measured lift compare with the platform's credit, and what explains the difference?
+
+The outcome is a calibrated view of the campaign, not a contradiction to be resolved. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Experiments use comparison groups | `source-reported` | Google Ads experiment guidance | 2026-11-18 | Guidance changes |
+| Credit differs from causation | `source-reported` | Causal attribution literature | 2026-11-18 | Method changes |
+| Check contamination and power | `inferred` | Derived from the method | 2026-11-18 | Campaign changes |
+
+## Why a tracked conversion is not a result
+
+A tracked conversion shows that a person exposed to a campaign later converted. It does not show that the campaign caused the conversion, because the person might have converted anyway. The incrementality test exists to measure that difference, which is why its design matters more than its headline.
+
+A further consideration is that the result applies to the period and audience tested. A campaign that produced a lift in one season may not do so in another, and a conclusion should be stated with those conditions rather than as a permanent property of the channel.
+
+The holdout also has an opportunity cost. Customers excluded from the campaign did not receive the offer, which matters if the campaign was genuinely useful. Weighing that cost against the value of the information is part of deciding whether to run the test, and it is a decision that belongs to the business.
+
+None of this makes the credit report useless. It remains a record of what the platform counted, and comparing it with the measured lift is what turns two different numbers into a useful explanation.
+
+A null result from an underpowered test is a limitation of the design, not evidence of no effect.
+
+The design should be recorded with the result, so a later reader can judge whether the comparison was valid.
+
+## What it cannot do
+
+It cannot eliminate all uncertainty. It does not guarantee that the result transfers to a different period. And it cannot fix a campaign that has no effect.
+
+The counterargument that a platform's report is enough is fair for tracking and incomplete for a causal claim.
+
+## A decision test
+
+1. Define the outcome.
+2. Check the comparison for contamination.
+3. Estimate the required sample.
+4. Run the test for a full cycle.
+5. Compare the lift with reported credit.
+6. Record the design and result.
+
+For the credit question, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation).
+
+## References & Further Reading
+
+- Brian Vaver and Koehler, 2011. [Measuring Ad Effectiveness Using Geo Experiments](https://research.google/pubs/measuring-ad-effectiveness-using-geo-experiments/) — Geo experiments for incrementality, the cleanest way to attribute marketing spend.
+- Kai Zhang et al., 2019. [Explaining Visual Models by Causal Attribution](https://arxiv.org/abs/1909.08891) — The argument that observational-only explanations cannot compute the effects of altering a feature.
