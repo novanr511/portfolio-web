@@ -1,13 +1,85 @@
 ---
 title: "Getting Started with Rollback Strategies"
-description: "Reserved title for a future NOVANDRI article: Getting Started with Rollback Strategies."
-date: 2026-11-17
+description: "A rollback is a recovery path, not a button. Read the starting steps, a worked release, and why an untested rollback is a plan on paper."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Rollback strategies are often treated as a feature of the deployment tool. The GitHub Actions documentation describes automation for workflows, and NIST's incident-handling guide treats recovery as part of a lifecycle. The starting point is knowing what you can return to.
+
+**Direct answer:** Prepare a rollback before release, make it fast and tested, and decide in advance when to roll back versus roll forward. The sources describe automation and lifecycle; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked release, separating the documented tooling from the local decision about reversibility.
+
+## The mechanism
+
+Three points matter:
+
+- **Reversibility is a property of the change.** A schema migration may not be reversible. The incident guide treats recovery as a process, which begins before the incident.
+- **Automation reduces delay.** The CI documentation describes repeatable workflows. An automated rollback is faster than a runbook someone must read under pressure.
+- **A trigger must be defined.** A rollback that depends on a judgement made during an incident can be delayed by uncertainty. The objective defines the trigger.
+
+The sequence is: classify the change by reversibility, prepare the path, automate it, then define the trigger. The classification is local judgement, so it is `inferred`; the tooling is `source-reported`.
+
+## A worked release
+
+*Illustrative.* A team deploys a checkout change behind a canary.
+
+Three checks decide. First, can the change be reverted without a data migration that would leave the system inconsistent? Second, is the rollback automated and rehearsed, so it does not depend on a person finding the right command? Third, what signal triggers it, and who is authorised to decide?
+
+The outcome is a release decision with a recovery path. The conditions are hypothetical; the preparation method is the contribution.
+
+## Why rehearsal changes the result
+
+A rollback that exists only as documentation has never been tested against the conditions in which it will be needed. Permissions may be wrong, artefacts may have been removed, and the previous version may depend on a data state that no longer exists. Rehearsal is how those problems become visible before they matter.
+
+The most common gap is data. A code change can often be reverted in seconds; a schema change cannot always be reversed at all. Recognising this before release usually leads to a design change: separate the deployment from the migration, or make the migration backward-compatible. That design decision is more valuable than any tooling.
+
+## Why the trigger needs an owner
+
+A trigger tied to a service objective removes a debate during an incident, but only if someone is authorised to act on it. Without an owner, the team waits for consensus while the failure continues. The owner does not need to be the person who understands the cause; they need to be the person who can decide to contain.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Deployment workflows can be automated | `source-reported` | GitHub Actions docs | 2026-11-18 | Product changes |
+| Recovery is part of the incident lifecycle | `source-reported` | NIST SP 800-61 | 2026-11-18 | Guidance updated |
+| Test the rollback before relying on it | `inferred` | Derived from lifecycle practice | 2026-11-18 | Stack changes |
+
+## Why an untested rollback is not a plan
+
+A rollback described in a document is a claim. It becomes a plan when it has been executed in conditions close to a release. Testing reveals the details that are usually missing: permissions, stale artefacts, and changes that were not included in the original step.
+
+Reversibility is the deeper constraint. A deployment that changes data cannot always be undone by redeploying the previous code. Recognising that before release changes the design, often by separating the code change from the data change. Doing it during an incident is much harder.
+
+The final constraint is observability. A rollback can execute successfully and still leave the system in a bad state if the previous version depends on data written by the new one. Verification must therefore include the application's behaviour, not only the completion of the rollback command. Recording what signal confirmed recovery closes the loop and gives the next incident a clearer standard.
+
+A rollback should therefore be treated as a hypothesis about recovery, tested like any other assumption before it is relied upon during an incident.
+
+It also helps to record which artefacts were rolled back and when, so a later investigation can reconstruct the sequence without relying on memory.
+
+## What it cannot do
+
+It cannot undo a data change that was not designed for reversal. It does not guarantee that the restored state is correct. And it cannot replace monitoring, which is what tells you the rollback worked.
+
+The counterargument that a fast rollback makes testing less important is fair for speed and incomplete for confidence.
+
+## A decision test
+
+1. Classify the change by reversibility.
+2. Separate code and data changes.
+3. Prepare and automate the rollback.
+4. Rehearse it.
+5. Define a trigger tied to an objective.
+6. Verify recovery with signals.
+7. Record the decision and residual risk.
+
+For the trade-offs, see [Rollback Strategies Best Practices](/articles/rollback-strategies-best-practices).
 
 ## References & Further Reading
 

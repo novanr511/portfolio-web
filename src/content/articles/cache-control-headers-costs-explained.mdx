@@ -1,13 +1,82 @@
 ---
 title: "Cache-Control Headers Costs Explained"
-description: "Reserved title for a future NOVANDRI article: Cache-Control Headers Costs Explained."
-date: 2026-11-17
+description: "Caching saves work but cannot be undone instantly. Read the cost trade, a worked example, and why a long max-age is a commitment."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Web
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Cache-Control headers reduce repeated work, which makes them look like a pure saving. RFC 9111 defines the directives, and RFC 9110 defines the HTTP semantics around them. The cost appears when a cached response must be invalidated before its time expires.
+
+**Direct answer:** Set caching directives from how often a resource changes and how quickly you need changes to be visible. The RFCs define the directives; the trade-off is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating protocol definitions from the local choice of freshness windows.
+
+## The mechanism
+
+Three directives do most of the work:
+
+- **max-age.** RFC 9111 defines how long a response may be reused. A longer value reduces requests and extends the window in which a stale copy can be served.
+- **no-cache.** The term is counterintuitive: it requires revalidation rather than forbidding storage. The RFC is explicit about this.
+- **immutable.** For resources whose content never changes at a given URL, a long lifetime is safe. Applying it to changing content is not.
+
+The sequence is: classify the resource, choose a lifetime, define a cache-busting strategy, then measure origin load. Choosing the lifetime is judgement, so it is `inferred`; the directive semantics are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A site sets a one-year max-age on its stylesheet, then ships a fix that must go live immediately.
+
+Three checks decide. First, is the URL content-hashed, so a new version gets a new URL? Second, if not, how many cached copies will continue serving the old file? Third, what is the cost of the extra origin load if the lifetime is shortened globally?
+
+The outcome is a policy decision: either shorten the lifetime or adopt content-addressed URLs. The numbers are hypothetical; the trade-off is the contribution.
+
+## Where the cost becomes visible
+
+The cost of a caching policy appears at the moment a change must be seen quickly. A long lifetime that saved requests for months becomes a liability when a fix is urgent. Teams then face a choice: accept a slow rollout, purge caches they can reach, or break the URL convention. None of those is free.
+
+The first cost is operational. A purge requires knowing which caches exist, which is rarely true for shared caches and intermediate proxies. The second is architectural: adopting content-addressed URLs changes the build and deployment pipeline. The third is user-facing: shortening lifetimes increases origin load and can slow pages during peaks.
+
+## Why the policy needs a date
+
+A caching decision is tied to a release process. When that process changes, the safe lifetime changes with it. Recording the policy with a recheck date turns it from a permanent assumption into a decision that can be revisited. This is a small discipline that prevents a long-ago optimisation from quietly becoming a constraint.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Caching directives are defined in RFC 9111 | `source-reported` | IETF, RFC 9111 | 2026-11-18 | RFC updated |
+| HTTP semantics are defined in RFC 9110 | `source-reported` | IETF, RFC 9110 | 2026-11-18 | RFC updated |
+| Choose lifetime from change frequency and invalidation need | `inferred` | Derived from directive semantics | 2026-11-18 | Release process changes |
+
+## Why the saving has a cost
+
+Every cache hit is a request that did not reach the origin, which is the saving. Every stale hit is a user who did not receive the change, which is the cost. The two are controlled by the same directive, so they cannot be optimised independently.
+
+Content-addressed URLs resolve the conflict for static assets. When the URL changes with the content, a long lifetime is safe because a new version has a new name. For resources that must keep a stable URL, revalidation is the control, and it requires the origin to answer validation requests quickly.
+
+A related issue is shared caches. A directive honoured by a browser may be interpreted differently by an intermediate proxy, and a private response must be marked so it is not stored where others can read it. The RFCs define the semantics, but correct deployment depends on applying them consistently across every layer that can hold a copy. A policy that is right at the origin and wrong at the edge produces a result that looks like a cache problem and is actually a configuration problem.
+
+The same caution applies to HTML, where a long lifetime can keep an old navigation or a stale price visible.
+
+## What it cannot do
+
+It cannot make a changing resource immutable. It does not guarantee that every cache obeys the directive. And it cannot remove the need to monitor origin load after a change.
+
+The counterargument that a longer cache is always cheaper is fair for static assets and incomplete for content that changes unexpectedly.
+
+## A decision test
+
+1. Classify the resource by change frequency.
+2. Choose a lifetime.
+3. Define the invalidation path.
+4. Use content-addressed URLs where possible.
+5. Measure origin load.
+6. Record the decision and the recheck condition.
+
+For the directive semantics, see [Cache Control Is a Contract](/articles/cache-control-is-a-contract-not-a-suggestion).
 
 ## References & Further Reading
 
