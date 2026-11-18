@@ -1,10 +1,63 @@
 ---
 title: "Server-side Tagging without the Hype"
-description: "Reserved title for a future NOVANDRI article: Server-side Tagging without the Hype."
-date: 2026-11-17
+description: "Server-side tagging moves measurement off the browser. Read what it changes, a worked example, and the privacy and cost limits."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Analytics
+  - Marketing
+  - Privacy
+  - Web
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Server-side tagging is often pitched as a fix for every measurement problem: blocked cookies, ad blockers, and inaccurate attribution. It changes where a tag fires, which solves some problems and creates others. The honest case is narrower — more control over what is collected and where it goes, at the cost of infrastructure and new obligations.
+
+**Direct answer:** Server-side tagging runs tag logic on a server you control rather than in the user's browser, which gives you control over the data sent to third parties. Google Tag Manager documentation covers the mechanism, and the analytics event guidance covers how events are defined. The boundary: it does not create consent, does not fabricate identity, and does not guarantee attribution accuracy, which the attribution article treats as a credit rule rather than a causal measurement.
+
+## The governance question
+
+Moving tags to a server concentrates data handling in one place, which is an opportunity to apply rules consistently but also creates a single point of responsibility. Someone must decide what each vendor receives, which consent signals are honoured, and what happens when a downstream tool changes, as the governance checklist requires for any maintained system. A server container that forwards everything by default has not solved a measurement problem; it has moved an unmanaged set of transfers to a new location, which the data-privacy article treats as a compliance question.
+
+The operational obligation is similar. A client-side tag that fails affects one page; a server container that fails can stop measurement across a whole site, which the observability article treats as a system-level risk. There should be an owner, an alert, and a fallback, as the incident-response article requires for any component that can fail. This is the cost of the control the architecture provides, which the cloud-cost article frames as part of any new workload.
+
+For a small team, the right question is whether the measurement need justifies that obligation. If it does not, a well-managed client-side setup with clear consent handling may be the better choice, as the build-versus-buy article recommends for software capabilities. The architecture is a tool, not a statement of maturity, which the publication standard requires articles to say honestly.
+
+## What it changes
+
+**Control over outbound data.** Instead of a browser sending data directly to many vendors, a server decides what to forward, which reduces client-side payloads and gives a single place to apply rules, as the tag-manager documentation explains for the server container.
+
+**Resilience to browser restrictions.** A tag that does not depend on a browser cookie may survive some blocking, which the event-measurement guidance treats as a question of how an event is recorded. This is a measurement property, not permission to track someone who has objected.
+
+**First-party context.** Requests can arrive at your own domain before being forwarded, which changes how some browsers treat them, as the privacy-sandbox material explains for the changing web platform.
+
+Three consequences follow. The server is now part of your infrastructure, with availability and maintenance duties, which the observability article treats as an operational responsibility. Data still has a legal basis, which the data-privacy article makes jurisdiction-specific. And the measurement is still a model of behaviour, not behaviour itself, as the marketing-attribution article warns about credit rules.
+
+## A worked example
+
+The following is hypothetical and illustrative. A site wants to measure a purchase event and send it to an analytics tool and an ad platform.
+
+In the browser-only setup, two vendor scripts fire on the thank-you page and each sends its own payload. With server-side tagging, the browser sends one purchase event to the site's server container, which validates the event — order ID, value, currency — and forwards a reduced payload to each vendor. Three checks decide whether this is better. First, is the event definition identical across setups, as the event-measurement guidance requires for comparable data? Second, does the server container forward only what consent permits, which the data-privacy article requires? Third, what does the infrastructure cost, as the cloud-cost article asks for any new workload?
+
+Three conclusions follow. The main gain is control, not magic accuracy, as the mechanism above explains. The consent obligation follows the user, not the architecture, which the privacy article treats as a legal question. And the cost includes a service that must be monitored, as the observability article requires for any production component.
+
+## What server-side tagging cannot do
+
+It cannot reconstruct a user journey that was never observed, which the attribution article treats as a counterfactual problem. It cannot override a privacy choice, which the data-privacy article makes a legal constraint. And it does not guarantee that vendor measurements agree, as the marketing-attribution article explains for different credit rules.
+
+The counterargument that client-side tags are simpler is fair for a small site, which the tag-manager documentation concedes by offering both models. The response is proportionality: choose the model that matches the measurement need and the team's capacity to operate it, as the build-versus-buy article recommends for software capabilities.
+
+## A decision test
+
+1. State the measurement question before choosing an architecture.
+2. Define events consistently, as the event-measurement guidance requires.
+3. Check what data each vendor actually needs.
+4. Apply consent rules at the server, as the privacy article requires.
+5. Price the infrastructure, as the cloud-cost article advises.
+6. Monitor the container as production infrastructure, as the observability article requires.
+7. Treat attribution as a credit rule, as the attribution article warns.
+
+For the measurement frame, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation); for the consent context, see [Data Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design).
+
+## Further Reading
+
+- Google, 2026. [About Google Tag Manager | Tag Platform | Google for Developers](https://developers.google.com/tag-manager) — Primary documentation on tag management and server-side tagging options.
+- Google Analytics Help, 2026. [About events (Google Analytics 4)](https://support.google.com/analytics/answer/9322688) — How an event is defined as a measurable interaction or occurrence, and why the event model determines what can be reported at all.
