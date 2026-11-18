@@ -1,10 +1,73 @@
 ---
 title: "How to Evaluate Model Cards"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Model Cards."
-date: 2026-11-17
+description: "How to evaluate a model card against real deployment questions, with a worked review, an evidence table, and the limits of documentation as assurance."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Model Documentation
+  - Model Evaluation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Model cards are often treated as completed paperwork, filed once and rarely read. The model card paper proposes a reporting template for intended use, evaluation, and limitations, while NIST's AI Risk Management Framework frames documentation as part of governing risk. The real problem is knowing whether a card is good enough to support a decision about a model.
+
+**Direct answer:** Evaluate a model card by asking what decision it supports and whether the reported evidence is specific enough to answer that decision. The Mitchell paper defines the reporting fields, and the NIST framework supplies the risk context in which those fields matter. A card that looks complete but reports vague limitations has not done its job.
+
+**Delta:** This article adds a decision-facing test beyond the sources: it maps model card fields to deployment questions, with claim status explicit.
+
+## The mechanism
+
+The model card paper, by Mitchell and colleagues, proposes a short document that accompanies a trained model. Its fields cover intended use, training and evaluation data, metrics, performance across conditions, and ethical considerations. The purpose is transparency: to give a reader enough structured information to understand what a model is for and where it is likely to fail. The practical consequence is that a card is not an end in itself but an input to someone else's decision.
+
+Evaluating that input starts with specificity. A card that lists intended uses without naming the situations the model was not designed for gives a reader little protection. A card that reports accuracy as a single number without saying which data it was measured on hides the conditions that matter. The mechanism here is simple: the value of documentation lies in the detail that constrains interpretation, so vague fields reduce the card to a formality. A reviewer should treat vagueness as a finding, not as a neutral stylistic choice.
+
+NIST's AI Risk Management Framework provides the context for those details. Its functions ask an organisation to map the context of use, measure what can go wrong, and manage the residual risk. A model card supplies evidence for those functions, but it does not perform them. The framework does not certify a card as adequate; it defines the risk questions that documentation should help answer. The card and the framework therefore play different roles, and evaluation is where they meet.
+
+The synthesis is to read a card as a decision artefact. Each field is useful to the extent that it answers a question a risk owner actually has. Mapping fields to questions is not something the sources state directly; it is a judgement about how to use the template, and it is marked as inferred below. Keeping that mark visible is what stops a useful reading method from being reported as a result of the paper.
+
+## A worked example
+
+The following is hypothetical and illustrative. A reviewer receives a model card for a classification model proposed for a screening workflow. The first check is intended use: does the card name the population and conditions the model was evaluated on, and does it state where use is inappropriate? The second check is evidence: are the reported metrics tied to a specific dataset, with performance broken out where relevant groups differ? The third check is limitations: does the card describe known failure modes in terms concrete enough to inform a mitigation? The outcome is a decision to request revision rather than accept the card, with the missing fields recorded. The scenario is invented; the fields and risk context come from the sources.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Model cards provide a reporting template for intended use, evaluation, and limitations | `source-reported` | Model Cards for Model Reporting (Mitchell et al.) | 2026-11-18 | Updated reporting standards published |
+| NIST AI RMF frames risk as lifecycle functions including map, measure, and manage | `source-reported` | AI Risk Management Framework (NIST) | 2026-11-18 | Framework revision |
+| Card fields map to specific deployment questions | `inferred` | Derived from the sources | 2026-11-18 | Use context changes |
+
+The first two rows are claims the sources make. The third is a practical reading method, not a finding of either source, so it is marked inferred. Its usefulness depends on the use context, and it should be rechecked when that context changes even if the sources stay the same. The table exists to keep that dependence from being forgotten between reviews.
+
+## What it cannot do
+
+A model card cannot prove that a model is safe. The Mitchell paper proposes a reporting format, not a certificate of quality. A card can be filled in accurately and still accompany a model that behaves badly in a context the authors did not anticipate. Evaluation results are bounded by the data and conditions they were measured under, and a card that reports those bounds honestly is telling the reader where the evidence stops. Treating the existence of a card as evidence of safety confuses documentation with assurance, and the more polished the document, the easier that confusion becomes.
+
+The hidden cost is that a card can become a substitute for investigation. Once a document exists, it is tempting to stop asking questions, especially when the reader is busy and the card looks thorough. This is the opposite of the transparency the template intends. The NIST framework resists this by treating risk work as ongoing: mapping, measuring, and managing do not end because a document was produced. A reviewer who reads a card and then stops has used it badly, mistaking the artefact for the work it was meant to support.
+
+A common failure mode is staleness. A card written for one version of a model, one dataset, or one intended use can remain in circulation after those conditions change. The reported metrics no longer describe the deployed system, but the document still looks authoritative. Because the card does not update itself, someone must own its revision. Without that owner, the card drifts from the artefact it describes and quietly becomes misleading, and a misleading card is worse than no card because it carries an appearance of authority.
+
+The boundary is between reporting and deciding. The model card reports what the authors chose to include; the risk decision belongs to the organisation deploying the model. The two are related but not identical. A complete card does not remove the need for a deployment judgment, and a risk framework cannot fill in missing fields in a card. Evaluation is therefore a dialogue between the document and the decision, and the quality of that dialogue depends on a reader willing to probe the gaps rather than admire the structure.
+
+That probing needs structure and a date. A card should be evaluated against the questions that matter for a specific use, and the evaluation should be revisited when the model, the data, or the use context changes. The sources provide the template and the risk context, but not a schedule. Setting one locally is what keeps the card a living input to governance rather than a file that was completed once and then archived. An owner and a review condition turn the document into a maintained artefact.
+
+Counterargument: "The counterargument that model cards are just bureaucracy is fair for low-risk models with a narrow audience and incomplete where a card is the only record of intended use and limitations."
+
+## A decision test
+
+1. Name the decision the card is meant to support.
+2. Check that intended use and out-of-scope uses are stated.
+3. Verify that metrics are tied to specific datasets and conditions.
+4. Look for performance detail where groups or conditions differ.
+5. Check that limitations are concrete enough to inform mitigation.
+6. Map the reported evidence to the NIST risk functions.
+7. Assign an owner and a review date for revision.
+
+The test turns a document into a decision input. Each step asks whether a field is specific enough to answer a real question, and the final steps make sure someone keeps it current. A card that passes is not proof of safety; it is evidence that the right questions were asked and answered in writing. Reviewed on a date and by an owner, it becomes part of governance rather than a filing exercise.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Margaret Mitchell et al., 2019. [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) — The reporting template used to document intended use, evaluation, and limitations.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

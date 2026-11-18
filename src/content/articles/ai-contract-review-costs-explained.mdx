@@ -1,10 +1,71 @@
 ---
 title: "AI Contract Review Costs Explained"
-description: "Reserved title for a future NOVANDRI article: AI Contract Review Costs Explained."
-date: 2026-11-17
+description: "AI contract review costs depend on volume, document length, and human verification. See a bounded cost frame, a worked example, and what the sources cannot establish."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Cost Modeling
+  - Contracts
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI contract review is often priced as a per-document fee, which hides the factors that actually drive cost. Anthropic's use-case guides describe tasks such as legal summarization and document processing, and the customer-review entry describes how reviews form a public reputation record. The real problem is that cost depends on volume, document length, and the amount of human verification required, none of which a headline rate reveals.
+
+**Direct answer:** The cost of AI contract review is driven by the number and length of documents, the complexity of the task, and the human time needed to verify output. The sources describe the available use cases and how public reviews form, not a priced contract-review workflow. Any figure is therefore a local estimate, not a source-reported fact.
+
+**Delta:** This article adds a bounded cost frame and a claim-status table beyond the sources: it maps each cost driver to the budgeting decision it supports, with claim status explicit.
+
+## The mechanism
+
+Anthropic's guides to common use cases describe tasks that include summarization, legal document handling, and customer support. These are the building blocks of an AI contract review workflow: the model reads text, extracts or summarizes clauses, and produces a structured output that a person checks. The practical consequence is that the model's work scales with the text it processes. A longer contract consumes more processing than a short one, and a batch of many contracts consumes more than a single document. Cost therefore begins with volume and length, which are measurable before any contract is reviewed.
+
+The customer-review source describes how individual reviews accumulate into a public reputation record. This matters for contract review because the output of an automated review can itself become a record that others rely on, and because customer feedback about a review service is not evidence of its accuracy. The practical consequence is that a review, whether of a product or of a clause, is an opinion or observation stored in a system, not a verified judgment. An AI contract review system that treats its own output as authoritative, or that takes user ratings as proof of correctness, confuses a record with a fact.
+
+The sources describe use cases and reputation records; they do not publish a price for contract review. Cost modeling is therefore inferred, not source-reported. A useful discipline is to separate the costs that scale with processing from the costs that do not. Processing cost rises with document volume and length, while verification cost rises with how much output a human must check. A workflow that produces confident but unreliable extractions shifts cost from processing to verification, often increasing the total.
+
+The consequence for practice is that a budgeting decision should start from the review workflow, not from a rate card. A team that needs every clause verified will budget mostly for human time, while a team that needs a first-pass summary will budget mostly for processing. The same tool serves both, but the cost structure differs. Each driver should have an owner and a measured quantity, so the estimate can be revised when volume or document mix changes. A rate with no volume and no verification assumption is not an estimate.
+
+## A worked example
+
+The following is hypothetical and illustrative. A legal team plans to use AI to produce first-pass clause summaries before human review, and wants a bounded monthly cost. Three checks decide the estimate. First, how many documents will be processed and how long is a typical one, since these set the processing component? Second, what share of the output will a lawyer verify, since this sets the human component? Third, what happens when the model is uncertain, since rework moves cost between the two components? The review finds that volume is stable, documents are long, and the team currently verifies every clause. The estimate therefore assigns most cost to human time and proposes sampling verification for low-risk clauses. The figures are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| AI use-case guides describe legal summarization and document tasks | `source-reported` | Anthropic, Guides to common use cases | 2026-11-18 | Guides updated |
+| Online reviews accumulate into a public reputation record | `source-reported` | Wikipedia, Customer review | 2026-11-18 | Definition revised |
+| Cost is driven by volume, length and human verification | `inferred` | Derived from the sources | 2026-11-18 | Pricing or workflow changes |
+
+The first two rows restate what the sources describe. The third row is a synthesis, since neither source provides a contract-review price. Recheck when the use-case guides change or when the team's review workflow, document mix, or verification requirement shifts.
+
+## What it cannot do
+
+AI contract review cannot establish legal correctness. The use-case guides describe summarization and document processing, not legal judgment. A model can extract a clause and summarize it, but whether the clause is enforceable or desirable is a decision that requires authority the sources do not grant the tool. A team that reads a fluent summary as a legal conclusion has confused an output with an opinion. The tool produces text; a qualified person still decides what the text means.
+
+The hidden cost is verification and error handling. A review system that gets most clauses right but is wrong on the few that matter can be more expensive than a slower manual process, because the errors are found late and require rework. The guides do not quantify this cost, so it must be estimated locally. Uncertain output should be routed to a person, and that routing takes time. When volume rises, verification time can grow faster than processing cost, and a budget built only on processing will be wrong.
+
+The main failure mode is treating a reputation signal as a quality measure. The customer-review source explains that reviews form a public record of opinions, not a verified measure of accuracy. A review service with high ratings may still produce unreliable clause summaries, and ratings can be shaped by factors unrelated to correctness. Using user ratings as evidence that a review workflow is sound substitutes a social signal for a test. Because the sources describe reputation formation rather than evaluation, this risk is an inference.
+
+There is a boundary around what an automated review covers. It covers text that the system can read, which may exclude scanned or poorly formatted documents and anything outside the uploaded set. It does not cover the commercial context of a contract, the counterparty's behavior, or changes in law after the review. It also cannot replace negotiation: a flagged clause still has to be discussed with the other party. A review that ignores these boundaries will produce a clean summary of an incomplete picture.
+
+Because document mix and law change, the cost model and the workflow need periodic review. Each driver should be rechecked against measured volume and verification time, and the sharing rule between model and person should be revised when errors cluster. Recheck dates and owners belong with the estimate, so a reviewer can see which figures were assumptions. Without that record, a budget can look precise while resting on a rate and a verification rule nobody revisits.
+
+The counterargument that a per-document rate is fair for budgeting is incomplete when verification time is the larger and more variable cost.
+
+## A decision test
+
+1. Name the decision the review output is meant to support.
+2. Count the documents and measure their typical length.
+3. Decide which clauses require human verification.
+4. Estimate processing cost from volume and length.
+5. Estimate verification cost from the share of output checked.
+6. Route uncertain output to a person and estimate the rework cost.
+7. Record owners, assumptions, and recheck dates with the estimate.
+
+A cost estimate is useful only when it separates what scales with processing from what scales with verification. The test ties each driver to a budgeting decision and makes the assumptions visible, so a reviewer can see which numbers are measured and which are local choices. For further reading, see [Related](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Customer review - Wikipedia](https://en.wikipedia.org/wiki/Online_review) — How online reviews form a public reputation record.

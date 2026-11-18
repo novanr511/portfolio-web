@@ -1,10 +1,73 @@
 ---
 title: "DPO Alignment Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: DPO Alignment Trade-Offs."
-date: 2026-11-17
+description: "DPO's alignment trade-offs, the governance context from NIST's risk framework, a worked comparison, and the limits of treating a training method as assurance."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Preference Optimization
+  - Alignment
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Alignment methods are often presented as a choice between capability and safety, which hides the practical trade-offs. Direct Preference Optimization reframes alignment as an optimisation over preference pairs, while NIST's AI Risk Management Framework treats risk as something governed across a lifecycle. The real problem is connecting a training technique to the governance decision of whether a model is ready to deploy.
+
+**Direct answer:** DPO optimises a policy directly from preference data, removing the separate reward model used in RLHF but shifting the burden onto the quality of the preference pairs. NIST's framework does not validate a technique; it provides functions for governing the risks that any technique leaves behind. The trade-off is simplicity in training against sensitivity in data and evaluation.
+
+**Delta:** This article adds a governance-facing map beyond the sources: it maps DPO's technical trade-offs to risk-management decisions, with claim status explicit.
+
+## The mechanism
+
+Direct Preference Optimization, as Rafailov and colleagues describe it, reframes the alignment problem. Instead of training a separate reward model and then optimising a policy against it with reinforcement learning, DPO uses preference pairs directly to optimise the policy. The paper's central claim is an equivalence: the reward can be represented implicitly by the policy itself, so the separate reward-model stage can be removed. The practical consequence is a simpler pipeline with fewer moving parts, which lowers the engineering cost of running alignment experiments.
+
+That simplification has a counterpart. Because there is no separately trained reward model to smooth and generalise preferences, the quality of the preference pairs becomes more consequential. Noisy, inconsistent, or narrowly sourced preferences feed directly into the policy. The mechanism is that DPO learns from the data it is given without an intermediate abstraction, which makes the method sensitive to how those preferences were collected and labelled. A team adopting DPO is therefore making a data-quality decision as much as an algorithmic one.
+
+NIST's AI Risk Management Framework operates at a different level. It organises risk work into functions such as governing, mapping, measuring, and managing, and it treats risk as a continuous lifecycle concern rather than a one-time check. The framework does not endorse particular algorithms. Its relevance here is that it asks what evidence supports a deployment decision, regardless of whether the model was aligned with DPO, RLHF, or another method.
+
+The bridge between the two is evaluation. DPO's simplicity reduces one source of complexity, but the NIST functions still require measurement of the behaviours that matter and management of the residual risk that remains. Mapping a technical trade-off to a governance decision is a synthesis: the sources describe the method and the framework separately, and this article connects them without claiming the paper makes governance claims.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team is choosing between RLHF and DPO to align a support assistant, with a fixed annotation budget. The first check is data: are the preference pairs consistent and representative of real user queries, since DPO feeds them directly into the policy? The second check is evaluation: can the team measure the behaviours of concern independently of the training method, following the NIST emphasis on measurement? The third check is residual risk: what happens when the assistant meets a query unlike anything in the preference data? The outcome is a recorded choice with the reasons made explicit, not a claim that one method is universally better. The scenario is invented; the method and framework are from the sources.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| DPO optimises a policy directly from preference pairs | `source-reported` | Direct Preference Optimization (Rafailov et al.) | 2026-11-18 | New method variants or corrections published |
+| NIST AI RMF organises risk work into lifecycle functions | `source-reported` | AI Risk Management Framework (NIST) | 2026-11-18 | Framework revision |
+| Technical trade-offs map to deployment risk decisions | `inferred` | Derived from the sources | 2026-11-18 | Governance process changes |
+
+The first two rows are claims the sources make directly. The third row connects them and is therefore a judgement, not a reported result. Because it is inferred, the mapping should be rechecks when either the method landscape or the governance process changes, rather than treated as a fixed conclusion. Marking it explicitly prevents a synthesis from being mistaken for a finding of the paper.
+
+## What it cannot do
+
+DPO cannot compensate for poor preference data. The paper presents a method for learning from preferences; it does not guarantee that those preferences are coherent, representative, or aligned with the behaviours a deployment requires. If the annotation process encodes a narrow view of acceptable answers, the policy will learn that view efficiently. The method makes the training pipeline simpler, not the problem simpler, and that distinction is easy to lose when the headline is that one stage has been removed. Teams should read the simplification as a shift of responsibility, not a reduction of it.
+
+The hidden cost is displacement. Removing the reward model does not remove the need to decide what good behaviour means; it moves that decision upstream into the collection of preference pairs and downstream into evaluation. Teams that treat DPO as a shortcut may spend less engineering effort on the pipeline and more on data curation and measurement, but the total work does not vanish. The NIST framework makes this visible by insisting that measurement and management remain explicit functions regardless of the training technique. A simpler pipeline is not a simpler obligation.
+
+A common failure mode is overfitting to the preference set. Because DPO optimises directly against pairs, a policy can become good at reproducing the preferred responses in the data while behaving unpredictably on queries outside it. Distribution shift, length biases, and noisy labels are all ways the method can produce a policy that looks aligned on the evaluation set and degrades in use. The paper does not promise immunity from these effects, and treating it as a guarantee would overstate the result. Evaluation has to probe beyond the distribution the pairs came from.
+
+The boundary is between a training method and a governance decision. DPO is a way to align a policy; the NIST framework asks whether the risks of deploying that policy have been mapped, measured, and managed. Neither answers the other. A well-run DPO experiment does not by itself justify deployment, and a thorough risk framework does not tell you which alignment algorithm to use. Conflating the two produces either false confidence in a technique or a governance process disconnected from the model it is meant to govern. Keeping them separate but linked is the discipline this article recommends.
+
+Both sources also require periodic review. Method claims can be revised as new variants and evaluations appear, and the NIST framework is updated as understanding of AI risk develops. A decision made today should carry a date and a condition under which it should be revisited. Building that review trigger into the deployment record is what keeps a technical choice from becoming an unexamined default that outlives the evidence it was based on.
+
+Counterargument: "The counterargument that DPO's simplicity makes governance unnecessary is fair for low-stakes experiments and incomplete for deployment, where residual risk still needs mapping and management."
+
+## A decision test
+
+1. State the behaviour the alignment is meant to change.
+2. Audit the preference pairs for consistency and coverage.
+3. Choose the alignment method and record why.
+4. Measure the target behaviours independently of the method.
+5. Probe queries outside the preference distribution.
+6. Map and manage residual risk per the NIST functions.
+7. Set a review date tied to method or framework changes.
+
+The test keeps the technical and governance questions separate but connected. DPO answers how to train from preferences; the framework answers whether the resulting risks are acceptable. Recording both, with a review condition, prevents a simplification in training from being mistaken for a reduction in risk. A decision that passes the test is documented, not proven safe, and that wording matters when the decision is reviewed later.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Rafael Rafailov et al., 2023. [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) — Optimising a policy directly from preference pairs without training a separate reward model.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

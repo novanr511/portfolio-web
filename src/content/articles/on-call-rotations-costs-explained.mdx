@@ -1,10 +1,73 @@
 ---
 title: "On-call Rotations Costs Explained"
-description: "Reserved title for a future NOVANDRI article: On-call Rotations Costs Explained."
-date: 2026-11-17
+description: "On-call cost is more than stipends. Read how availability and alert design drive the true cost, a worked example, and the limits of the sources."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Reliability Engineering
+  - On-call
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often price an on-call rotation by adding up stipends and calling it a day. The real problem is that the visible payment is the smallest part of the cost: the rotation also consumes attention, interrupts work, and shapes whether people stay on the team. A rotation that looks cheap on a budget line can be expensive in ways the budget never records.
+
+**Direct answer:** On-call means staff are available outside normal working hours to respond to incidents, usually organized as a rotation. Google's SRE guidance argues that alerts should fire on user-visible symptoms and error-budget burn rather than on internal causes. The boundary: these sources describe the duty and how to alert well, not a costing formula, so any full cost must be assembled locally from compensation, load, and reliability data.
+
+**Delta:** This article adds a decision framing beyond the sources: it maps the structure of on-call duty and symptom-based alerting to the specific question of what a rotation actually costs, with claim status explicit.
+
+## The mechanism
+
+The on-call entry describes an arrangement in which employees are required to be available outside their normal schedule to handle problems that arise, typically organized as a rotation that shares the burden across a group. The mechanism is reserved availability: the organization pays for the capacity to respond at any hour, whether or not an incident occurs. The practical consequence is that the cost exists even on a quiet night. The time is not free simply because no page arrived; it is held in readiness and cannot be spent elsewhere without giving up the ability to respond.
+
+Google's SRE workbook chapter on alerting on SLOs argues that alerts should be based on symptoms that affect users and on the rate at which an error budget is being consumed, rather than on low-level causes or raw thresholds. The mechanism is signal quality: a good page represents a real user problem that needs a human now, while a bad page demands attention without a corresponding need. The practical consequence for cost is direct. Every page pulls an engineer away from other work, and a page that could have been automated or ignored spends that attention for nothing. Improving alert quality reduces the load the rotation has to carry.
+
+Combining the two shows where a rotation's cost is determined. Availability is fixed by the schedule, but the burden within that schedule depends on how often people are called and how much each call demands. A team can lower cost by improving the system so that fewer human responses are needed, by making alerts more precise, or by distributing what remains more evenly. It cannot lower the cost by redefining a busy night as not working, because the readiness was still required. The honest accounting separates the payment for availability from the load imposed during it.
+
+A further mechanism is the effect of predictability on recovery. Interruptions that arrive without warning and cluster in the same hours prevent people from resting, and the following shift begins with less capacity. The practical consequence is that the distribution of pages matters as much as the total. Two rotations with the same number of incidents can have very different costs if one concentrates them on a few individuals or repeatedly breaks sleep. This is why a fair-looking schedule by headcount can still be expensive in practice.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team of eight reviews a rotation that pays a flat weekly stipend. Three checks estimate its real cost. First, the availability check: how many engineer-hours are reserved each week across evenings and weekends, regardless of whether anything breaks? Second, the load check: how many pages actually arrived, what share were actionable user-visible problems under SLO-style rules, and how long did each interruption last? Third, the distribution check: were pages and lost sleep spread across the team, or concentrated on two people? The outcome is a plan that trims noisy alerts, adds a follow-the-sun handoff for overnight hours, and tracks page load per engineer. The limitation is that fatigue and attrition effects are hard to quantify in a short review.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| On-call requires availability outside normal hours, typically via a rotation | `source-reported` | On-call - Wikipedia | 2026-11-18 | when the entry's description of the practice changes |
+| SRE guidance recommends alerting on symptoms and error-budget burn | `source-reported` | Alerting on SLOs - Google SRE | 2026-11-18 | when the workbook's alerting guidance is revised |
+| Poorly targeted alerts raise rotation cost without improving reliability | `inferred` | Derived from the sources | 2026-11-18 | when incident or reliability research reframes the link |
+
+The first two rows report what the sources state and can be checked against them. The third is an inference from combining paid availability with a warning against non-actionable alerts; neither source presents it as a costing rule. Recheck conditions point back to the sources or to new reliability evidence, so each row's status stays explicit.
+
+## What it cannot do
+
+These sources cannot produce a total cost for a specific rotation. The on-call entry describes what the duty is, and the SRE chapter describes how alerts should be designed. Neither supplies wage rates, page volumes, or a way to value lost sleep and turnover. A manager looking for a number will not find one in them, and treating their guidance as a costing model would be a category error. What they provide is the structure of the problem, not its price.
+
+A hidden cost is the attention debt that pages create. An interruption during deep work does not simply pause the task and resume it cleanly; returning to the original problem takes time, and a page late in the day can consume the next morning's focus as well. When pages cluster, the team spends the following shift recovering rather than improving the system that failed. The expense appears nowhere as a line item, yet it is often larger than the stipend, because it reduces the capacity to do the reliability work that would prevent future pages.
+
+A common failure mode is treating every alert as equally serious. A rotation whose alerts fire on internal causes or marginal thresholds generates a steady stream of pages that require a human to decide that nothing is wrong. This trains responders to treat pages as noise, which is dangerous when a genuine incident eventually arrives among them. The cost is double: wasted attention on the false alarms, and slower response when a real one matters. Symptom-based alerting is the remedy the SRE guidance proposes, but adopting it requires the discipline to delete alerts that no longer represent user harm.
+
+The boundary is that these are descriptions of practice, not guarantees. The on-call entry explains an arrangement for handling problems outside hours; it does not endorse any particular schedule or compensation level. The SRE guidance explains how to alert on symptoms and burn rate; it does not claim that following it eliminates incidents or operator load. Applying them responsibly means using the availability concept to account for reserved time and the alerting principle to reduce needless pages, while assembling the actual figures from local compensation, incident, and reliability records.
+
+Because systems and teams change, the cost needs scheduled review. A rotation designed for a small product can become punishing as traffic grows, and an alert set that was once precise drifts as services are added and thresholds go stale. The practical requirement is to recheck page volume, the share of actionable alerts, and their distribution across people on a fixed cadence, and to revisit the schedule when those figures move. Without that review, the rotation quietly becomes more expensive while its stipend stays unchanged.
+
+The counterargument that on-call is simply a cost of running a service is fair for systems where human response is genuinely needed and incomplete for cases where better alerting and automation would remove much of the load.
+
+## A decision test
+
+1. Count the engineer-hours reserved by the schedule each week.
+2. Record the page volume and how many pages were actionable.
+3. Measure the time each interruption took, including return to work.
+4. Check how pages and overnight disruptions are distributed across people.
+5. Remove or rework alerts that do not reflect user-visible symptoms.
+6. Compare the full local cost against the cost of fewer, better alerts.
+7. Revisit volume, precision, and distribution on a fixed cadence.
+
+These steps make the rotation's cost visible instead of assuming it equals the stipend. The mapping from reserved availability and symptom-based alerting to local load is what allows a team to decide whether to change the schedule or the system. A passed test leaves a record of hours, pages, and distribution, so the next reviewer can see what the rotation cost rather than guessing from the payment.
+
+For further reading, see [Related](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Schedule (workplace) - Wikipedia](https://en.wikipedia.org/wiki/On-call) — Work schedules including on-call duty.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.

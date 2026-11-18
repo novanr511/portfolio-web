@@ -1,10 +1,74 @@
 ---
 title: "How to Evaluate Embedding Model Selection"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Embedding Model Selection."
-date: 2026-11-17
+description: "Choosing an embedding model is an evaluation problem, not a leaderboard problem. Learn how reranking signals and web analytics reveal whether retrieval actually serves users."
+date: 2026-11-18
 tags:
-  - Planned
-  - AI
+  - Machine Learning
+  - Evaluation
+  - Embedding Models
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often pick an embedding model by downloading a leaderboard and choosing the top row. The trouble is that a leaderboard score measures a benchmark, while the system the team is building has its own queries, its own documents, and its own definition of a good result. Without an evaluation tied to that context, the selected model can be excellent on the benchmark and mediocre where it matters.
+
+**Direct answer:** Evaluate an embedding model against retrieval outcomes in your own domain, not against a generic score. Reranking documentation shows how a second-stage model reorders candidates, which gives you a way to separate retrieval quality from ranking quality. Web analytics supplies the behavioral signals that tell you whether the results users see are the ones they want.
+
+**Delta:** This article adds a decision layer beyond the sources: it maps reranking mechanics and analytics signals to a model-selection test, with claim status explicit.
+
+## The mechanism
+
+Cohere's reranking documentation describes a two-stage pattern. A first stage retrieves a set of candidate documents using embeddings, and a second stage re-ranks those candidates with a model that scores the query against each document more carefully. The reason for the pattern is practical: embedding retrieval is fast and scales well, while reranking is slower but more precise. The two stages trade cost for quality, and their separation is what makes diagnosis possible.
+
+That separation is the key to evaluation. If the wrong document never appears in the candidate set, no reranker can recover it, because reranking only reorders what retrieval supplied. Conversely, if the right documents are present but ranked low, the fix may be a reranker rather than a new embedding model. Reading the two stages distinctly lets you assign a failure to the right component instead of replacing the whole pipeline when one part is at fault. Most model churn happens because teams skip this distinction and treat retrieval and ranking as a single opaque block.
+
+Wikipedia's web analytics article defines the collection and analysis of web data such as page views, clicks, and user behavior. In a retrieval context, these signals become outcome measures. A click on a result, a short dwell time followed by a return to the search, or a refinement of the query each says something about whether the returned documents served the user. The analytics material provides the vocabulary for these signals, even though it was written about websites rather than retrieval systems. Applying it here is an analogy, and like all analogies it has limits that the evaluation must respect.
+
+The practical consequence is that evaluation has two layers. The offline layer measures whether relevant documents are retrieved and ranked well, using the reranking distinction to isolate the stages. The online layer measures whether users actually succeed, using behavioral signals. A model-selection decision that considers only the offline layer can optimize a metric that users never feel; one that considers only the online layer can mistake a presentation change for a model improvement. The two layers are complementary, and neither is sufficient alone.
+
+## A worked example
+
+The following is hypothetical and illustrative. A support team compares two embedding models for a search over help articles. Rather than trust a public benchmark, it builds a small set of real support queries with known good answers. For each model it runs the retrieval stage and checks whether the correct article appears in the top candidates, then applies a reranker and checks whether that article rises to the top. It also reviews web analytics from the existing search: queries that were reformulated quickly or ended without a click point to weak results. The outcome: the lower-benchmark model retrieves the correct article more often on the team's own queries, so it is selected. The decision came from domain evidence, not a leaderboard.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A reranker reorders candidates produced by a first-stage retriever. | `source-reported` | Cohere | 2026-11-18 | Cohere changes the reranking API or description. |
+| Web analytics covers page views, clicks, and user behavior. | `source-reported` | Wikipedia: Web analytics | 2026-11-18 | The web analytics definition is broadened. |
+| Retrieval failures cannot be fixed by reranking alone. | `inferred` | Derived from the sources | 2026-11-18 | A reranker is documented to retrieve new candidates. |
+| Behavioral signals can stand in as outcome measures for retrieval quality. | `inferred` | Derived from the sources | 2026-11-18 | Evidence shows the signals do not track user success. |
+
+The source rows restate what the two references state directly. The inferred rows extend the two-stage idea and the analytics definition to a selection decision; neither source prescribes a specific evaluation protocol, so those lines are reasoning from the described mechanics. Recheck them if Cohere changes the reranking API or the analytics definition is broadened in a way that alters these conclusions.
+
+## What it cannot do
+
+The first limit is that these sources do not provide an embedding benchmark or a scoring formula. Cohere's documentation describes a reranking feature, and the web analytics article describes web measurement; neither ranks embedding models or defines a relevance metric. This article offers a way to structure a decision, but it cannot pick a model for you, and it cannot supply the labeled queries that any meaningful evaluation requires. A team hoping to outsource the judgment to these pages will find only a framework for making the judgment itself.
+
+A hidden cost of domain evaluation is the effort of building the query set. Someone has to assemble real questions, identify the correct documents, and keep the set honest as the content changes. That work is unglamorous and often underfunded, which is why teams fall back on leaderboards. There is also a cost to running two-stage pipelines in evaluation: reranking every candidate takes time, and the evaluation harness must mirror production or the measurements will mislead. A harness that reranks ten candidates while production reranks one hundred is measuring a different system.
+
+The characteristic failure mode is contamination between the stages. If the offline test uses the same queries the team tuned on, the measured lift is optimistic. If the online signals are read without controlling for presentation changes, a layout tweak can be mistaken for a model gain. A third failure is measuring only what is easy: click-through is simple to log but can rise when results are merely tempting, not correct. Each of these failures produces a number that looks like progress and is not, which is why the evaluation design matters as much as the model choice.
+
+There is a boundary between what web analytics can show and what it cannot. Behavioral signals indicate that users engaged, not that their information need was met. A user may click a result and still leave unsatisfied. Analytics also aggregate across users and can hide the experience of a small but important segment. The signals are useful as one input, not as a verdict on a model. Treating a click as a proxy for correctness is a convenience that should be stated openly and tested against the offline measures.
+
+The material needs review when the content or the query mix changes. A model that ranked one catalog well may rank a broader one poorly, and a reranker's behavior can change with a version update. The references should be re-read for API or definition changes, and the query set should be refreshed on a schedule so that the evaluation keeps reflecting real usage. An evaluation that is never refreshed becomes a stale benchmark of its own, repeating the very mistake it was built to avoid.
+
+**Counterargument:** The preference for domain evaluation over leaderboards is fair for a team with real traffic and incomplete for a greenfield project; with no users to observe, a benchmark is a reasonable starting prior.
+
+## A decision test
+
+1. Write down the information need the system must serve and the kind of query it will receive.
+2. Assemble a small set of real queries with known correct documents, kept separate from any tuning set.
+3. Evaluate the retrieval stage: check whether the right document appears among the candidates for each model.
+4. Evaluate the reranking stage: check whether the right document rises to the top when a reranker is applied.
+5. Review web analytics signals from the existing system for queries that end in reformulation or no click.
+6. Compare models on these domain measures rather than on a generic leaderboard score.
+7. Record the choice with the evidence and set a date to re-run the evaluation after content or model changes.
+
+The purpose of a decision test is to keep model selection tied to the system you actually run. By separating retrieval from ranking and pairing offline checks with behavioral signals, the team can see which component needs work. The result is a choice that can be explained and revised, rather than a preference inherited from a public score. A model selected this way has a reason attached to it, and that reason can be checked when the context changes.
+
+For further reading, see [What AI Search Actually Measures](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- Cohere, 2026. [An Overview of Cohere Rerank Model | Cohere](https://docs.cohere.com/docs/reranking) — How a second-stage reranker scores query-document pairs after an initial retrieval pass.
+- Wikipedia contributors, 2026. [Web analytics - Wikipedia](https://en.wikipedia.org/wiki/Web_analytics) — Collection and interpretation of website behaviour data.

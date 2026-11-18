@@ -1,10 +1,74 @@
 ---
 title: "How to Get Trial Design Right"
-description: "Reserved title for a future NOVANDRI article: How to Get Trial Design Right."
-date: 2026-11-17
+description: "A trial that cannot fail is not a trial. Learn how A/B testing mechanics and a clear value proposition keep an experiment from measuring the wrong thing."
+date: 2026-11-18
 tags:
-  - Planned
-  - Marketing
+  - Experimentation
+  - Trial Design
+  - A/B Testing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams frequently launch a trial with a clear hope and an unclear hypothesis. They change several things at once, watch a single metric, and declare success when the line moves. The problem is that a movement in a metric does not identify its cause, and without a stated value proposition the team cannot say what would have counted as a failure.
+
+**Direct answer:** A well-designed trial isolates one change, defines its outcome measure in advance, and ties the expected effect to a specific value proposition. A/B testing supplies the comparison structure; the value proposition supplies the claim being tested. Design the trial so that a null result is informative, and decide before launch what you will do with each possible outcome.
+
+**Delta:** This article adds a decision layer beyond the sources: it maps the A/B testing mechanics and value-proposition framing to a design checklist, with claim status explicit.
+
+## The mechanism
+
+Wikipedia's A/B testing article describes a randomized experiment in which two variants are shown to different groups and their outcomes are compared. The core idea is control: by holding everything else constant and randomizing assignment, the difference in outcomes can be attributed to the variant rather than to pre-existing differences between the groups. That attribution is the whole value of the method. Without randomization, a change in a metric is confounded with whatever else differed between the groups, and the result cannot support a causal claim.
+
+The value-proposition article defines the bundle of benefits a product promises to deliver and the reason a customer should choose it. In a trial, the value proposition is the claim under test. If the claim is that a shorter signup form increases completion because users value speed, then completion rate is the outcome and the mechanism is reduced friction. Stating the claim this way forces the team to name both the benefit and the causal path, which is what makes the metric choice defensible. A team that cannot name the benefit is not ready to choose a metric.
+
+The practical consequence is that design begins before traffic. A team that can write the value proposition as a testable sentence can derive the metric, the minimum effect worth detecting, and the decision rule. A/B testing then provides the randomization and the statistical comparison, but it cannot rescue a vague hypothesis. The experiment will faithfully measure whatever was specified, including the wrong thing. Careful specification is therefore the highest-leverage work in the whole design.
+
+The mechanism also has a timing dimension. Because assignment is randomized, the comparison is valid only if the groups remain comparable through the observation window. Peeking at results and stopping early when the line looks favorable breaks that comparability by selecting the moment that flatters the result. The discipline is to set the duration and the rule in advance and to let the randomization run its course. A result that needs an early stop to look good is not a result the team can safely act on.
+
+## A worked example
+
+The following is hypothetical and illustrative. A product team wants to test a redesigned onboarding screen and states its value proposition as: new users will complete setup faster when the steps are fewer. It runs an A/B test with randomized assignment, defining the primary metric as the share of new users who finish setup within one session and fixing the observation window at two weeks. Three checks guide the design: the metric matches the stated benefit, only the screen changes between variants, and the sample size is set before launch to detect the minimum worthwhile lift. Midway, the early line favors the variant, but the team declines to stop. At the end the lift is smaller, and the team ships anyway because the result clears the pre-set threshold.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A/B testing randomizes users across variants and compares outcomes. | `source-reported` | Wikipedia: A/B testing | 2026-11-18 | The A/B testing entry changes its method description. |
+| A value proposition states the benefit a product promises to customers. | `source-reported` | Wikipedia: Value proposition | 2026-11-18 | The value-proposition definition is revised. |
+| A stated value proposition should determine the trial's primary metric. | `inferred` | Derived from the sources | 2026-11-18 | A team's measurement practice contradicts the link. |
+| Early stopping biases the estimated effect. | `inferred` | Derived from the sources | 2026-11-18 | Statistical guidance in the source is updated. |
+
+The source rows restate definitions found in the two articles. The inferred rows apply those definitions to trial design; neither source prescribes a metric-selection rule or discusses stopping, so those conclusions are reasoning from the method rather than quotations. Revisit them if the A/B testing entry changes its guidance on validity or duration.
+
+## What it cannot do
+
+The first limit is that these sources explain methods and concepts, not your product. A/B testing describes a class of experiment; the value-proposition article describes a class of claim. Neither can tell you which benefit your customers actually value or which metric your business should optimize. This article supplies a design discipline, but the substance of the hypothesis must come from knowledge of the product and its users. A perfectly designed test of a trivial claim produces a precise answer to a question nobody needed to ask.
+
+The hidden cost of rigorous design is speed. Fixing a sample size and an observation window means waiting, and waiting is unpopular when a decision is due. There is also an opportunity cost: traffic assigned to a test is traffic not spent on other work. Teams that accept these costs openly make better trade-offs than teams that quietly run an underpowered test and then over-interpret the result. The pressure to shorten a trial is constant, and the design has to be strong enough to withstand it rather than rely on good intentions.
+
+The characteristic failure mode is the test that measures the wrong thing well. A metric can move for reasons unrelated to the value proposition: a seasonal shift, a change in traffic mix, or a bug in the tracking. Randomization protects against some of these, not all. A second failure is the multiple-comparison problem: test enough variants and metrics and one will appear significant by chance. The design discipline has to limit the number of questions asked. A trial that answers five questions at once has usually answered none of them reliably, whatever the dashboard suggests.
+
+There is a boundary between what a trial can establish and what it cannot. A/B testing can show that a change affected a measured outcome in a specific population over a specific window. It cannot show why, in the sense of a verified psychological mechanism, and it cannot show that the effect will persist after novelty fades or in a different market. Generalization is an argument, not an output of the experiment. A result is evidence for a context, and the burden of extending it to another context sits with the person making the claim.
+
+For these reasons the design should be reviewed before launch by someone who did not write the hypothesis. The value proposition should be checked against actual user evidence, the metric against the claim, and the decision rule against the cost of a wrong call. After the trial, the result should be filed with the design so that future teams can see what was promised and what was observed. That archive is what prevents the same weak hypothesis from being retested under a new name.
+
+**Counterargument:** The insistence on pre-set rules is fair for a team with steady traffic and incomplete for an early team with little; for the latter, running no test is often the larger error.
+
+## A decision test
+
+1. Write the value proposition as a single testable sentence naming the benefit and the mechanism.
+2. Derive one primary metric from that sentence and define exactly how it will be measured.
+3. State the minimum effect that would matter and set the sample size before launch.
+4. Randomize assignment and confirm that nothing except the intended change differs between variants.
+5. Set the observation window and the decision rule, including what a null result means.
+6. Avoid stopping early for a favorable line; let the pre-set duration complete.
+7. Record the result with the original hypothesis and schedule a check for durability.
+
+The point of a decision test is to make the trial honest about its own limits. When the metric, the duration, and the rule are fixed in advance, the result can be read without hindsight. A trial designed this way produces a decision even when the hypothesis fails, because a clear null result tells the team what not to build. That is a useful outcome, and a design that cannot produce it has wasted the traffic it consumed.
+
+For further reading, see [Voice of Customer](/articles/voice-of-customer-turning-feedback-into-decisions).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [A/B testing - Wikipedia](https://en.wikipedia.org/wiki/A/B_testing) — Controlled comparison of two variants.
+- Wikipedia contributors, 2026. [Value proposition - Wikipedia](https://en.wikipedia.org/wiki/Value_proposition) — The value a product promises to a buyer.
