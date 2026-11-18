@@ -1,10 +1,83 @@
 ---
 title: "Getting Started with Zero Trust"
-description: "Reserved title for a future NOVANDRI article: Getting Started with Zero Trust."
-date: 2026-11-17
+description: "Zero trust changes how access is decided. Read where to start, a worked example, and why it is not a product you can install."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Security
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Zero trust is often presented as a product category, which hides that it is a change in how access decisions are made. The Wikipedia entry describes the approach, and NIST's guidance covers the underlying architecture. The starting point is knowing what needs protection and who currently has access.
+
+**Direct answer:** Start with an inventory of resources and access, then move decisions closer to the resource with explicit verification. The sources describe the model; the starting sequence is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented principles from local choices about scope.
+
+## The mechanism
+
+The first step is an inventory. The zero-trust entry describes a model that does not grant trust based on network location. To apply that, an organisation must know which resources exist and who can reach them, which is often the least developed part of the work. A model applied to an unknown inventory cannot make better decisions.
+
+The second step is defining the decision. NIST's guidance treats access as a decision involving identity, context, and policy. A system that checks identity once at the network boundary and trusts everything after it is making a different decision from one that checks at each resource. The difference is not a feature; it is the principle.
+
+The third step is scope. A full implementation is a programme, not a week's work. Choosing one resource or one flow as a first case produces evidence and limits disruption. The choice should follow the value of the resource and the current weakness in its access path, which is a local judgement.
+
+The sequence is: inventory, choose a decision point, define the policy, apply it to one case, then expand. Each step is documented in principle, but the order is a practical recommendation.
+
+## A worked example
+
+*Illustrative.* A team wants to restrict access to a database that is currently reachable from the whole office network.
+
+Three checks decide. First, who actually needs access, and from which devices? Second, where should the decision be made — at the network or at the resource? Third, what happens to legitimate workflows when the policy is applied, and how will exceptions be handled?
+
+The outcome is a first case with a recorded exception process. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Zero trust does not rely on network location | `source-reported` | Wikipedia, Zero trust | 2026-11-18 | Definition changes |
+| NIST describes architecture for the model | `source-reported` | NIST SP 800-207 | 2026-11-18 | Guidance updated |
+| Start with an inventory and one case | `inferred` | Derived from the model | 2026-11-18 | Resources change |
+
+## Why it is not a product
+
+A tool can implement part of the model, but buying one does not create an inventory or define a policy. The organisation still has to decide what access is appropriate and where decisions are made. Those decisions are the work, and they cannot be outsourced to a purchase.
+
+A further issue is user experience. Stronger checks on every access can slow legitimate work, and a model that makes work difficult will be bypassed. Designing the checks so they are proportionate to the resource is part of the implementation, not an optional refinement.
+
+None of this removes the need for the basics. An accurate inventory and a clear policy matter more than any specific technology, because a tool applied without them will enforce the wrong decisions more efficiently.
+
+The first case should be chosen for value and weakness, not for convenience, so the result is informative.
+
+An exception without an expiry becomes a permanent hole in the policy, which is why the review date belongs in the record.
+
+The model works only when the inventory behind it is accurate, which is why keeping that inventory current is continuing work.
+
+Access decisions should be logged, because a policy that cannot be reviewed cannot be improved after an incident.
+
+A first case should have a clear owner who can make the policy decision when it arises.
+
+## What it cannot do
+
+It cannot guarantee security. It does not remove the need for monitoring. And it cannot make an inventory accurate by itself.
+
+The counterargument that a platform solves the problem is fair for tooling and incomplete for policy.
+
+## A decision test
+
+1. Inventory resources and access.
+2. Choose a decision point.
+3. Define a policy.
+4. Apply to one case.
+5. Handle exceptions explicitly.
+6. Expand with evidence.
+7. Record the decision and recheck condition.
+
+For the security context, see [Cybersecurity Fundamentals](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response).
+
+## References & Further Reading
+
+- NIST, 2020. [Zero Trust Architecture](https://csrc.nist.gov/pubs/sp/800/207/final) — The official zero-trust architecture and its tenets.
+- NIST, 2017. [NIST Special Publication 800-63B](https://pages.nist.gov/800-63-3/sp800-63b.html) — Authenticator Assurance Levels and the verifier-impersonation-resistance requirement; the standards basis for phishing-resistant authentication.
