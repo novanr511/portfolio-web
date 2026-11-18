@@ -1,13 +1,92 @@
 ---
 title: "Continued Pretraining Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Continued Pretraining Trade-Offs."
-date: 2026-11-17
+description: "Continued pretraining adds domain knowledge but can erase general ability. Read the trade-offs, a worked plan, and why more data is not always better."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Continued pretraining is often presented as a way to teach a model a new domain, which hides what it can cost. The model documentation literature describes what a model card should record, and the synthetic-data entry covers generated data and its limits. The trade-off is between new knowledge and what is lost.
+
+**Direct answer:** Continue pretraining only when the domain gap is measurable, with a held-out test for both the new domain and general ability. The sources describe documentation and data; the evaluation rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked plan, separating documented concepts from the local decision to train.
+
+## The mechanism
+
+Three points matter:
+
+- **Knowledge is not additive.** Training on new material changes existing weights. The model card literature exists partly to record what a model can and cannot do, which matters after a change.
+- **Data quality dominates.** The synthetic-data entry describes limits of generated data. Training on more of it can reinforce errors.
+- **General ability can degrade.** Improvement on a domain test can come at the cost of broader performance, which is why both must be measured.
+
+The sequence is: define the gap, prepare a representative corpus, test the new domain and general ability, then decide. The corpus is local work, so it is `inferred`; the concepts are `source-reported`.
+
+## A worked plan
+
+*Illustrative.* A team considers continuing pretraining on internal documents.
+
+Three checks decide. First, is there a measurable gap that other methods, such as retrieval, cannot close? Second, is the corpus clean, dated, and representative of the target use? Third, does a held-out test show improvement on the domain without a drop in general ability?
+
+The outcome is a decision to train or use another method. The scenario is hypothetical; the evaluation method is the contribution.
+
+## Why a checkpoint matters
+
+Continued training changes a model in ways that are hard to reverse precisely. Saving a checkpoint before the run means a degraded general ability can be rolled back without retraining from the beginning. The cost of the checkpoint is storage; the benefit is a recoverable decision.
+
+## Why the corpus is the real input
+
+The quality of the material dominates the choice of method. A small, clean, representative corpus can produce a useful improvement, while a large noisy one can degrade both the domain and general behaviour. Treating curation as the main work, rather than the training run, is the practical lesson.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Model cards document capabilities and limits | `source-reported` | Model Cards paper | 2026-11-18 | Practice changes |
+| Synthetic data has limits | `source-reported` | Wikipedia, Synthetic data | 2026-11-18 | Methods change |
+| Test domain gain against general loss | `inferred` | Derived from the trade-off | 2026-11-18 | Model changes |
+
+## Why retrieval is the baseline
+
+Before training, the team should ask whether retrieval can supply the same knowledge. If it can, training adds cost and risk without a clear benefit. Comparing against retrieval is the cheapest way to justify or reject continued pretraining.
+
+It also cannot guarantee that the new knowledge is correct. A corpus can contain errors that the model will reproduce with confidence, which is why provenance matters as much as volume.
+
+The decision should name the recheck condition. A model that was better than retrieval last quarter may fall behind as retrieval improves, and a periodic comparison keeps the choice honest.
+
+The evaluation should include a held-out set that the training process never saw, because improvement on the training corpus says little about generalisation.
+
+A further consideration is cost. Continued training consumes compute for a benefit that retrieval might provide more cheaply, and the comparison should include both the training run and the ongoing serving cost of the changed model.
+
+The practice also has a maintainability cost. A model adapted to an internal corpus must be retrained when that corpus changes, while a retrieval index can be updated in place. Recording which approach was chosen and why makes the next decision easier.
+
+The checkpoint should be retained until the new model has passed evaluation, not deleted as soon as training finishes.
+
+The decision to train should be revisited whenever retrieval improves, since the comparison can change without any change in the model itself.
+
+The evaluation should include tasks outside the target domain to reveal losses that a narrow test would miss.
+
+The recheck should include the cost of the alternative, since both options continue to change.
+
+## What it cannot do
+
+It cannot guarantee that new knowledge is retained correctly. It does not remove the need for evaluation. And it cannot make a poor corpus useful.
+
+The counterargument that more domain data always helps is fair for a clean corpus and incomplete when general ability matters.
+
+## A decision test
+
+1. Measure the domain gap.
+2. Compare with retrieval.
+3. Prepare a clean corpus.
+4. Test new and general ability.
+5. Keep a rollback checkpoint.
+6. Record the decision and recheck condition.
+
+For the data side, see [Data Curation](/articles/data-curation-for-llm-pretraining-deduplication-and-quality).
 
 ## References & Further Reading
 
