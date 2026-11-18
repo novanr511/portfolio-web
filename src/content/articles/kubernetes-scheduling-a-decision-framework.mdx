@@ -1,10 +1,80 @@
 ---
 title: "Kubernetes Scheduling: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: Kubernetes Scheduling: a Decision Framework."
-date: 2026-11-17
+description: "Scheduling decides where work runs. Read the framework, a worked example, and why a default placement can be the wrong answer."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Kubernetes
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Kubernetes scheduling is often treated as automatic, which hides the decisions that determine where work runs. The Kubernetes scheduler documentation describes how pods are assigned to nodes, and the QoS material covers resource guarantees. The framework starts with what the workload needs.
+
+**Direct answer:** Schedule with explicit resource requests, defined priority, and a clear placement rule, then verify where pods actually landed. The sources describe the mechanism; the framework is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented scheduler behaviour from local choices about placement.
+
+## The mechanism
+
+The first input is resource requests. The scheduler documentation describes how requests influence placement, which means a pod without them is placed on an assumption rather than a requirement. Setting requests from observed use is the first decision, and it affects both stability and cost.
+
+The second input is guarantees. The QoS material describes how resource classes behave under pressure, which matters when a node is near its limit. A workload that cannot tolerate eviction needs a different treatment from a batch job that can be retried.
+
+The third input is placement rules. The scheduler can spread or pack workloads, and the right choice depends on the failure domain and the cost of idle capacity. A rule chosen without those factors produces a placement that is tidy and wrong.
+
+The sequence is: state the resource need, choose the guarantee, set the placement rule, then verify the result. The choices are local, so the conclusions are `inferred`; the mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team deploys a service and finds that two replicas land on the same node.
+
+Three checks decide. First, do the pods declare resource requests that reflect their real needs? Second, does the QoS class match the consequence of an eviction? Third, is there a placement rule that spreads replicas across failure domains?
+
+The outcome is a placement decision with a recorded rationale. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| The scheduler assigns pods to nodes | `source-reported` | Kubernetes scheduler docs | 2026-11-18 | Version changes |
+| QoS classes affect behaviour under pressure | `source-reported` | Kubernetes QoS docs | 2026-11-18 | Version changes |
+| Define needs before choosing rules | `inferred` | Derived from the mechanism | 2026-11-18 | Workload changes |
+
+## Why the default can be wrong
+
+A default scheduler placement optimises for its own criteria, not for the application's failure domains or cost. Accepting it without checking means the placement is decided by a system that does not know what matters, which is a gap the framework exists to close.
+
+## What it cannot do
+
+It cannot make an under-resourced node sufficient. It does not remove the need for capacity planning. And it cannot guarantee that a placement rule will always be satisfiable.
+
+A further consideration is that placement changes over time. A pod that was placed well at deployment may sit badly after the cluster grows or a node fails, and observing the result after a change is part of the practice. A rule that is never reviewed becomes an assumption that nobody checked.
+
+The framework also cannot fix a workload that requests the wrong amount. Requests that are too small invite eviction, and requests that are too large waste capacity, so the measurement behind them matters more than the scheduling rule that consumes them. Recording how the numbers were chosen gives the next reviewer a place to start.
+
+The third limit is that spreading and packing pull in opposite directions. A rule that maximises resilience wastes capacity, while one that maximises utilisation concentrates risk. The decision between them belongs to the application, and it should be made explicitly rather than inherited from a default that nobody examined.
+
+Placement decisions should be reviewed after any change to the cluster, since a rule that worked before may no longer describe the available nodes.
+
+A placement that is correct today can be wrong after a node failure, which is why the result deserves another look when the cluster changes.
+
+Resource requests should be measured from use, not chosen for tidiness.
+
+The QoS class should follow the consequence of an eviction, not a default choice.
+
+## A decision test
+
+1. Measure the workload's resource needs.
+2. Choose a QoS class from the consequence of eviction.
+3. Set a placement rule for failure domains.
+4. Verify where pods landed.
+5. Review after a cluster change.
+6. Record the decision and recheck condition.
+
+For the resource side, see [Requests and Limits](/articles/kubernetes-requests-and-limits-why-pods-get-evicted).
+
+## References & Further Reading
+
+- Kubernetes, 2026. [Kubernetes Scheduler | Kubernetes](https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/) — How pods are assigned to nodes.
+- Kubernetes Documentation, 2026. [Configure Quality of Service for Pods | Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/) — The Guaranteed, Burstable and BestEffort classes, their criteria, and the fact that the class is fixed at pod creation.

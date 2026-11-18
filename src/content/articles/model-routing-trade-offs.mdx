@@ -1,10 +1,80 @@
 ---
 title: "Model Routing Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Model Routing Trade-Offs."
-date: 2026-11-17
+description: "Routing sends each request to a model. Read the trade-offs, a worked example, and why a cheap route can be the expensive one."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Model routing is often presented as a way to cut inference cost, which hides the trade between price, quality, and latency. The RouteLLM paper describes learned routing between models, and the PagedAttention paper covers the cost of serving them. The decision is what the router optimises.
+
+**Direct answer:** Choose a routing objective, measure each route on real requests, and count escalations and tail cost before claiming a saving. The sources describe the mechanism; the rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented routing methods from local judgements about cost.
+
+## The mechanism
+
+The first trade is cost against quality. The routing paper describes selecting a model per request, which can save money when a smaller model suffices. The saving disappears when the smaller model fails and the request is retried on a larger one, so the measure is cost per successful answer rather than cost per call.
+
+The second trade is latency. A router that inspects a request before choosing adds time, and a cheap route that is slow may be worse than a fast expensive one for interactive use. The acceptable latency is a product decision, not a property of the model.
+
+The third trade is complexity. A learned router needs training data and evaluation, while a simple rule is easier to understand. The extra complexity should be justified by a measurable improvement, which is a comparison that belongs in the design.
+
+The sequence is: define the objective, measure quality by route, count escalations, then inspect the cost tail. The choices are local, so the conclusions are `inferred`; the methods are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team routes short questions to a small model and the rest to a large one.
+
+Three checks decide. First, does the small model actually succeed on the short questions, measured on real requests? Second, what share of traffic escalates, and what does that cost? Third, are the most expensive requests routed correctly, or is the tail driven by a class the router misjudges?
+
+The outcome is a routing adjustment with a recorded objective. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Models can be selected per request | `source-reported` | RouteLLM paper | 2026-11-18 | Methods change |
+| Serving has memory and compute cost | `source-reported` | PagedAttention paper | 2026-11-18 | Stack changes |
+| Optimise cost per successful answer | `inferred` | Derived from both | 2026-11-18 | Pricing changes |
+
+## Why a cheap route can be expensive
+
+A route that fails and retries pays twice, and a route that produces a wrong answer shifts the cost to a human. Counting only the model price hides both effects, which is why the measure has to include the whole path.
+
+## What it cannot do
+
+It cannot guarantee that a model suits a request. It does not remove the need for evaluation. And it cannot predict price changes.
+
+A further consideration is that traffic changes. A router tuned for one mix of requests can misclassify a new mix, and the resulting cost appears gradually, which is why sampling the routes on a schedule is part of the practice. A chart of escalations by week is often more revealing than a single evaluation.
+
+The router also needs an owner. A configuration that nobody reviews will outlive the conditions it was built for, and a rule that was sensible last quarter can send expensive work down an cheap path today. Recording the last review date is a small control with a large effect.
+
+The third limitation is that a router can optimise the wrong metric. A team measured on average cost will produce a router that looks good on average while a few requests dominate the bill, which is the reason to publish the distribution beside the headline figure.
+
+The objective should be written down, since a router measured on cost alone will produce a different design from one measured on successful answers.
+
+Escalations are part of the cost, and a route that fails often is more expensive than its price suggests.
+
+A router that is never measured on real traffic will optimise the wrong metric.
+
+Cost per successful answer is the measure that includes retries and failures.
+
+## A decision test
+
+1. Define the routing objective.
+2. Measure quality by route.
+3. Count escalations.
+4. Compute cost per successful answer.
+5. Inspect the expensive tail.
+6. Record the decision and recheck date.
+
+For the method, see [Model Routing Metrics](/articles/model-routing-metrics-that-matter).
+
+## References & Further Reading
+
+- Isaac Ong et al., 2024. [RouteLLM: Learning to Route LLMs with Preference Data](https://arxiv.org/abs/2406.18665) — Routers that dynamically choose between a stronger and weaker LLM at inference, reporting cost reductions of over 2x in some cases without quality loss.
+- Woosuk Kwon et al., 2023. [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) — Continuous batching and paged KV-cache memory that raise serving throughput.
