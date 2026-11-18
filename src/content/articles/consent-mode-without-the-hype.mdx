@@ -1,10 +1,84 @@
 ---
 title: "Consent Mode without the Hype"
-description: "Reserved title for a future NOVANDRI article: Consent Mode without the Hype."
-date: 2026-11-17
+description: "Consent mode adapts measurement to a choice. Read what it does, a worked example, and why it is not a legal safe harbour."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Marketing
+  - Method
+  - Privacy
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Consent mode is often described as a way to keep measuring after a refusal, which hides what it actually does. GDPR Article 6 sets conditions for lawful processing, and the Privacy Sandbox entry describes browser mechanisms that limit tracking. The question is what a consent signal changes.
+
+**Direct answer:** Use consent mode to make measurement respect a stated choice, with a lawful basis for what remains and a clear account of what is lost. The sources describe the law and the mechanisms; the rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented obligations from local judgements about implementation.
+
+## The mechanism
+
+The first point is the signal. A consent choice is information about what a person allowed, which a system must be able to receive and honour. A mechanism that records the choice but continues the same processing has not changed anything, whatever its name.
+
+The second point is the lawful basis. GDPR Article 6 describes the conditions under which processing is permitted, which is independent of the consent mechanism. A tool can implement a signal correctly and still be used without an adequate basis, and the two questions should be kept separate.
+
+The third point is data loss. When consent is withheld, some measurement becomes unavailable, and a system that fills the gap with modelling is producing estimates rather than observations. Naming which figures are modelled is the condition for honest reporting.
+
+The sequence is: define the processing, map it to the choice, establish the basis, then report what is observed versus modelled. The choices are local, so the conclusions are `inferred`; the obligations are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A site adopts a consent signal and continues to report campaign conversions.
+
+Three checks decide. First, which processing stops when consent is withheld, and which continues with a different basis? Second, is the lawful basis documented for each? Third, which reported figures are modelled, and are they labelled as such?
+
+The outcome is an implementation with an honest data account. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Lawful bases are required for processing | `source-reported` | GDPR Article 6 | 2026-11-18 | Law changes |
+| Browser mechanisms limit tracking | `source-reported` | Wikipedia, Privacy Sandbox | 2026-11-18 | Proposals change |
+| Map choices to processing and label models | `inferred` | Derived from both | 2026-11-18 | Implementation changes |
+
+## Why it is not a safe harbour
+
+A consent mechanism is an implementation detail, and a legal assessment depends on the processing it supports. Treating the presence of a signal as compliance skips the question that matters, which is what the organisation does with the data.
+
+A further point is that consent can be withdrawn. A system that handles the first choice but cannot handle a later change will keep processing after permission ends, and the reversal path belongs in the design. Testing it is part of implementation.
+
+The modelled data also needs a limit. An estimate that fills a reporting gap is useful for some decisions and weak for others, and a report that does not distinguish it from an observation will be trusted too much. Labelling the source of each figure is the practical control.
+
+The third limitation is that a consent choice reduces data. A team that treats the resulting drop as a bug will try to work around it, which is the wrong response to a design that respects a decision. Accepting the gap is part of adopting the mechanism.
+
+A consent choice can be withdrawn, and the reversal path belongs in the design.
+
+A modelled figure should be labelled as an estimate, not reported as an observation.
+
+A tool that implements the signal correctly can still lack a lawful basis, which is a separate question.
+
+A mechanism is not a legal basis, and the two belong in separate reviews.
+
+The data lost after a refusal should be accepted, not treated as a bug to fix.
+
+A signal that is recorded but not honoured changes nothing about the processing.
+
+Withdrawal should be tested as carefully as the first choice.
+
+Measured data loss after a refusal is a design consequence, not a failure.
+
+## A decision test
+
+1. Define the processing.
+2. Map each item to a consent choice.
+3. Document the lawful basis.
+4. Handle withdrawal.
+5. Label modelled figures.
+6. Record the design and recheck condition.
+
+For the privacy frame, see [Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design).
+
+## References & Further Reading
+
+- GDPR Info, 2016. [Art. 6 GDPR – Lawfulness of processing - General Data Protection Regulation (GDPR)](https://gdpr-info.eu/art-6-gdpr/) — The lawful bases for processing personal data under GDPR.
+- Wikipedia contributors, 2026. [Privacy Sandbox - Wikipedia](https://en.wikipedia.org/wiki/Privacy_sandbox) — Browser proposals to limit tracking while supporting advertising.
