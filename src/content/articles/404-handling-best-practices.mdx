@@ -1,13 +1,55 @@
 ---
 title: "404 Handling Best Practices"
-description: "Reserved title for a future NOVANDRI article: 404 Handling Best Practices."
-date: 2026-11-17
+description: "A 404 is protocol feedback, not a ranking event. Read what to return, a worked diagnosis, and why a soft 404 is worse than a clean error."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Web
+  - HTTP
+  - Technical
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A missing page should return a clear signal that it is missing. The common failure is returning a helpful-looking page with a 200 status, which tells a crawler the page exists even when its content says otherwise, as the HTTP-status-codes article explains for the difference, as RFC 9110 defines the protocol semantics. A soft 404 creates ambiguity, and ambiguity is expensive in systems that rely on status to decide what to do.
+
+**Direct answer:** Return a genuine 404 status for missing resources, provide a useful page for humans, and verify what the server actually returns with logs and a status check. RFC 9110 is the primary protocol source, and Search Console guidance covers diagnosis. The boundary: a correct status does not guarantee indexing or ranking, which the publication standard states for SEO, and a 404 is not inherently harmful, as the crawler-request article explains for the stages of access and indexing.
+
+## What to do
+
+**Return the right status.** A missing resource should return 404, which the protocol defines as the response for a resource not found, as RFC 9110 specifies, as the status-codes article explains for diagnosis. A redirect to the homepage is a different claim and can be misleading, as the redirect-chains article warns about ambiguous signals.
+
+**Make the page useful.** A human who lands on a missing page should be able to find what they need, which the content-marketing article treats as value before asks, as the value-proposition article argues for a clear next step. This can be done without changing the status code, as the two concerns are separate, as the protocol article explains.
+
+**Find the source.** A 404 can result from a broken internal link, an old external link, or a migration, which the site-migration article treats as an infrastructure checklist, as the internal-linking article advises for maintenance, as the log-analysis article recommends for evidence.
+
+**Check with logs.** Server logs show what a crawler actually requested and received, which the server-logs article describes, as the crawler-request article explains for the stages of a request. A status-checking tool reports what the server returned, which the diagnostic article recommends for verification.
+
+Three consequences follow. The status and the human experience should both be handled, which the protocol and content articles advise. The source of the broken link determines the fix, which the migration article treats as an infrastructure decision. And the result should be rechecked, as the monitoring article treats as a review of any maintained change.
+
+## A worked diagnosis
+
+The following is hypothetical and illustrative. A site reports thousands of soft 404s in Search Console.
+
+Three checks decide the fix. First, what status does a sample of those URLs actually return, which the log-analysis article recommends? If they return 200 with a "not found" message, the fix is to return a real 404, as RFC 9110 defines. Second, where do the URLs come from, which the migration and internal-linking articles advise investigating? Third, does a useful page appear for humans while the status stays correct, as the content and protocol articles require?
+
+Three conclusions follow. The headline count is a symptom of a status mismatch, which the diagnosis reveals. Updating templates without checking the status would not fix it, as the verification article warns. And the change should be recorded with the evidence, as the decision-memo article requires.
+
+## What 404 handling cannot do
+
+It cannot recover a page that no longer exists, which the migration article treats as a content decision, as the site-migration checklist advises on redirects where appropriate. It does not guarantee a ranking, which the publication standard forbids claiming, as the status-codes article treats a correct response as a necessary signal, not a sufficient one. And it cannot fix a site with widespread broken links, which the internal-linking article treats as a maintenance problem, as the technical-SEO-at-scale article advises for inventory.
+
+The counterargument that every 404 is harmful is wrong, which the crawler-request article explains for the stages of access and indexing, as the status article treats a clean error as useful feedback.
+
+## A decision test
+
+1. Check the actual status returned for missing URLs, as RFC 9110 defines.
+2. Keep a useful human page without changing the status, as the content article advises.
+3. Investigate the source of the URLs, as the log and migration articles recommend.
+4. Verify with server logs, as the server-logs article describes.
+5. Recheck after a template or migration change, as the monitoring article advises.
+6. Keep access, crawling, and indexing distinct, as the stages article requires.
+7. Record the decision, as the decision-memo article requires.
+
+For the protocol, see [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx); for the verification, see [Server Logs](/articles/server-logs-for-seo-see-what-googlebot-requests).
 
 ## Further Reading
 
