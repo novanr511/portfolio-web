@@ -67,6 +67,10 @@ The human factor matters as much as the arithmetic. A system with 15% precision 
 
 For the pipeline discipline this depends on, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for monitoring after deployment, see [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation).
 
+## A counterargument
+
+A fair objection is that the article's "name the anomaly and its cost first" framing assumes the cost of each error type can be written down as a stable number - which is precisely what is hard in the fast-moving settings where anomaly detection matters most. scikit-learn's own documentation is hedged: Isolation Forest and neighbour-based methods "perform reasonably well on the data sets considered here," and One-Class SVM is "sensitive to outliers" - phrasing that signals dataset-specific results, yet the practical sequence tells readers to pick a threshold from a cost ratio as if those costs were knowable in advance. Hidden Technical Debt argues that production ML fails for organisational reasons, suggesting the real obstacle is glue code and monitoring, none of which a cleaner definition supplies. The "baseline usually wins" conclusion may understate cases where the definition itself must be learned from data.
+
 ## References & Further Reading
 
 - scikit-learn developers, 2026. [Outlier detection with scikit-learn](https://scikit-learn.org/stable/modules/outlier_detection.html) — How the classic unsupervised outlier detectors are actually implemented and when each one fails.

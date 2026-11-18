@@ -87,6 +87,10 @@ Three limits deserve clear statement.
 
 For the operational side, see [Observability](/articles/observability-logging-metrics-tracing-alerting); for the data-modelling context, see [Data Pipelines](/articles/data-pipelines-airflow-prefect-and-orchestrating-etl-at-scale).
 
+## A counterargument
+
+The article tells readers that once an index exists "no further intervention is required," quoting the PostgreSQL introduction, and then advises auditing and removing indexes the planner never uses - exactly the intervention that sentence says is unnecessary. A reasonable critic would say the planner-centric framing is doing two jobs at once: it usefully warns that an index does not force its own use, but it also discourages the schema-level reasoning the article later relies on when it recommends multicolumn indexes and column-order checks. The selectivity heuristics ("a large result set often does not") are themselves rules of thumb, and the EXPLAIN documentation warns that costs are "inherently somewhat platform-dependent," which cuts against generalising any threshold. Trusting the plan is sound advice; presenting the planner as self-sufficient while recommending continuous index audits is not quite consistent.
+
 ## References & Further Reading
 
 - PostgreSQL Global Development Group, 2026. [PostgreSQL: Documentation: 18: 11.1. Introduction](https://www.postgresql.org/docs/current/indexes-intro.html) — How indexes work, why the planner may prefer a sequential scan, the ANALYZE/statistics requirement, and the write overhead of indexes.

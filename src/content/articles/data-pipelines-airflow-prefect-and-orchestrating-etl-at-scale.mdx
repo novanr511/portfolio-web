@@ -101,6 +101,10 @@ Three limits matter.
 
 For the operational side, see [MLOps](/articles/mlops-from-experiment-to-production-pipeline); for the broader architecture, see [Microservices Architecture](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern).
 
+## A counterargument
+
+The article draws a firm boundary between an orchestrator and a CI/CD tool, then claims the orchestrator makes scheduled and event-driven work "visible in one place." A reasonable critic would say that boundary is a convention rather than a property established by the sources. CloudEvents and AMQP, as cited, specify an event envelope and a messaging protocol; neither supplies dependency graphs, run history, or backfills, so the "one place" is something the orchestrator adds rather than something the standards guarantee. GitHub Actions is described as automating "software development workflows," but the cited documentation does not say it cannot run a scheduled, retried data job - the claim that it "will not tell you that a partition is stale" is a feature gap, not an inherent limit. The distinction is useful, yet the article presents a tool boundary as a principle.
+
 ## References & Further Reading
 
 - CloudEvents, 2026. [CloudEvents](https://cloudevents.io/) — The vendor-neutral event envelope standard.

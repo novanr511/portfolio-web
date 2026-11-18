@@ -51,6 +51,10 @@ For a `PUT`, the resource should converge on the representation or state the req
 
 Method semantics govern what a request asks the server to do and how repetitions should be interpreted. Status codes describe the response to a particular request. A `200 OK` does not make a `POST` safe, and a `404 Not Found` does not tell you whether the original request had an idempotent effect. For crawl troubleshooting based on response outcomes, see [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx).
 
+## A counterargument
+
+A fair critic would argue that the article gives method semantics too much authority over the retry decision. RFC 9110 defines safe in terms of what the client requests, not what the server does, and logging and accounting still occur, so the classification is only a weak signal about real effects. The `POST` with an idempotency key makes the point: the guarantee comes from an application contract, not from HTTP, so the property that makes a retry safe sits outside the taxonomy. Even the RFC 6585 `429` cited here can be returned for a `GET` as readily as a `POST`, so rate limiting cuts across the safe/idempotent distinction. The semantics are a vocabulary, not the rulebook the checklist implies.
+
 ## References & Further Reading
 
 - R. Fielding, M. Nottingham, and J. Reschke, editors, [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110), IETF Standards Track, June 2022. Section 9 defines safe and idempotent method properties, method classifications, and client retry considerations.

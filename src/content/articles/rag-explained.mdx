@@ -12,6 +12,8 @@ tags:
 
 Most RAG tutorials stop at "split your documents, embed them, ask the model." That recipe produces an impressive demo on Friday and an unusable system on Monday. The gap between those two states lives entirely in the details of the retrieval pipeline — so this article goes deep on the whole thing: how the pieces fit, where the standard recipe breaks, and the decisions that matter in production.
 
+**Direct answer:** RAG grounds an LLM's answers in documents retrieved at query time, updating knowledge through the index rather than retraining the model. A production system depends on the retrieval pipeline: chunking, embeddings, hybrid search, reranking, and evaluation decide whether the right evidence reaches the generator. The real design choice is what to trade off at each stage, not whether to use retrieval at all.
+
 ## The problem RAG solves
 
 An LLM has two knowledge sources: its training data (frozen at a point in time, sometimes wrong, never *yours*) and whatever fits in its context window. RAG exploits the second source to fix the first. Instead of asking the model what it knows, you ask it to answer using **retrieved documents** — your product docs, your policies, your knowledge base — placed into the context at query time.
@@ -127,6 +129,10 @@ Build the minimal pipeline end-to-end first — chunk, embed, retrieve, generate
 The deep insight worth carrying into every AI system you build: **RAG is an information-retrieval system with an LLM at the end, not an LLM with a search bolted on.** The engineering discipline lives in the middle, and that's where your existing software skills are worth the most.
 
 For the retrieval layer underneath a RAG pipeline, see [Vector Databases: Embeddings, ANN Search, and RAG Applications](/articles/vector-databases-embeddings-ann-search-and-rag-applications), and for the tokenisation and embedding groundwork see [NLP Fundamentals](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers).
+
+## A counterargument
+
+A reasonable critic would object that the article places the whole demo-to-production gap in the retrieval pipeline, when its own references put ceilings at both ends. Sentence-BERT compresses text into a fixed vector, and FAISS and HNSW trade recall for speed; the exact codes and error strings the article says become "semantic mush" are lost in the representation and index, not recovered by reranking. The generator is a transformer whose context behaviour produces the "lost in the middle" effect described here, and that limit sits outside the retriever. The pipeline work is real, but locating the discipline chiefly in the middle overstates how much a practitioner controls.
 
 ## References & Further Reading
 

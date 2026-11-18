@@ -83,6 +83,10 @@ The failure mode to avoid is treating a group disparity as a drift alert that re
 
 For the pipeline contracts that have to hold before any of this is meaningful, see [MLOps: From Experiment to Production Pipeline](/articles/mlops-from-experiment-to-production-pipeline), and for the limits that make this hard, see [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do).
 
+## A counterargument
+
+The article borrows SRE burn rate as "the model to copy for model quality," but the analogy breaks on its own premise. Error budgets assume a signal observable inside the window; here labels arrive late or never, and the piece warns against evaluating on a partially-labelled population, so a 30-day quality SLO can measure an incomplete outcome. The early warning is weaker than presented: input drift "does not imply the model is wrong," and the output proxy "detects unusualness, not error," so it may fire on harmless shifts and miss the concept drift it should catch. The objection is that a framework designed for services is applied to a signal far less observable than the one it was built for.
+
 ## References & Further Reading
 
 - D. Sculley et al., 2015. [Hidden Technical Debt in Machine Learning Systems](https://proceedings.neurips.cc/paper_files/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html) — Why production ML fails for organisational reasons rather than algorithmic ones.

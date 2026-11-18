@@ -96,6 +96,10 @@ Three failure modes are worth naming explicitly, because they are all operationa
 
 For the request path that produces these certificates in the first place, see [What Happens When a Crawler Requests a URL?](/articles/what-happens-when-a-crawler-requests-a-url) and [HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects).
 
+## A counterargument
+
+The article is right that CT is discoverability rather than prevention, but a critic would say it understates how conditional even that guarantee is. RFC 9162, cited in the article, concedes that auditing can be circumvented by a log showing inconsistent views to different clients and that logs must be treated as trusted third parties, so the "public record" is only as trustworthy as the logs maintaining it. The Maximum Merge Delay it quotes - up to 24 hours for Argon2026h2 - is a window in which an SCT exists but a monitor cannot yet see the entry. And the practical advice to "monitor your own names" assumes a capacity that is distributed unevenly: the operators who most need early warning of misissuance are often the least equipped to run continuous log polling. The protocol makes misissuance detectable in principle; whether it is detected in practice depends on resourcing the article treats as an afterthought.
+
 ## References & Further Reading
 
 - IETF, [RFC 6962 — Certificate Transparency](https://www.rfc-editor.org/rfc/rfc6962.txt), June 2013 (Experimental; B. Laurie, A. Langley, E. Kasper). Supports the log model, the SCT-as-promise definition, the Maximum Merge Delay, the append-only Merkle tree, the "logs do not themselves prevent misissue" limitation, and the detection-oriented framing in Section 1.

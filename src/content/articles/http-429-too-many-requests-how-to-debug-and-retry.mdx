@@ -56,6 +56,10 @@ HTTP 429 responses must not be stored by a cache according to RFC 6585. If a use
 
 For search infrastructure, seeing a 429 in a crawl log is a request-level observation. It does not, by itself, establish an indexing or ranking outcome. First determine whether the response came from the origin or an intermediary and whether it affected important URLs or repeated requests.
 
+## A counterargument
+
+A reasonable critic would argue that the diagnostic workflow promises more than the protocol can deliver. RFC 6585 deliberately leaves the identity and counting rules to each server, and RFC 9111's caching rules do not expose the quota either, so captured fields cannot reveal the rate-limit key unless the provider documents it. Comparing affected and unaffected requests can narrow the field to a plausible hypothesis, but it cannot confirm which principal or window the server counted, and the article's own warning against inferring the key from one incident applies to the whole procedure. For a small operator that cannot correlate logs across a CDN, gateway, and origin, that evidence-gathering may cost more than the conservative backoff it is meant to justify.
+
 ## References & Further Reading
 
 - M. Nottingham and R. Fielding, [RFC 6585: Additional HTTP Status Codes](https://www.rfc-editor.org/rfc/rfc6585), IETF Standards Track, April 2012. Section 4 defines 429, optional `Retry-After` guidance, server-specific rate-limit identification/counting, and the prohibition on caching 429 responses.

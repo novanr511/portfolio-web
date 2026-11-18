@@ -59,6 +59,10 @@ Treat a priority adjustment as a hypothesis. Use a controlled comparison that ch
 5. **Check for trade-offs:** ensure the change did not starve other resources, increase completion times elsewhere, or affect other clients sharing an intermediary.
 6. **Keep results scoped:** report the tested browser, protocol, edge, and server configuration. Do not generalize one test into a universal HTTP/2 or HTTP/3 result.
 
+## A counterargument
+
+A reasonable critic would push back on the article's recommendation to treat priority as a tunable that clients can adjust and measure. RFC 9218 permits servers to combine the `u` and `i` values with other inputs or ignore them outright, and RFC 9113 and RFC 9114 only define the frames that carry the signal, not any scheduling behaviour, so on a deployment that does not implement the scheme a header change is a guaranteed no-op. The article's fairness discussion points to the deeper issue: transmission order is decided by a server scheduler balancing starvation against urgency, which is an implementation property rather than something a request field can force. A critic could argue that the useful question is whether the server and intermediaries honour RFC 9218 at all, and that framing the field as a per-resource lever risks sending teams deep into timing tests for a control the deployment never reads.
+
 ## References & Further Reading
 
 - K. Oku and L. Pardue, [RFC 9218: Extensible Prioritization Scheme for HTTP](https://www.rfc-editor.org/rfc/rfc9218), IETF Standards Track, June 2022. Defines `Priority`, urgency and incremental parameters, update frames, and the non-guaranteed nature of scheduling signals.

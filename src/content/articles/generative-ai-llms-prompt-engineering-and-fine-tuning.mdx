@@ -62,6 +62,10 @@ The cost that does not disappear is the training data. Fine-tuning requires exam
 
 For how these models behave once they are in production, see [Model Monitoring](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation); for the limits that no amount of tuning removes, see [The Limits of AI](/articles/the-limits-of-ai-what-machines-cannot-do).
 
+## A counterargument
+
+A reasonable critic could argue that the article's "start with prompting" default understates what reliability actually costs. Prompt iteration is free per call but not free in engineering time, and the article itself concedes that when a failure is systematic - always ignoring the schema, always truncating - prompting alone will not close it. The clean split between prompting and fine-tuning also blurs on inspection: the alignment the article says is separate from scale comes from Ouyang et al.'s supervised and preference-based fine-tuning, so reliable behaviour often requires the very training the decision order defers. A critic could add that LoRA's "on-par or better" result is reported on RoBERTa and GPT-3 comparisons, which may not transfer to a team's narrow task.
+
 ## References & Further Reading
 
 - Tom B. Brown et al., 2020. [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165) — The GPT-3 scaling study behind the decoder-only foundation-model family.

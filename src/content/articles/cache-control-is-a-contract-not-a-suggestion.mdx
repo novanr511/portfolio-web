@@ -108,6 +108,10 @@ Adding `Cache-Control: no-cache` to the *request* is the client-side way of sayi
 
 For the surrounding request path, see [CDN Caching and Googlebot: Avoid Origin Overload](/articles/cdn-caching-and-googlebot-avoid-origin-overload) for the crawler-facing failure modes, and [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) for where cache hits fit into the request waterfall.
 
+## A counterargument
+
+The contract metaphor is tidier than the system RFC 9111 actually describes, and a careful critic would call that out. The article notes that shared and private caches derive different freshness lifetimes from the same headers by design, and that caches must ignore directives they do not recognise - which is exactly why the stale-serving extensions in RFC 5861, an Informational document, cannot be assumed to be in force. If every cache along the path is free to ignore unrecognised directives or fall back to heuristic freshness when no explicit expiration is present, the origin's intent is not a single enforced agreement but a set of local interpretations. The Mozilla response quoted above, with an `Expires` date predating its `Date`, is the article's own evidence that deployed headers are messy and that honouring the RFC is not the same as controlling what users receive.
+
 ## References & Further Reading
 
 - IETF, [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.txt), June 2022 (Standards Track, STD 98; R. Fielding, M. Nottingham, J. Reschke). Supports the freshness-lifetime calculation order and the `s-maxage` precedence, the `Age` definition and its sum-along-the-path semantics, §4.2.4's rules on serving stale responses, the `no-cache` and `must-revalidate` semantics, the directive-ignoring rule for unrecognised directives, and the requirement to ignore `Expires` when `max-age` or `s-maxage` is present.

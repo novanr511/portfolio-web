@@ -54,6 +54,10 @@ Measure delivery, loss, latency, and application-level quality under representat
 
 For the reliable-stream transport that QUIC DATAGRAMs complement, see [HTTP/3: What Changes When HTTP Runs over QUIC?](/articles/http3-what-changes-when-http-runs-over-quic). That article explains HTTP/3’s mapping onto QUIC and its stream behavior.
 
+## A counterargument
+
+A reasonable critic would push back that the article presents the extension's usefulness as more settled than its sources warrant. RFC 9221 and RFC 9000 define a mechanism: frames that are not retransmitted, negotiated by a transport parameter, still carried inside a congestion-controlled connection. Neither sets an application-level latency or delivery guarantee, so the time-sensitive use cases the article names remain conditional on how the rest of the connection behaves. In particular, shared congestion state means stream traffic can still affect datagram timing, a factor the deployment checklist mentions only obliquely. The article is right that loss tolerance is a prerequisite; it understates how much of the outcome depends on conditions the RFCs do not specify.
+
 ## References & Further Reading
 
 - T. Pauly, E. Kinnear, and D. Schinazi, [RFC 9221: An Unreliable Datagram Extension to QUIC](https://www.rfc-editor.org/rfc/rfc9221), IETF, March 2022. Defines DATAGRAM frames, negotiation using `max_datagram_frame_size`, and their unreliable delivery behavior.

@@ -193,6 +193,10 @@ Continue exploring server infrastructure and reliability:
 * **[Website Uptime, 5xx Errors, and Crawl Reliability](/articles/website-uptime-5xx-errors-and-crawl-reliability)** — How server availability and 5xx thresholds govern search indexing.
 * **[DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works)** — Executing seamless DNS cutovers during CDN migrations.
 
+## A counterargument
+
+A fair objection is that the article treats high edge hit ratios as an unqualified good and understates how the arrangement interacts with Google's own crawl decisions. If caching and shielding hide origin strain, the host looks fast and healthy, and Google's crawler guidance describes a system that adjusts crawl rate to perceived host capacity - meaning the protection can invite more crawl demand until a genuine origin failure exposes the masked weakness. The runbook also presumes that pre-warming the top 10,000 sitemap URLs anticipates what Googlebot will request, but the crawler follows discovery and links, not a site owner's priority list; RFC 9111 governs freshness, not which objects get fetched. Finally, delegating bot classification to a CDN's managed "Verified Bots" list trades the spoofing risk the article correctly identifies for a dependency on someone else's classification. The levers are real, but the framing is more deterministic than the system it describes.
+
 ## References & Further Reading
 
 - R. Fielding, M. Nottingham, and J. Reschke, editors, 2022. [RFC 9111: HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111) — The normative cache-control, freshness, validation, and invalidation rules.

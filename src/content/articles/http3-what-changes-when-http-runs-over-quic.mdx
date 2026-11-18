@@ -60,6 +60,10 @@ HTTP/3 is a delivery protocol, not an indexing directive. A successful HTTP/3 co
 
 If you are evaluating adoption or performance, measure actual clients and representative paths. The HTTP Archive’s [2025 CDN chapter](/articles/what-http-archives-cdn-numbers-can-and-cannot-tell-you) shows why protocol shares depend on the dataset and request category. For HTTP caching behavior that can be investigated independently of the transport version, see [Cache-Control Is a Contract, Not a Suggestion](/articles/cache-control-is-a-contract-not-a-suggestion). For the unreliable-datagram extension that sits alongside QUIC streams rather than replacing them, see [QUIC DATAGRAMs](/articles/quic-datagrams-when-unreliable-delivery-is-useful).
 
+## A counterargument
+
+A fair objection is that the article's emphasis on per-stream independence overstates what most users will feel. RFC 9000 gives each QUIC stream ordered delivery, but congestion control and recovery still operate at the connection level, and the article itself concedes that loss can reduce how much the whole connection sends. A reasonable critic would push back that on a lossy, bandwidth-limited path the aggregate connection rate, not head-of-line blocking, is the binding constraint, so the headline advantage can shrink to near zero even though the mechanism is real. The 0-RTT discussion points the same way: RFC 9001's replay warning means the latency win is unavailable for actions with side effects, which is precisely many of the requests a browser sends. The article's caution is well placed, but a critic could argue it still lets the transport story carry more weight than the measured end-to-end evidence warrants.
+
 ## References & Further Reading
 
 - M. Bishop, editor, [RFC 9114: HTTP/3](https://www.rfc-editor.org/rfc/rfc9114), IETF, June 2022. Defines HTTP semantics over QUIC, stream mapping, endpoint discovery, `h3` negotiation, fallback considerations, and HTTP/3 framing.

@@ -75,6 +75,10 @@ A practical policy therefore states: which changes are permitted without a versi
 
 For the protocol underpinnings, see [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean) and [HTTP 429 Too Many Requests](/articles/http-429-too-many-requests-how-to-debug-and-retry). For the shared foundations — resource naming, the failure contract, HTTP semantics, and the OWASP API Security Top 10 — see [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems), which is the canonical home for that material.
 
+## A counterargument
+
+A reasonable critic could argue that the article's "it depends where the complexity lives" framing is so accommodating that it refuses to recommend anything - every style is a reasonable answer to some situation, leaving a decision sequence rather than a real trade-off. The GraphQL specification and gRPC documentation are cited for what each style is, but the warnings about query complexity and non-human-readable wire formats are asserted rather than evidenced by those sources; a specification describes capabilities, not failure rates. Stripe's idempotency example is a single, well-resourced implementation - 255-character keys and recorded first results are not what a small team can casually maintain. Treating the gateway as the obvious home for cross-cutting concerns also overlooks that it is itself a single point of failure, a caveat the article notes before folding it back into "do it once at the boundary."
+
 ## References & Further Reading
 
 - GraphQL Foundation, 2026. [GraphQL Specification Versions](https://spec.graphql.org/) — The published specification for the query language and type system that the GraphQL section describes.

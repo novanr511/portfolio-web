@@ -186,6 +186,10 @@ Continue through the Technical SEO infrastructure series:
 * **[HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx)** — Detailed semantics of HTTP status codes and soft 404s.
 * **[What Happens When a Crawler Requests a URL?](/articles/what-happens-when-a-crawler-requests-a-url)** — Tracing the full lifecycle of a web request.
 
+## A counterargument
+
+The two-tier model is tidy, but a reasonable critic would note that the article's own diagram includes an edge and firewall layer that its status-code catalog then ignores: a CDN or load balancer can emit a 502 or 504 before any request reaches Nginx, so the 'web server emitted the 502' rule can send an engineer to the wrong box. The cited RFC 9112 and RFC 9293 define HTTP and TCP syntax and transport, not crawler policy, so the asserted thresholds (a 5% error rate triggering backoff, a 60s proxy timeout) are operational heuristics the references do not establish. The framework is a useful starting hypothesis, not the deterministic map the status table implies.
+
 ## References & Further Reading
 
 - R. Fielding, editor, 2022. [RFC 9112: HTTP/1.1](https://www.rfc-editor.org/rfc/rfc9112) — The HTTP/1.1 messaging syntax and connection management.

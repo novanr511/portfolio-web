@@ -57,6 +57,10 @@ Do not treat a 451 as equivalent to `404 Not Found`, `403 Forbidden`, or `503 Se
 
 HTTP 451 gives an operator a standard way to report a particular kind of access denial and a way to identify the blocking entity. Its value depends on accurate implementation and meaningful explanation. Because use is not guaranteed, the absence of 451 cannot establish that access has not been legally restricted.
 
+## A counterargument
+
+A fair objection is that the article overstates 451's transparency value. RFC 7725 makes both the explanatory body and the `blocked-by` link recommendations rather than requirements, and it explicitly says clients cannot rely on the code being used at all, so an operator can emit a bare 451 that reveals nothing. The article itself notes that `blocked-by` names the entity implementing the block, not the party that made or issued the demand, which means even a fully compliant response may leave the most consequential question unanswered. A critic could argue that a standardised code with optional disclosure risks looking more authoritative than the evidence behind it, inviting users to read a terse status line as a verified account of the legal basis. On that view the RFC's transparency goal is only partly achievable through the status code alone.
+
 ## References & Further Reading
 
 - T. Bray, [RFC 7725: An HTTP Status Code to Report Legal Obstacles](https://www.rfc-editor.org/rfc/rfc7725), IETF Standards Track, February 2016. Defines 451, its legal-demand scope, limits on what the response implies, recommended explanatory content, and the `blocked-by` link relation.

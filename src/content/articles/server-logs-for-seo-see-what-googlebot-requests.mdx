@@ -224,6 +224,10 @@ Server logs strip away assumptions and reveal how search engines experience your
 
 To see how server logs connect with the full web request pipeline, explore [Technical SEO Engineering: From Web Request to Search Index](/articles/technical-seo-engineering-from-web-request-to-search-index).
 
+## A counterargument
+
+A reasonable critic would object to the word "ground truth." Access logs record only requests that reach the origin; traffic answered at a CDN edge, rejected there, or stopped before the application leaves no line in the file, so the record is partial by construction. The article's own verification step sharpens the point: keeping only IPs confirmed by forward-confirmed reverse DNS or the published Googlebot ranges (Google, "What Is Googlebot") deliberately discards unauthenticated requests, making the clean dataset a verified subset. A 200 response also says the document was delivered, not that it was indexed. RFC 1918 private ranges matter when proxies mask the true client. Log findings are therefore starting hypotheses, to be cross-checked against the search engine's own reporting before they drive changes.
+
 ## References & Further Reading
 
 - Google, 2026. [What Is Googlebot](https://developers.google.com/search/docs/crawling-indexing/googlebot?hl=en) — How Googlebot identifies itself and how you can verify it.

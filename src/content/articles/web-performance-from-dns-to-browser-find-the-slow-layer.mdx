@@ -172,6 +172,10 @@ Continue exploring user-centric performance metrics:
 * **[CDN Caching and Googlebot: Avoid Origin Overload](/articles/cdn-caching-and-googlebot-avoid-origin-overload)** — Edge caching strategies to achieve sub-100ms TTFB.
 * **[JavaScript SEO: SSR, CSR, SSG, and ISR Explained](/articles/javascript-seo-ssr-csr-ssg-isr)** — The rendering architectures that determine frontend parsing speed.
 
+## A counterargument
+
+The layered waterfall is a clean teaching model, but a reasonable critic would object that it implies the tiers are independent when they are coupled: an edge cache that turns a cache MISS into a fast response can hide an origin TTFB problem until traffic patterns change, and a fast TTFB can coexist with a slow LCP that the article's own Web Vitals reference treats as the user-facing outcome. The thresholds quoted (a 600ms TTFB, a 200ms crawler target) are presented as firm, yet the cited sources define metrics rather than universal pass/fail limits. A single curl timing is a lab sample from one vantage point, not the distribution of real-user experiences the Web Vitals data describes, so isolating a 'slow layer' from one run risks optimizing for the measurement rather than the visitor.
+
 ## References & Further Reading
 
 - web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.

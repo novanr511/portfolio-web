@@ -188,6 +188,10 @@ Observability elevates technical SEO from periodic post-mortems to proactive inf
 
 For the foundational architecture connecting server responses to search indexing, read [Technical SEO Engineering: From Web Request to Search Index](/articles/technical-seo-engineering-from-web-request-to-search-index).
 
+## A counterargument
+
+The three-alert recipe is presented as production-tested, but its specificity exceeds what the cited sources support. Google's SRE material argues for alerting on symptoms and burn rate against an SLO, not on a fixed 1% error ratio over 15 minutes; at the stated minimum of 50 requests that threshold can fire on a handful of failures, which is close to the noise the article warns against. The synthetic canary covers five to ten routes, so it cannot see template drift on the long tail of pages the metrics layer is meant to represent. And the references - SLO guidance and an address-allocation RFC - say nothing about crawler behaviour. A critic would call the pipeline sound and the numbers heuristics, not principles.
+
 ## References & Further Reading
 
 - Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.

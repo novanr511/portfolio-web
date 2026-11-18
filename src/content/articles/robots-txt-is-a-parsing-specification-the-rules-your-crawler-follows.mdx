@@ -138,6 +138,10 @@ And because group selection is case-insensitive while the file may be inconsiste
 
 For the surrounding logic — what `robots.txt` does and does not control relative to `noindex` and sitemaps — see [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap), and for measuring what actually got crawled, [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests).
 
+## A counterargument
+
+The article's confidence rests on treating RFC 9309 as a deterministic contract, but the standard leaves the consumer more latitude than that framing suggests. Several behaviours presented as firm are advisory: the Allow tie-break is a SHOULD, crawlers MAY cache for up to 24 hours, MAY stop at the redirect limit, and MAY interpret undefined records. That matters because conformance testing verifies the file, not the crawler reading it. The article's own references concede the gap, noting that AI crawlers are a separate case and that vendors may take up to 24 hours to reflect a change. A reasonable critic would say the parsing rules are necessary knowledge but not a guarantee of how a given bot will behave.
+
 ## References & Further Reading
 
 - IETF, [RFC 9309 — Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.txt), September 2022 (Standards Track). Supports the product-token definition and character restrictions, case-insensitive group matching, the requirement to merge multiple matching groups, the fallback to the `*` group, the longest-match rule and the `Allow` tie-break, the percent-encoding normalisation and un-encoding rules, the three special characters (`#`, `$`, `*`), the "other records" rule that a `Sitemap` record must not terminate a group, the access-method requirements (`/robots.txt`, lowercase, top-level, UTF-8, `text/plain`), the five-redirect limit, the 4xx-versus-5xx availability distinction including "MUST assume complete disallow" on unreachability, the parseable-rules requirement, the 24-hour caching recommendation, and the 500 KiB minimum parsing limit.
