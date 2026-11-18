@@ -1,10 +1,83 @@
 ---
 title: "AI Red Teaming Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: AI Red Teaming Metrics that Matter."
-date: 2026-11-17
+description: "A red team finds failures before users do. Read the metrics, a worked exercise, and why a finding count is a weak result."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Security
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Red teaming is often reported as a number of findings, which rewards volume over relevance. The NIST adversarial ML taxonomy describes categories of attack and mitigation, and the OWASP LLM list identifies risks for language-model applications. The useful question is whether the exercise changed a decision about the system.
+
+**Direct answer:** Measure red teaming by the coverage of defined attack categories, the severity of confirmed failures, and the rate at which fixes are verified. The sources provide the categories; the measurement rule is a synthesis.
+
+**Delta:** This article adds a claim-status layer and a worked scoring method, so the distinction between documented categories and locally chosen thresholds is explicit.
+
+## The mechanism
+
+Three ideas from the sources do the work:
+
+- **Categories are defined.** The NIST taxonomy names attack classes. Using it as a checklist makes coverage visible instead of implicit.
+- **Risks are application-specific.** The OWASP list describes risks for LLM applications. A generic test suite cannot tell you which of them matters to your deployment.
+- **A finding is not a fix.** A confirmed failure is evidence, but it becomes useful only when the mitigation is tested again.
+
+The practical sequence is: define the system's boundaries, choose relevant categories, run probes with recorded conditions, confirm failures, then retest after mitigation. Choosing categories is judgement, which makes it `inferred`; the existence of the categories is `source-reported`.
+
+## A worked exercise
+
+*Illustrative.* A support assistant can read documents and issue refunds.
+
+Three checks decide. First, which attack categories apply to a system that reads untrusted text and can act on refunds? Second, for each confirmed failure, was the condition recorded precisely enough to reproduce, including the input and the tool state? Third, after a mitigation, was the same probe re-run, and did it stop producing the failure?
+
+The outcome is a severity-ranked list with verified fixes, not a raw count. The thresholds are a local decision; the method is the contribution.
+
+## Why the scoring method matters
+
+A security exercise produces evidence only if the conditions are recorded. A failure that cannot be reproduced is a story, not a finding. The condition record should include the input, the tool state, and the configuration that was active at the time. Without those details, a mitigation cannot be verified, and the team repeats the same discovery in the next exercise under a slightly different name.
+
+Severity is the second problem. A count treats every finding as equal, which makes a minor formatting anomaly look like a critical failure. A severity scale works only when it is defined before the exercise and applied without adjustment afterwards. Otherwise the scale becomes a way of making the report look better rather than a way of making risk visible.
+
+Coverage answers a different question from severity. A system can have few findings because it is robust, or because only one category was tested. Reporting coverage makes that distinction visible. It also exposes the reverse case: many findings concentrated in one category may indicate that one area was examined deeply while others were ignored.
+
+Retesting closes the loop. A confirmed failure that has been mitigated is not resolved until the same probe is run again. Teams that skip this step accumulate a backlog of findings marked fixed on the strength of a code change rather than evidence. A small retest suite, kept from the original exercise, is usually enough.
+
+Taken together, these practices turn a red team from a reporting exercise into a control. The categories come from the sources; the decision about what to test, how to score, and when to retest belongs to the team running the system.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Adversarial ML attacks can be taxonomised | `source-reported` | NIST AI 100-2 E2025 | 2026-11-18 | New taxonomy released |
+| LLM applications have identified risk categories | `source-reported` | OWASP LLM Top 10 | 2026-11-18 | New edition published |
+| Retest confirmed failures after mitigation | `inferred` | Derived from the risk lifecycle | 2026-11-18 | Process changes |
+
+## Why counting findings misleads
+
+A count mixes a harmless anomaly with a critical failure. It also grows with the effort spent looking, which means a more thorough team can appear worse. Severity weighting helps, but only if the severity scale is defined before the exercise and applied consistently. Reproduction is the stronger test: a finding that cannot be reproduced cannot be verified as fixed.
+
+Coverage matters for the opposite reason. A small number of findings concentrated in one category may indicate that other categories were never tested. Reporting coverage alongside severity prevents a team from mistaking an easy category for a secure system.
+
+## What it cannot do
+
+Red teaming cannot prove the absence of failures. It does not replace monitoring, which observes the deployed system. And it cannot assign risk ownership, which remains a governance decision.
+
+The counterargument that a clean exercise means a safe system is fair for the tested cases and incomplete for everything outside them.
+
+## A decision test
+
+1. Define the system boundary.
+2. Choose relevant categories from the taxonomy.
+3. Record probe conditions.
+4. Confirm and severity-rank failures.
+5. Mitigate and retest the same probes.
+6. Report coverage and verified fixes.
+7. Record what remains untested.
+
+For the method, see [AI Red Teaming](/articles/ai-red-teaming-a-practical-methodology).
+
+## References & Further Reading
+
+- NIST, 2025. [AI 100-2 E2025, Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations | CSRC](https://csrc.nist.gov/pubs/ai/100/2/e2025/final) — The adversarial machine learning taxonomy that treats abuse and large-language-model attacks as a formal category.
+- OWASP Gen AI Security Project, 2025. [LLMRisks Archive - OWASP Gen AI Security Project](https://genai.owasp.org/llm-top-10/) — The OWASP Top 10 for LLM Applications 2025, where prompt injection is ranked LLM01:2025.

@@ -1,10 +1,82 @@
 ---
 title: "KV Cache Management Examples"
-description: "Reserved title for a future NOVANDRI article: KV Cache Management Examples."
-date: 2026-11-17
+description: "A KV cache trades memory for speed. Read worked examples, a worked budget check, and why more cache is not always faster."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Infrastructure
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+The KV cache stores attention keys and values so they need not be recomputed on each token. The PagedAttention paper describes how memory management affects serving efficiency, and Anthropic's caching guide covers reuse of repeated prefixes. The management question is what to keep in memory and what to evict.
+
+**Direct answer:** Budget cache memory per active request, reuse prefixes that actually repeat, and measure cost per successful answer. The paper provides the mechanism; the budget rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked budget example, separating the documented mechanism from local capacity decisions.
+
+## The mechanism
+
+Three points do the work:
+
+- **Memory scales with context.** The PagedAttention paper describes how serving systems manage the cache. Longer contexts consume more memory per request.
+- **Repeated prefixes can be reused.** Anthropic's guide describes caching repeated context. A prefix that changes every request cannot be reused.
+- **Eviction is a policy.** When memory is limited, something must be removed. The choice affects latency and cost differently across workloads.
+
+The sequence is: measure the prefix that repeats, budget memory per concurrent request, then decide whether capacity or eviction is the lever. Measuring is local work, so that step is `inferred`; the mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A service sends a 2,000-token system prefix with every request and serves 50 concurrent requests.
+
+Three checks decide. First, is the prefix byte-identical across requests, as the caching guide requires for reuse? Second, what is the memory per request at that context length, and does the total fit the available capacity, as the serving paper's memory model implies? Third, if it does not fit, is the better lever a shorter prefix, a smaller batch, or a different caching policy?
+
+The outcome is a capacity decision with a recorded trade-off. The numbers are hypothetical; the budget method is the contribution.
+
+## Why the prefix decides the benefit
+
+A cache yields value only when the same content is requested again. A prefix that includes a timestamp or a user identifier changes on every call and produces no reuse, even though it occupies cache memory. Splitting the stable part from the variable part is often a more effective change than tuning cache size.
+
+The stable part should be placed first. Serving systems reuse a prefix from the beginning of a request, so a stable prefix followed by a changing suffix can be reused, while the reverse cannot. This is a practical consequence of how prefix caching works, and it is available from the documented behaviour rather than from a benchmark.
+
+Memory is the competing constraint. Each active request needs space for its attention state, and a larger context consumes more of it. Reserving too much for cache reduces the number of concurrent requests that fit, which can raise latency even though individual requests are faster. The right balance depends on the distribution of prefix lengths in real traffic.
+
+Hit rate is the diagnostic. A cache with a low hit rate is consuming memory without a benefit; a cache with a high hit rate may be too small if new prefixes are being evicted before they are reused. Reporting both alongside cost per successful answer gives a clearer picture than cache size alone.
+
+The management rule is therefore a measurement rule first. Decide what repeats, measure whether it is reused, then size the cache. The opposite order produces a configuration that looks reasonable and performs poorly.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| KV cache memory grows with context length | `source-reported` | PagedAttention paper | 2026-11-18 | New serving design |
+| Repeated prefixes can be cached | `source-reported` | Anthropic caching guide | 2026-11-18 | API behaviour changes |
+| Budget cache per concurrent request before optimising | `inferred` | Derived from the two sources | 2026-11-18 | Workload changes |
+
+## Why reuse is not automatic
+
+A cache is useful only when the same content is requested again. A prefix that includes a timestamp, a user name, or a random identifier changes on every call and cannot be reused, even though it looks structurally similar. Splitting the stable part from the variable part is often a bigger win than tuning the cache itself.
+
+Capacity is the other constraint. A larger cache can hold more prefixes, but it consumes memory that could serve concurrent requests. The right size depends on the distribution of prefixes, not on the maximum possible size. Measuring hit rate and cost per successful answer is the practical way to choose.
+
+## What it cannot do
+
+It cannot make a changing prefix reusable. It does not guarantee lower latency under all loads. And it cannot replace measuring the total cost, which includes the cache itself.
+
+The counterargument that a bigger cache is always better is fair for repeated prefixes and incomplete when memory is needed for concurrency.
+
+## A decision test
+
+1. Identify the stable prefix.
+2. Measure its reuse rate.
+3. Budget memory per concurrent request.
+4. Check hit rate, not just cache size.
+5. Compute cost per successful answer.
+6. Record the decision and the recheck trigger.
+
+For the reuse pattern, see [Prompt Caching](/articles/prompt-caching-reducing-cost-on-repeated-context).
+
+## References & Further Reading
+
+- Woosuk Kwon et al., 2023. [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) — Continuous batching and paged KV-cache memory that raise serving throughput.
+- Anthropic, 2026. [Prompt caching - Claude Platform Docs](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — Cache control semantics, breakpoints and the conditions under which a prefix is reused.

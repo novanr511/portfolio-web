@@ -1,10 +1,82 @@
 ---
 title: "DNS Resolution Examples"
-description: "Reserved title for a future NOVANDRI article: DNS Resolution Examples."
-date: 2026-11-17
+description: "DNS turns a name into an address through a sequence of lookups. Read worked examples, a worked cache check, and why a cached answer can be stale."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Reference
+  - DNS
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+DNS resolution is often described as a single lookup, which hides the sequence and the caches. RFC 1035 defines the DNS implementation, and the Wikipedia overview describes the system. The practical consequences appear when an answer is wrong or stale.
+
+**Direct answer:** Follow the query path — resolver, root, authoritative server — and check each cache when an address looks wrong. The RFC provides the protocol; the diagnostic sequence is a synthesis.
+
+**Delta:** This article adds worked examples that distinguish a protocol-defined step (`source-reported`) from a local diagnostic decision (`inferred`), with a verification date and a recheck trigger.
+
+## The mechanism
+
+Three steps matter for diagnosis:
+
+- **Recursive lookup.** A resolver asks other servers until it obtains an answer. RFC 1035 defines the query and response format.
+- **Caching.** Answers are stored for a time-to-live. The same RFC defines the record structure that carries that value.
+- **Authoritative answer.** The server that holds the zone provides the definitive record. A cached answer is not authoritative, though it is often correct.
+
+The diagnostic order follows from this: identify which server answered, check the TTL, then compare with the authoritative record. Treating a cached answer as a fact is the common error. This ordering is `inferred`; the existence of caches and TTLs is `source-reported`.
+
+## Worked examples
+
+*Illustrative.* A site moves to a new address and one region still reaches the old server.
+
+Three checks decide. First, did the region's resolver return a cached record, as the TTL would predict? Second, does the authoritative server return the new address? Third, is the old answer still inside its TTL, in which case waiting is the correct action rather than changing configuration?
+
+A second example: a hostname fails only for one user. The checks are the same, but the cause may be a local resolver or a stale operating-system cache. In both cases the method is to identify who answered before changing anything.
+
+The outcome is a diagnosis rule: locate the answering server first, then decide whether to wait, flush, or escalate. That rule is the article's synthesis.
+
+## Why the path matters more than the record
+
+When a name resolves incorrectly, the record itself is rarely the problem. The problem is usually which server answered and how long that answer has been cached. Starting from the record invites configuration changes that cannot affect a cached response, which is why the change appears to do nothing.
+
+The resolver is the first useful observation. It may hold an answer from an earlier query, and the time-to-live on that answer decides how long the observation remains valid. A short remaining TTL is a reason to wait; a long one is a reason to investigate who supplied the answer. Both conclusions come from the same measurement, which is why checking the answering server comes first.
+
+The authoritative server is the second observation. If it returns the expected address, the record is correct and the problem is local to a cache. If it returns the old address, the delegation or the zone content needs attention. Reversing this order leads teams to flush caches that were never wrong.
+
+Time is part of the diagnosis. A change made minutes ago cannot be expected to be visible everywhere, because cached answers are valid until their TTL expires. Lowering a TTL before a planned move helps future caches, not existing ones. Treating propagation as an error condition is a misunderstanding of the protocol, not a monitoring failure.
+
+The examples in this article therefore describe a sequence, not a set of fixed answers. Once the sequence is known, a new symptom can be placed in it and the next observation becomes obvious.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| DNS defines query and response formats | `source-reported` | RFC 1035 | 2026-11-18 | RFC updated |
+| Answers carry a time-to-live used for caching | `source-reported` | RFC 1035 | 2026-11-18 | RFC updated |
+| Identify the answering server before changing records | `inferred` | Derived from the lookup sequence | 2026-11-18 | Resolver behaviour changes |
+
+## Why stale answers persist
+
+A TTL is a promise about how long an answer may be reused. Shortening it before a planned move reduces the window in which old answers circulate, but it cannot recall answers already cached. This is why a change appears to propagate gradually. The observation is a property of the protocol, not a fault in the new configuration.
+
+## What it cannot do
+
+The examples cannot identify a specific provider's cache behaviour without local evidence. They do not replace querying the authoritative server. And they cannot guarantee that a flush takes effect everywhere at once.
+
+The counterargument that a DNS problem must be a configuration error is fair for new records and incomplete for recently changed ones, where a cached answer is often the explanation.
+
+## A decision test
+
+1. Identify which server answered.
+2. Check the record's TTL.
+3. Compare with the authoritative answer.
+4. Wait if the old answer is still valid.
+5. Flush only the cache you can identify.
+6. Record the finding and the recheck condition.
+
+For the SEO context, see [DNS for SEO](/articles/dns-for-seo-how-domain-resolution-works).
+
+## References & Further Reading
+
+- M. Mockapetris, 1987. [Domain Names: Implementation and Specification (RFC 1035)](https://www.rfc-editor.org/rfc/rfc1035) — The DNS protocol specification.
+- Wikipedia contributors, 2026. [Domain name system - Wikipedia](https://en.wikipedia.org/wiki/Domain_name_system) — How names resolve to addresses.
