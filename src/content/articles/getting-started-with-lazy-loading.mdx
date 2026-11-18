@@ -1,13 +1,87 @@
 ---
 title: "Getting Started with Lazy Loading"
-description: "Reserved title for a future NOVANDRI article: Getting Started with Lazy Loading."
-date: 2026-11-17
+description: "Lazy loading defers work, not removes it. Read where to start, a worked example, and why deferring the hero image hurts."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Web
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Lazy loading is often applied to every image at once, which can make a page slower. The Wikipedia entry describes deferring resources until they are needed, and the Web Vitals material defines the metrics it affects. The starting point is knowing which resources are critical.
+
+**Direct answer:** Defer only resources below the fold or unlikely to be used, and keep the largest paint eager. The sources describe the technique and the metrics; the selection rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented behaviour from the local choice of what to defer.
+
+## The mechanism
+
+Three points matter:
+
+- **Deferral has a cost.** The Wikipedia entry describes loading resources on demand. A deferred resource is still loaded, sometimes later than ideal.
+- **The largest paint matters.** The Web Vitals material defines LCP. Deferring that element delays the metric.
+- **Selection comes first.** A blanket rule treats a hero image and a footer image alike, which is wrong.
+
+The sequence is: identify critical resources, defer the rest, then measure. The identification is local work, so it is `inferred`; the technique is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A page lazy-loads every image, including its hero, and reports a worse LCP.
+
+Three checks decide. First, which element is the largest paint? Second, was it deferred? Third, does loading it eagerly improve the metric on a realistic connection?
+
+The outcome is a targeted change rather than a blanket one. The scenario is hypothetical; the method is the contribution.
+
+## Why the fold is not a moral line
+
+The idea of above and below the fold is a simplification of where attention goes. A resource that appears later in the document may still be needed soon after the first paint, and deferring it can produce a visible delay. The practical question is when the resource is needed, not where it sits in the markup.
+
+## Why measurement closes the loop
+
+A lazy-loading change is easy to make and hard to evaluate without a before-and-after comparison on the same connection and device. A faster score on a developer machine may not describe a user's experience. Re-measuring under realistic conditions is what turns the change from a belief into evidence.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Lazy loading defers resource loading | `source-reported` | Wikipedia, Lazy loading | 2026-11-18 | Technique changes |
+| Web Vitals define LCP | `source-reported` | web.dev, Web Vitals | 2026-11-18 | Metric changes |
+| Keep the largest paint eager | `inferred` | Derived from the metric | 2026-11-18 | Layout changes |
+
+## Why selection matters more than the technique
+
+A deferred resource saves initial work only when it was not needed initially. Applying the technique to a critical resource moves work into the measurement window instead of removing it. Knowing which resources are critical is therefore the real task.
+
+A related issue is accessibility. A resource that is deferred until an interaction may delay content that assistive technology needs, and a page that appears fast can still be slow to use. Testing with the same care applied to visual performance is part of a responsible implementation.
+
+The technique also interacts with caching. A deferred image loaded on scroll will still consume bandwidth, and on a metered connection that cost is real. Treating deferral as a way to reduce total data is a misunderstanding; it changes timing, not volume. The distinction matters when the audience pays for data.
+
+A final point is that the technique can hide problems rather than solve them. A large image deferred until a user scrolls will still load slowly when it finally appears, which is a different failure from loading it too early. Testing the deferred path is part of the work, not an optional check after the main metric improves.
+
+The decision should also record what was deliberately left eager and why. A future change to the page can move an element into view, and without that record nobody will know that the previous choice no longer holds. A short note attached to the change is enough to make the reasoning recoverable.
+
+The deferred path should be tested on the devices the audience actually uses.
+
+Selection is the skill here; the technique itself is easy to apply and easy to apply wrongly.
+
+The record should include the connection used for the measurement, since results do not transfer across networks.
+
+## What it cannot do
+
+It cannot remove a resource. It does not fix an oversized image. And it cannot guarantee a better score on every device.
+
+The counterargument that lazy loading everything is simplest is fair for small pages and incomplete when the largest paint is deferred.
+
+## A decision test
+
+1. Identify critical resources.
+2. Defer only the rest.
+3. Test on realistic connections.
+4. Re-measure after the change.
+5. Record the decision and recheck date.
+
+For the pitfalls, see [LCP Optimization Pitfalls](/articles/lcp-optimization-pitfalls).
 
 ## References & Further Reading
 
