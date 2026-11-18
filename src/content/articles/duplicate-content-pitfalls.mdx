@@ -1,10 +1,71 @@
 ---
 title: "Duplicate Content Pitfalls"
-description: "Reserved title for a future NOVANDRI article: Duplicate Content Pitfalls."
-date: 2026-11-17
+description: "Duplicate URLs split signals and confuse review. Read how consolidation choices map to decisions, a worked example, and why canonical tags are not a cleanup shortcut."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Explanation
+  - Duplicate content
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Duplicate content appears when substantially similar material lives at more than one URL. Google's documentation addresses consolidating duplicate URLs, while the general reference describes the idea of duplicate content across the web. The real problem is that teams treat duplication as a single defect with one fix, when different causes call for different decisions and some duplication is harmless.
+
+**Direct answer:** Identify the cause before choosing a remedy. The sources describe duplicate URLs and consolidation options; selecting which remedy follows which cause is a synthesis. A duplicate is a problem when it splits signals, wastes crawl effort, or confuses a reviewer about which page is authoritative, not merely because two pages look alike.
+
+**Delta:** This article adds a claim-status table and a cause-to-remedy decision test beyond the sources: it maps each duplication pattern to a consolidation choice, with claim status explicit.
+
+## The mechanism
+
+The general reference describes duplicate content as blocks of content that appear on more than one web address. Google's documentation focuses on consolidating duplicate URLs so that signals attached to several addresses can be treated as belonging to one. The distinction matters: sameness of text is a description, while consolidation is a decision about which address should represent the content. The practical consequence is that a review should begin by naming the cause, because the remedy depends on why the duplication exists.
+
+Common causes include printer-friendly versions, tracking parameters that generate new addresses, syndicated copies, and e-commerce pages that differ only by a minor facet. Each creates a different pattern of URLs. A tracking parameter can create many addresses for one page, while syndication creates genuinely separate hosts with the same text. The consequence is that no single fix covers all cases. A canonical declaration may suit parameter-driven duplication, while a redirect or a content rewrite may suit a page that should never have existed.
+
+The sources describe duplicate content and list consolidation approaches; they do not provide a workflow that maps each cause to a remedy. That mapping is a synthesis and is marked inferred. The mark matters because it is a local operating choice: another team may weigh the same causes differently. The claim here is that the mapping makes the decision explicit, not that the sources dictate it.
+
+The output of a duplicate review is a list of URL groups, each labeled with a cause and a chosen remedy. That label is the decision instrument. Without it, a team applies the same tool to every duplicate and cannot explain afterward why a particular page was kept, merged, or left alone.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retailer notices that several product pages appear under multiple addresses because tracking parameters and alternate sort links generate new URLs. Three checks decide the review. First, do the duplicate addresses differ only by parameters, or do they represent genuinely different versions of the page? Second, is there a single canonical address that each variant should point to? Third, would a redirect be safer than a canonical where the page has no independent value? The review finds that parameter variants cluster around a few product pages, while one sort link produces a page with no unique content. The team declares canonicals for the variants and removes the empty sort page. The outcome is a consolidation decision, not a promise of higher traffic. The URLs are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Duplicate content is substantially similar material at more than one address | `source-reported` | Wikipedia, Duplicate content | 2026-11-18 | Definition revised |
+| Consolidating duplicate URLs is Google's documented approach | `source-reported` | Google Search Central, Duplicate URLs documentation | 2026-11-18 | Documentation updated |
+| Mapping each cause to a remedy yields a defensible review | `inferred` | Derived from the sources | 2026-11-18 | Site structure or URL scheme changes |
+
+The first two rows are factual claims drawn from the sources and should be rechecked when those references change. The third is an inference about how to run a review, because neither source defines a cause-to-remedy workflow. Recheck it when the URL scheme or site structure changes.
+
+## What it cannot do
+
+A canonical declaration does not remove a page. It indicates a preferred address, but the other addresses can still be crawled, linked, and visited by people. Treating a canonical as a cleanup tool that erases duplicates is a category error. The sources describe consolidation, not deletion, so a team that declares a canonical and walks away has left the underlying addresses in place. Where a page should not exist at all, a different remedy is required.
+
+The hidden cost is ongoing URL discipline. Duplicates tend to regenerate: a new parameter, a seasonal template, or a migrated path can recreate the same pattern after it has been fixed once. A review is therefore not a one-time project but a recurring habit. The cost is paid in monitoring, not in the initial implementation, and it grows with the number of generated URLs. Without an owner, the problem quietly returns.
+
+The main failure mode is choosing the wrong preferred address. If a canonical points to a page that redirects, or to a version that lacks the content of its variants, consolidation can discard useful signal. The format encourages this because a canonical is a single line that looks settled once written. A reviewer should verify the destination before endorsing the declaration, checking that it is stable, reachable, and representative of the group.
+
+There is a boundary around what consolidation can achieve. It addresses which address represents a piece of content, not whether that content is good, distinct, or worth including. Two pages that are genuinely different in purpose are not fixed by merging them, and a page with no value is not improved by pointing at it. The sources address duplicate URLs, not content quality. Where quality is the question, a separate review is the more honest instrument.
+
+Because URL schemes and content change, the mapping needs periodic review. Each duplicate group should carry a recheck condition tied to the cause that created it, and the preferred address should be revisited when the page is redesigned. Without that record, a future reviewer cannot tell why a page was chosen as canonical or whether the cause still exists.
+
+The counterargument that consolidation is fair for protecting limited crawl and signal value is incomplete when the duplication reflects genuinely distinct pages that serve different needs.
+
+## A decision test
+
+1. Group addresses whose content is substantially similar.
+2. Name the cause of duplication for each group.
+3. Determine whether each address has independent value.
+4. Choose the preferred address, and verify it is reachable and stable.
+5. Select the remedy: canonical, redirect, or removal.
+6. Confirm that no unique content is lost in consolidation.
+7. Record the cause, remedy, and a recheck date for each group.
+
+A duplicate review is useful only when each group is tied to a cause and a remedy. The test turns a list of similar pages into decisions a reviewer can follow, so a canonical is not applied where removal was the real answer. For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Duplicate content - Wikipedia](https://en.wikipedia.org/wiki/Duplicate_content) — Repeated content across web addresses.
+- Google, 2026. [How to Specify a Canonical with rel="canonical" and Other Methods](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls?hl=en) — What Google says about redirects, canonicals, and duplicate handling.

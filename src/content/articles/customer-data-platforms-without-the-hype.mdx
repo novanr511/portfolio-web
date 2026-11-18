@@ -1,10 +1,71 @@
 ---
 title: "Customer Data Platforms without the Hype"
-description: "Reserved title for a future NOVANDRI article: Customer Data Platforms without the Hype."
-date: 2026-11-17
+description: "A customer data platform unifies profiles, but identity and lawful basis decide its value. Read the evaluation checks, a worked example, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Analysis
+  - Customer data platforms
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A customer data platform is often sold as a single, complete view of the customer. The promise is attractive, but the hard part is not collecting data; it is deciding whether the joined profile is accurate and whether each use of it is lawful. A unified profile assembled without a valid legal ground is a liability rather than an asset, however elegant the technology looks.
+
+**Direct answer:** Evaluate a customer data platform on two things: the quality of its identity resolution and the coverage of its lawful bases for processing. The customer data platform source describes collecting and stitching customer data into a persistent profile, while GDPR Article 6 requires a lawful basis for processing. A profile that fails either test should not drive decisions.
+
+**Delta:** This article adds a claim-status table and a purpose-to-basis decision test beyond the sources: it maps each data use to a legal ground, with claim status explicit.
+
+## The mechanism
+
+The customer data platform entry describes a system that gathers data from multiple sources, resolves identities into a persistent, unified customer profile, and makes that profile available to other systems. The practical consequence is that the value concentrates in identity resolution. Collection is a commodity; deciding that two records refer to the same person is an assumption-laden task. Merge two customers by mistake and every downstream message is wrong; fail to merge one customer and the view stays fragmented. The quality of the stitch, not the volume of data ingested, determines whether the profile is useful.
+
+GDPR Article 6 supplies the second constraint. It states that processing is lawful only if at least one basis applies, such as consent, the performance of a contract, a legal obligation, vital interests, a public task or legitimate interests. The practical consequence is that lawfulness attaches to a purpose, not to a database. The same field can be processed lawfully for one reason and unlawfully for another. A platform that makes reuse effortless also makes it effortless to reuse data beyond the basis that justified collecting it.
+
+Combining the two sources exposes the central risk: purpose creep. A unified profile merges data gathered for different original reasons, and the platform's convenience invites new uses. Web behavior collected to improve a site can be repurposed for targeting; support records kept to resolve tickets can be repurposed for scoring. Each new purpose needs its own lawful basis, and the more systems the profile feeds, the more grounds must be documented and kept current.
+
+The output of a sound evaluation is therefore a map from each intended use to both an identity-quality check and an Article 6 basis. The map is a decision instrument. It tells a team which profile fields are reliable enough to act on and which uses have a documented legal ground, so gaps are visible before the data is put to work.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retailer builds a platform merging web behavior, purchase history and support tickets. Three checks decide the review. First, identity resolution: are anonymous web events correctly linked to known accounts before they are used? Second, purpose: is each use mapped to an Article 6 basis, with contract covering order fulfilment and consent covering marketing? Third, access: can downstream systems receive only the fields they need? The review finds that marketing reuse of support-ticket data has no documented basis, so the team restricts that field and records consent before proceeding. The scenario is hypothetical; the purpose-to-basis method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A customer data platform unifies data from multiple sources into a persistent profile | `source-reported` | Wikipedia, Customer data platform | 2026-11-18 | Definition revised |
+| GDPR Article 6 requires a lawful basis for processing | `source-reported` | EU, GDPR Article 6 | 2026-11-18 | Law or guidance updated |
+| Identity resolution quality, not collection volume, determines platform value | `inferred` | Derived from the sources | 2026-11-18 | Data sources change |
+
+The first two rows are claims stated by the sources themselves. The third is an inference about where value comes from, because the platform entry describes stitching without ranking its importance and the legal source says nothing about data quality. Recheck the source claims when the definition or the law changes, and the inferred claim whenever the sources of data or the identity scheme change.
+
+## What it cannot do
+
+A customer data platform cannot manufacture a truthful identity. Stitching is a probabilistic act: records are matched on keys and signals that can collide or go missing. False merges combine two people into one profile, and missed merges split one person across several. The resulting profile is a model of a customer, not the customer, and no amount of technology turns a weak match into a fact. Treating the unified view as ground truth transfers the error into every campaign and analysis that consumes it.
+
+The hidden cost is maintenance. Identity keys decay as people change emails, devices and names, so resolution must be retested rather than set once. Consent must be captured, stored and honored, and each new purpose needs a basis documented before use. Data quality has to be monitored as sources change shape. These are recurring obligations paid in ongoing work, not one-time tasks that disappear after launch. Teams that budget only for implementation are surprised by the steady cost of keeping the profile trustworthy and lawful.
+
+The main failure mode is purpose creep at machine speed. The platform's entire value proposition is making data available to many systems, which is exactly what makes unauthorized reuse easy. A field gathered under one lawful basis can flow into a use that needs another, and the friction that once slowed such reuse is gone. Unless every use is mapped to a basis and enforced at the access layer, the architecture quietly converts a lawful collection into an unlawful application. The legal problem arrives as a technical default.
+
+There is a boundary around what the platform decides. It does not determine lawfulness; GDPR applies to the processing regardless of the tool used. Legitimate interests, consent and the other bases carry conditions that depend on context, jurisdiction and the specifics of the processing, none of which a platform can settle on its own. This article is not legal advice. The map it recommends is a way to make questions visible to the people who must answer them, not a substitute for that answer.
+
+Because purposes, sources and rules change, the evaluation needs periodic review. A basis that fit an original purpose may not fit a new one, and consent can be withdrawn. The platform entry and the Article 6 text are both stable, but the way they apply to a particular business is not. Each use should carry a recheck condition and an owner. Without that record, a future reader cannot tell whether a use was deliberately cleared or simply inherited from an earlier configuration.
+
+The counterargument that a single customer view is fair for personalization is incomplete when the underlying data was collected for a different purpose.
+
+## A decision test
+
+1. Name the decisions the unified profile must support.
+2. Inventory the source systems and the identity keys they use.
+3. Test identity resolution accuracy on cases with known matches.
+4. Map every intended use to an Article 6 lawful basis.
+5. Confirm consent and legitimate-interest assessments are documented.
+6. Limit downstream access to the minimum fields each system needs.
+7. Record the design with recheck triggers for purposes and sources.
+
+The platform is useful only when identity quality and legal ground are visible for each use. The test turns a marketing promise into a sequence of checks, so a reviewer can see which profiles are reliable enough to trust and which purposes still need a documented basis. For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Customer data platform - Wikipedia](https://en.wikipedia.org/wiki/Customer_data_platform) — Systems that unify customer data.
+- GDPR Info, 2016. [Art. 6 GDPR – Lawfulness of processing - General Data Protection Regulation (GDPR)](https://gdpr-info.eu/art-6-gdpr/) — The lawful bases for processing personal data under GDPR.

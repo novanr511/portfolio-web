@@ -1,10 +1,71 @@
 ---
 title: "Structured Data Examples"
-description: "Reserved title for a future NOVANDRI article: Structured Data Examples."
-date: 2026-11-17
+description: "Structured data labels content for machines. Read what markup can express, a worked annotation example, and why valid syntax is not a visibility promise."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Explanation
+  - Structured data
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Structured data labels content so machines can interpret it. Google's starter guide introduces markup as a way to describe page meaning, while the general reference defines structured data as information organized with a defined model. The real problem is that markup is often treated as a ranking lever, so teams add it for visibility without deciding what fact they are actually declaring or whether the visible page supports it.
+
+**Direct answer:** Use structured data to describe facts already present on the page, not to create new claims. The sources define structured data and introduce markup; deciding which declared fact maps to which review decision is a synthesis. Markup is useful when each declared field can be checked against the visible content, so a reviewer can judge accuracy rather than guess at benefit.
+
+**Delta:** This article adds a claim-status table and a fact-to-field decision test beyond the sources: it maps each visible fact to a markup field, with claim status explicit.
+
+## The mechanism
+
+Structured data, in the general sense described by the source, is data organized according to an explicit structure with defined meaning. On the web, markup such as JSON-LD places that structure alongside a page's human-readable content. Google's starter guide describes markup as a way to help search systems understand what a page is about. The practical consequence is that markup is a statement about meaning, not a cosmetic addition: every field claims that a fact of a certain type appears on the page.
+
+The fields form a vocabulary with types and properties. A type names what an entity is, and properties attach attributes such as a name, a date, or a relationship. The consequence is that writing markup is an act of classification. Choosing the wrong type is not a minor syntax error; it asserts the wrong kind of thing. A reviewer should therefore read markup as a set of claims and ask, for each field, whether the visible page would support the same claim.
+
+The sources define structured data generally and introduce markup in the starter guide; they do not prescribe a workflow that maps visible facts to declared fields. That mapping is a synthesis and is marked inferred. The marker matters because it is a local authoring choice: another team could decide which facts to expose differently. The claim here is that an explicit mapping makes markup reviewable, not that the sources require such a workflow.
+
+The output of a careful annotation pass is a list of facts, each with a source in the visible content and a destination field in the markup. That list is the decision instrument. Without it, markup becomes a block of code that nobody can verify against the page, and errors persist because no one knows which line corresponds to which statement.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team adds markup to a page describing a local workshop. Three checks decide the review. First, does each declared field correspond to a fact visible on the page, such as the name, date, and location? Second, is the entity type correct for what the page actually describes, an event rather than a generic article? Third, can a reviewer trace each field back to the sentence that supports it? The review finds a declared date that appears nowhere in the visible text and a type that describes an organization instead of the event. The team removes the unsupported date and corrects the type. The outcome is a consistent page, not a promise of a richer result. The content is hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Structured data organizes information with defined meaning | `source-reported` | Wikipedia, Structured data | 2026-11-18 | Definition revised |
+| Markup helps search systems understand page content | `source-reported` | Google, SEO Starter Guide | 2026-11-18 | Starter guide updated |
+| Mapping visible facts to fields makes markup reviewable | `inferred` | Derived from the sources | 2026-11-18 | Vocabulary or page content changes |
+
+The first two rows are factual claims drawn from the sources and should be rechecked when those references change. The third is an inference about authoring practice, because neither source defines a fact-to-field review. Recheck it when the vocabulary or the underlying page content changes.
+
+## What it cannot do
+
+Structured data does not create facts. If a page does not state a date, price, or name in its visible content, declaring it in markup does not make it true and can make the page inconsistent. The sources describe markup as a way to express meaning, not as a way to invent it. Treating markup as a shortcut around content quality reverses the relationship: the markup should describe the page, and the page should carry the claim.
+
+The hidden cost is ongoing consistency. Pages change, events pass, prices move, and a field that was accurate on launch becomes stale. A team that adds markup once and never revisits it accumulates contradictions between the visible page and the declared data. The cost is paid in maintenance, not in the initial authoring, and it grows with the number of annotated pages. Without an owner, no one notices the drift.
+
+The main failure mode is type and field confusion. A page can carry syntactically valid markup that describes the wrong kind of entity, or fill a property with a value that does not fit its expected meaning. Syntax checks catch malformed code, not mistaken classification. The format encourages this because a block of markup looks precise even when its semantics are wrong. A reviewer should read the declared type first, before examining the individual fields.
+
+There is a boundary around what markup can influence. It describes content; it does not ensure that a result is displayed, that a page is chosen, or that a rich presentation appears. The sources introduce markup and its role in understanding, not a guarantee of display. Where a display outcome matters, that is a separate question with a separate review. Presenting markup as a visibility promise overstates what the sources support.
+
+Because vocabularies and pages change, the mapping needs periodic review. Each declared field should carry a recheck condition tied to the fact it describes, and the type should be revisited when the page's subject changes. Without that record, a future reviewer cannot tell which declarations were deliberate and which were copied from a template.
+
+The counterargument that adding markup is fair for clarifying page meaning is incomplete when the declared facts are not supported by the visible content.
+
+## A decision test
+
+1. List the facts a page states visibly that are worth declaring.
+2. Choose the entity type that matches what the page describes.
+3. Map each fact to a field, noting the sentence that supports it.
+4. Drop any field with no visible support.
+5. Check that each value fits the field's expected meaning.
+6. Validate the syntax, then re-read the semantics.
+7. Record an owner and a recheck date for each declaration.
+
+Markup is useful only when it stays aligned with the page it describes. The test turns a block of code into a set of checkable claims, so a reviewer can trace each field to a visible fact and remove the ones that cannot be defended. For further reading, see [Related](/articles/technical-writing-documentation-api-docs-and-developer-experience).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Structured data - Wikipedia](https://en.wikipedia.org/wiki/Structured_data) — Structured markup for machine-readable content.
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.

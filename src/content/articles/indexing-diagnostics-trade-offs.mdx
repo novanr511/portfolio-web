@@ -1,10 +1,71 @@
 ---
 title: "Indexing Diagnostics Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Indexing Diagnostics Trade-Offs."
-date: 2026-11-17
+description: "Crawling and indexing signals answer different questions. Read how Googlebot diagnostics map to page decisions, a worked example, and where logs stop proving visibility."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Explanation
+  - Indexing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Indexing diagnostics tell a team whether search engines can reach and include a page. Google's crawler overview describes the bots that fetch pages, while its starter guide covers the basics of making content discoverable. The real problem is that crawl logs and index counts are often read as a single health score, when each answers a different question and supports a different decision.
+
+**Direct answer:** Separate reachability from inclusion before acting. The sources describe crawlers and basic site hygiene; deciding which fix follows which signal is a synthesis, not an instruction the sources give. A diagnostic is useful when it is tied to one of those two questions, so a crawl problem is not treated as a ranking problem and an indexing gap is not treated as a content problem.
+
+**Delta:** This article adds a claim-status table and a signal-to-action decision test beyond the sources: it maps each diagnostic to a specific page decision, with claim status explicit.
+
+## The mechanism
+
+Google's crawler overview describes Googlebot and other crawlers as automated clients that discover and fetch pages. Crawling is the act of fetching; indexing is the act of storing and making a page eligible to appear in results. The distinction matters because a page can be fetched and still not be included, and a page can be included on the strength of earlier fetches even when current crawling is uneven. A diagnostic that reports one does not settle the other. The practical consequence is that a team must name the question before reading the number: did a crawler reach the page, and is the page eligible to appear?
+
+The starter guide groups the levers that affect this process into site structure, links, and content signals. Internal links help discovery, a clear URL structure helps interpretation, and unique useful content helps a page earn a place. The consequence is that a review should move in an order: check whether the page can be reached, then whether it is likely to be understood, then whether it is worth including. Acting out of order wastes effort, because a content rewrite cannot repair a page that a crawler cannot fetch, and a link fix cannot rescue a page that duplicates another.
+
+The sources describe crawlers and general optimization basics; they do not define a decision workflow that maps each signal to a specific action. That mapping is a synthesis and is marked inferred. The mark is important because the mapping is a local operating choice: a team with a different site structure may legitimately reorder the steps. The claim made here is only that the mapping keeps review honest, not that the sources prescribe it.
+
+The output of a diagnostic session is a list of pages, each labeled with the question it failed and the action that follows. That label is the decision instrument. Without it, a team responds to a generic "indexing problem" with a generic set of fixes, and cannot tell whether any single fix addressed the cause.
+
+## A worked example
+
+The following is hypothetical and illustrative. A content team reviews a set of new pages after noticing low search visibility. Three checks decide the review. First, are the pages reachable through internal links from a Crawled page, or are they orphaned? Second, among pages that are crawled, do any rely on near-identical text that leaves their purpose unclear? Third, does the diagnostic signal actually distinguish reachability from inclusion, rather than mixing them into one score? The review finds that several pages are crawled but have thin distinguishing content, while a few are not linked at all. The team adds internal links for the second group and consolidates the first. The outcome is a split decision, not a claim that rankings will rise. The pages and counts are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Googlebot and other crawlers fetch and discover pages | `source-reported` | Google Search Central, Google crawler overview | 2026-11-18 | Crawler documentation updated |
+| Site structure, links and content are basics of search optimization | `source-reported` | Google, SEO Starter Guide | 2026-11-18 | Starter guide updated |
+| Separating reachability from inclusion improves diagnostic decisions | `inferred` | Derived from the sources | 2026-11-18 | Site architecture or guidance changes |
+
+The first two rows are factual claims drawn from the sources and should be rechecked when those documents change. The third is an inference about how to use diagnostics, because neither source defines a decision workflow. Recheck it when site architecture changes or when the guidance itself is updated.
+
+## What it cannot do
+
+Indexing diagnostics do not explain ranking. A page can be reachable, crawled, and included and still appear far down the results for a given query. The crawler overview is about fetching, and the starter guide covers fundamentals; neither offers a ranking model. Treating a clean diagnostic as a promise of position is a category error. The diagnostic speaks to eligibility and discovery, not to where a page places once it competes for a query.
+
+The hidden cost is interpretation time. Crawl logs and index reports generate many entries, each affected by timing, site changes, and crawler scheduling. A single snapshot can mislead because recent pages have not yet been visited and older pages may reflect past structure. Reading these signals carefully takes recurring effort, and teams that glance at a single report tend to overreact to noise. The cost is paid in attention, not in tooling.
+
+The main failure mode is conflating signals. A drop in reported indexed pages can have several causes: pages removed, canonical choices, temporary crawl delays, or reporting changes. Reading it as proof of a penalty sends the team down the wrong path. The format encourages this because dashboards present one number where several questions exist. A reviewer should insist that each signal carry the question it answers before any fix is proposed.
+
+There is a boundary around what logs can show. Crawler activity indicates that a fetch was attempted; it does not reveal how a page was understood or whether it was considered useful for a query. Nor does it expose the reasoning behind an inclusion decision. The diagnostic is therefore evidence of process, not a verdict on content quality. Where quality is the question, a separate content review is the more honest instrument.
+
+Because sites and guidance change, the mapping needs periodic review. Each assumption about what a signal means should carry a recheck condition, and the order of checks should be revisited when the site structure is redesigned. Without that record, a future reviewer cannot tell whether a fix was chosen for a reason or copied from a previous incident.
+
+The counterargument that separating reachability from inclusion is fair for triaging technical problems is incomplete when the real question is ranking or content quality.
+
+## A decision test
+
+1. Name the question: reachability, inclusion, or ranking.
+2. Check whether the page is linked from a crawlable part of the site.
+3. Check whether the page is crawled, reading logs as process evidence only.
+4. Check whether included pages are distinct enough to be understood.
+5. Assign one action to each failed question.
+6. Record the assumption behind each action with a recheck date.
+7. Re-measure only the signal tied to that action.
+
+Diagnostics are useful only when each signal is tied to one decision. The test turns a pile of logs into a sequence of questions, so a crawl fix is not mistaken for a content fix and neither is mistaken for a ranking promise. For further reading, see [Related](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- Google, 2026. [Google Crawler (User Agent) Overview](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers?hl=en) — How Google discovers, crawls, renders, and indexes pages.
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.

@@ -1,10 +1,71 @@
 ---
 title: "What Docker Images Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What Docker Images Actually Measures."
-date: 2026-11-17
+description: "A Docker image is a packaged, immutable snapshot, not a running process. Read what the image measures, a worked example, and where the layer model breaks."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Explanation
+  - Container images
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Docker images are often read as if they were the running application, which conflates a packaged artifact with a live process. The Docker entry describes images as the units that become containers, and the OCI specifications define the image format and the runtime contract. The real problem is that an image is read as a measure of what is executing, when it only records what was packaged.
+
+**Direct answer:** A Docker image measures a layered filesystem snapshot plus metadata such as configuration and entrypoint, not the behaviour of a live container. The sources define the image and the OCI format; treating a scan of an image as a statement about runtime is a synthesis. An image shows what could be started, not what is actually running.
+
+**Delta:** This article adds a claim-status table and a layer-to-decision test beyond the sources: it maps each image layer to a packaging decision, with claim status explicit.
+
+## The mechanism
+
+The Docker entry describes a platform that packages software into containers, which are standardised units of software. An image is the static artifact; a container is a running instance of it. The distinction matters because the image is immutable while the container carries state. The OCI specifications formalise the split: an image is represented by a manifest that lists layers and configuration, and a runtime specification defines how a container is run. What the image therefore measures is packaged content and its metadata, not execution. A reader who asks what an image contains is asking a different question from a reader who asks what a container is doing.
+
+The practical consequence sits in the layers. An image is assembled as a stack of layers, each recording a set of filesystem changes made during the build. The image records the accumulation of everything included along the way, including tools and files that were added and never removed. A scan of the image reports on that accumulation. It sees packages present in layers, not processes that will be invoked at runtime. A large image with many layers measures build history, and a finding reported in a layer may sit in a file that is never executed. The decision consequence is that image size and scan findings are supply-chain signals, not runtime verdicts. Treating them as verdicts moves attention away from the configuration that actually shapes behaviour.
+
+The OCI specifications define a format and a runtime contract, not a policy. They do not say what should be placed in an image, how it should be scanned, or what a passing result means. Those are local choices, and they should be marked as inferred. The sources describe how an image is represented and how a container is run; they do not endorse a scanning tool or a threshold. Keeping that boundary visible lets a reviewer see which part of the assessment came from the artifact and which part was a decision made by the team.
+
+The output is a snapshot that can be moved between environments, so its measure is reproducible content. The decision instrument is the comparison of that content against a stated policy. The value of the method lies in the sequence: establish what the artifact contains, decide what matters, then act. A team that follows that order can explain a packaging decision later, because the evidence and the choice are recorded separately.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team pulls a base image and builds a service on top of it. Three checks decide the review. First, does the manifest list only the layers the build intended, or does it include tooling left over from an earlier stage? Second, does a reported finding sit in a layer that is actually invoked at runtime, or in a leftover file? Third, does the runtime configuration recorded in the image match what the deployment expects? The scan flags a package in a retained layer that the service never calls. The team removes the layer and confirms the rebuilt image still starts. The outcome is a packaging decision, not a claim that the running service was unsafe. The numbers are hypothetical; the separation of artifact and runtime is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Docker packages software into containers | `source-reported` | Wikipedia, Docker (software) | 2026-11-18 | Definition revised |
+| OCI specs define the image format and runtime | `source-reported` | OCI, OCI specifications | 2026-11-18 | Spec version changes |
+| Layers record build history, not executed behaviour | `inferred` | Derived from the sources | 2026-11-18 | Build process changes |
+
+The first two rows are factual claims drawn directly from the sources. The third is an inference about what layers record, because neither source endorses a scanning policy. Recheck the definitions when the source entries change, and the inferred claim when the build process changes.
+
+## What it cannot do
+
+An image does not measure what a running container does. It is a static snapshot, while runtime behaviour depends on configuration, environment, mounts, and inputs applied when the container starts. A clean image can run badly, and a flagged image can run safely if the flagged component is never invoked. Treating an image scan as a verdict on runtime is a category error. The sources describe packaging and a runtime contract, not observed behaviour, so they cannot settle a question about what a deployed service actually did. The image answers what was assembled, which is a narrower and more stable question.
+
+The hidden cost is freshness. An image is immutable, but the base layers it inherits age, and a running fleet may be using several different images at once. Knowledge of one image does not reveal which version is deployed where. Maintaining the mapping between image digests and running containers is recurring work, and without it a scan result cannot be tied to a decision. The cost is paid in inventory discipline rather than in tooling. A team that skips that mapping may hold a clean report for an image that is no longer in use, while an older deployed image goes unexamined.
+
+The main failure mode is confusing the layer stack with the dependency graph. Layers record filesystem changes, not which packages are linked or invoked. A package present in a layer may be dead weight or may be essential, and the layer list alone cannot distinguish the two. Scanners that report on presence can therefore overstate or understate relevance. A reviewer who reads a layer count as a measure of complexity will draw the wrong conclusion, because a single dense layer can hold more risk than many small ones. The layer count describes the build, not the exposure.
+
+There is a boundary around the method. It covers the packaged artifact. It does not measure host security, orchestrator settings, network policy, or secrets injected at runtime. It does not replace runtime monitoring, because a threat that appears only when the container runs is invisible to an image inspection by design. A reader who needs an answer about the live environment must look to the runtime, and the sources do not extend that far.
+
+Because the specifications and the tooling evolve, the policy that decides which findings matter needs a refresh and a periodic review of its assumptions. Each choice should be recorded with a recheck condition, and the threshold for a blocking finding should be treated as a local policy decision rather than a number the sources supply. Without that record, a future reviewer cannot tell which judgements were deliberate and which were habits. The artifact will still be there; the reasoning behind the decision may not be.
+
+The counterargument that scanning a static image is fair for catching known packaged components is incomplete when the risk only appears at runtime.
+
+## A decision test
+
+1. Read the image manifest and list its layers.
+2. Identify which layers the build intended to include.
+3. Map each reported finding to a layer and a runtime use.
+4. Compare the recorded runtime configuration with the deployment expectation.
+5. Decide which findings change the packaging.
+6. Rebuild and confirm the image still starts.
+7. Record the policy choice, the owner, and the recheck date.
+
+The image is useful only when the artifact and the runtime are kept distinct. The test turns a static snapshot into a sequence of packaging decisions with a visible owner, so a reviewer can see which layer was removed and when the choice must be revisited. For further reading, see [Related](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Docker (software) - Wikipedia](https://en.wikipedia.org/wiki/Docker_(software)) — Container images and the tooling around them.
+- Open Container Initiative, 2026. [Open Container Initiative - Open Container Initiative](https://opencontainers.org/) — The open specifications behind container images.
