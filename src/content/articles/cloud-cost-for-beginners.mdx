@@ -1,10 +1,57 @@
 ---
 title: "Cloud Cost for Beginners"
-description: "Reserved title for a future NOVANDRI article: Cloud Cost for Beginners."
-date: 2026-11-17
+description: "Cloud bills grow from small decisions repeated at scale. Read where cost comes from, a worked example, and why a smaller instance is not always cheaper."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Cloud
+  - Cost
+  - Engineering
+  - Finance
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A first cloud bill is usually a surprise because the pricing looks simple: pay for what you use. The complexity is that "what you use" includes idle time, duplicated data, and requests you never intended to send, which the AWS cost framework treats waste as a design problem, as the cost-optimization article covers right-sizing and commitments. Understanding the shape of the bill comes before optimising it.
+
+**Direct answer:** Start by separating the bill into compute, storage, data transfer, and requests, then measure each against the work it supports. AWS provides the cost-optimisation framework, and the cloud-cost article covers the optimisation techniques. The boundary: this is educational orientation, not a guarantee — prices and discounts change by region and provider, as the cost estimator requires dated figures, as the publication standard forbids guaranteed savings.
+
+## Where the cost comes from
+
+**Compute.** You pay for capacity whether or not it is busy, which the AWS framework treats as utilisation, as the cost-optimization article advises on right-sizing, as the unit-economics article requires for contribution, as the cash-flow article requires for cash spent.
+
+**Storage.** Data persists and accumulates copies, which the AWS framework treats as a source of waste, as the data-curation article advises on keeping only what is needed, as the data-governance article requires for provenance, as the cost estimator requires for the total.
+
+**Data transfer.** Moving data out can cost more than storing it, which the CDN article explains for delivery, as the cloud-cost article treats network cost, as the capacity-planning article advises on architecture, as the cost estimator requires for a full accounting.
+
+**Requests and managed services.** Each API call and managed feature has a price, which the cost estimator requires you to count, as the observability article treats signals as evidence, as the dashboard article argues for metrics tied to decisions, as the decision-memo article requires for a recorded judgement.
+
+Three consequences follow. The bill should be read by category before changing anything, as the cost estimator requires, as the dashboard article argues, as the rubric article requires concrete criteria, as the data-governance article requires dated figures, as the monitoring article advises for review, as the decision-memo article requires for a record, as the risk article requires residual risk.
+
+## A worked example
+
+The following is hypothetical and illustrative. A small service runs an always-on instance, stores daily backups indefinitely, and serves assets directly from the origin.
+
+Three checks decide where to start. First, what share of compute is idle, as the AWS framework asks, with utilisation measured, as the observability article advises? Second, how much storage is retention and how much is forgotten copies, as the data-curation and cloud-cost articles advise, with provenance, as data governance requires? Third, would a CDN reduce transfer cost, as the CDN and cloud-cost articles advise, with the full cost computed, as the cost estimator requires?
+
+Three conclusions follow. Idle compute is often the largest line, which the first check reveals. Retention without a rule is a cost, as the data-curation article advises. And the decision should be recorded with the figures, as the decision-memo article requires.
+
+## What cloud-cost basics cannot do
+
+They cannot guarantee a saving, which the publication standard forbids claiming, as the risk article requires residual risk, as the benchmarks article warns about broad results. They do not replace performance measurement, which the observability article treats as evidence, as the dashboard article argues, as the rubric article requires, as the monitoring article advises for review. And they cannot fix an architecture that needs the capacity, which the capacity-planning article treats as a design question, as the value-proposition article argues for the purpose, as the decision-memo article requires for a judgement.
+
+The counterargument that a smaller instance is always cheaper is fair for idle workloads and wrong when it causes slow responses or retries, which the performance article advises, as the cost estimator requires cost per successful request, as the routing article treats as the decision metric, as the worked example shows.
+
+## A decision test
+
+1. Separate the bill into categories, as the cost estimator requires.
+2. Measure utilisation, as the AWS framework advises.
+3. Set retention rules for storage, as the data-curation article advises.
+4. Check transfer paths, as the CDN article advises.
+5. Use dated prices, as data governance requires.
+6. Compute cost per successful request, as the routing article advises.
+7. Record the decision and review, as the decision-memo article requires.
+
+For the framework, see [Cloud Cost Optimization](/articles/cloud-cost-optimization-finops-right-sizing-and-reserved-instances); for the total, see [LLM Cost Estimator](/articles/llm-cost-estimator-how-to-predict-your-monthly-bill).
+
+## References & Further Reading
+
+- Amazon Web Services, 2026. [Cost Optimization (AWS Well-Architected Framework)](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Vendor primary documentation on right-sizing and commitment models.
+- Amazon Web Services, 2026. [Well-Architected Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Right-sizing, commitment discounts, and cost allocation in one framework.
