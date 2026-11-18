@@ -1,10 +1,57 @@
 ---
 title: "Multimodal Models Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Multimodal Models Trade-Offs."
-date: 2026-11-17
+description: "Adding vision to a language model changes what it can do and what it can get wrong. Read the trade-offs, a worked example, and why modality is not accuracy."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Multimodal
+  - Evaluation
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A multimodal model can accept images alongside text, which makes applications possible that text-only systems cannot support. The trade-off is that the added modality adds a new surface for error: an image can be misread, or the model can answer from language priors rather than the pixels, as CLIP demonstrates joint image-text representations, as the LLaVA work extends instruction following to images, as the hallucination article warns about confident wrong detail.
+
+**Direct answer:** Choose a multimodal model when the task truly requires the extra modality, then evaluate it on that task with image-grounded tests and a text-only baseline. CLIP and LLaVA are the primary sources for the mechanisms. The boundary: a multimodal model is not automatically better at a text task, which the embedding-selection article advises for own-data evaluation, as the benchmarks article warns about broad claims, as the publication standard forbids guaranteed outcomes.
+
+## The trade-offs
+
+**Capability versus grounding.** A model can describe an image plausibly while relying on a language prior, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises for checks, as the LLaVA work treats visual instruction following as a distinct capability.
+
+**Representation versus task.** Joint image-text training, which CLIP demonstrates, is not the same as accuracy on your task, which the embedding-selection article advises for local evaluation, as the evaluation-rubric article requires for concrete criteria.
+
+**Cost versus benefit.** Images add tokens and processing, which the cost estimator requires you to count, as the routing article treats cost per correct answer as the decision metric, as the prompt-caching article explains for repeated content.
+
+**Coverage versus failure.** A model may handle common images well and unusual ones poorly, which the benchmarks article warns about, as the risk-assessment article requires residual risk, as the monitoring article advises for change triggers.
+
+Three consequences follow. The task should be tested with images that are representative, as the rubric article requires, as the evaluation article advises for held-out cases. A text-only baseline should be included, as the embedding-selection article recommends for comparisons, as the cost estimator requires for honest accounting. And the result should be recorded with the limits, as the decision-memo article requires.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team considers a multimodal model to answer questions about product photos.
+
+Three checks decide. First, does the task require the image at all, as the decision-memo article asks, with a text-only baseline, as the embedding-selection article advises? Second, does the model answer from the image rather than a plausible prior, as the hallucination and reduce-hallucinations articles advise, with a fixed test set, as the rubric article requires? Third, what is the cost per correct answer, as the cost estimator requires, with images billed as tokens, as the routing article treats as the decision metric?
+
+Three conclusions follow. If text metadata answers the question, a text-only model may suffice, as the baseline check shows. If the image matters, grounding checks are essential, as the hallucination article advises. And the decision should be recorded with the cost, as the decision-memo article requires.
+
+## What multimodal models cannot do
+
+They cannot guarantee correct reading of an image, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises. They do not replace a text baseline, which the evaluation article advises for comparison, as the benchmarks article warns about broad claims. And they cannot guarantee a saving, which the cost estimator makes explicit, as the publication standard forbids guaranteed outcomes.
+
+The counterargument that more modalities are always better is fair for tasks that need the extra information and wrong when metadata already answers the question, which the worked example shows, as the cost estimator argues for cost per correct answer.
+
+## A decision test
+
+1. Confirm the task requires the image, as the decision-memo article advises.
+2. Include a text-only baseline, as the embedding-selection article recommends.
+3. Test grounding on a fixed image set, as the rubric article requires.
+4. Check for prior-driven answers, as the hallucination article advises.
+5. Compute cost per correct answer, as the cost estimator requires.
+6. Record the limits, as the decision-memo article requires.
+7. Review after a model change, as the monitoring article advises.
+
+For the representation, see [CLIP paper](https://arxiv.org/abs/2103.00020); for the evaluation method, see [Embedding Model Selection](/articles/embedding-model-selection-a-task-driven-evaluation).
+
+## Further Reading
+
+- Alec Radford et al., 2021. [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020) — The CLIP paper on joint image-text representations.
+- Haotian Liu et al., 2023. [Visual Instruction Tuning](https://arxiv.org/abs/2304.08485) — The LLaVA paper on multimodal instruction following.
