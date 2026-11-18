@@ -1,13 +1,88 @@
 ---
 title: "AI Content Moderation without the Hype"
-description: "Reserved title for a future NOVANDRI article: AI Content Moderation without the Hype."
-date: 2026-11-17
+description: "AI can filter content at scale, not decide what is acceptable. Read the practice, a worked example, and why speed is not accuracy."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Governance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI content moderation is often sold as a way to handle volume, which hides the decisions it cannot make. The Wikipedia entry describes moderation as reviewing and filtering content, and the NIST AI RMF provides a risk frame. The practice is about where automation is safe and where a person must decide.
+
+**Direct answer:** Use AI to route and prioritise content against a defined policy, with human review for consequential decisions and measured accuracy for the rest. The sources describe the practice; the boundary rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented moderation concepts from local policy choices.
+
+## The mechanism
+
+Three points matter:
+
+- **Policy comes first.** The moderation entry describes filtering content. A system cannot be accurate against a policy nobody defined.
+- **Errors are asymmetric.** The NIST RMF asks for risk to be measured and managed. Removing legitimate content and leaving harmful content have different costs.
+- **Appeals are part of the system.** A moderation decision that cannot be challenged will be wrong without a correction path.
+
+The sequence is: define the policy, measure error by category, route uncertain cases to people, then review appeals. The policy is local judgement, so it is `inferred`; the practice is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A platform uses a model to flag content for review.
+
+Three checks decide. First, is the policy specific enough that two reviewers would agree on a case? Second, what are the false-positive and false-negative rates, and which error costs more? Third, can a flagged user appeal, and do appeals change the model or the policy?
+
+The outcome is a moderation design with recorded limits. The scenario is hypothetical; the method is the contribution.
+
+## Why policy disagreement is a signal
+
+If two reviewers would decide the same case differently, the policy is not clear enough to automate. That disagreement is useful information: it identifies where a rule needs to be written down before a model is trained on inconsistent labels. Automating an ambiguous policy scales the ambiguity.
+
+## Why appeals improve the system
+
+An appeal is not only a correction for one user. It is evidence about where the model or the policy is wrong. Grouping appeals by cause reveals patterns that an aggregate accuracy figure hides, which makes the review loop more useful than a periodic score.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Moderation involves reviewing and filtering content | `source-reported` | Wikipedia, Content moderation | 2026-11-18 | Definition revised |
+| AI risk should be measured and managed | `source-reported` | NIST AI RMF | 2026-11-18 | Framework changes |
+| Route uncertain cases to people | `inferred` | Derived from error asymmetry | 2026-11-18 | Policy changes |
+
+## Why speed is not accuracy
+
+A system that filters quickly can still make the wrong decision at scale. The useful measure is error by category, not throughput. Measuring both errors also reveals whether the model is merely shifting the problem from one kind of mistake to another.
+
+A final limit is context. A model can classify a piece of text but cannot know the conversation around it, and the same phrase can be harmless or harmful depending on context. Systems that treat content in isolation will make predictable errors, which is another reason to keep human review for borderline cases.
+
+Moderation also has a cost on legitimate expression. A system tuned to remove everything risky will remove valid content, and the effect falls unevenly across communities. Measuring that cost is part of the policy decision, not an optional refinement. A system that reports only removals is reporting only half of its impact.
+
+The system should record which policy version produced each decision, since a rule that changes over time makes older decisions impossible to interpret.
+
+A decision that cannot be appealed is a policy decision made without a correction mechanism.
+
+The appeal record belongs with the model version, so a change in behaviour can be traced to a change in the system.
+
+The measurement should include the time to resolution, not only the number of decisions. A fast decision that is appealed and reversed is slower than a careful one that stands, and a system optimised for throughput will hide that difference. Reading both figures together gives a more honest view of the work.
+
+The threshold for escalation should be reviewed when the content mix changes.
+
+## What it cannot do
+
+It cannot define what is acceptable. It does not remove the need for human review. And it cannot guarantee that a policy is fair.
+
+The counterargument that automation removes the backlog is fair for volume and incomplete for judgement.
+
+## A decision test
+
+1. Define the policy.
+2. Measure errors by category.
+3. Route uncertain cases to people.
+4. Provide an appeal path.
+5. Review the model and policy.
+6. Record the decision and recheck condition.
+
+For the risk frame, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 
 ## References & Further Reading
 

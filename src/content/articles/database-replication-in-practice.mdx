@@ -1,13 +1,86 @@
 ---
 title: "Database Replication in Practice"
-description: "Reserved title for a future NOVANDRI article: Database Replication in Practice."
-date: 2026-11-17
+description: "Replication copies data across systems. Read the trade-offs, a worked setup, and why a replica can be correct and still be stale."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Databases
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Replication is often described as making more copies of the data, which hides the trade-offs. The Wikipedia entry describes copying data across systems, and the CAP theorem treats the limits of consistency, availability, and partition tolerance. The practice is about choosing which property to favour.
+
+**Direct answer:** Replicate for a stated purpose — availability, read scale, or recovery — then choose a consistency model that fits it and measure lag. The sources describe the mechanism; the choice rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked setup, separating documented properties from the local choice of consistency.
+
+## The mechanism
+
+Three points matter:
+
+- **Purpose decides topology.** The replication entry describes copies across systems. Read scale and disaster recovery produce different designs.
+- **Consistency has a cost.** The CAP theorem describes the trade-off under partition. Stronger consistency usually means more coordination and latency.
+- **Lag is visible.** A replica can be correct in the sense of eventually matching the source while still being behind at a given moment.
+
+The sequence is: state the purpose, choose the model, measure lag, then define what staleness is acceptable. The choice is local judgement, so it is `inferred`; the properties are `source-reported`.
+
+## A worked setup
+
+*Illustrative.* A service adds a read replica to reduce load on the primary.
+
+Three checks decide. First, can the application tolerate a replica that is slightly behind, or does it need read-after-write consistency? Second, how is lag monitored, and what value would trigger a fallback to the primary? Third, how does the system behave when the primary is unavailable?
+
+The outcome is a replication policy with a recorded trade-off. The scenario is hypothetical; the method is the contribution.
+
+## Why the purpose changes the design
+
+Read scale and disaster recovery both use copies, but they impose different requirements. Read scale tolerates some lag as long as the replicas serve requests. Recovery requires a copy that is complete and restorable, which is a different test. A design borrowed from one purpose and applied to the other will fail at the moment it is needed.
+
+## Why lag belongs in the dashboard
+
+A replica that falls behind is still serving requests, which is why the problem can go unnoticed until someone reads stale data. Monitoring lag turns an invisible condition into a visible one. The threshold should be set from the application's tolerance for staleness, not from a generic number.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Replication copies data across systems | `source-reported` | Wikipedia, Replication | 2026-11-18 | Definition changes |
+| Consistency and availability trade off under partition | `source-reported` | CAP theorem | 2026-11-18 | Theory revised |
+| Choose the model from the stated purpose | `inferred` | Derived from the trade-off | 2026-11-18 | Workload changes |
+
+## Why a replica can be correct and stale
+
+A replica that eventually matches the primary is not necessarily current. An application that reads from it immediately after a write may see old data, which is a design consequence rather than a fault. Naming the acceptable staleness is the practical control.
+
+Replication also cannot replace a backup taken for recovery. A replica that mirrors a mistaken delete will faithfully reproduce it, which is why the two mechanisms are not interchangeable. A recovery plan needs a point in time to return to, and that requires a history rather than a live copy.
+
+The final consideration is the failure mode under partition. When a replica cannot reach the primary, it must choose between refusing writes and accepting divergent data. That choice is the CAP trade-off in practice, and it should be made deliberately rather than discovered during an outage. Recording the choice makes the system's behaviour predictable.
+
+The application should also be written with the chosen model in mind, because code that assumes immediate consistency will misbehave on a lagging replica even when the infrastructure is correct.
+
+A recorded failure test is more useful than an assumed behaviour, because the choice under partition is only visible when a partition occurs.
+
+The chosen consistency model should be stated where the application reads from the replica, so a future change does not silently assume something stronger.
+
+A replica does not remove the need to test a restore, because a copy that cannot be restored is not a recovery path. Testing the restore is the only way to know whether the design works, and it should happen before the failure rather than during it.
+
+## What it cannot do
+
+It cannot remove the need for backups, which serve a different purpose. It does not guarantee availability under every failure. And it cannot make a partition disappear.
+
+The counterargument that more replicas always improve reliability is fair for read scale and incomplete for write consistency.
+
+## A decision test
+
+1. State the purpose.
+2. Choose the consistency model.
+3. Measure lag.
+4. Define a staleness threshold.
+5. Test failure behaviour.
+6. Record the decision and recheck condition.
+
+For the data model, see [NoSQL Design at Scale](/articles/nosql-design-at-scale).
 
 ## References & Further Reading
 

@@ -1,13 +1,88 @@
 ---
 title: "Query Planners in Practice"
-description: "Reserved title for a future NOVANDRI article: Query Planners in Practice."
-date: 2026-11-17
+description: "A planner chooses how to run a query. Read how to work with it, a worked example, and why a hint is not a substitute for evidence."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Databases
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A query planner chooses an execution strategy from the options available. The Wikipedia entry describes query optimization, and the PostgreSQL index documentation covers one of the main tools a planner uses. The practice is about giving the planner good information rather than forcing a plan.
+
+**Direct answer:** Work with the planner by keeping statistics current, indexing from real access patterns, and verifying changes with execution plans. The sources describe the mechanism; the workflow is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented planner behaviour from local judgements about indexes and hints.
+
+## The mechanism
+
+Three points matter:
+
+- **The planner uses estimates.** The optimization entry describes choosing among strategies. Bad estimates produce bad plans.
+- **Indexes are inputs.** The PostgreSQL documentation describes how indexes support access. An index that does not match the query cannot help.
+- **Plans change with data.** A plan that was good last month can be wrong after the data distribution shifts. Verification is continuing work.
+
+The sequence is: inspect the plan, check the estimates, add or change an index from the access pattern, then verify. The changes are local, so they are `inferred`; the mechanism is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A query slows after the table grows, and the planner chooses a sequential scan.
+
+Three checks decide. First, are the statistics current enough for the planner to know the table grew? Second, does an index exist that matches the filter in the query? Third, does the plan improve after refreshing statistics or changing the index, measured on the same query?
+
+The outcome is a change with evidence rather than a guess. The scenario is hypothetical; the workflow is the contribution.
+
+## Why estimates drive the plan
+
+A planner chooses based on estimates of row counts and selectivity. When those estimates are wrong, a reasonable strategy becomes a bad one. Keeping statistics current is therefore not housekeeping; it is the input that the planner uses to make decisions.
+
+## Why the plan should be observed
+
+A query can return the correct result through an expensive path, and an index can exist without being used. Reading the execution plan is the only way to see which happened. It turns an optimisation discussion from an argument about preferences into a comparison of observed behaviour.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Planners choose among execution strategies | `source-reported` | Wikipedia, Query optimization | 2026-11-18 | Method changes |
+| Indexes support particular access paths | `source-reported` | PostgreSQL index docs | 2026-11-18 | Version changes |
+| Verify plan changes with evidence | `inferred` | Derived from planner behaviour | 2026-11-18 | Data shifts |
+
+## Why a hint is not a fix
+
+A hint forces a plan that may be right today and wrong after the data changes. Fixing the information available to the planner — statistics and indexes — is usually more durable because it lets the planner adapt.
+
+A plan that is optimal on one data distribution can be poor on another, which is why a recorded plan is a snapshot rather than a guarantee. Revisiting the plan after significant growth or a change in query patterns is part of maintenance. A system that never revisits it will slowly degrade without an obvious cause.
+
+The practice also has a limit when the schema itself is wrong. No planner can rescue a query that asks for far more data than the application needs, and adding indexes to such a query often moves the cost rather than removing it. Reading the query is the first step, not the plan.
+
+The measurement should record the query and the data size together, since a plan cannot be judged without knowing the conditions it was chosen under.
+
+The index should match the predicate the query actually uses, not the one the reader expects it to use.
+
+A hint that fixes today's plan should be reviewed when the data changes, because tomorrow's best plan may be different.
+
+A plan should also be read against the workload, not a single query in isolation. An index that helps one query may slow down writes, and a planner tuned for reads can make the overall system worse. The decision belongs at the workload level, which is why measuring the whole application matters.
+
+The planner's estimates should be checked before the query is rewritten to compensate for them.
+
+## What it cannot do
+
+It cannot make a poorly designed query efficient. It does not guarantee the same plan under different data. And it cannot remove the need to monitor performance.
+
+The counterargument that forcing a known-good plan is safest is fair for a stable workload and incomplete when the data changes.
+
+## A decision test
+
+1. Inspect the execution plan.
+2. Check statistics.
+3. Match indexes to access patterns.
+4. Verify on the same query.
+5. Monitor after data changes.
+6. Record the decision and recheck condition.
+
+For the access path, see [Database Indexes](/articles/database-indexes-and-query-plans).
 
 ## References & Further Reading
 
