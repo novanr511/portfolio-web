@@ -1,10 +1,73 @@
 ---
 title: "How to Get Inventory Accuracy Right"
-description: "Reserved title for a future NOVANDRI article: How to Get Inventory Accuracy Right."
-date: 2026-11-17
+description: "Inventory accuracy is often a single percentage that hides decision-changing errors. Read the mechanism, a worked example, and a claim-status table."
+date: 2026-11-18
 tags:
-  - Planned
-  - Retail
+  - Operations
+  - Measurement
+  - Inventory
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Inventory accuracy is usually reported as a single percentage, but that number can look healthy while a few important items are badly wrong. The inventory control entry describes systems for tracking stock, and the inventory entry treats stock as cash tied up in the business. The real problem is deciding which discrepancies change a decision.
+
+**Direct answer:** Treat accuracy as the absence of decision-changing discrepancies rather than a score to raise, and verify it with counts targeted at the items whose errors carry consequence. The sources describe the tracking concepts; the targeting rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the two sources: it maps inventory discrepancy types to a counting decision, with claim status explicit.
+
+## The mechanism
+
+The inventory control entry describes systems that record stock movements and support counting. Such systems can report a high average accuracy while a small number of items are badly wrong. An error on a fast-moving or high-value item changes purchasing and fulfilment more than many small errors on slow stock. A single percentage weights every item equally, so it cannot show which error matters. The practical consequence is to classify items by consequence before deciding what to count.
+
+The inventory entry treats stock as cash tied up in operations. A discrepancy found late has already influenced orders and promises to customers. This means the value of a count depends on when it happens relative to how fast the item moves. Counting the items that matter more often is the response, rather than counting every item with the same frequency. The classification is local judgment, so conclusions about frequency are inferred rather than source-reported.
+
+A discrepancy is a symptom, not a diagnosis. The underlying cause may be a receiving mistake, a picking error, a miscount, or theft. Inventory control systems can record adjustments, but an adjustment without a cause restores the number without fixing the process. The practical consequence is to record the cause at the moment of discovery, while the context is still fresh, so that a fix can be attempted.
+
+The sequence is to classify items by consequence, count the ones that matter, record causes, then correct both the number and the process. Each step has a different epistemic status. The existence of tracking systems and the treatment of stock as cash are source-reported. The decision to concentrate counting effort by consequence is inferred from those concepts, and it should be rechecked when the product mix or the cost of a stockout changes.
+
+## A worked example
+
+The following is hypothetical and illustrative. A distribution centre reports 98 percent inventory accuracy, yet repeatedly runs out of one fast-moving item while holding excess slow stock. Three checks decide what to do. First, is the fast-moving item among the errors hidden by the 98 percent aggregate? Second, when was it last counted relative to its rate of sale, and has the lag grown? Third, do the recorded causes point to receiving, picking, or the record itself? The outcome is a targeted count on the fast-moving item and a process fix at the point where the cause sits, rather than a warehouse-wide recount. The scenario is hypothetical; the method of moving from a discrepancy to a decision is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Inventory control tracks stock movements | `source-reported` | Wikipedia, Inventory control | 2026-11-18 | Definition changes |
+| Inventory represents cash tied up | `source-reported` | Wikipedia, Inventory | 2026-11-18 | Accounting treatment changes |
+| Count by consequence and record causes | `inferred` | Derived from the sources | 2026-11-18 | Product mix or stockout cost changes |
+
+The table separates what the sources state from what this article concludes. The two source-reported rows are stable descriptions of the concepts. The inferred row is a local decision rule and carries the most uncertainty, so it deserves the earliest recheck. When the product mix changes, the classification that drives counting frequency should be revisited before the accuracy figure is trusted.
+
+## What it cannot do
+
+Inventory accuracy work cannot make a record correct without a process that keeps it correct. A count is a snapshot, and between counts the record drifts again as goods arrive, move, and leave. The sources describe systems for tracking stock, but a system does not enforce that every movement is captured. If receiving or picking happens outside the recorded flow, the most diligent counting schedule will only reveal the damage after it has affected a decision.
+
+The hidden cost is the effort spent counting items that do not matter. A uniform counting policy treats slow, cheap stock the same as fast, expensive stock, and consumes labour that could protect the items whose errors are expensive. There is also a cost to acting on a single figure: when accuracy is reported as an average, a manager may respond to the average rather than to the item that is actually failing, and the stockout continues while the metric looks healthy.
+
+A specific failure mode is treating the first count as truth. A count is itself an observation with error, and a discrepancy after a count may reflect a miscount rather than a missing item. Acting on that discrepancy without a second look creates a false problem and can trigger a correction that makes the record worse. Sampling the same items twice is a cheap way to estimate counting error before acting, and it exposes whether the apparent discrepancy is real.
+
+The boundary of this approach is that it decides where to look, not what the truth is. Classification by consequence tells a team which items deserve attention, but it says nothing about the source of a discrepancy once found. The inventory control entry and the inventory entry provide concepts, not a local root cause. A discrepancy traced to theft needs a different response from one traced to a data-entry habit, and the sources cannot make that distinction for a particular warehouse.
+
+For all these reasons the classification and the cause log need regular review. A receiving problem that was fixed may be replaced by a picking problem, and a rule written for one cause will miss the other. The accuracy definition itself should be recorded, because a change in definition can mimic an improvement and make a trend unreadable. Accuracy cannot be improved by reporting alone, and a definition that drifts silently undermines every decision built on the figure.
+
+The counterargument that a single accuracy percentage is simpler to manage is fair for high-level reporting and incomplete for an operational decision, because it hides the specific item whose error changes what the business does next.
+
+## A decision test
+
+1. Classify items by the consequence of an error.
+2. Count the high-consequence items more frequently.
+3. Record the cause of every discrepancy at discovery.
+4. Sample twice when a count is surprising.
+5. Correct the process as well as the number.
+6. Revisit the classification when the product mix changes.
+7. Record the definition, the decision, and a recheck date.
+
+The steps turn a reported percentage into a set of decisions that can be reviewed. Their value is not a higher number but a clearer link between a discrepancy and the action it triggers. For a related treatment of how measurements enter decisions, the reading below offers context without repeating this method.
+
+For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Inventory control - Wikipedia](https://en.wikipedia.org/wiki/Inventory_control_system) — Systems for tracking and managing stock accuracy.
+- Wikipedia contributors, 2026. [Inventory - Wikipedia](https://en.wikipedia.org/wiki/Inventory) — The role of stock in operations and accounting.

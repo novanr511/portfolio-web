@@ -1,10 +1,73 @@
 ---
 title: "Mortgage Markets Examples"
-description: "Reserved title for a future NOVANDRI article: Mortgage Markets Examples."
-date: 2026-11-17
+description: "Mortgage-backed securities pool home loans and carry interest rate risk. Read how the two connect, with a worked example and claim-status table."
+date: 2026-11-18
 tags:
-  - Planned
   - Finance
+  - Risk Analysis
+  - Mortgage Markets
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Mortgage markets are often explained through examples that focus on the housing loan, but the decisions that matter sit in how those loans are bundled and in how interest rate changes affect their value. The mortgage-backed security entry describes pooling loans into tradable instruments, and the interest rate risk entry describes the exposure of value to rate moves. The real problem is seeing how the two connect.
+
+**Direct answer:** A mortgage-backed security turns a pool of home loans into a tradable instrument, and its value moves with interest rates because the underlying payments are fixed in advance. The two entries supply the instrument and the risk; the worked connection here is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the two sources: it maps features of mortgage pooling to an interest rate risk decision, with claim status explicit.
+
+## The mechanism
+
+The mortgage-backed security entry describes pooling mortgages and issuing securities backed by their payments. Pooling combines many individual loans into one instrument, and payments from borrowers flow through to holders of the security. A practical consequence is that the risk of an individual borrower matters less than the behaviour of the pool as a whole. Diversification across many loans changes which risks dominate, shifting attention from single defaults to broad patterns.
+
+The interest rate risk entry describes the exposure of an asset's value to changes in interest rates. Mortgage-backed securities carry this exposure because the payments they promise are set by the loans in the pool. When market rates rise, fixed payments become less valuable, and the price of the security falls. The connection is direct: the instrument defined in one entry is subject to the risk defined in the other.
+
+A complication is that mortgage borrowers can repay early, especially when rates fall and refinancing becomes attractive. This prepayment behaviour means the pool's cash flows are not fixed in timing, even when the payment amounts are. A practical consequence is that the interest rate exposure is not simple. Falling rates can shorten the life of the security as borrowers refinance, so the holder receives principal back sooner than expected.
+
+The sequence is to identify the pool and its payment terms, determine how its value responds to rate changes, and account for how borrower behaviour can alter that response. The existence of mortgage-backed securities and the definition of interest rate risk are source-reported. The practice of reading prepayment into the rate exposure is inferred from those concepts, and it should be rechecked when refinancing conditions change.
+
+## A worked example
+
+The following is hypothetical and illustrative. An investor holds a mortgage-backed security and faces a possible rise in market rates. Three checks decide the response. First, how much does the security's price change for a small rise in rates, given the pool's payment terms? Second, how would falling rates change borrower refinancing and shorten the pool's life, returning principal early? Third, does the holder's time horizon match the possible change in the security's duration? The outcome is a decision to hold or hedge based on the rate exposure that matters for that horizon, not on a headline rate forecast. The scenario is hypothetical; the mapping from pooling to a risk decision is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Mortgage-backed securities pool home loans | `source-reported` | Wikipedia, Mortgage-backed security | 2026-11-18 | Structure changes |
+| Interest rate risk is exposure to rate moves | `source-reported` | Wikipedia, Interest rate risk | 2026-11-18 | Definition changes |
+| Prepayment alters rate exposure | `inferred` | Derived from the sources | 2026-11-18 | Refinancing conditions change |
+
+The table separates the instrument and the risk from the behavioural link added here. Both source-reported rows are stable descriptions. The inferred row carries the most uncertainty because borrower behaviour responds to conditions the sources do not model, so it needs the earliest recheck. When refinancing incentives change, the timing of cash flows changes with them.
+
+## What it cannot do
+
+Mortgage market examples cannot predict interest rates. They can show how a security's value responds to a rate change, but the direction and size of future rate moves are outside the model. The interest rate risk entry describes exposure, not forecasting. A reader who takes an example as a prediction will misread a demonstration of sensitivity as a view about where rates go next, and will make a decision on the wrong basis.
+
+The hidden cost is complexity. A mortgage-backed security pools many loans, and understanding its behaviour means understanding both the payment terms and the factors that change cash flow timing. That analysis takes time and data, and it may require assumptions about borrower behaviour. The cost of getting it wrong is borne when rates move and the actual response differs from the assumed one, which is precisely when the holder is least able to correct cheaply.
+
+A specific failure mode is ignoring prepayment. A simple analysis treats the pool's payments as fixed and measures rate exposure accordingly. When rates fall, borrowers refinance, principal returns early, and the security's life shortens. The holder who ignored prepayment has misjudged both the timing of cash flows and the reinvestment conditions under which they arrive. The mortgage-backed security entry describes the instrument, but the behavioural response is the part most often missed in simple examples.
+
+The boundary is that these entries describe an instrument and a risk, not a complete valuation model. They do not specify how to price prepayment, how to choose a discount rate, or how to aggregate loans into a pool. Those choices are local and depend on data the sources do not provide. Two analysts can read the same entries and reach different conclusions about a specific security, because the sources set the concepts rather than the numbers.
+
+For these reasons the assumptions behind any example need regular review. Refinancing incentives change with rates and with the availability of credit, and a prepayment assumption that held in one period may fail in another. The rate sensitivity itself changes as the pool ages and its remaining term shortens. An example is a demonstration of a relationship, not a permanent description of a security, and it should be refreshed whenever the conditions it assumes have moved.
+
+The counterargument that simple examples are easier to teach is fair for explaining the basic link and incomplete for a decision, because they omit the prepayment behaviour that changes the real exposure.
+
+## A decision test
+
+1. Identify the pool and its payment terms.
+2. Determine how its value responds to rate changes.
+3. Account for prepayment and its effect on timing.
+4. Match the exposure to the holder's time horizon.
+5. Check the assumptions about borrower behaviour.
+6. Decide whether to hold, hedge, or reduce exposure.
+7. Record the assumptions, the decision, and a recheck date.
+
+The steps turn a mortgage market example into a rate risk decision that can be reviewed. Their value is not a precise forecast but a clear link between a security's features and the exposure that matters for a given horizon. For a related treatment of how risk assumptions enter decisions, the reading below offers context without repeating this method.
+
+For further reading, see [Decision Memos that Survive Review](/articles/decision-memos-that-survive-review).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Mortgage-backed security - Wikipedia](https://en.wikipedia.org/wiki/Mortgage-backed_security) — Securities backed by mortgage payments.
+- Wikipedia contributors, 2026. [Interest rate risk - Wikipedia](https://en.wikipedia.org/wiki/Interest_rate_risk) — Exposure of value to changes in rates.

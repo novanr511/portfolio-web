@@ -1,10 +1,73 @@
 ---
 title: "Greeks for Beginners"
-description: "Reserved title for a future NOVANDRI article: Greeks for Beginners."
-date: 2026-11-17
+description: "The Greeks are local price sensitivities, not forecasts. Read how each maps to a hedging decision, with a worked example and claim-status table."
+date: 2026-11-18
 tags:
-  - Planned
   - Finance
+  - Risk Management
+  - Derivatives
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Options and other derivatives are often described through a set of sensitivity measures called the Greeks, but beginners frequently treat them as predictions rather than as local measures of risk. The hedge entry describes positions taken to offset exposure, and the volatility entry describes the dispersion of returns. The real problem is understanding what each sensitivity measures and when it stops being useful.
+
+**Direct answer:** The Greeks are sensitivities of a derivative's price to small changes in inputs such as the underlying price, time, and volatility. They describe local behaviour, not forecasts. The hedge and volatility entries supply the concepts; the mapping from each sensitivity to a risk decision here is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the two sources: it maps each sensitivity to a hedging decision, with claim status explicit.
+
+## The mechanism
+
+The hedge entry describes taking a position to offset exposure in another position. A hedge works because the two positions respond to the same drivers in roughly opposite ways. The Greeks are the tool for describing those responses. Each one measures how the price of an option changes when one input moves a little, holding the others fixed. That local framing is the source of both their usefulness and their limits.
+
+The volatility entry describes volatility as the dispersion of returns over time. Volatility is an input into option prices, and one sensitivity measures how much an option's price changes when that input changes. Because volatility is not directly observable in the same way a price is, this sensitivity depends on how volatility is estimated. A beginner who reads it as a fixed property of the option misses that it is a bet on the estimate.
+
+Time is another input, and a sensitivity describes how an option's value erodes as expiry approaches. This erosion is not linear, and it interacts with the position of the underlying relative to the strike. A practical consequence is that a hedge which looks balanced today can drift as time passes, even if the underlying price does not move. Rebalancing is the response, and the sensitivities indicate which exposure is growing.
+
+The sequence is to identify the exposures a position carries, match each to the input that drives it, and then decide which exposures to offset. The existence of hedging and the definition of volatility are source-reported. The practice of reading each sensitivity as a separate risk to be managed is inferred from those concepts, and it should be rechecked when the assumptions behind the estimate change.
+
+## A worked example
+
+The following is hypothetical and illustrative. A trader holds a short position in a call option on a stock and watches the stock rise. Three checks decide the response. First, how much does the option's price change for a small move in the stock price, and is that exposure growing as the stock approaches the strike? Second, how much does the price change for a small change in estimated volatility, given that the estimate has been rising? Third, how much value is lost to time decay over the remaining days? The outcome is a hedge adjusted for the exposure that grew fastest, not for the one that is largest on paper. The scenario is hypothetical; the method of mapping a sensitivity to an action is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Hedging offsets exposure | `source-reported` | Wikipedia, Hedge | 2026-11-18 | Definition changes |
+| Volatility is dispersion of returns | `source-reported` | Wikipedia, Volatility | 2026-11-18 | Measurement convention changes |
+| Read each sensitivity as a risk to manage | `inferred` | Derived from the sources | 2026-11-18 | Model or estimate changes |
+
+The table separates the concepts the sources define from the risk practice built on them. Both source-reported rows are stable. The inferred row carries the most uncertainty because it depends on a model and on estimated inputs, so it warrants the earliest recheck. When the volatility estimate or the pricing model changes, the sensitivities should be recomputed before any hedge adjustment is trusted.
+
+## What it cannot do
+
+The Greeks cannot predict price moves. Each is a local sensitivity, measured for a small change in one input while others are held fixed. Markets do not move one input at a time, and large moves change the sensitivities themselves. A beginner who reads a sensitivity as a forecast will hedge for a small move that never arrives, or misjudge a large move that does. The hedge entry describes offsetting positions, not forecasting, and the sensitivities serve that offsetting role.
+
+The hidden cost is rebalancing. A hedge that matches exposures at one moment drifts as prices, time, and volatility change, so maintaining it requires repeated trades. Each trade has a cost, and frequent rebalancing can consume the benefit of the hedge in a choppy market. There is also a modelling cost: computing sensitivities requires a model and inputs, and a false precision in those inputs can make a hedge look exact when it is not.
+
+A common failure mode is treating the volatility sensitivity as if volatility were directly observed. The volatility entry describes dispersion of returns, but the figure used in a pricing model is an estimate, often implied by market prices. When the estimate shifts, the sensitivity shifts with it, and a hedge built on the old estimate is suddenly wrong. The beginner sees a stable number and misses that the number is a moving estimate.
+
+The boundary is that these measures assume a model. Different pricing models can produce different sensitivities for the same option, especially when assumptions about volatility behaviour differ. Two traders using the same position but different models may disagree about the correct hedge. The hedge and volatility entries provide concepts, not a single correct model, and the choice of model remains a local decision that the sources cannot settle.
+
+For these reasons the sensitivities and the model behind them need regular review. As expiry approaches, time decay accelerates and the exposures change faster, so a hedge that was adequate early in a position's life may be inadequate late. The inputs should be refreshed, the model assumptions questioned, and the rebalancing cost weighed against the protection gained. A sensitivity is a tool for a moment, not a permanent description of a position.
+
+The counterargument that a single risk number is easier to communicate is fair for a high-level report and incomplete for a hedge, because one number cannot show which input is driving the current exposure.
+
+## A decision test
+
+1. Identify the position and the inputs that drive its value.
+2. Compute the sensitivity to each relevant input.
+3. Match each sensitivity to the exposure it represents.
+4. Decide which exposures to offset and which to accept.
+5. Check how the volatility estimate affects the result.
+6. Rebalance when exposures drift, weighing trading costs.
+7. Record the model, the assumptions, and a recheck date.
+
+The steps turn a set of sensitivities into a hedging decision that can be reviewed. Their value is not a perfect hedge but a clear link between a measured exposure and the action it justifies. For a related treatment of how risk inputs enter financial decisions, the reading below offers context without repeating this method.
+
+For further reading, see [Cash Flow Forecasting: A 13-Week Operating Model](/articles/cash-flow-forecasting-a-13-week-operating-model).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Hedge (finance) - Wikipedia](https://en.wikipedia.org/wiki/Hedge_(finance)) — Reducing an existing exposure with an offsetting position.
+- Wikipedia contributors, 2026. [Volatility (finance) - Wikipedia](https://en.wikipedia.org/wiki/Volatility_(finance)) — The degree of variation in prices over time.
