@@ -36,7 +36,7 @@ const formatEntry = (source) => {
 };
 
 const buildSection = (keys) =>
-  `## Further Reading\n\n${keys.map((key) => formatEntry(sources[key])).join("\n")}\n`;
+  `## References & Further Reading\n\n${keys.map((key) => formatEntry(sources[key])).join("\n")}\n`;
 
 /**
  * Removes every reading-list section from the body and returns the remaining
