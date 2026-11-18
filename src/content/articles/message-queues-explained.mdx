@@ -1,10 +1,63 @@
 ---
 title: "Message Queues Explained"
-description: "Reserved title for a future NOVANDRI article: Message Queues Explained."
+description: "A queue decouples the system that produces work from the one that consumes it. Read the mechanism, a worked example, and the traps."
 date: 2026-11-17
 tags:
-  - Planned
-  - Technology
+  - Engineering
+  - Architecture
+  - Distributed Systems
+  - Infrastructure
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A message queue is a buffer between a producer and a consumer. It lets one system hand off work without waiting for the other to finish, which changes both the reliability and the failure modes of an architecture. The concept is simple; the operational consequences are not.
+
+**Direct answer:** A queue stores messages until a consumer processes them, which decouples the producer from the consumer in time. The message-queue overview provides the general mechanism, and AMQP is a standard protocol for interoperable messaging. The boundary: a queue does not guarantee that work is processed correctly — it guarantees delivery semantics defined by its configuration, and duplicates and ordering need explicit handling, as the tool-calling article explains for at-least-once actions.
+
+## Choosing the right delivery guarantee
+
+Queues differ in what they promise about a message after it is accepted. At-most-once delivery avoids duplicates but can lose work; at-least-once delivery avoids loss but can deliver the same message twice; exactly-once is a strong claim that usually requires coordination with the consumer's own state, as the message-queue overview explains for different semantics. The choice is not a technical preference but a business decision about what a lost order or a duplicate charge costs, which the risk-assessment article frames as impact and likelihood.
+
+This is why idempotency at the consumer is the practical defence, as the tool-calling article explains for retried actions. A consumer that can recognise a repeated message and return the original result makes at-least-once delivery safe, which is why most systems choose it and invest in deduplication. A queue that promises more than the consumer can honour is a configuration that transfers risk back to the application, as the saga pattern in the microservices article shows for compensating actions.
+
+Monitoring should follow the guarantee. A queue that grows without a bound is a visible symptom, as the observability article argues for alerts on meaningful signals, but so is a high rate of redelivery, which indicates that consumers are failing after accepting work. Both need owners, as the governance checklist requires for any maintained control.
+
+## What the queue changes
+
+**Decoupling in time.** A producer can continue accepting work while a consumer is slow or temporarily unavailable, which the microservices article treats as a reason to use event-driven communication. The queue absorbs the difference in rate, up to its capacity.
+
+**Backpressure.** When consumers cannot keep up, the queue grows, which is a visible signal of overload, as the observability article recommends for alerts on queue depth rather than resource utilisation.
+
+**Failure isolation.** A failing consumer does not stop the producer, which the site-reliability article treats as containment. The work remains in the queue and can be retried, as the saga pattern handles compensating actions.
+
+Three consequences follow. The producer no longer knows when the work completed, which changes how the application reports success to users. The queue itself becomes infrastructure that must be monitored, as the data-pipeline article explains for orchestration dependencies. And messages can be delivered more than once, which requires idempotency at the consumer, as the idempotency article covers for retried API calls.
+
+## A worked example
+
+The following is hypothetical and illustrative. An application accepts orders and sends them to a queue for a fulfilment service. At peak, it receives 100 orders per second while the service processes 80.
+
+The queue grows by 20 messages per second, so a backlog of 7,200 builds in an hour. Three checks decide what happens. First, what is the queue's capacity and retention, as the message-queue overview explains for storage semantics? If messages expire before processing, orders are lost. Second, is the consumer the bottleneck or is a downstream dependency, which the observability article treats as a diagnostic question? A faster consumer that waits on an external API will not help. Third, what does the system tell the user, as the SLO article requires for honest status? A queued order is accepted but not fulfilled, which is a different promise from completed.
+
+Three conclusions follow. The queue prevented immediate failure but hid a growing delay, which the batching-economics article treats as queueing that no local speed removes. Duplicates require idempotent handling, as the tool-calling article explains for retried actions. And the backlog needs an owner and an alert, as the governance checklist requires for a maintained control.
+
+## What queues cannot do
+
+They cannot create capacity; they defer work, which the batching article explains for queueing. They do not guarantee ordering across all consumers, as the message-queue overview describes for different delivery semantics, which matters when a later message depends on an earlier one. And they cannot fix a slow downstream service, which the microservices article treats as a dependency problem.
+
+The counterargument that synchronous calls are simpler is fair for small systems, which the microservices article concedes, and misses the point that a queue changes when failure occurs, not whether it can.
+
+## A decision test
+
+1. Identify what work can be decoupled from the request path.
+2. Define delivery semantics and duplicate handling at the consumer, as the tool-calling article requires.
+3. Monitor queue depth and age of oldest message, as the observability article advises.
+4. Check capacity and retention against peak load.
+5. Diagnose the consumer's bottleneck before adding consumers.
+6. Tell users honestly what a queued state means, as the SLO article requires.
+7. Review the design when load or dependencies change, as the monitoring article advises.
+
+For the architecture, see [Microservices Architecture](/articles/microservices-architecture-service-mesh-event-driven-and-saga-pattern); for the observability, see [Observability](/articles/observability-logging-metrics-tracing-alerting).
+
+## Further Reading
+
+- Wikipedia contributors, 2026. [Message queue - Wikipedia](https://en.wikipedia.org/wiki/Message_queue) — How message queues decouple producers and consumers and provide asynchronous communication.
+- OASIS, 2012. [Advanced Message Queuing Protocol (AMQP) v1.0 - OASIS Open](https://www.oasis-open.org/standard/amqp) — The message-protocol standard behind most enterprise brokers.
