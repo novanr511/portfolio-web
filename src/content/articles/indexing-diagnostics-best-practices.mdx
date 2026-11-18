@@ -1,10 +1,77 @@
 ---
 title: "Indexing Diagnostics Best Practices"
-description: "Reserved title for a future NOVANDRI article: Indexing Diagnostics Best Practices."
-date: 2026-11-17
+description: "A two-pass routine for separating crawl failures from index exclusions, with a worked diagnostic and explicit claim status."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Diagnostics
+  - Indexing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Site owners often treat indexing as one switch that either works or fails. In practice, crawling and indexing are distinct stages with different controls, and a page can be fetched successfully yet never appear in search results. The Google Search Central crawler overview and the Google SEO Starter Guide describe the stages, but neither turns them into a repeatable diagnostic routine.
+
+**Direct answer:** Diagnose indexing in two passes: first confirm the crawler can discover and fetch the URL, then confirm the page is eligible and useful enough to include. The sources document crawler behavior and basic site hygiene; the ordering is a synthesis offered for practice, not a quotation from either document.
+
+**Delta:** This article adds a claim-status table and a worked diagnostic, mapping crawler concepts to a specific inspection decision while marking which statements come from the sources and which are inferred.
+
+## The mechanism
+
+The Google Search Central crawler overview describes how search crawlers discover, fetch, and process pages before any question of ranking arises. That description carries a practical consequence: a fetch problem and an index problem are different failures requiring different fixes. Treating them as one condition leads teams to rewrite content when the real issue is a blocked request, or to study server logs when the content itself is the obstacle.
+
+The Google SEO Starter Guide covers the site-side conditions that make crawling and inclusion more reliable: a clear structure, internal links that expose important pages, and content that is distinctive and useful. The practical consequence is that many issues labeled "indexing" are really structure or content problems surfaced at the indexing stage. A page buried behind weak internal links may be crawled rarely, and a page that merely repeats another offers little reason for inclusion.
+
+The two stages also have different levers. Robots directives govern whether a URL may be fetched, while noindex directives act after a page has been fetched to keep it out of the index. Duplicate or thin content affects inclusion without being a technical block at all. Because the levers differ, diagnostic order matters: check access, then instructions, then content value, in that sequence. Starting with content quality risks solving the wrong problem, and starting with directives can miss a site-wide access fault.
+
+The concepts of crawling, fetching, and indexing are reported by the sources; the decision sequence and its priority ordering are inferred from those concepts.
+
+## A worked example
+
+The following is hypothetical and illustrative. A site reports that a newly published product page is absent from search results, and the team suspects a penalty.
+
+Three checks decide. First, access: can the crawler request the URL, or does a robots directive or server response prevent a fetch? Second, instruction: does the page carry a noindex directive that would keep a fetched page out of the index? Third, value: is the page distinct from existing pages, or does it repeat content already indexed elsewhere?
+
+The outcome is that the page is fetched but carries an unintended noindex tag left from a staging template, so the fix is a template correction rather than a content rewrite or a penalty appeal. The scenario is hypothetical; the contribution is the ordered check, not the invented page.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Crawlers discover and fetch pages before ranking | `source-reported` | Google Search Central, crawler overview | 2026-11-18 | Crawler documentation changes |
+| Clear structure and useful content support inclusion | `source-reported` | Google, SEO Starter Guide | 2026-11-18 | Starter Guide guidance changes |
+| Check access, then instructions, then content value | `inferred` | Derived from the sources | 2026-11-18 | Site architecture or directives change |
+
+The first two rows are descriptive claims taken from the documentation. The third row is a local synthesis: it follows from the separation of stages but is not stated as a procedure by either source. Recheck it when the site's architecture or directive scheme changes materially.
+
+## What it cannot do
+
+A diagnostic routine cannot guarantee inclusion or ranking. The sources describe how crawling and indexing work, not a threshold a page must cross to appear. A page can pass every check and still be absent because the index is selective and competitive. Reading a routine as a guarantee is the most common misuse, and it produces false confidence when results do not follow from the work.
+
+It cannot substitute for content quality. Diagnostics tell a team where a failure sits, but a page that offers little distinct value may be excluded for that reason alone. No amount of log inspection or directive checking converts duplicate content into a reason to include it. The practical cost is that teams prefer technical checks because they feel objective, while the harder content work stays undone and the same exclusion recurs on the next set of pages.
+
+There is a hidden cost in large sites. Crawl attention is finite, so structure and internal linking influence which pages get fetched often enough to be evaluated. A diagnostic that inspects only individual URLs misses the systemic problem that important pages are starved of internal links while trivial pages consume requests. Fixing one URL in that situation treats a symptom and leaves the cause in place, so the team repeats the same investigation next quarter.
+
+A failure mode is misreading coverage reports. A report entry can indicate that a page is available to crawl but not indexed, and that state has several causes with different remedies. Treating the label as a diagnosis collapses distinct problems into one and sends the team toward the wrong fix. The report is evidence to interpret alongside access, directives, and content, not a verdict to act on without checking those other signals.
+
+The boundary is between indexing and ranking. Passing the checks makes a page eligible; it does not make it visible for a particular query. Teams that blur this boundary keep re-auditing indexing after a ranking complaint, repeating work that cannot answer the question actually asked. Review the routine when site structure, directives, or the reporting interface changes, since each can alter what the checks mean and which order is most efficient.
+
+Counterargument: the claim that indexing checks are overrated is fair when content is clearly strong and site structure simple, and incomplete when access faults or stray directives are quietly suppressing pages.
+
+## A decision test
+
+1. State the symptom precisely and separate absence from low position.
+2. Verify the crawler can request and fetch the URL.
+3. Check for directives that block fetching or instruct non-inclusion.
+4. Assess whether the page is distinct from existing indexed pages.
+5. Confirm internal links expose the page within the site structure.
+6. Apply the smallest fix that addresses the failing stage.
+7. Recheck after the change and record the condition that would trigger review.
+
+The test turns a vague complaint into a sequence of bounded observations. Its value is the ordering: each step rules out a class of causes before the next begins.
+
+For further reading, see [AI search measurement](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- Google, 2026. [Google Crawler (User Agent) Overview](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers?hl=en) — How Google discovers, crawls, renders, and indexes pages.
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.

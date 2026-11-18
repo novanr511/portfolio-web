@@ -1,10 +1,73 @@
 ---
 title: "XML Sitemaps at Scale"
-description: "Reserved title for a future NOVANDRI article: XML Sitemaps at Scale."
-date: 2026-11-17
+description: "A sitemap is a declaration about which URLs exist, and drift makes it misleading. Read the protocol limits, generation mistakes, and a decision test."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Technical SEO
+  - Sitemaps
+  - Crawlability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+At small scale a sitemap is a file a developer writes once and forgets. At large scale it is a generated artifact that must keep pace with thousands of changing URLs, and the failure modes multiply. The real problem is that a sitemap is a declaration about which pages exist, and when that declaration drifts from reality, search engines receive a misleading map of the site.
+
+**Direct answer:** A sitemap is a file that lists URLs a site owner wants crawled, with the protocol defining an XML format of URL entries and optional fields such as last modified time, as Sitemaps.org specifies. Google's documentation describes sitemaps as a way to surface URLs for crawling while stating that inclusion does not guarantee crawling or indexing. The boundary: a sitemap is a hint to crawlers, not an instruction they must obey, and not a substitute for a crawlable site structure.
+
+**Delta:** This article adds a decision map beyond the sources: it maps sitemap fields and limits to the generation decisions they force, with claim status explicit.
+
+## The mechanism
+
+The Sitemaps protocol, as published by Sitemaps.org, defines a structured XML format in which a set of URL entries lists the pages a site wants crawled. Each entry carries a location and may carry optional fields such as the last modification time, change frequency, and priority. The mechanism is a machine-readable declaration: the site publishes a list that a crawler can consume without having to discover every URL by following links. The practical consequence is that the sitemap becomes a contract about the site's URL inventory, and a stale entry is a broken promise to any crawler that trusts it.
+
+The same protocol sets limits on the size of a single sitemap file, both in URL count and in file size, and provides for an index file that points to multiple sitemaps. The mechanism is partitioning: when a site exceeds the limits, URLs are split across files listed in an index. The practical consequence is that scale is not an optional refinement; beyond the limits, a single sitemap is invalid, and the generation process must handle sharding from the start. A system that works at a thousand URLs can fail abruptly at a hundred thousand.
+
+Google's sitemap documentation explains that the last modification field is used to help decide when a page has changed, and that sitemaps should list canonical URLs rather than duplicates or redirected addresses. The mechanism is a freshness and identity signal: the crawler uses the timestamp to prioritize recrawls and uses the URL to know which page is authoritative. The practical consequence is that inaccurate timestamps or non-canonical entries actively mislead, which is worse than omitting a URL altogether. A wrong declaration sends a crawler toward the wrong page or convinces it that nothing has changed.
+
+Both sources are careful about what a sitemap does not do. Google states that including a URL does not guarantee it will be crawled or indexed, and the protocol frames the file as a way to inform crawlers. The mechanism is therefore advisory: the sitemap adds URLs to the set a crawler may consider, but the crawler decides. The practical consequence is that the sitemap cannot compensate for a page that is blocked, orphaned, or otherwise unreachable; it complements a sound structure rather than replacing one. A site with a perfect sitemap and a broken internal link graph is still hard to crawl.
+
+## A worked example
+
+The following is hypothetical and illustrative. A large site generates a sitemap from its database each night. Three checks are applied. First, the file is counted and found to exceed the protocol's per-file URL limit, so it is split into shards listed in an index. Second, a sample of entries is compared with live pages, revealing URLs that now redirect and last-modified timestamps that are set to the generation time rather than the true content change. Third, a set of old product URLs is found to be included even though canonical versions exist. The outcome is corrected generation: sharding by limit, timestamps tied to content changes, and non-canonical URLs removed. The limiting condition is that these are illustrative checks, not measurements of a real site.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| The protocol defines a URL-set XML format with optional fields | `source-reported` | Sitemaps.org: Sitemaps protocol | 2026-11-18 | when the protocol specification is revised |
+| Including a URL does not guarantee crawling or indexing | `source-reported` | Google: Sitemaps documentation | 2026-11-18 | when Google changes its crawling guidance |
+| Generated sitemaps drift unless tied to content changes and canonical URLs | `inferred` | Derived from the sources | 2026-11-18 | when a live generation audit is performed |
+
+Rows one and two are direct statements from the two sources and can be checked there. Row three is an inference: it combines the protocol's fields with Google's canonical-URL and freshness guidance, but neither source states it as a single rule. The recheck conditions are tied to the documents themselves or to an audit of a real generated file, which keeps status honest and makes clear what kind of evidence would change the claim.
+
+## What it cannot do
+
+A sitemap cannot force indexing. Google's documentation is explicit that listing a URL is not a guarantee; it is an invitation to crawl. A site with thousands of thin or duplicate pages can list them all and still see little benefit. The limit is that the sitemap describes what exists, not what is worth including in a search index. The practical consequence is that teams should not measure a sitemap's success by URL count. A larger file is not evidence of better coverage, and optimizing for size can make the declaration less accurate.
+
+There is a hidden cost in generation at scale. A sitemap that is rebuilt mechanically tends to use the build time as the last-modified value, which tells a crawler nothing useful. Keeping accurate timestamps requires the generation process to consult the underlying content's real change history, which is more work than emitting a file. The cost is engineering effort that is easy to skip and expensive to discover later. Teams that skip it often assume the sitemap is complete simply because it regenerates on schedule, when in fact the schedule hides the problem.
+
+A common failure mode is treating the sitemap as a dumping ground. When every URL is included regardless of canonical status, the file mixes duplicates, redirects, and retired pages with live ones. This dilutes the signal and can confuse crawling priorities. The practical symptom is a large sitemap where the important pages are indistinguishable from the noise, defeating the purpose of declaring them. Once the file is polluted, a crawler has to spend effort sorting out which entries matter, and the site owner has lost the ability to use the sitemap as a clear inventory.
+
+The boundary is that the sources describe a protocol and a crawler behavior, not a performance guarantee. Sitemaps.org defines the file format; Google describes how the file is used. Neither claims that a correct file raises rankings. Treating the sitemap as a ranking lever leads to pointless optimization of fields the crawler largely ignores. The useful framing is that a sitemap improves discoverability of URLs that are already worth crawling. A page that nobody would want to index is not made valuable by being listed, and the field values cannot substitute for the page itself.
+
+Review is required because sites change. Pages are added, removed, and re-canonicalized continuously, and a generated file must reflect that or it becomes misleading. Both sources describe a mechanism that depends on accurate, current information. A team that reviews the sitemap against live URLs keeps the declaration truthful; a team that generates once and forgets will publish a map of a site that no longer exists. The review should check not only that the file parses, but that its entries still describe canonical, reachable pages with honest timestamps.
+
+The counterargument that listing every URL is fair for maximum visibility is incomplete for effective crawling: a sitemap crowded with duplicates and stale entries spends crawler attention on pages that do not need it.
+
+## A decision test
+
+1. Declare the URL inventory the sitemap is meant to represent.
+2. Check the file against the protocol's URL-count and size limits and shard if needed.
+3. List only canonical URLs and exclude redirects and duplicates.
+4. Set the last-modified field from the content's real change history.
+5. Use an index file when URLs exceed a single sitemap's limits.
+6. Verify periodically that listed URLs still resolve and are still canonical.
+7. Review generation when the protocol or crawler guidance changes.
+
+The steps convert a sitemap from a file into a maintained declaration, connecting each field and limit to a generation decision. That connection is the mapping this article adds. The aim is a truthful inventory that a crawler can use, not the largest possible list of URLs.
+
+For further reading, see [Related](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- sitemaps.org, 2026. [Sitemaps.org protocol](https://www.sitemaps.org/protocol.html) — The sitemaps.org format that the XML sitemap protocol follows.
+- Google, 2026. [Create and submit a sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap?hl=en) — Sitemap format, size limits, and how sitemaps are used.

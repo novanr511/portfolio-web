@@ -1,10 +1,72 @@
 ---
 title: "Terraform for Beginners"
-description: "Reserved title for a future NOVANDRI article: Terraform for Beginners."
-date: 2026-11-17
+description: "Terraform turns infrastructure into declared code and a saved plan. Read the core concepts, a worked example, and how code habits shape cloud cost."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Infrastructure
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Terraform is often introduced as a tool that replaces clicking in a console, which understates what actually changes. The Wikipedia entry describes Terraform as infrastructure as code using declarative configuration and a state file, and the AWS cost optimization pillar describes practices for controlling spend. The real problem for a beginner is understanding how declared configuration and saved state turn into a cost decision.
+
+**Direct answer:** Terraform declares the desired infrastructure, plans the changes, and applies them while tracking state. It does not automatically optimise cost. The sources describe the tool and cost practices; connecting declarations to cost control is a synthesis.
+
+**Delta:** This article adds a claim-status table beyond the sources: it maps Terraform concepts to a cost decision, with claim status explicit.
+
+## The mechanism
+
+The Terraform entry describes a tool that manages infrastructure through declarative configuration files, where the desired end state is stated and the tool works out the steps to reach it. Providers connect the configuration to platforms. The practical consequence is that, because the desired state is written down, a beginner can review infrastructure changes the same way code is reviewed, before anything is created.
+
+The same entry describes a state file that records the currently managed infrastructure, and a plan step that shows proposed changes before they are applied. The practical consequence is that state is the tool memory, so losing or corrupting it creates real risk, while the plan step is the place where an unintended resource or a cost surprise can be caught before it is committed.
+
+The AWS cost optimization pillar describes practices such as matching capacity to demand, gaining visibility into spend, and removing unused resources. The practical consequence is that these practices become enforceable when expressed as configuration. Tagging resources, defining environment sizes, and writing teardown rules in code make cost control repeatable rather than a one-time cleanup that depends on memory.
+
+Together, the concepts form a loop: declare desired infrastructure, review the plan, apply it, and keep state accurate. Cost practices plug into that loop at the declaration and plan stages. Because the sources describe the tool and the cost principles separately, the link between them is an inference a beginner must make explicitly rather than something the tool provides on its own.
+
+## A worked example
+
+The following is hypothetical and illustrative. A small team uses Terraform to manage a staging environment and notices the cloud bill rising even though traffic is flat. Three checks decide. First, review the plan output: if it proposes creating idle resources that are not part of the intended design, the definition has drifted. Second, inspect the state file: orphaned resources left after manual console changes may still be tracked and billed. Third, check tagging and environment definitions against the cost practices: untagged or oversized resources are harder to attribute and right-size. The outcome is a configuration that removes idle resources and adds teardown rules so the environment shrinks when not in use. The numbers are hypothetical; the review sequence is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Terraform uses declarative configuration and managed state | `source-reported` | Wikipedia, Terraform (software) | 2026-11-18 | Tool behavior changes |
+| Cost optimization favors matching demand and visibility | `source-reported` | AWS, Cost Optimization | 2026-11-18 | Cloud pricing or guidance changes |
+| Code review and plan checks can enforce cost practices | `inferred` | Derived from the sources | 2026-11-18 | New tooling or evidence appears |
+
+The first two rows report documented facts about the tool and about cost practices. The third row is an inference drawn from combining them, since neither source states that plan review enforces cost control. Recheck it if the tool workflow changes or if the cost guidance is revised.
+
+## What it cannot do
+
+Terraform cannot decide the right size or number of resources for a workload. It applies the configuration it is given, so an oversized definition is reproduced faithfully. The tool enforces consistency, not wisdom, and a plan that looks clean can still describe an expensive design. Judgement about demand remains a human responsibility that the plan output cannot supply.
+
+A hidden cost is state management. The state file must be stored, protected, and kept consistent with reality. If it is lost, corrupted, or edited by hand, the tool can plan incorrect changes. A beginner who treats state as an incidental file rather than a critical artifact will eventually face a recovery problem at the worst possible moment, often during a time-sensitive change.
+
+A common failure mode is configuration drift, where resources are changed directly in the console and no longer match the declared state. The next plan may then propose destructive changes to bring reality back in line. Drift turns the convenience of declarative management into a surprise at the next apply, and the surprise is larger when the difference has accumulated over many manual edits.
+
+The boundary is provider coverage and platform support. Terraform can only manage what a provider exposes, and a setting outside the provider model must be handled elsewhere. Cost practices that depend on data the provider cannot see, such as nuanced billing signals, remain outside the tool view, so code alone cannot guarantee an optimised result.
+
+The configuration and state need review whenever the platform changes or team needs shift. Provider updates, new resource types, and changed pricing can make a once-correct definition costly or wrong. Keeping plans, state, and cost observations dated together lets a reader see whether a change came from the code or the environment. Without that record, the cause of a cost movement stays ambiguous.
+
+The counterargument that a beginner can start by clicking in a console is fair for one-off experiments and incomplete for anything repeatable, because manual steps cannot be reviewed or reproduced reliably.
+
+## A decision test
+
+1. Write the desired infrastructure as declarative configuration.
+2. Run a plan and read every proposed change.
+3. Confirm the state file is stored and protected.
+4. Check that resource sizes match expected demand.
+5. Apply tags so resources can be attributed to a cost owner.
+6. Define teardown rules for temporary environments.
+7. Record plans and state changes with dates before comparing cost over time.
+
+These steps turn a tool into a repeatable practice. They will not choose the right architecture, but they prevent the most common beginner error: treating applied configuration as a substitute for reviewing what it costs. The result is infrastructure that can be explained as well as recreated.
+For further reading, see [data governance managing data as an asset](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Terraform (software) - Wikipedia](https://en.wikipedia.org/wiki/Terraform_(software)) — Declarative infrastructure definition and change management.
+- Amazon Web Services, 2026. [Cost Optimization (AWS Well-Architected Framework)](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Vendor primary documentation on right-sizing and commitment models.
