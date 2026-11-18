@@ -1,13 +1,85 @@
 ---
 title: "HTTP Semantics without the Hype"
-description: "Reserved title for a future NOVANDRI article: HTTP Semantics without the Hype."
-date: 2026-11-17
+description: "HTTP carries meaning, not just bytes. Read the semantics that matter, a worked diagnosis, and why a status code is not a verdict."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Web
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+HTTP is often treated as a transport detail, which hides the semantics that decide how systems behave. RFC 9110 defines the request and response model, and RFC 9111 covers caching. The useful knowledge is what the protocol actually says, not what a framework assumes.
+
+**Direct answer:** Read HTTP behaviour from the normative semantics — methods, status classes, headers — then diagnose against those definitions. The RFCs are the sources; the diagnostic rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked diagnosis, separating protocol definitions from local interpretations.
+
+## The mechanism
+
+Three points matter:
+
+- **Methods have meaning.** RFC 9110 defines what each method is for. Using a method for the wrong purpose can break caching and intermediaries.
+- **Status classes are signals.** The RFC defines classes such as client and server failure. A status says where the problem sits, not what caused it.
+- **Headers are contracts.** RFC 9111 defines caching behaviour. A header that is present but incorrect changes behaviour without an error.
+
+The sequence is: name the observed behaviour, map it to the RFC definition, then check the actual request and response. The mapping is analysis, so it is `inferred`; the definitions are `source-reported`.
+
+## A worked diagnosis
+
+*Illustrative.* A resource updates inconsistently across clients.
+
+Three checks decide. First, do the requests use the methods the RFC defines for the intended operation? Second, do the responses carry the caching headers that RFC 9111 specifies? Third, do intermediaries treat the headers as the protocol says, or does a local convention override them?
+
+The outcome is a diagnosis tied to a definition. The scenario is hypothetical; the method is the contribution.
+
+## Why intermediaries matter
+
+A request passes through proxies and caches that read headers and act on them. A header that is locally meaningful but not standard will be interpreted differently by each intermediary. Reading the RFC definition is what makes behaviour predictable across a system you do not control.
+
+## Why the request is the evidence
+
+A discussion about why a response is wrong often begins with assumptions about the server. The actual request and response are the evidence, and they settle questions about method, headers, and status quickly. Capturing them is the first diagnostic step.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| HTTP defines methods and status classes | `source-reported` | RFC 9110 | 2026-11-18 | RFC updated |
+| Caching behaviour is defined in RFC 9111 | `source-reported` | RFC 9111 | 2026-11-18 | RFC updated |
+| Diagnose against the normative definition | `inferred` | Derived from the protocol | 2026-11-18 | Stack changes |
+
+## Why a status is not a verdict
+
+A 200 means the request was fulfilled, not that the content is correct. A 404 means the resource was not found at that address, not that it never existed. Reading the definition prevents a response from being treated as more information than it carries.
+
+The RFCs describe the protocol, not the application behind it. A request can follow every rule and still ask for the wrong thing, which is a design problem rather than a protocol one.
+
+The diagnosis should record the version of the stack in use, because frameworks can change how they interpret headers between releases. A behaviour that was correct last month may be a defect today for that reason alone.
+
+There is also a difference between what the protocol permits and what an implementation does. A method may be defined as safe and idempotent while a particular framework applies side effects, and a cached response may be served longer than the headers allow. Diagnosing such a problem requires reading both the specification and the actual behaviour, because neither alone explains the result.
+
+The headers are another source of complexity. A header that controls caching is meaningful only in combination with the status code and the method, and reading any one of them in isolation can produce a wrong conclusion. This is why a diagnosis should consider the whole response rather than the single field that looks suspicious.
+
+For a practitioner, the lasting value of the semantics is that they give a shared vocabulary for disagreement. When two systems behave differently, the RFC settles which one is following the protocol and which one is relying on a convention. That is a more productive starting point than comparing framework defaults, which change between versions.
+
+A recorded request and response is a better starting point than an assumption about what the framework does.
+
+## What it cannot do
+
+It cannot fix an application bug. It does not guarantee intermediaries behave as specified. And it cannot replace observing the actual requests.
+
+The counterargument that frameworks hide these details is fair for convenience and incomplete when behaviour surprises you.
+
+## A decision test
+
+1. Name the observed behaviour.
+2. Map it to the RFC definition.
+3. Inspect the actual request and response.
+4. Check header semantics.
+5. Record the finding and recheck condition.
+
+For the status classes, see [HTTP Status Codes](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx).
 
 ## References & Further Reading
 

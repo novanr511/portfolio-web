@@ -1,13 +1,88 @@
 ---
 title: "Model Monitoring Examples"
-description: "Reserved title for a future NOVANDRI article: Model Monitoring Examples."
-date: 2026-11-17
+description: "A deployed model drifts quietly. Read what to monitor, worked examples, and why a stable accuracy figure can hide a change."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - AI
+  - Method
+  - Operations
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Model monitoring is often reduced to watching accuracy, which misses the changes that matter first. The model-card literature describes what should be documented about a model, and the data-curation entry covers changing inputs. The examples show what to watch and why.
+
+**Direct answer:** Monitor inputs, outputs, and outcomes against a documented baseline, with a clear trigger for investigation. The sources describe documentation and data; the monitoring rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and worked examples, separating documented concepts from local choices about thresholds.
+
+## The mechanism
+
+Three points matter:
+
+- **Documentation is the baseline.** Model cards record capabilities and limits. A model cannot be monitored against what was never stated.
+- **Inputs change first.** The data-curation entry describes ongoing management. A shift in inputs often precedes a change in outcomes.
+- **Labels arrive late.** Outcome metrics may be delayed, which makes input monitoring the earlier signal.
+
+The sequence is: document the baseline, monitor inputs, then outcomes, then investigate on a trigger. The trigger is local, so it is `inferred`; the concepts are `source-reported`.
+
+## Worked examples
+
+*Illustrative.* A classifier's accuracy stays flat while the share of an input category doubles. Input monitoring catches the shift before the label arrives.
+
+A second example: a model's average latency is stable while a small group of requests becomes very slow. Monitoring the distribution rather than the mean reveals the tail.
+
+The outcome is a monitoring design with recorded thresholds. The scenarios are hypothetical; the method is the contribution.
+
+## Why labels arrive late
+
+A prediction can be made immediately, but the outcome that judges it may take days or weeks. Waiting for labels means discovering drift after it has affected decisions. Input monitoring is the earlier signal because it does not depend on the outcome.
+
+## Why a trigger is necessary
+
+A chart that changes without a rule for acting on it is decoration. Setting a trigger in advance removes the debate during an incident and makes the response consistent. The trigger should be tied to a decision, not to a number chosen for its neatness.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Model cards document capabilities and limits | `source-reported` | Model Cards paper | 2026-11-18 | Practice changes |
+| Data needs ongoing management | `source-reported` | Wikipedia, Data curation | 2026-11-18 | Definition changes |
+| Monitor inputs before outcomes | `inferred` | Derived from the timing difference | 2026-11-18 | Pipeline changes |
+
+## Why stability can hide drift
+
+An average can stay the same while the distribution shifts underneath it. That is why monitoring should include the shape of the data, not only a headline score. A change in inputs is the earliest warning that the model's assumptions may no longer hold.
+
+Monitoring cannot tell you that a model is correct, only that something has changed. A drift alert starts an investigation; it does not end one.
+
+The baseline should be revisited when the model is retrained, because a new version legitimately behaves differently. Comparing against an old baseline will produce alerts that look like problems but are expected.
+
+A further difficulty is that monitoring needs a baseline that is itself trustworthy. If the baseline was recorded during an unusual period, normal variation will look like drift and the team will spend time investigating a non-problem. Choosing a representative period requires judgement, and recording why that period was chosen is what makes later comparisons meaningful.
+
+There is also a distinction between a change and a problem. A shift in input distribution may be harmless, while a small shift in a sensitive segment may be serious. A monitoring system that treats every change as an alert will train the team to ignore alerts, which is worse than having none. The trigger should therefore reflect the cost of the decision the model supports, not the size of the change alone.
+
+Finally, monitoring consumes engineering time. The number of signals worth watching is smaller than the number that can be collected, and choosing the few that matter is the real design work. A short list that someone reads is more valuable than a dashboard that nobody opens.
+
+A drift signal should be tied to a decision, because a chart that changes without an action rule has no operational value.
+
+The baseline should be recorded with the data period it came from, so a later comparison uses the same conditions.
+
+## What it cannot do
+
+It cannot guarantee that a model remains correct. It does not replace investigation. And it cannot make a bad baseline useful.
+
+The counterargument that accuracy is enough is fair for stable inputs and incomplete when the data changes.
+
+## A decision test
+
+1. Document the baseline.
+2. Monitor input distributions.
+3. Monitor outcomes when available.
+4. Set a trigger.
+5. Investigate on the trigger.
+6. Record the finding and recheck condition.
+
+For the data side, see [Data Curation](/articles/data-curation-for-llm-pretraining-deduplication-and-quality).
 
 ## References & Further Reading
 

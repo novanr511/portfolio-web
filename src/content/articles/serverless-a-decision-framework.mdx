@@ -1,13 +1,83 @@
 ---
 title: "Serverless: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: Serverless: a Decision Framework."
-date: 2026-11-17
+description: "Serverless removes server management, not cost or design. Read the framework, a worked example, and why a function is not a free resource."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Cloud
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Serverless is often presented as a way to stop thinking about infrastructure, which hides the decisions that remain. The Wikipedia entry describes event-driven compute with managed infrastructure, and the AWS cost framework treats waste as a design problem. The framework starts from the workload.
+
+**Direct answer:** Choose serverless when the workload is event-driven and variable, then check cost at the expected scale and the cold-start behaviour. The sources describe the model; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented platform behaviour from local choices about workload fit.
+
+## The mechanism
+
+Three points matter:
+
+- **The unit is the event.** The serverless entry describes event-driven compute. A workload that runs continuously may not fit the model.
+- **Cost scales with invocation.** The AWS framework treats utilisation as a design concern. High-frequency functions can cost more than a long-running server.
+- **Cold starts are real.** An idle function may need time to start. That delay is a property of the model, not a bug.
+
+The sequence is: describe the workload, estimate invocations, test cold-start impact, then compare cost. The estimates are local, so they are `inferred`; the model is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team moves a nightly batch job to a serverless function.
+
+Three checks decide. First, does the job fit an event-driven model, or does it run continuously? Second, what is the cost at the actual invocation rate, including requests and duration? Third, does a cold start matter for a nightly job, where delay is acceptable?
+
+The outcome is a fit decision with a recorded cost. The scenario is hypothetical; the method is the contribution.
+
+## Why invocation rate decides cost
+
+A function billed per invocation is economical when calls are infrequent or bursty, because no capacity is paid for while idle. A function called continuously can cost more than a server that runs all the time. Estimating the real rate before migrating is the difference between a saving and a surprise.
+
+## Why cold starts depend on the task
+
+A cold start matters when a user is waiting, and less when a job runs overnight. The same delay is therefore a defect in one workload and irrelevant in another. Naming the user's tolerance is the first step in deciding whether the model fits.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Serverless is event-driven managed compute | `source-reported` | Wikipedia, Serverless computing | 2026-11-18 | Definition changes |
+| Waste is a design concern in cloud cost | `source-reported` | AWS Well-Architected | 2026-11-18 | Pricing changes |
+| Fit the workload before choosing the model | `inferred` | Derived from the model | 2026-11-18 | Workload changes |
+
+## Why a function is not free
+
+The appeal of serverless is that capacity is managed, not that it has no cost. Invocations, duration, and requests are all billed, and a high-frequency workload can exceed the cost of a reserved server. Estimating at the real rate is the control.
+
+A function also has limits on duration and memory, which shape the workloads that fit. A long-running job may need to be split, and the split adds coordination cost that should be counted in the comparison.
+
+The decision should be reviewed when traffic changes, because a workload that fit serverless at one volume can outgrow it at another. Recording the assumed rate makes that review possible.
+
+A practical concern that deserves more attention is vendor coupling. A function written against a provider's event format is portable in theory and expensive to move in practice, because the triggers, permissions, and local tooling are all specific to that provider. The decision to adopt serverless is therefore also a decision about how much switching cost the team is willing to carry. Writing the core logic in a provider-independent module and keeping the glue thin is a common way to limit that cost, but it adds work that must be justified by a real possibility of moving.
+
+Another consideration is observability. A system spread across many short-lived functions is harder to trace than a single long-running process, because a request can cross several invocations whose logs are stored separately. The team needs a way to follow a request end to end before it needs to debug one under pressure. This is not an argument against the model; it is a cost that belongs in the same comparison as invocation pricing.
+
+The decision should also account for local development. A server that runs on a developer machine is easy to reproduce, while a serverless environment often requires emulators whose behaviour differs from production. That difference shows up as bugs discovered late, which is a real cost even though it never appears on a bill.
+
+## What it cannot do
+
+It cannot remove all operational concerns. It does not guarantee lower cost. And it cannot make a continuous workload event-driven.
+
+The counterargument that serverless always saves money is fair for spiky workloads and incomplete for steady ones.
+
+## A decision test
+
+1. Describe the workload.
+2. Estimate invocations and duration.
+3. Test cold-start impact.
+4. Compare with a server.
+5. Record the decision and recheck date.
+
+For the cost side, see [Cloud Cost Optimization](/articles/cloud-cost-optimization-finops-right-sizing-and-reserved-instances).
 
 ## References & Further Reading
 
