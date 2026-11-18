@@ -1,13 +1,82 @@
 ---
 title: "How to Evaluate Canary Releases"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Canary Releases."
-date: 2026-11-17
+description: "A canary limits exposure, not uncertainty. Read how to evaluate one, a worked release, and why a small rollout still needs a signal."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A canary release is often judged by whether the rollout completed, which misses its purpose. The Wikipedia entry describes gradual release techniques, and the SRE alerting workbook ties signals to service objectives. The evaluation question is whether the canary produced useful evidence.
+
+**Direct answer:** Evaluate a canary by the signal it observed, the representativeness of the slice, and the decision that followed. The sources describe the technique; the evaluation rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked release, separating documented release techniques from local choices about thresholds.
+
+## The mechanism
+
+The first consideration is the signal. A canary that watches only errors can miss a change that makes the product slower or less useful. The alerting workbook argues for signals tied to objectives, which applies to the canary as much as to production. The signal should be defined before the rollout, so a result cannot be interpreted after the fact.
+
+The second consideration is the slice. A small group that does not include the users affected by the change will produce reassuring evidence. Representativeness matters more than size, and it should be checked against the population that will eventually receive the release.
+
+The third consideration is the decision. A canary that ends with "all clear" but no recorded reason is weaker than one that documents what was observed and why the rollout continued. The record matters when the same change is evaluated again or when a later incident is traced back to this release.
+
+The sequence is: define the signal, choose a representative slice, observe, decide, and record. Each step is a local choice, so the conclusions are `inferred`; the technique is `source-reported`.
+
+## A worked release
+
+*Illustrative.* A team releases a checkout change to five percent of traffic.
+
+Three checks decide. First, is the signal tied to an objective and sensitive to the failure being guarded against? Second, does the slice include the users most likely to hit the change? Third, was the decision to expand recorded with the observed values?
+
+The outcome is a release with evidence, not just completion. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Canaries are a gradual release technique | `source-reported` | Wikipedia, Feature toggle | 2026-11-18 | Definition changes |
+| Alerting should relate to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Evaluate signal, slice and decision | `inferred` | Derived from the technique | 2026-11-18 | Release process changes |
+
+## Why the signal decides the value
+
+A canary is a test, and a test without a measurement is a delay. Defining the signal before release turns the interval into evidence. It also prevents the threshold from being chosen after seeing the data, which would make any result look acceptable.
+
+A further limitation is that a canary observes a short window, while some failures emerge only after extended use. A release that passes a canary can still fail later, which is why the evaluation should include a plan for monitoring after full rollout.
+
+The decision should also name who is authorised to stop the rollout. A signal that turns bad at an hour when nobody is watching has no effect until someone responds, and assigning that authority in advance is as important as choosing the threshold.
+
+A canary that never shows a problem may mean the signal was too weak, not that the change was safe.
+
+The evaluation should record what the signal would have caught, so a clean result can be interpreted correctly.
+
+The slice should be checked against the population that will receive the full release.
+
+A canary is a sample, and a sample can miss a failure that appears only in the population it excludes.
+
+A recorded decision is more useful than an unrecorded success.
+
+The result should record both the signal and the share of traffic observed, since the two together determine how much weight the result deserves.
+
+## What it cannot do
+
+It cannot catch a failure that appears only at full scale. It does not replace testing. And it cannot revert a data change that was not designed for reversal.
+
+The counterargument that a completed rollout means success is fair for deployment and incomplete for the decision it was meant to inform.
+
+## A decision test
+
+1. Define the signal.
+2. Choose a representative slice.
+3. Observe against the objective.
+4. Decide to expand, hold, or revert.
+5. Record the observed values.
+6. Set a recheck condition.
+
+For the starting point, see [Canary Releases](/articles/getting-started-with-canary-releases).
 
 ## References & Further Reading
 
