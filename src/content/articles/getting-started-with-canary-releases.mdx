@@ -1,10 +1,88 @@
 ---
 title: "Getting Started with Canary Releases"
-description: "Reserved title for a future NOVANDRI article: Getting Started with Canary Releases."
-date: 2026-11-17
+description: "A canary limits the blast radius of a change. Read how to start, a worked release, and why a small rollout still needs a signal."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A canary release sends a change to a small share of traffic before the rest. The GitHub Actions documentation describes automation for deployment workflows, and the SRE alerting workbook ties signals to objectives. The starting point is not the traffic split but the signal that decides whether to continue.
+
+**Direct answer:** Start with a small, reversible rollout and a defined signal for success or failure, then expand only when the signal supports it. The sources describe automation and objectives; the rollout rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked release, separating documented tooling from the local choice of threshold.
+
+## The mechanism
+
+Three points matter:
+
+- **Exposure is limited.** A canary reduces the number of users affected by a bad change. The tooling documentation describes how to automate the steps.
+- **A signal is required.** The SRE workbook argues for alerting tied to service objectives. Without a signal, a small rollout is a delay rather than a test.
+- **Reversibility still matters.** A canary does not undo a data change. The rollback path must exist independently.
+
+The sequence is: define the signal, choose the first slice, watch, then expand or revert. Choosing the signal is local judgement, so it is `inferred`; the automation is `source-reported`.
+
+## A worked release
+
+*Illustrative.* A team releases a checkout change to five percent of traffic.
+
+Three checks decide. First, which signal decides success — error rate, latency, or conversion? Second, is the slice representative, or does it exclude the users most likely to hit the change? Third, can the change be reverted quickly if the signal turns bad?
+
+The outcome is a decision to expand, hold, or revert. The scenario is hypothetical; the method is the contribution.
+
+## Why the slice has to be representative
+
+A canary that excludes the users most likely to hit a change tells you little. If the first slice is drawn only from internal accounts or a quiet region, the result will look reassuring while the affected population remains untouched. Choosing a representative slice is part of the design, not a detail of the rollout.
+
+The duration matters for the same reason. A short window may miss a failure that appears only under normal load or at a particular time of day. Holding the canary long enough to cover ordinary conditions costs time, but it is the cost that makes the signal credible.
+
+## Why reversibility is separate
+
+A canary limits exposure; it does not undo the change. If the deployment includes a data migration that cannot be reversed, the safety of the rollout is an illusion. Separating code from data is often the most valuable preparation step, because it makes the canary meaningful.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Deployment steps can be automated | `source-reported` | GitHub Actions docs | 2026-11-18 | Product changes |
+| Signals should relate to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Define the signal before the rollout | `inferred` | Derived from the purpose of a canary | 2026-11-18 | Release process changes |
+
+## Why the signal comes first
+
+A rollout without a decision rule is an interval during which nobody knows what to do. Defining the signal before release turns the interval into a test. It also prevents the threshold from being chosen after seeing the data, which would make any result interpretable as success.
+
+A final constraint is that the canary only observes what it can measure. A failure that appears as a slow degradation in correctness may not trigger an alert tied to latency or errors. Choosing signals that cover both failure and quality is therefore part of the release design, not an improvement to be added later.
+
+The rollout also needs a decision maker. A signal that turns bad at an hour when nobody is watching has no effect until someone responds. Assigning that responsibility before release is as important as choosing the threshold, because the two together determine whether the canary protects users.
+
+A canary that never fails tells you that the signal was not sensitive enough, not that the change was safe. Recording what level of problem the signal would have caught is part of interpreting the result.
+
+The same applies to the traffic share: a very small slice can miss a failure that only appears under ordinary load.
+
+A representative slice and a defined signal together are what make a small rollout a test rather than a delay.
+
+## What it cannot do
+
+It cannot protect against a change that only fails at full scale. It does not replace testing. And it cannot revert a data change that was not designed for reversal.
+
+The counterargument that a canary is slow is fair for trivial changes and incomplete for ones that can affect many users.
+
+## A decision test
+
+1. Define the signal.
+2. Choose a representative slice.
+3. Confirm the rollback path.
+4. Watch the signal.
+5. Expand, hold, or revert.
+6. Record the decision and recheck condition.
+
+For the trade-offs, see [Canary Releases](/articles/how-to-evaluate-canary-releases).
+
+## References & Further Reading
+
+- GitHub, 2026. [GitHub Actions Documentation](https://docs.github.com/en/actions) — The CI platform's own documentation, including required status checks.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.
