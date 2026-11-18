@@ -1,10 +1,80 @@
 ---
 title: "Lead Scoring Explained"
-description: "Reserved title for a future NOVANDRI article: Lead Scoring Explained."
-date: 2026-11-17
+description: "A lead score ranks attention, not intent. Read how scoring works, a worked example, and why a model can encode the past's mistakes."
+date: 2026-11-18
 tags:
-  - Planned
+  - Business
+  - Method
   - Marketing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Lead scoring assigns a number to a prospect so a sales team can decide where to spend time. The lead-generation entry describes the stages before a purchase, and the CRM entry covers systems that hold customer records. The difficulty is that a score is a prediction built from past behaviour, not a measurement of current intent.
+
+**Direct answer:** Score leads against a defined outcome, using only signals available at scoring time, and verify the ranking against later results. The sources describe the stages and the system; the verification rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked calibration example, separating the documented purpose of scoring from the local choices that decide whether it works.
+
+## The mechanism
+
+Three properties shape a scoring system:
+
+- **The target must be defined.** A score that predicts "engagement" is not the same as one that predicts a closed deal. The lead-generation entry describes the stages; the choice of stage is local.
+- **Features must be available at the time of scoring.** A field recorded after conversion cannot be used to predict conversion. This is a leakage problem, not a modelling detail.
+- **The ranking must be checked.** A score is useful only if high scores correspond to better outcomes. Checking that correspondence requires later results joined back to earlier scores.
+
+The sequence is: define the outcome, choose available signals, assign weights, then evaluate the ranking. Choosing the outcome is judgement, so it is `inferred`; the existence of stages and records is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team scores leads using email opens, company size, and a form field.
+
+Three checks decide. First, is the target a completed purchase or a meeting, and was it recorded consistently? Second, were all three signals available before a salesperson contacted the lead, or did one of them come from later activity? Third, when the scores are compared with outcomes from the previous quarter, do the top-ranked leads actually convert more often?
+
+The outcome is a recalibration decision, not a new tool. The numbers are hypothetical; the verification method is the contribution.
+
+## Why a score needs a target before a model
+
+A scoring model is only as good as the outcome it was built to predict. Teams often begin with the signals they already have — opens, clicks, company size — and then look for an outcome that correlates with them. That order invites self-fulfilling scores: the model learns who replied to email, not who became a customer.
+
+Starting with the outcome forces a different conversation. A meeting is easier to predict than a closed deal, and it is also easier to act on, because a salesperson can do something with it. If the goal is revenue, the score must be evaluated against revenue, with a window long enough for deals to close. Choosing a shorter proxy without saying so makes the model look accurate while leaving the business question unanswered.
+
+The timing of signals is the second discipline. Every input must be available at the moment the score is used. A field filled in by a salesperson after a discovery call is a result, not a predictor. Removing these fields usually lowers the reported accuracy, which is a useful sign that the previous number was measuring the future rather than forecasting it.
+
+Evaluation should be a regular event. Scores drift when the product, pricing, or market changes. A simple check — does the top-scored group convert better than the bottom-scored group this quarter — is often enough to detect a problem before it becomes expensive. The result belongs in the same record as the model definition, with a date and a recheck condition.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Lead generation describes stages before purchase | `source-reported` | Wikipedia, Demand generation | 2026-11-18 | Definition revised |
+| CRM systems hold customer records | `source-reported` | Wikipedia, CRM | 2026-11-18 | System changes |
+| Verify the score against later outcomes | `inferred` | Derived from prediction logic | 2026-11-18 | Target changes |
+
+## Why scores drift
+
+A model trained on past conversions learns the patterns of that period. When the product, pricing, or market changes, the patterns change with them. A score that was well calibrated last year can rank the wrong leads today, and nothing in the interface will signal the drift.
+
+Leakage is the other common failure. A field that appears only after a sales conversation feels predictive because it correlates with conversion, but it cannot be used at scoring time. Removing such fields usually lowers the apparent accuracy and improves the real decision.
+
+## What it cannot do
+
+It cannot create intent. It does not replace a salesperson's judgement about fit. And it cannot guarantee that a high-scoring lead will buy.
+
+The counterargument that a complex model is more accurate is fair on historical data and incomplete when the underlying market moves.
+
+## A decision test
+
+1. Define the outcome.
+2. List signals available at scoring time.
+3. Remove post-outcome fields.
+4. Check ranking against later results.
+5. Recalibrate on a schedule.
+6. Record the target and the recheck date.
+
+For the system context, see [CRM Marketing Trade-offs](/articles/crm-marketing-trade-offs).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Lead generation - Wikipedia](https://en.wikipedia.org/wiki/Lead_generation) — The definition of lead generation, inbound versus outbound methods, and the role of content and forms; secondary reference.
+- Wikipedia contributors, 2026. [Customer relationship management - Wikipedia](https://en.wikipedia.org/wiki/Customer_relationship_management) — Systems for managing customer relationships.

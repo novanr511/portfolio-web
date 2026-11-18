@@ -1,10 +1,84 @@
 ---
 title: "AI Voice Agents: Common Questions"
-description: "Reserved title for a future NOVANDRI article: AI Voice Agents: Common Questions."
-date: 2026-11-17
+description: "A voice agent must hear, decide, and speak. Read the common questions, a worked example, and why a good transcript is not a good call."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Voice
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Voice agents are often evaluated by transcription accuracy, which covers only the first layer. The voice-user-interface entry describes the interaction, and the speech-recognition entry explains the listening step. A call can be transcribed perfectly and still produce the wrong outcome.
+
+**Direct answer:** Evaluate the three layers separately — listening, deciding, and speaking — with a fixed call set and a fallback rule. The sources describe the interface and recognition; the layered evaluation is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked call-set example, separating documented mechanisms from locally chosen evaluation criteria.
+
+## The mechanism
+
+Three layers do the work:
+
+- **Listening.** Automatic speech recognition turns audio into text. The speech-recognition entry describes the mechanism, and accuracy depends on noise, accent, and vocabulary.
+- **Deciding.** The agent chooses an action from the transcript. This is where tool boundaries and escalation rules matter.
+- **Speaking.** The reply must be understandable and timed appropriately. The voice-user-interface entry treats the interaction as a whole.
+
+The sequence is: build a fixed call set, score each layer, then check escalation. Choosing the cases is local judgement, so it is `inferred`; the mechanisms are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team tests an agent on 50 calls across intents and noise conditions.
+
+Three checks decide. First, is the transcript accurate under the conditions tested, with dated data? Second, did the agent choose the right action and escalate when uncertain? Third, was the reply understandable, and did a person remain accountable for consequential actions?
+
+The outcome is a layered score with a recorded residual risk. The numbers are hypothetical; the separation of layers is the contribution.
+
+## Why the call set is the real evaluation
+
+A voice agent can be tested in many ways, but most of them measure the wrong thing. Accuracy on a clean recording says little about a call with background noise. A correct transcript says nothing about whether the agent chose the right action. Only a fixed call set with recorded conditions makes the three layers comparable.
+
+Building that set is the most valuable part of the work. Each case should name the intent, the noise condition, and the expected action, including whether escalation is correct. Once those labels exist, a change to the agent can be measured against the same cases, and a regression becomes visible. Without a fixed set, every evaluation is a new experiment and results cannot be compared.
+
+Escalation deserves its own cases. An agent that hands a call to a person is behaving correctly in some situations, and a test set that treats every handoff as a failure will reward the wrong behaviour. Recording the expected escalation alongside the expected answer is the simplest fix.
+
+## What the layers reveal
+
+Layered scores tell you where to act. Poor transcription points to audio or vocabulary. Poor decisions with good transcripts point to missing rules or tools. Poor replies with good decisions point to phrasing or timing. An end-to-end score collapses all three into one number and hides the cause, which is why it is a weak basis for iteration.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Voice interfaces have distinct interaction requirements | `source-reported` | Wikipedia, Voice user interface | 2026-11-18 | Definition revised |
+| Speech recognition converts audio to text | `source-reported` | Wikipedia, Speech recognition | 2026-11-18 | Technology changes |
+| Score layers separately with escalation | `inferred` | Derived from the interaction model | 2026-11-18 | Agent design changes |
+
+## Why a good transcript is not enough
+
+A transcript can be accurate and still omit tone, hesitation, or urgency. More importantly, a correct transcript can lead to a wrong action if the decision layer lacks a rule for uncertainty. Layered scoring reveals which part failed, which a single end-to-end score cannot do.
+
+Escalation is the design control. A voice agent that guesses on a consequential action is worse than one that hands the call to a person. The fallback should be tested as deliberately as the main path, because it is the part most often ignored during evaluation.
+
+A fourth practical question is what happens when the caller changes mid-call. A fixed test set covers known intents, but real calls drift, and an agent must recognize when the conversation has moved outside its scope. Recording that decision as a separate case makes the boundary explicit and gives reviewers a concrete standard for what the agent should not attempt.
+
+## What it cannot do
+
+It cannot cover every accent or noise condition. It does not guarantee a good experience, which involves factors outside transcription. And it cannot remove human accountability for consequential actions.
+
+The counterargument that transcript accuracy is the main metric is fair for the listening layer and incomplete for the others.
+
+## A decision test
+
+1. Build a fixed call set.
+2. Score listening, deciding, and speaking separately.
+3. Check escalation behaviour.
+4. Use dated data.
+5. Keep a person accountable for high-impact actions.
+6. Record residual risk and a recheck trigger.
+
+For the evaluation method, see [How to Evaluate AI Voice Agents](/articles/how-to-evaluate-ai-voice-agents).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Voice user interface - Wikipedia](https://en.wikipedia.org/wiki/Voice_user_interface) — The design of voice-based interfaces and interactions.
+- Wikipedia contributors, 2026. [Speech recognition - Wikipedia](https://en.wikipedia.org/wiki/Speech_recognition) — The mechanisms of automatic speech recognition.
