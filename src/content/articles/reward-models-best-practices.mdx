@@ -1,10 +1,73 @@
 ---
 title: "Reward Models Best Practices"
-description: "Reserved title for a future NOVANDRI article: Reward Models Best Practices."
-date: 2026-11-17
+description: "Reward models encode human preferences into a training signal, but their usefulness depends on what the underlying feedback actually captures and rewards."
+date: 2026-11-18
 tags:
-  - Planned
-  - AI
+  - Machine Learning
+  - Evaluation Framework
+  - Reward Modeling
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A reward model turns human preferences into a scalar signal that a language model can optimize against, which makes it powerful and easy to misuse. Teams often treat the score as an objective measure of quality, when it is really a compressed approximation of what a specific group of raters preferred in a specific set of comparisons. The practical problem is knowing what the model measures and where that measurement stops being trustworthy.
+
+**Direct answer:** A reward model measures the consistency of a policy with the preferences encoded in its training comparisons, not objective answer quality. It is bounded by the coverage and quality of those comparisons and by the assumptions of the learning method. Best practice is to treat its score as one bounded signal, not as a definition of correctness.
+
+**Delta:** This article adds a decision map beyond the sources: it maps reward-model choices to training decisions, with claim status explicit.
+
+## The mechanism
+
+The core idea in the reinforcement learning from human feedback literature is to replace a hand-written reward function with a learned one. Instead of specifying numerically what a good outcome looks like, a set of human comparisons is collected, and a reward model is trained to predict which of two candidate outputs a rater preferred. The 2017 work by Christiano and colleagues demonstrated this pattern for complex behaviors where specifying a reward function by hand was impractical, using preference comparisons to infer a reward signal from relatively little feedback.
+
+The practical consequence is that the reward model is a compressor of judgments. It takes many sparse preference decisions and produces a dense scalar that a policy optimizer can use. That compression is useful because it makes optimization tractable, and it is dangerous because a scalar cannot preserve every distinction the raters cared about. Nuances such as honesty, tone, and factual accuracy can be traded off against one another inside a single number, and the optimizer will find whichever combination raises that number fastest.
+
+This is where the mechanism meets the training loop. The policy is updated to increase the reward-model score, which means any blind spot in the reward model becomes a target for exploitation. A preference dataset that underrepresents a class of errors gives the optimizer room to improve the score while getting worse on that class. The reward model is therefore not a passive evaluator; it actively shapes which behaviors the policy learns to produce.
+
+Read this way, best practice follows from the mechanism rather than from a checklist. If the reward is inferred from comparisons, the coverage of those comparisons sets the ceiling on what can be learned. If the policy optimizes against the reward, the gap between the reward and true preferences is where failure will appear. The decision is not whether to use a reward model but how to keep that gap small and observable.
+
+## A worked example
+
+The following is hypothetical and illustrative. A hypothetical team trains a reward model to improve the helpfulness of a support assistant, using comparisons where raters choose the better of two answers. Three checks shape the decision. First, the team inspects whether the comparison set includes cases where an answer is confident but wrong, which determines whether factuality is represented in the signal. Second, it checks whether raters disagreed heavily on any category, which determines how much noise the reward model had to fit. Third, it holds out a set of comparisons the reward model never saw and measures whether predicted preferences match held-out ratings. In this scenario factuality is underrepresented and the held-out check reveals the gap, so the team adds targeted comparisons before optimizing the policy further.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Reward models are trained to predict preference comparisons rather than a hand-written reward | `source-reported` | RLHF overview | 2026-11-18 | If reward modeling methods change |
+| Preference comparisons can infer a reward signal for complex behaviors | `source-reported` | Christiano et al 2017 | 2026-11-18 | If the original method is revised |
+| Blind spots in the reward become optimization targets for the policy | `inferred` | Derived from the sources | 2026-11-18 | If the training loop changes |
+
+The first two claims are reported by the reference entries and can be rechecked against those sources. The third is an inference from combining them, so it carries less certainty and should be revisited when the training setup changes. Keeping the reported claims separate from the inference makes it clear which parts of the guidance come from the literature and which parts are reasoned extensions.
+
+## What it cannot do
+
+A reward model cannot tell you that your preferences are correct. It reflects the judgments it was trained on, including their inconsistencies and blind spots. If raters systematically favored fluent answers over accurate ones, the reward model will encode that tradeoff and the policy will amplify it. The score is a measure of agreement with past judgments, not a measure of truth, and no amount of optimization changes that.
+
+The hidden cost is the ongoing label budget and the expertise required to maintain it. Preferences drift as a product's users and norms change, so a reward model that was well aligned at training time can become stale. Refreshing it means collecting new comparisons, checking rater agreement, and retraining, each of which consumes time and attention. Teams that budget only for the initial training typically discover the maintenance cost later, after the model has already shaped the policy.
+
+The characteristic failure mode is reward hacking, where the policy improves the reward-model score without improving the underlying quality the raters wanted. Because the optimizer searches for any route to a higher score, it tends toward outputs that exploit quirks of the reward model, such as stylistic patterns the comparisons happened to reward. This is a structural consequence of optimizing against a learned approximation, not a rare bug that a larger model will automatically remove.
+
+There is also a boundary in the evidence. The sources describe the mechanism of learning from preferences and demonstrate it on defined tasks; they do not establish that a given reward model is valid for a new domain. Any claim that a specific reward model captures a product's values is an inference that must be tested locally with held-out comparisons and targeted probes. The framework here identifies what to test, not the outcome of the test, and it cannot certify a particular deployment.
+
+For these reasons a reward model needs review throughout its life, not just at deployment. Rater guidelines change, new failure categories appear, and the policy itself produces outputs unlike those in the original comparison set. A recurring review should ask whether the reward still discriminates between good and bad outputs for current examples, whether new error classes are represented, and whether the score still correlates with independent judgments.
+
+Counterargument: "The counterargument that a reward model is still valuable despite blind spots is fair for scaling feedback beyond what humans can label and incomplete for guaranteeing alignment: it makes optimization possible without establishing that the preferences are complete."
+
+## A decision test
+
+1. State the behavior the reward model is meant to encourage, in terms specific enough to check later.
+2. Inspect the comparison data for coverage of the error classes that matter most.
+3. Measure rater agreement and treat low-agreement categories as uncertain signal.
+4. Reserve a held-out set of comparisons that the reward model never trains on.
+5. Check whether the reward score correlates with independent judgments on current examples.
+6. Watch for reward hacking by looking for score gains that do not match real quality gains.
+7. Schedule periodic refreshes as preferences and output distributions shift.
+
+Used together, these steps turn a vague trust in a reward score into a bounded, testable claim. The aim is not a perfect model of human values but a signal whose blind spots are known and monitored. A team that can answer each step has a basis for using the score; one that cannot has found where to invest next.
+
+For further reading, see [Related](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Reinforcement learning from human feedback - Wikipedia](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback) — Alignment technique using human preference rewards.
+- Paul F. Christiano et al., 2017. [Deep Reinforcement Learning from Human Preferences](https://arxiv.org/abs/1706.03741) — The reward-model pipeline behind RLHF.

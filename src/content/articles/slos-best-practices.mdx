@@ -1,10 +1,70 @@
 ---
 title: "SLOs Best Practices"
-description: "Reserved title for a future NOVANDRI article: SLOs Best Practices."
-date: 2026-11-17
+description: "Best practices for defining service level objectives, drawn from Google SRE guidance and tied to error-budget decisions, with claim status made explicit."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Site Reliability Engineering
+  - SLO Definition
+  - Error Budgets
+  - Verified
 ---
+Service level objectives are often adopted as a number without a decision attached, which turns reliability into a reporting exercise. The harder problem is choosing indicators that reflect user experience and turning the target into an error budget a team can spend. This article grounds those choices in Google SRE guidance and marks what is stated versus inferred.
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+**Direct answer:** An SLO is a target for a service level indicator, and its complement is the error budget that governs how much unreliability is tolerable. Google SRE guidance says indicators should be chosen from the user's perspective and that objectives should be attainable but ambitious. The bounded answer is to define user-centered indicators first, set a target, and convert the remainder into an explicit release policy.
+
+**Delta:** This article adds a decision mapping beyond the sources: it maps SLI choice, SLO targets, and error budgets to concrete release decisions, with claim status explicit.
+
+## The mechanism
+
+The SRE material distinguishes the service level indicator, the measured signal, from the service level objective, the target on that signal, and the service level agreement, the external promise. Keeping these separate prevents a team from confusing an internal goal with a contractual commitment. The practical consequence is that internal objectives should be published stricter than any external agreement so there is room to recover before a promise is broken.
+
+Google SRE recommends choosing indicators based on what users care about, such as request latency, error rate, or availability measured at the user-facing edge. Internal utilization metrics are easier to collect but can look healthy while users suffer. The practical consequence is to start with the user question, then find the measurable signal, rather than starting with whichever telemetry happens to be available and declaring it an indicator.
+
+The error budget is the complement of the objective, so a 99.9 percent target leaves a small allowance of failed requests. The guidance treats this budget as a resource that can be spent by releasing changes, with a policy that pauses releases when the budget is exhausted. The practical consequence is that reliability becomes a currency balancing feature velocity against stability, and the trade-off becomes visible to the whole team instead of staying inside an engineering argument.
+
+Best practice therefore reduces to a short discipline: pick user-centered indicators, set a target that is achievable but not trivial, publish the budget, and agree in advance on what happens when it runs out. The sources supply the structure and the caution against misleading metrics; the team supplies the numbers and the enforcement policy. That division of responsibility is the reason claim status matters here: the framework is sourced, the operating values are chosen.
+
+## A worked example
+
+The following is hypothetical and illustrative. A service team considered raising its availability target after a bad quarter. Three checks were applied. First, the indicator was reviewed: it measured server uptime, not successful user requests, so it missed a degradation at the edge. Second, the target was tested for attainability against a quarter of measured user-facing errors. Third, the team checked whether a written error-budget policy existed; none did. The outcome was to redefine the indicator at the user edge, keep the target stable, and write a release-freeze policy. This scenario is illustrative, not a measured case.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| An SLO is a target for a service level indicator, and the error budget is its complement | `source-reported` | Google SRE SLO chapter | 2026-11-18 | When SRE guidance is revised |
+| Indicators should be chosen from the user perspective rather than internal metrics alone | `source-reported` | Google SRE SLO chapter | 2026-11-18 | When indicator guidance changes |
+| Error budgets convert reliability targets into release decisions | `inferred` | Derived from the sources | 2026-11-18 | When team telemetry and policy data are available |
+
+The two source-reported rows restate guidance the references state directly. The inferred row is the operational bridge this article adds from a target to a release decision, and it depends on instrumentation the team must provide. Recheck conditions identify when that dependence changes enough to revisit the claim rather than carry it forward unexamined.
+
+## What it cannot do
+
+The SRE book reflects one organization's operating experience, not a universal law or a controlled study. Its recommendations are practice-based, so transferring them assumes a comparable service and team structure. Claims of effectiveness are therefore weaker than claims of description: the material can justify how to define an objective, but it cannot prove that a particular target will produce a particular business result in a different setting.
+
+Maintaining user-centered indicators requires instrumentation at the user edge, which is more work than reading server health. Setting an ambitious target consumes engineering attention, and a strict error budget can slow releases during periods when speed matters commercially. The budget is only as useful as the organization's willingness to honor it, and a policy that is routinely waived teaches the team that the number is decorative.
+
+An indicator can be gamed. A metric that excludes certain failed requests will show a healthy objective while users experience errors. A target set too loose gives no signal at all, and one set too high exhausts the budget immediately and triggers constant freezes. Both extremes produce the same practical outcome: the team stops using the SLO to make decisions and starts using it to report status.
+
+The guidance does not specify target numbers for arbitrary services, nor does it resolve multi-region or multi-dependency reliability trade-offs. It also treats internal objectives and external agreements as distinct, and the legal consequences of an agreement lie outside the engineering guidance. A team operating under contractual penalties needs input that the source material does not provide.
+
+As traffic patterns, architecture, and user expectations change, indicators and targets drift. A signal that once tracked user pain can become a proxy for something else after a redesign, so both the indicator and the budget policy need scheduled review with explicit ownership. Without that review, an SLO quietly stops representing the service it claims to describe.
+
+The counterargument that a simple uptime metric is fair for small services is reasonable, but incomplete for user trust: uptime can stay high while the requests users make fail, so it understates real degradation.
+
+## A decision test
+
+1. State the user question the indicator must answer.
+2. Measure the signal at the point users experience the service.
+3. Set a target that is attainable but not trivial.
+4. Derive the error budget as one minus the target.
+5. Agree in advance on the action when the budget is exhausted.
+6. Keep internal objectives stricter than any external agreement.
+7. Review indicators and targets after architecture or traffic changes.
+
+These steps turn a reliability slogan into a testable routine. The value is not the percentage itself but the decision rule attached to it, which makes the cost of unreliability explicit. When the indicator is wrong, fix the measurement before changing the target. For further reading, see [Related](/articles/decision-memos-that-survive-review).
+
+## References & Further Reading
+
+- Google, 2016. [Google SRE - Defining SLO: Service Level Objective Meaning](https://sre.google/sre-book/service-level-objectives/) — How to define SLIs and SLOs that are actually useful.
+- Betsy Beyer et al., 2016. [Google SRE - Site Reliability Engineering book Google Index](https://sre.google/sre-book/table-of-contents/) — The book that defined SRE practice, including SLOs and error budgets.

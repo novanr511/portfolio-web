@@ -1,10 +1,69 @@
 ---
 title: "Data Warehouses Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: Data Warehouses Mistakes to Avoid."
-date: 2026-11-17
+description: "A data warehouse centralizes reporting data through ETL. See how load design maps to trust decisions, with claim status explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Data engineering
+  - Data warehousing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A data warehouse is expected to give an organization one reliable set of numbers, yet conflicting totals are a common result. The real problem is that consolidation does not equal correctness: the transformations and load rules that populate the warehouse decide what each number means. When those rules are undocumented, every dashboard can disagree while appearing authoritative.
+
+**Direct answer:** A data warehouse is a central store of current and historical data used for reporting and analysis, distinct from an operational database. ETL is the process that extracts data from sources, transforms it into a common form, and loads it into that store. The bounded claim: the warehouse's trustworthiness is set by its transformation and refresh rules, which must be explicit.
+
+**Delta:** This article adds a table-to-rule mapping beyond the sources: it maps each stored table to its source, transformation, and refresh trigger, with claim status explicit.
+
+## The mechanism
+
+Wikipedia defines a data warehouse as a system used for reporting and data analysis, regarded as a core component of business intelligence, and storing current and historical data in one place. Data is entered from source systems, integrated, and made available for queries rather than for transaction processing. The practical consequence is that a warehouse is shaped for reading and analysis, not for the fast, row-level writes an operational database handles. Expecting it to behave like a transactional system leads to design choices that undermine both purposes.
+
+Wikipedia describes ETL as the process of extracting data from source systems, transforming it, and loading it into a destination such as a warehouse. Transformation covers cleaning, validating, and restructuring so that data from different sources fits a common model. The practical consequence is that transformations encode business rules about what a metric means and how records are counted. A mistake in a transformation propagates to every report that reads the warehouse, so the transformation layer is where consistency is either established or lost. A dashboard that looks polished cannot compensate for a rule that is wrong upstream.
+
+The two sources connect at a decision neither frames as one. The warehouse defines the shape and purpose of the stored data, including its grain, keys, and history. ETL defines how source data arrives in that shape. A choice about grain or how to handle changes over time in the warehouse must be matched by a transformation step that implements it. Neither source tells a team the right grain or refresh cadence for its business; those are local choices that must be marked as inferred. Treating them as defaults is how divergent metrics are born.
+
+The useful output is a table mapping each warehouse table to its source system, its transformation rule, and its refresh trigger. That table, not a diagram of boxes and arrows, is the decision instrument. It shows where a rule lives and which load must complete before a number is trustworthy. It also makes the rationale reviewable, because source, rule, and trigger are recorded together. A team that writes them down can later explain why two reports differ, instead of assuming one of them is simply broken and rebuilding it from scratch.
+
+## A worked example
+
+The following is hypothetical and illustrative. A leadership team notices that two dashboards report different revenue totals from the same warehouse. Three checks shape the investigation. First, which transformation rule defines revenue, and is that rule applied identically in both pipelines? Second, does each table carry a documented refresh trigger, and are both sources loaded at the same point in the cycle? Third, how are late-arriving records and corrections handled in the grain of the fact table, and could one report be reading a partially loaded table? The review finds that one dashboard reads a table before its load completes and that the two pipelines apply slightly different filters. The team aligns the rule, sequences the loads, and documents both in the table map. The outcome is a number both reports can defend. The figures are hypothetical; the decision method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A data warehouse centralizes current and historical data for reporting and analysis | `source-reported` | Data warehouse, Wikipedia | 2026-11-18 | Definition revised |
+| ETL extracts, transforms, and loads data into the warehouse | `source-reported` | ETL, Wikipedia | 2026-11-18 | Process definition revised |
+| Grain and refresh cadence are local, inferred choices | `inferred` | Derived from the sources | 2026-11-18 | Source systems change |
+
+The first two rows report the definition and the process description given in the reference articles. The third is an inference about what the sources leave to each organization, because neither fixes a table grain or a refresh schedule. Recheck the source rows when those definitions are revised, and the inferred row whenever a source system, a rule, or a load pattern changes.
+
+## What it cannot do
+
+A data warehouse does not guarantee correct numbers. It stores what the pipelines put into it, so a flawed transformation or a stale load yields confident errors that look identical to correct results. Treating the warehouse as a single source of truth confuses consolidation with correctness. Trust comes from the rules and their ongoing maintenance, not from the existence of a central store. A team that assumes the warehouse is right by definition will stop checking the rules, which is precisely when silent errors take root and spread across reports.
+
+The hidden cost is that building and maintaining a warehouse takes more work than publishing a dashboard. Modeling tables, writing and monitoring transformations, handling source schema changes, and documenting rules all require effort that a direct query against a live system avoids. That asymmetry is why teams accumulate ad hoc pipelines that bypass the warehouse entirely. The cost is paid in pipeline code, in monitoring, and in the discipline to update rules when a source changes. Skipping that work does not make it disappear; it moves the cost into every later argument about which number is right.
+
+The main failure mode is treating the warehouse like an operational database, or neglecting transformation hygiene. Querying it for row-level writes, ignoring late-arriving data, or allowing each team to redefine a metric produces divergent results that erode confidence. The relevant question is which rule or load caused a number to differ and who owns that rule. A warehouse that cannot answer that question has become a place where inconsistencies are stored rather than resolved. Making the rule map a prerequisite for new reports keeps the team from adding another layer of ambiguity.
+
+There is a boundary around the idea. It covers storage designed for analysis and the ETL process that populates it, not data governance policy, not access control, and not the meaning of every business metric. It cannot tell a team what its metrics should mean, because that is a decision for the people who use them. It can show whether the chosen rules are applied consistently across tables and reports. That is narrower than the one source of truth claim often made for a warehouse, where the store is asked to settle semantic disagreements it was never designed to resolve on its own.
+
+Because sources and rules drift over time, the mapping needs a refresh. Each table should carry its source, its rule, and a recheck condition, and the grain should be treated as a local decision rather than a value the sources provide. Without that record, a future reviewer cannot tell a deliberate rule from an inherited default. The data will still flow; the rationale for how it is transformed is what makes the warehouse reviewable. For further reading, see [Data Governance: Managing Data as an Asset](/articles/data-governance-managing-data-as-an-asset).
+
+## A decision test
+
+1. List the source systems that feed the warehouse.
+2. Define the grain and keys of each target table.
+3. Write the transformation rule for each field.
+4. Record the refresh trigger and the required load order.
+5. Specify how late or corrected records are handled.
+6. Map each published metric to its underlying rule.
+7. Revisit the mapping whenever a source or a rule changes.
+
+A data warehouse is useful only when its rules and its refresh behavior are both visible. The test turns a vague promise of trustworthy numbers into a sequence of decisions with an explicit rationale, so a reviewer can trace a disputed figure back to the rule and load that produced it. Errors will still occur when sources change; the difference is that the team can locate the cause and correct it instead of debating which dashboard to believe.
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data warehouse - Wikipedia](https://en.wikipedia.org/wiki/Data_warehouse) — Centralised repository for analytical data.
+- Wikipedia contributors, 2026. [Extract, transform, load - Wikipedia](https://en.wikipedia.org/wiki/Extract,_transform,_load) — The stages and orchestration of data pipelines.

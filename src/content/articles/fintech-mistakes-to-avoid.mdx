@@ -1,10 +1,73 @@
 ---
 title: "Fintech Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: Fintech Mistakes to Avoid."
-date: 2026-11-17
+description: "Fintech mistakes often come from treating regulation as an afterthought. Read how compliance maps to product decisions, a worked example, and what a licence misses."
+date: 2026-11-18
 tags:
-  - Planned
-  - Retail
+  - Finance
+  - Method
+  - Risk
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Fintech products fail in ways that ordinary software does not, because the failure mode is often regulatory rather than technical. The financial technology entry describes the use of software to deliver financial services, and the FCA's cryptoassets guidance describes a specific regulated domain. The real problem is that teams treat compliance as a step after launch, when it should shape which product they build.
+
+**Direct answer:** Treat regulatory status as an input to product design: decide whether the activity is regulated, which permissions apply, and what evidence the product must produce. The sources describe the field and one regulator's work on cryptoassets. The rule that maps permission to product scope is a synthesis, not a quotation.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the sources: it maps regulatory scope to a product decision, with claim status explicit.
+
+## The mechanism
+
+The financial technology entry describes technology used to provide financial services, from payments to lending to advanced computational uses in finance. The breadth matters. A product can look like a software tool and still be performing a regulated financial activity, because the classification follows what the product does rather than what it calls itself. The practical consequence is that scope is decided by function: moving money, holding funds, extending credit, or advising on instruments. A team that describes its work purely in engineering terms will miss the classification.
+
+The FCA's cryptoassets work describes a regulator's engagement with a specific class of assets, including the risks it sees and the permissions it expects. This supplies a second idea: regulation is not a single gate but a set of obligations that attach to particular activities. One product may need permission for custody, another for trading, and a third may be outside the regime entirely. The practical consequence is that permission must be assessed per activity, not per company. A licence obtained for one function does not automatically cover another.
+
+The mechanism is therefore a sequence. Identify the financial function the product performs, determine whether that function is regulated in the relevant jurisdiction, identify the permissions and disclosures that apply, and design the product to produce the required evidence. Each step is documented in general terms by the sources; none supplies the answer for a specific product. The local contribution is the mapping from function to product scope. Because that mapping is a judgement, the corresponding claim is marked inferred.
+
+A second practical consequence follows from the sequence. Compliance evidence, such as records of transactions or disclosures, is a product requirement, not a document written after launch. If the product does not capture the data the regulator expects, retrofitting is expensive and sometimes impossible. Treating compliance as a design input is cheaper than treating it as a remediation project, and this is the main reason the decision belongs at the start.
+
+## A worked example
+
+The following is hypothetical and illustrative. A startup plans a feature that lets users hold and exchange a digital asset, and the team asks whether it can ship before seeking permission. Three checks decide. First, what financial function does the feature perform: custody, exchange, or payment? Second, is that function within the scope of the regulator's cryptoassets work in the target market? Third, what records and disclosures would the product have to produce from the first transaction onward? The outcome is a scope decision: build the feature only if the required permissions are in place and the evidence requirements are designed in, or narrow the feature to an unregulated function. No legal conclusion here is real; the sequence is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Financial technology applies software to financial services | `source-reported` | Wikipedia, Financial technology | 2026-11-18 | Definition revised |
+| A regulator describes work and permissions for cryptoassets | `source-reported` | FCA, Cryptoassets | 2026-11-18 | Rules or guidance updated |
+| Map regulatory scope to product scope before building | `inferred` | Derived from the sources | 2026-11-18 | Jurisdiction or product scope changes |
+
+The source-reported rows describe a field and a regulator's area of work. Neither tells a specific product which permissions it needs. The inferred row is the local addition, connecting scope to what gets built. Recheck when entering a new jurisdiction, adding a financial function, or when the regulator updates guidance, because permission is attached to activity and can change with either.
+
+## What it cannot do
+
+This approach cannot determine legality on its own. The sources describe a field and one regulator's remit; they do not provide legal advice or a complete map of obligations. Identifying that a function is regulated is different from establishing which rules apply, how they interact, and whether an exemption exists. A team that uses a general description as a substitute for specialist advice will reach a confident but unreliable conclusion. The limit is useful to state plainly: the decision test is a screening tool, not a legal opinion.
+
+There is a cost in speed and in opportunism. Building compliance into the product slows the first release, because permissions and evidence requirements must be settled before code is final. That cost is real, and it is why teams are tempted to defer it. The hidden cost of deferring is higher: a product that must be restructured to capture records it never collected, or a launch that is paused while permission is sought. The sequence in the mechanism is cheaper precisely because it is early, and that saving is invisible on a launch timeline.
+
+A common failure is scope creep across regulated boundaries. A product starts with one permitted function and adds another, assuming the original permission covers it. The FCA material concerns a specific class of assets and the permissions around them; it does not suggest that one permission extends to every adjacent activity. The practical consequence is that each new feature needs its own scope check. A feature that seems small, such as holding funds for a settlement delay, can be the one that changes the regulatory position.
+
+The sources also set a boundary on claims. They describe what financial technology is and what a regulator works on. They do not say that a permission in one jurisdiction applies in another, nor that guidance is identical across markets. Any statement about a specific product's obligations is local and jurisdiction-specific. Presenting it as if it followed from the general sources would overstate the evidence and would undermine the distinction between reported and inferred claims that the table makes explicit.
+
+Finally, the decision needs review. Guidance changes, products change, and a function that was outside scope can move inside it when the product evolves or the regulator clarifies its position. A review does not require rebuilding the compliance programme; it requires asking whether the original scope assessment still matches what the product does. When it no longer does, the right response is to revisit permissions and evidence before adding the feature, not after. The recheck condition in the table exists for exactly this drift.
+
+The counterargument that shipping fast beats compliance review is fair for a tool with no financial function and incomplete when the product moves money or holds assets.
+
+## A decision test
+
+1. Name the financial function the feature performs.
+2. Check whether that function is regulated in the market.
+3. Identify the permissions the activity requires.
+4. List the records and disclosures the product must produce.
+5. Design those requirements into the product before launch.
+6. Recheck scope whenever a new function is added.
+7. Record the claim status and the condition for recheck.
+
+A decision test turns a vague worry about regulation into a concrete scope question. It forces the team to name the function, check the permission, and design the evidence before the feature is built. Running it early avoids the expensive reverse path, in which a product is shipped and then reworked to satisfy obligations it could have met from the start. The recheck step handles drift as the product and the guidance change.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Financial technology - Wikipedia](https://en.wikipedia.org/wiki/Financial_technology) — Technology applied to financial services.
+- UK Financial Conduct Authority, 2026. [Cryptoassets: Our Work | FCA](https://www.fca.org.uk/firms/cryptoassets) — Primary regulatory guidance on cryptoasset promotion and disclosure.

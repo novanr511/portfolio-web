@@ -1,10 +1,71 @@
 ---
 title: "Lazy Loading Costs Explained"
-description: "Reserved title for a future NOVANDRI article: Lazy Loading Costs Explained."
-date: 2026-11-17
+description: "Lazy loading defers assets to speed first paint, but deferral can shift layout and delay content. Read the metric trade-off, a worked example, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Explanation
+  - Web performance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Lazy loading is recommended as a performance fix, so teams apply it to images and scripts and expect faster pages. The Wikipedia entry on lazy loading describes deferring resources until they are needed, and web.dev defines Web Vitals as metrics of user experience. The real problem is that deferral trades one metric for another, and a page can improve its first load while feeling worse to use.
+
+**Direct answer:** Use lazy loading only where the deferred resource is unlikely to be needed immediately, and check the effect on layout stability and interaction. The sources define the technique and the metrics; the decision rule that connects them is a synthesis. Reserve space for deferred content so that it does not shift the page when it arrives.
+
+**Delta:** This article adds a deferral-to-metric mapping beyond the sources: it maps each lazy-loading choice to a Web Vitals decision, with claim status explicit.
+
+## The mechanism
+
+The Wikipedia lazy loading entry describes a resource being loaded when it is needed rather than up front. The practical consequence is that fewer bytes are fetched on the first load, so initial load metrics can improve, but the resource still has to arrive later, and that later arrival has to be managed. Deferral does not remove work; it schedules it at a different moment, and the moment matters to the person using the page.
+
+Web Vitals, as defined by web.dev, is a set of metrics covering loading, interactivity, and visual stability. The practical consequence is that an optimization improving one metric can worsen another. Deferring an image can help the load metric while hurting stability if no space was reserved for it. A script loaded late may keep the page responsive at first and then delay an interaction the user expected to be instant. The metrics describe the experience, so they have to be read together rather than one at a time.
+
+The connection between the sources is about timing. Lazy loading changes when content arrives; Web Vitals describe what the user experiences when it does. The practical consequence is that the right question is not whether lazy loading is good in general, but whether the deferred element is above the fold, part of the main content, or likely to be scrolled to soon. Deferring the wrong element delays the very content the load metric rewards, turning a supposed improvement into a regression measured by a different number.
+
+The output is a rule: defer off-screen, non-critical assets with reserved space, and keep critical content eager. Neither source fixes which elements qualify on a given page, so that classification is a local decision and must be marked as inferred. The discipline is to map each element's role to a metric consequence before deferring it, so the choice can be explained to a reviewer and checked against what the page actually needs.
+
+## A worked example
+
+The following is hypothetical and illustrative. A product page loads a hero image, a thumbnail grid, and a review widget. Three checks decide what to defer. First, a visibility check: is the hero image part of the initial viewport, so it should load eagerly, while the thumbnails sit below the fold? Second, a stability check: does the thumbnail grid have reserved dimensions so that deferred images do not push content down when they arrive? Third, an interaction check: does deferring the widget delay a control the user expects to use immediately? The team keeps the hero eager, lazy-loads the thumbnails with fixed dimensions, and loads the widget after first interaction. The outcome is a smaller initial payload without a layout shift. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Lazy loading defers resources until they are needed | `source-reported` | Wikipedia, Lazy loading | 2026-11-18 | Entry revised |
+| Web Vitals cover loading, interactivity and visual stability | `source-reported` | web.dev, Web Vitals | 2026-11-18 | Metrics updated |
+| Deferring an element with reserved space avoids a layout shift | `inferred` | Derived from the sources | 2026-11-18 | Page layout changes |
+
+The first two rows are factual claims drawn directly from the sources. The third is an inference, because neither source states that reserving dimensions prevents a shift for a given element. Recheck the source claims when the entry or the metric definitions change, and the inferred claim when the page layout changes.
+
+## What it cannot do
+
+Lazy loading cannot make a page faster in every sense. It reduces initial downloads, which can improve a load metric, but it does not reduce the total work the browser does; it postpones it. If a user scrolls quickly, the deferred content still has to arrive, and the wait is more noticeable because it happens in the middle of an interaction. A page that scores well on a first-load metric while stuttering during use is a real failure mode of an optimization applied without looking at the whole experience.
+
+The hidden cost is complexity around placeholders and dimensions. Every deferred element needs a reserved box, a fallback, and a strategy that survives a slow connection. That code has to be maintained, and it interacts with responsive layouts in ways that are easy to get wrong. A fixed height that works on a desktop can crop or leave gaps on a narrow screen. The bandwidth savings are real, but the engineering time is a recurring expense rather than a one-time change, and it is rarely counted in the decision to adopt the technique.
+
+The main failure mode is deferring critical content. When the largest visible element is lazy-loaded, the metric that rewards an early paint gets worse, because the content it looks for arrives late. A second failure mode is layout shift: an image without reserved dimensions moves the page when it appears, and a user may click the wrong target. A third is a blank area on a slow network, where the placeholder never resolves into content. Each of these can be introduced by a change whose stated purpose was to improve performance, which is why the metrics need to be checked after the change.
+
+There is a boundary around what the technique covers. Lazy loading addresses when a resource is fetched, not how large it is or how quickly the server answers. It does not compress an image, fix a slow backend, or repair a heavy script that blocks interaction. Those problems need different fixes, and deferring a resource can mask them by moving the delay to a later moment where it is less visible in a first-load report. Treating lazy loading as a general performance strategy leaves the underlying cause untouched.
+
+Because content, layouts, and metric definitions change, the deferral rules need periodic review. Which elements are deferred, how space is reserved, and which metrics are watched should be owned by a named party with a recorded recheck condition. Without that record, a future reviewer cannot tell which elements were deliberately deferred and which were defaults, and a layout change can quietly turn a sound rule into a source of shift.
+
+The counterargument that lazy loading is fair for image-heavy pages is incomplete when the deferred element is the main content the user came to see.
+
+## A decision test
+
+1. Identify which elements are in the initial viewport.
+2. Keep critical content eager and defer only off-screen assets.
+3. Reserve dimensions for every deferred element.
+4. Check the effect on the largest contentful paint.
+5. Check for layout shift as deferred content arrives.
+6. Check that deferred controls do not delay interaction.
+7. Record the rules, an owner, and a recheck date.
+
+Lazy loading is a timing decision, not a universal improvement. This test turns a deferral choice into a sequence of checks a reviewer can audit, so the page is judged on the experience it delivers rather than on a single metric that deferral happens to flatter. For further reading, see [Related](/articles/technical-writing-documentation-api-docs-and-developer-experience).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Lazy loading - Wikipedia](https://en.wikipedia.org/wiki/Lazy_loading) — Deferring resource loading until it is needed.
+- web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.

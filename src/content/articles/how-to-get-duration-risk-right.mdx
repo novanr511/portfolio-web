@@ -1,10 +1,73 @@
 ---
 title: "How to Get Duration Risk Right"
-description: "Reserved title for a future NOVANDRI article: How to Get Duration Risk Right."
-date: 2026-11-17
+description: "Duration maps bond price sensitivity to yield changes, but the measure is an approximation with limits. See the mechanism, a worked example, and a decision test."
+date: 2026-11-18
 tags:
-  - Planned
   - Finance
+  - Measurement
+  - Interest Rate Risk
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Duration is often quoted as a single number that supposedly tells you how much a bond portfolio will lose when rates rise. The Wikipedia material defines the measure and describes interest rate risk, but a single duration figure hides assumptions about yield changes, embedded options, and reinvestment. The real problem is treating a local approximation as a complete risk description.
+
+**Direct answer:** Duration measures the sensitivity of a bond's price to a change in yield, usually expressed as the approximate percentage price change for a small yield move. Interest rate risk is the broader risk that rate changes affect the value and cash flows of a position. Use duration as a first-order estimate, then check convexity, option effects, and the horizon before treating the number as a decision.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the sources: it maps duration choices to a portfolio decision, with claim status explicit.
+
+## The mechanism
+
+Macaulay duration is the weighted average time until a bond's cash flows are received, with the weights set by the present value of each payment. Modified duration converts that time measure into a sensitivity: for a small parallel shift in yield, it approximates the percentage change in price. The inverse relationship matters - when yields rise, prices fall, and modified duration tells you roughly how much. The practical consequence is that a longer-duration bond is more sensitive to a given rate move than a shorter one, which is why duration is used to compare bonds with different coupons and maturities.
+
+The approximation has conditions. It is linear, so it works well for small yield changes and degrades for large ones; convexity, the curvature of the price-yield relationship, corrects the estimate when moves are bigger. Bonds with embedded options, such as callable issues, do not have a stable cash-flow pattern, so effective duration - which recalculates cash flows under different rate paths - is used instead. Key rate durations break sensitivity down by point on the yield curve, which matters because curves rarely shift in parallel. Choosing the right duration measure is a modelling decision about the instrument, not a lookup.
+
+Interest rate risk, as the Wikipedia material frames it, is the risk that movements in interest rates affect the value of assets and liabilities and the cash flows they produce. Duration addresses the price component of that risk. The other component is reinvestment risk: as coupons are reinvested at different rates, the terminal value of a holding changes in the opposite direction to price. For a holding period equal to the Macaulay duration, the two effects roughly offset, which is the idea behind immunization. That offset is a useful concept but a fragile plan, because the yield curve moves and the holding period is rarely exact.
+
+The cost of getting duration right therefore lives in specification. A single number is cheap to quote and expensive to rely on if it is the wrong kind - modified when effective is needed, or one figure when the curve is not moving in parallel. The sources describe the measures and the risk; deciding which one governs a particular position is a local judgment, which is why the rows below separate what is documented from what is inferred.
+
+## A worked example
+
+The following is hypothetical and illustrative. A manager holds two bonds and wants to know which one leaves a portfolio more exposed to a rate increase. Three checks decide. First, a measure check: one bond is a plain fixed-rate issue and the other is callable, so the manager uses modified duration for the first and effective duration for the second rather than comparing two raw numbers. Second, a curvature check: because the expected rate move is large, the manager adds a convexity estimate instead of relying on the linear approximation. Third, a horizon check: the manager compares the portfolio's holding period with its duration to see how much reinvestment risk offsets price risk. The outcome is a decision to shorten the callable position, recorded with the measure and assumptions used. The scenario is hypothetical; the mapping from measure to decision is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Modified duration approximates price change for a small yield move | `source-reported` | Wikipedia: Duration | 2026-11-18 | Conventions or definition change |
+| Interest rate risk covers rate effects on value and cash flows | `source-reported` | Wikipedia: Interest rate risk | 2026-11-18 | Scope of the definition changes |
+| Measure choice depends on the instrument and the yield move | `inferred` | Derived from the sources | 2026-11-18 | Curve behavior or instrument mix changes |
+
+The source-reported rows establish the sensitivity measure and the broader risk category; neither selects a measure for a given portfolio. The inferred row is the synthesis of duration types and reinvestment effects into a selection rule, not a documented prescription. Recheck it if the instrument set changes or if the yield curve behaves in ways that break the parallel-shift assumption.
+
+## What it cannot do
+
+This framing has a definite limit. The sources define duration and interest rate risk; they do not tell you which bond to hold, what rate move to expect, or whether a given duration target is appropriate for your liabilities. Those are decisions about a specific balance sheet and a specific view of rates. Any claim that a duration number makes a portfolio safe is a judgment about fit, not a fact the sources provide. Read the framework as a checklist for specifying the risk you mean to measure, not as a formula that returns a portfolio decision.
+
+A hidden cost is that duration compresses a cash-flow pattern into one number, and the compression hides distribution. Two bonds with the same modified duration can behave differently when the curve steepens or flattens, because their sensitivities sit at different points. Reporting a single figure makes a portfolio look more precisely specified than it is. Using key rate durations or effective duration costs more data and modelling effort, but it exposes the shape that a single number conceals; that extra work is part of getting the risk right, not an optional refinement.
+
+The main failure mode is using modified duration where effective duration is required. A callable bond's cash flows change with rates, so a sensitivity computed from a fixed schedule understates the risk of early redemption and the price cap that comes with it. A second failure is assuming parallel shifts: when the curve twists, short and long rates move differently, and a single duration can be wrong at both ends. A third is ignoring the horizon - a position can be duration-matched and still expose an investor to reinvestment risk if the holding period differs from the duration, which is what the immunization idea is designed to highlight.
+
+The boundary is when duration is the right tool at all. It describes interest-rate sensitivity for fixed-income instruments with reasonably predictable cash flows; it says little about credit risk, liquidity risk, or the risk that an issuer defaults. A portfolio can be well managed on duration and still lose money for reasons duration does not capture. For liabilities with option-like features or for non-linear instruments, duration is a starting point that must be supplemented with scenario analysis rather than a sufficient measure on its own.
+
+Positions also need review. Coupons are paid, bonds mature, options come into the money, and the yield curve changes shape, so a duration that was correct when a position was opened drifts as time passes. Keep the measure type, the curve assumption, and the calculation date with each recorded figure, and set a trigger to recompute when rates move materially or the instrument changes. Without that, a duration number becomes a permanent label whose assumptions nobody remembers, and the next rate move is analysed with a stale estimate.
+
+The counterargument that duration is just a sensitivity number you read off a fact sheet is fair for a plain bond and a small yield move, and incomplete for callable issues, large moves, or curved yield shifts.
+
+## A decision test
+
+1. **Identify the instrument.** Note whether cash flows are fixed or depend on rates.
+2. **Choose the measure.** Use modified duration for plain bonds, effective duration when options are embedded.
+3. **Check the move size.** Add convexity when the expected yield change is large.
+4. **Inspect the curve.** Use key rate durations if a parallel shift is doubtful.
+5. **Compare the horizon.** Set holding period against duration to expose reinvestment risk.
+6. **Name what is excluded.** Record credit and liquidity risks that duration does not cover.
+7. **Set a recompute trigger.** Recalculate when rates move or the instrument changes.
+
+Getting duration right is a specification task. The sources define the sensitivity and the risk; the quality of the result depends on matching the measure to the instrument, the yield move, and the horizon. Record those choices with the number, and a duration figure becomes a decision input someone can audit rather than a label that outlives its assumptions.
+
+For further reading, see [Decision Memos That Survive Review](/articles/decision-memos-that-survive-review).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Duration (finance) - Wikipedia](https://en.wikipedia.org/wiki/Bond_duration) — The measure of a bond price sensitivity to interest-rate changes.
+- Wikipedia contributors, 2026. [Interest rate risk - Wikipedia](https://en.wikipedia.org/wiki/Interest_rate_risk) — Exposure of value to changes in rates.

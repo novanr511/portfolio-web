@@ -1,10 +1,73 @@
 ---
 title: "How to Evaluate RLHF"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate RLHF."
-date: 2026-11-17
+description: "Evaluate RLHF by testing reward-model agreement with held-out preferences and probing whether constitutional feedback preserves helpfulness, with limits stated."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Preference Learning
+  - RLHF Evaluation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+RLHF systems are often judged by a final chat demo, which hides whether the training signal was sound. The deep reinforcement learning from human preferences paper trains a reward model from comparisons of behaviour, and the Constitutional AI paper replaces part of that human feedback with AI judgments guided by written principles. The real problem is evaluating whether the signal and the feedback process actually track the behaviour a team wants.
+
+**Direct answer:** Evaluate RLHF on two layers: first, whether the learned reward model agrees with held-out human preferences, as the preference-learning work requires; second, whether the feedback process produces harmlessness without losing helpfulness, as the Constitutional AI work measures. A falling training loss is not evidence of either.
+
+**Delta:** This article adds an evaluation split beyond the sources: it maps reward signal faithfulness and constitutional coverage to a deployment decision, with claim status explicit.
+
+## The mechanism
+
+The preference-learning paper replaces a hand-written reward function with a model learned from human comparisons. People are shown short segments of behaviour and asked which they prefer; those judgments train a reward model, and that model then guides reinforcement learning. The authors evaluate the learned reward by checking how well it predicts preferences on comparisons it was not trained on. The practical consequence is that evaluation has to test generalisation of the reward model, not just performance of the final policy. A policy can score highly under a reward model that has learned the wrong preference structure, and held-out agreement is the check the paper supplies for that risk.
+
+Constitutional AI adds a different feedback source. A set of written principles, the constitution, guides a supervised stage in which the model critiques and revises its own responses, and a reinforcement stage in which AI-generated feedback replaces some human preference labels. The authors report ratings of helpfulness and harmlessness to see whether reducing harm costs usefulness. The practical consequence is that the constitution becomes an implicit specification of acceptable behaviour. Evaluating the system therefore means probing what the principles cover and what they omit, because a behaviour outside the constitution is invisible to the feedback that enforces it.
+
+Together the sources imply two evaluation layers. The first asks whether the reward or feedback signal is faithful to the intended judgments; the second asks whether the resulting behaviour satisfies the intended properties. Neither paper supplies a complete production evaluation recipe, and neither claims that agreement on held-out preferences is sufficient for deployment. Mapping one to the other is a local judgement. A team that only measures final helpfulness misses a mis-specified reward; a team that only measures reward agreement misses harm the constitution never named.
+
+That split is marked as inferred below because the sources present their evaluation methods separately and do not prescribe a combined decision procedure. The value of the split is that it assigns each failure to a layer. A reward-model problem is fixed with better or broader preference data; a constitutional gap is fixed by editing principles and re-running feedback. Conflating the two leads teams to collect more preferences when the real problem was a missing principle, or to edit principles when the reward model was the weak link.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team is evaluating an assistant trained with preference-based rewards and constitutional revision. Three checks structure the review. First, preference pairs are held out and the reward model's agreement with those human judgments is measured, to see whether the signal generalises. Second, prompts are probed against the constitution's stated harms, looking for a category the principles do not cover. Third, helpfulness ratings are compared across the supervised and reinforcement stages to catch a regression. The outcome is that reward agreement is acceptable but one harm category is missing, so a principle is added and feedback is re-run before the next evaluation. The figures are hypothetical; the three checks are the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Human preferences can train a reward model for RL without a hand-coded reward | `source-reported` | Deep RL from Human Preferences (Christiano et al.) | 2026-11-18 | New preference-learning results |
+| Constitutional AI uses a written principle set and AI feedback to reduce harmlessness | `source-reported` | Constitutional AI (Bai et al.) | 2026-11-18 | Updated constitution or method |
+| Reward signal faithfulness should be tested separately from final behavior | `inferred` | Derived from the sources | 2026-11-18 | Evaluation design changes |
+
+The first two rows report the methods the papers describe. The third is a synthesis about how to organise evaluation, because neither paper prescribes a combined procedure. Recheck the preference claim when new preference-learning results appear, the constitutional claim when the principles or method change, and the inferred split when the evaluation design changes. The table separates what the papers establish from what a team decides.
+
+## What it cannot do
+
+Preference agreement does not guarantee a correct reward model. A model can match human judgments on the comparisons it is shown and still be wrong in regions of behaviour nobody sampled. Reinforcement learning then optimises against that flawed proxy, and the policy can find states where the reward model gives high scores for behaviour the human rater would reject. The preference paper is aware of this limitation, and it is the reason held-out checks matter. Agreement is evidence about the sampled distribution, not a certificate about the whole space of behaviour.
+
+Human preferences are expensive and noisy. Each comparison costs attention, and raters disagree, so a reward model inherits both the cost of collection and the ambiguity of the labels. Constitutional AI reduces the need for some human labels but does not remove cost; it moves it into writing, maintaining, and testing the principles. A constitution that is vague produces vague feedback, and a team will spend that saved effort on probing what the principles actually enforce. The hidden cost is specification work, not just labeling work.
+
+A recurring failure mode is optimising the proxy rather than the goal. Once a reward model or a set of AI-generated labels becomes the target, the policy is under pressure to satisfy the target rather than the underlying intent. Helpfulness and harmlessness ratings can be gamed if the same model produces both the behaviour and the judgment. The constitutional work separates these roles to reduce that risk, but separation is a design choice a team must preserve, not an automatic property of the method.
+
+There is a boundary around the values themselves. The preference paper treats human preferences as the source of the reward and does not adjudicate whose preferences should count. The constitutional paper supplies a written set of principles and does not claim those principles are universal. What counts as harmless is context specific, and a constitution tuned for one product may be wrong for another. Neither paper validates a generic deployment, so a team cannot outsource its normative choices to the method.
+
+Because preferences drift and principles age, evaluation needs a review condition. New user behaviour produces comparisons the reward model has not seen, and new failure modes fall outside old principles. Recheck held-out agreement when the preference distribution changes, and re-probe constitutional coverage when the product's harms change. Record the evaluation date and the principle version so a future reviewer can tell which results belong to which specification.
+
+Counterargument: "The counterargument that AI feedback cuts evaluation cost is fair for well-specified principles and incomplete where the constitution has blind spots."
+
+## A decision test
+
+1. Name the behaviour the system is meant to produce.
+2. Hold out preference pairs and measure reward-model agreement.
+3. Probe the constitution for harms the principles do not name.
+4. Compare helpfulness across the supervised and feedback stages.
+5. Keep feedback judgments separate from the model being judged.
+6. Attribute any failure to the signal layer or the principles layer.
+7. Record the principle version and a recheck condition.
+
+The test separates two questions that are usually merged. A system can have a faithful reward signal and still be harmless only in the narrow sense its constitution defines; it can also behave well in a demo while the reward model is fragile. Evaluating the layers independently tells a team where to spend the next effort. Recorded with a version and a date, that judgement becomes repeatable.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Paul F. Christiano et al., 2017. [Deep Reinforcement Learning from Human Preferences](https://arxiv.org/abs/1706.03741) — The reward-model pipeline behind RLHF.
+- Yuntao Bai et al., 2022. [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073) — Self-critique against an explicit constitution as a scalable harmlessness procedure.

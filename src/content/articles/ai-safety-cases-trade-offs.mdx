@@ -1,10 +1,69 @@
 ---
 title: "AI Safety Cases Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: AI Safety Cases Trade-Offs."
-date: 2026-11-17
+description: "A safety case argues a system is safe enough for a use. See how assurance claims map to deployment decisions, with claim status explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Risk analysis
+  - AI safety cases
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An AI safety case is meant to show that a system is safe enough for a specific use, but it is often reduced to a document that implies more assurance than it provides. The real problem is that a claim can look rigorous while resting on weak or irrelevant evidence. Without a clear link from risk to evidence to decision, the case cannot actually support a deployment choice.
+
+**Direct answer:** A safety case is a structured argument, backed by evidence, that a system is safe for a stated application and operating context. The NIST AI Risk Management Framework organizes AI risk work into Govern, Map, Measure, and Manage activities. The bounded claim: an AI safety case maps each identified risk to a claim and supporting evidence, with sufficiency decided locally.
+
+**Delta:** This article adds a risk-to-claim-to-evidence mapping beyond the sources: it maps each framework category to an assurance decision, with claim status explicit.
+
+## The mechanism
+
+Wikipedia describes a safety case as a structured argument, supported by a body of evidence, that provides a compelling, comprehensible, and valid case that a system is safe for a given application in a given operating environment. The approach originated in safety-critical industries and is associated with goal-based regulation, where the duty is to demonstrate safety rather than merely to follow a prescribed checklist. The practical consequence is that the artifact of value is the argument and its evidence, not a passing test score or a signed form. A case is judged by whether its reasoning holds together.
+
+The NIST AI Risk Management Framework offers a voluntary, risk-based approach to managing the risks of AI systems. It is organized around four functions: Govern, Map, Measure, and Manage. It treats risk as context-dependent and describes trustworthiness through multiple characteristics, including validity and reliability, safety, security and resilience, accountability and transparency, explainability, privacy enhancement, and fairness with harmful bias managed. The practical consequence is that a safety case for an AI system must state the context and name the specific risks it addresses, rather than asserting safety in general terms that cannot be checked.
+
+The two sources connect at a decision neither states as a single step. The safety case supplies the argument structure of claim, evidence, and reasoning. The framework supplies a way to identify and categorize risks and the functions for working with them. Read together, they suggest mapping each relevant risk to a testable claim and each claim to the evidence that supports it. Neither source dictates how much evidence is enough for a given deployment, so that sufficiency threshold is a local choice that must be marked as inferred. Treating a generic checklist as a safety case skips the reasoning that makes the argument meaningful.
+
+The useful output is a table pairing each identified risk with a claim, the evidence offered for it, and a level of confidence. That table, not a generic policy document, is the decision instrument. It shows where evidence is thin and where a claim has outrun what can be shown. It also makes the rationale reviewable, because risk, claim, and evidence are recorded together. A team that writes them down can later explain why it accepted a residual risk and who owns it, instead of pointing to a document that asserts safety without showing its basis.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team is preparing to deploy an automated screening tool that influences access to a service. Three checks shape the review. First, which risks from the framework's categories are actually present in this context, and which are reasonably out of scope? Second, for each claim of acceptable performance, what evidence supports it, and does that evidence cover the groups the tool will affect rather than only an aggregate? Third, what level of confidence counts as enough to deploy, and who owns whatever risk remains after the evidence is weighed? The review finds one claim supported only by an overall metric, adds subgroup evidence, and records the residual risk with a named owner. The outcome is a case whose claims can be challenged on their merits. The details are hypothetical; the decision method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A safety case is a structured argument with evidence that a system is safe in context | `source-reported` | Safety case, Wikipedia | 2026-11-18 | Definition revised |
+| The AI RMF organizes risk work into Govern, Map, Measure, and Manage | `source-reported` | AI RMF, NIST | 2026-11-18 | Framework updated |
+| The evidence sufficiency threshold is a local, inferred choice | `inferred` | Derived from the sources | 2026-11-18 | Deployment context changes |
+
+The first two rows report what the reference article and the framework state. The third is an inference about what the sources leave to the deployer, because neither fixes a sufficiency threshold for a particular system. Recheck the source rows when the definition or framework is revised, and the inferred row whenever the model, the data, or the deployment context changes.
+
+## What it cannot do
+
+A safety case does not make a system safe. It is an argument that safety has been demonstrated to some standard, and that argument can be wrong, incomplete, or overconfident. Treating the document as a certificate confuses the documentation of assurance with assurance itself. A system with a polished case can still fail in conditions the case never anticipated, because the evidence covers the scenarios the authors chose to examine. The distinction matters most when the stakes are high, since the case is a claim about a bounded context and not a guarantee about every future situation the system might encounter.
+
+The hidden cost is that assembling a defensible case takes more effort than completing a checklist. Identifying hazards, gathering relevant evidence, reasoning from that evidence to specific claims, and maintaining a confidence argument all require work that a sign-off sheet avoids. That asymmetry is why teams default to checklists and then describe the result as a safety case. The cost is paid in evidence collection, in analysis that may weaken a favored conclusion, and in the discipline to update the argument when the system or its context changes. Skipping the work does not remove the risk; it only removes the record of how the risk was considered.
+
+The main failure mode is a case that is impressive in form but weak in substance. Aggregate evidence can conceal poor performance on specific groups. A claim can be phrased so broadly that no realistic evidence could refute it. A sufficiency threshold can be set to match whatever data happens to exist, so that the conclusion is decided before the evidence is gathered. None of these is a formatting problem; all are failures of reasoning. The question worth asking is whether the evidence would change the deployment decision if it came out the other way. If the answer is no, the case is decoration rather than a decision input, and it should be treated that way.
+
+There is a boundary around the approach. It covers the structure of an assurance argument and a framework for organizing AI risk, not legal compliance, not formal certification, and not the technical guarantees of the model itself. It cannot tell a team what level of residual risk is acceptable, because that is a judgment about the context and the people affected. It can show whether the claims a team has chosen are supported by the evidence it has gathered. That is narrower than the phrase safe AI is often made to suggest, where a single artifact is asked to settle a much larger question.
+
+Because models and contexts change, the case needs a refresh. Each risk should carry its evidence, its claim, and a recheck condition, and the sufficiency threshold should be treated as a local decision rather than a value the framework supplies. Without that record, a future reviewer cannot tell a demonstrated claim from an assumed one. The evidence will still be collectible; the rationale that connects it to a decision is what makes the case reviewable. For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## A decision test
+
+1. State the system, its purpose, and its operating context.
+2. List the risks from the framework's categories that apply here.
+3. Write a testable claim for each relevant risk.
+4. Attach specific evidence to each claim.
+5. Record the reasoning that connects evidence to claim.
+6. Set a local sufficiency threshold and name an owner for residual risk.
+7. Revisit the case when the model, the data, or the context changes.
+
+An AI safety case is useful only when the risks, claims, and evidence are all visible together. The test turns a general assurance claim into a sequence of decisions with an explicit rationale, so a reviewer can challenge the weakest link rather than accept the document as a whole. The judgment about what is safe enough remains local; the value of the structure is that the judgment becomes inspectable and can be revised when the facts change.
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Safety case - Wikipedia](https://en.wikipedia.org/wiki/Safety_case) — Structured argument that a system is acceptably safe.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

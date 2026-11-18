@@ -1,10 +1,73 @@
 ---
 title: "How to Get Activation Emails Right"
-description: "Reserved title for a future NOVANDRI article: How to Get Activation Emails Right."
-date: 2026-11-17
+description: "Use A/B testing and permission-based email rules to improve activation, with a worked review, an evidence table, and the limits of an open-rate win."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - A/B Testing
+  - Activation Email
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Activation emails are often tuned for opens, yet an opened email is not a user who reached first value. The email marketing entry describes permission-based sending, deliverability, and the metrics teams track, while the A/B testing entry describes how to compare two variants fairly. The real problem is knowing which change actually causes more users to activate.
+
+**Direct answer:** Get activation emails right by testing one change at a time against a success metric defined as activation, not as an open. Send only to a permissioned list and keep deliverability rules in view, because a test on a polluted list measures the wrong thing. The sources supply the sending context and the comparison method; the choice of metric is a synthesis.
+
+**Delta:** This article adds a decision-facing test beyond the sources: it maps subject-line and send-time tests to an activation decision, with claim status explicit.
+
+## The mechanism
+
+Email marketing covers both promotional and transactional messages, and both depend on a list the recipient agreed to join. Permission matters for two reasons: it affects whether the message is wanted, and it puts the sender under anti-spam obligations such as accurate headers, honest subject lines, an identified physical address, and a working unsubscribe. Deliverability sits behind those rules. A message that lands in a spam folder cannot activate anyone, and a list that has aged without re-permissioning will suppress even a well-written email. The practical consequence is that activation work starts with list health before it starts with copy. A team that optimises subject lines on a list full of stale addresses is measuring deliverability, not persuasion.
+
+A/B testing compares two versions of a message by splitting an audience and measuring which version performs better on a chosen metric. The method rests on random assignment, one changed variable, and a metric fixed before the test begins. Random assignment makes the groups comparable; changing one variable makes the result interpretable; fixing the metric in advance stops a team from choosing whichever number looks best afterwards. The comparison also needs enough observations and a check of statistical significance, otherwise a small difference is indistinguishable from noise. The practical consequence is that a test is a question asked precisely: does this subject line, holding everything else constant, change the defined outcome?
+
+The two sources meet at the choice of outcome. Email marketing supplies the metrics teams commonly record, including opens and clicks; A/B testing supplies the discipline for comparing variants. Neither says that an open rate is the right success metric for activation. That is a local judgement. Activation is the point at which a user reaches the product's first value, which usually sits downstream of the click. If the test is scored on opens, it will reward curiosity rather than activation. If it is scored on activation, a subject line that wins on opens but loses on activation will be correctly rejected.
+
+The mapping from a test variant to an activation decision is therefore an inference, not a statement found in either source. It is marked as inferred in the table below. Keeping that marker visible matters because it is exactly the step a team most often skips: they import the testing method, keep the default metric, and then report the result as if the method had chosen the goal for them. The method chooses how to compare; the team chooses what to compare for.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team sends an activation email to a permissioned list and wants to learn whether a shorter subject line helps. Three checks structure the test. First, the list is confirmed as opted in, with a working unsubscribe and accurate headers, so the send does not undermine deliverability. Second, the audience is split at random and only the subject line changes, so the comparison is interpretable. Third, the success metric is fixed before launch as the share of recipients who reach first value within a week, not the share who open. The result is that the longer subject line wins on opens while the shorter one wins on activation, so the team ships the shorter one and records the open-rate difference as a diagnostic. The numbers are hypothetical; the checking sequence is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Email marketing depends on permissioned lists and anti-spam obligations | `source-reported` | Wikipedia, Email marketing | 2026-11-18 | Anti-spam rules change |
+| A/B testing compares randomized variants on a metric fixed in advance | `source-reported` | Wikipedia, A/B testing | 2026-11-18 | Testing guidance changes |
+| Activation, not open rate, should score an activation email test | `inferred` | Derived from the sources | 2026-11-18 | Activation definition changes |
+
+The first two rows report what each source describes. The third is a local choice about the success metric, because neither entry names activation as the goal. It should be rechecked whenever the definition of first value changes or the product's activation event is redefined. The table keeps that dependency visible so a future reviewer can see why an open-rate win was not accepted.
+
+## What it cannot do
+
+An A/B test cannot explain why a variant won. It reports a difference on a metric; the causal story about wording, timing, or audience mood is a hypothesis the test does not test. A team can correctly conclude that a subject line raised activation and still be wrong about the reason, then generalise the lesson to unrelated emails where it does not hold. The sources describe a comparison method, not a theory of what persuades a recipient. Treating a winning variant as an explanation is the first mistake this method invites.
+
+The hidden cost is traffic and patience. A test needs enough recipients in each group to distinguish a real effect from noise, which means holding back a simpler decision while the test runs. Multiple variants, repeated peeking, and early stopping quietly inflate the chance of a false positive. Each extra comparison is another chance to find a winner that is only luck. The cost is not just time; it is the statistical hygiene required to keep the result honest. Teams that check a test daily and stop when it looks good are usually measuring their own impatience.
+
+The common failure mode is scoring on the wrong outcome. Open rates are easy to collect and move quickly, so they become the default even when activation is the goal. This is reinforced by the fact that opens are a noisy signal: privacy features and mail clients can inflate or suppress them. A variant that wins on opens can therefore lose on activation, and the team will celebrate the wrong result. The practical safeguard is to write the success metric into the test plan before launch and resist substituting a convenient proxy afterwards.
+
+There is a boundary around permission and jurisdiction. The email marketing entry summarises obligations such as accurate headers and honouring opt-outs, but it is not legal advice, and the rules vary by jurisdiction and change over time. What counts as consent in one region may not count in another. A team that treats a summary as compliance advice has confused an overview with a legal determination. Deliverability rules also sit outside the test: a list that is technically permissioned can still be poorly targeted, and no subject line fixes a message the recipient did not want.
+
+Because both the list and the rules change, the practice needs a review condition. Re-permission a stale list, recheck the anti-spam summary when rules change, and redefine the activation event when the product changes. A test that was valid last quarter can measure something else this quarter if first value now means a different action. Recording the metric, the list state, and the date alongside the result is what makes the next test comparable.
+
+Counterargument: "The counterargument that open-rate tests are fast is fair for low-stakes subject-line tweaks and incomplete where the change is meant to move activation."
+
+## A decision test
+
+1. Confirm the list is permissioned and the send respects anti-spam rules.
+2. Define activation as the success metric before launch.
+3. Change one variable, keeping the rest of the email constant.
+4. Split the audience at random into control and variant.
+5. Wait for enough observations and check significance.
+6. Decide from the activation metric, not the open rate.
+7. Record the metric, list state, and review date.
+
+The test turns an email change into a decision with a visible rule. Each step removes a way for a team to fool itself: a polluted list, a moving metric, or a premature stop. A variant that passes has earned a ship decision, not a story. Recorded with a date, it also becomes a baseline the next test can be compared against.
+
+For further reading, see [Marketing Dashboards Without the Hype](/articles/marketing-dashboards-without-the-hype).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Email marketing - Wikipedia](https://en.wikipedia.org/wiki/Email_marketing) — The mechanisms and measurement of email campaigns.
+- Wikipedia contributors, 2026. [A/B testing - Wikipedia](https://en.wikipedia.org/wiki/A/B_testing) — Controlled comparison of two variants.

@@ -1,10 +1,73 @@
 ---
 title: "Data Governance Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: Data Governance Metrics that Matter."
-date: 2026-11-17
+description: "Governance metrics should track the goals of governance, not activity. Read the goal-to-measure map, a worked example, and where metrics mislead."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Metrics
+  - Data Governance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Data governance programs often measure the wrong thing. They count meetings held or policies written, then declare success while data stays hard to find and hard to trust. The sources define governance and the models that structure data, but they do not hand over a metric set. The real problem is turning the aims of governance into measures that drive a decision.
+
+**Direct answer:** Data governance metrics should trace back to the goals of governance: availability, usability, integrity, and security. Wikipedia describes governance as the management of data's availability, usability, integrity, and security, and describes data modeling as defining the structure of data. The practical step is to attach a measure to each aim and decide what a change in that measure means.
+
+**Delta:** This article adds a governance-goal-to-measure map beyond the sources: it maps each governance aim to a measurable indicator and a decision, with claim status explicit.
+
+## The mechanism
+
+Wikipedia describes data governance as the overall management of the availability, usability, integrity, and security of data used in an enterprise. The discipline is carried out through processes, roles, policies, standards, and, notably, metrics. The practical consequence is that metrics are part of governance rather than an add-on attached at the end. They exist to show whether the four aims are actually being met, so a metric that does not connect to one of those aims is already suspect.
+
+Wikipedia describes data modeling as the process of defining data elements, their structure, and their relationships, often expressed at conceptual, logical, and physical levels. The connection to metrics is easy to miss but important. Without an agreed model, a word like integrity has no fixed referent: there is no shared statement of what a record should contain or how elements relate. The model supplies the definitions that make any count meaningful. A metric built on an ambiguous model measures an ambiguous thing.
+
+The translation from aim to measure is where a working map gets built. Availability becomes a question of whether consumers can obtain the data they need. Usability becomes a question of whether they can understand it, which depends on documented definitions. Integrity becomes a question of whether records conform to the rules the model states. Security becomes a question of whether access is limited to appropriate roles. Each indicator should point to a decision, such as release, remediate, or restrict. This map is a synthesis from the two sources and is treated as inferred, not reported.
+
+Once the indicators exist, they function as trends rather than verdicts. A single reading says little; a direction over time says more. The review cadence matters as much as the number, because governance is ongoing. A metric that moves without anyone acting on it is decoration. The model stays the shared reference that keeps the measures consistent, so when a definition changes, the metric changes with it and the change is visible to reviewers.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team governs a shared customer dataset and reviews it before opening wider access. Three checks frame the review. First, availability: can analysts locate and obtain the dataset through the normal path, or do they rely on informal copies? Second, integrity: do records conform to a documented rule from the data model, and is any gap traced to the rule itself or to the data? Third, security: is access limited to appropriate roles with a clear owner? The review finds availability and security sound, but a share of records fails a field rule, and the failure traces to an ambiguous definition in the model. The outcome is a decision to clarify the model definition rather than write a new policy. The scenario is illustrative; the mapping method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Data governance manages availability, usability, integrity and security of data | `source-reported` | Wikipedia, Data governance | 2026-11-18 | The entry is revised |
+| Data modeling defines data elements, structure and relationships | `source-reported` | Wikipedia, Data modeling | 2026-11-18 | The entry is revised |
+| Attaching a measure to each governance aim makes progress reviewable | `inferred` | Derived from the sources | 2026-11-18 | Metrics are ignored in decisions |
+
+The first two rows are factual claims drawn directly from the sources and stay stable until those entries change. The third is an inference about how a metric behaves in practice, not something either source asserts. It is the row to revisit first, because a measure that nobody acts on stops being useful regardless of how correct its definition is. Readers should treat the table as a snapshot tied to the verification date.
+
+## What it cannot do
+
+The sources define the aims of governance and the structure of data, but they supply no thresholds. No source says what level of availability is good enough or how much integrity gap is tolerable. Those targets are local decisions that depend on the cost of being wrong and the purpose of the data. A metric without a target can be tracked, but it cannot tell a reviewer whether the situation is acceptable. The team has to set the bar itself and record why it was set there.
+
+There is a hidden cost in maintaining measures. Instrumenting a dataset, agreeing definitions, and keeping them current require stewardship time that is easy to underestimate. Once a number is published, it also becomes a target, and targets can be gamed: a team may improve the measure while the underlying problem persists. That behavior is an inference about incentives rather than a statement from the sources, but it is a real risk. A well-designed metric set pairs each number with a qualitative check so that a rising score cannot hide a falling trust level.
+
+The main failure mode is measuring activity instead of outcomes. Counting policies signed or reviews held is easy, and those counts can rise while availability, integrity, and security stay poor. Activity metrics are attractive because they are cheap to produce and flattering to report. The goal-to-measure map exists to resist that pull by forcing every indicator back to one of the four aims. If a proposed metric cannot be traced to an aim, it is probably measuring the program rather than the data.
+
+There is a boundary around the method. The four aims can conflict: tightening security can reduce availability, and a strict integrity rule can slow delivery. A single metric cannot resolve those tradeoffs, and a dashboard that shows them side by side still leaves a human decision to make. The map also covers data within the modeled scope. Data outside the model, or uses nobody documented, will not appear in the measures, which is a limitation of relying on a model as the shared reference.
+
+Because both data and models change, the metrics need periodic review. A new source, a changed definition, or a new consumer can invalidate an indicator without warning. Each metric should carry a recheck condition and an owner, and the review should ask whether the measure still traces to an aim. Without that discipline, the metric set drifts into a collection of stale numbers that look authoritative and describe nothing current.
+
+Counterargument: the claim that a goal-to-measure map improves governance is fair for a program starting from vague aims and incomplete for a mature program, where scores may already be trusted and the harder problem is acting on them.
+
+## A decision test
+
+1. **List the four aims** from the governance definition: availability, usability, integrity, and security.
+2. **Confirm a model reference** exists so each aim has a defined object to measure.
+3. **Attach one indicator** to each aim that can be read consistently over time.
+4. **Set a local target** for each indicator and record the reason for that target.
+5. **Name the decision** each indicator informs, such as release, remediate, or restrict.
+6. **Assign an owner** and a recheck condition to every indicator.
+7. **Review the set** whenever a data source, model definition, or consumer changes.
+
+A metric set is useful only when a reading can change a decision. The test turns four abstract aims into indicators with owners and review points, so a reader can see what each number is for. That is the difference between governance that can be inspected and governance that is only asserted.
+
+For further reading, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data governance - Wikipedia](https://en.wikipedia.org/wiki/Data_governance) — Policies and accountable ownership of data.
+- Wikipedia contributors, 2026. [Data modeling - Wikipedia](https://en.wikipedia.org/wiki/Data_modeling) — The structure and purpose of data models.

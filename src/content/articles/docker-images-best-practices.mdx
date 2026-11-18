@@ -1,10 +1,71 @@
 ---
 title: "Docker Images Best Practices"
-description: "Reserved title for a future NOVANDRI article: Docker Images Best Practices."
-date: 2026-11-17
+description: "Docker images reward layering discipline. Read how image layers map to build and deploy decisions, a worked example, and the limits of image hygiene."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Container Images
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often treat image building as a packaging afterthought and accept whatever a build produces until pulls slow down or a deployment breaks. The Docker entry describes how images are assembled from layers, and the Open Container Initiative defines the image format and runtime standards those layers depend on. The real problem is that image structure is a chain of build and deployment decisions, not a one-time packaging step.
+
+**Direct answer:** Docker image best practices are mostly about controlling layers: choose a minimal base, order instructions so frequently changing steps come last, keep secrets and build-only tools out of runtime layers, and pin tags to fixed versions. The Docker entry documents the layer model and OCI documents the format and runtime standards. Which specific base or tag to use is a local decision, so each is marked inferred where the sources do not prescribe one.
+
+**Delta:** This article adds a claim-status mapping beyond the sources: it maps image-layer mechanics to specific build and deploy decisions, with claim status explicit.
+
+## The mechanism
+
+Docker delivers software in containers that use operating-system-level virtualization. All containers on a host share a single kernel, which is why they are lighter than virtual machines. An image is the read-only template from which containers are created, and it is built from a sequence of layers recorded in a Dockerfile. Each instruction adds a layer, and the layers stack in order. The practical consequence is that layers are additive: a file added in an early layer remains in the image history even if a later layer deletes it. Anything sensitive or bulky introduced at the wrong stage is carried forward, so the first discipline is to avoid putting it there at all.
+
+The Open Container Initiative defines open standards for the container image format and the container runtime. That matters because an image built to the specification is portable across any runtime that honors it. The practical consequence is that optimizing a build around one vendor's tooling can quietly reduce that portability. Standards give a stable target: an image is a portable artifact, and the layer rules that govern it are not a private implementation detail. Treating the image as a spec-governed object is what makes a build reproducible on another machine or in another environment.
+
+Layer caching follows from the same ordering rule. Because layers are built in sequence, a builder can reuse layers whose inputs have not changed. Instructions that rarely change, such as installing dependencies, should come before instructions that change often, such as copying edited source. The practical consequence is that a small reordering can keep the cache warm across most rebuilds, while careless ordering forces a full rebuild after every edit. The decision is not about style; it is about how much time the team spends waiting on builds.
+
+The output of the mechanism is a mapping from each Dockerfile choice to a consequence: base image to size and attack surface, instruction order to rebuild time, secrets handling to exposure, and tag pinning to reproducibility. That mapping, rather than a generic checklist, is the decision instrument. The useful sequence is to choose a minimal base, order for the cache, exclude secrets and build-only tools, pin the tag, and scan the result. Because tooling and base images change, each step carries a recheck condition rather than a permanent guarantee.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team ships a service whose image is large and whose rebuilds take too long, and it is evaluating a Dockerfile rewrite. Three checks decide the change. First, the base image and layer history: does the image carry a full compiler toolchain that is only needed at build time? Second, the instruction order: do dependency installs that rarely change come before the source copy that changes on every commit? Third, secrets and tags: are any credentials baked into a layer, and is the base pinned to a fixed version rather than a moving tag? The review finds build tools in the runtime image, a poorly ordered copy step, and an unpinned base. The outcome is a multi-stage build with a minimal runtime base, reordered instructions, secrets supplied at runtime, and a pinned tag. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Docker images are built from stacked layers recorded by a Dockerfile | `source-reported` | Docker - Wikipedia | 2026-11-18 | Engine or build tool behavior changes |
+| OCI defines standards for the container image format and runtimes | `source-reported` | Open Container Initiative | 2026-11-18 | Spec version changes |
+| Ordering instructions by change frequency preserves the layer cache | `inferred` | Derived from the sources | 2026-11-18 | Build tooling or builder behavior changes |
+
+The first two rows are reported directly from the reference sources and are comparatively stable; the third is an inference about how the layer model interacts with a build tool. The implication is that the layer and standards claims can be trusted as stated, while the caching rule should be revisited whenever the builder changes. Each choice should carry its own recheck condition, because a rule that held for one version of the tool may not hold for the next.
+
+## What it cannot do
+
+Image best practices do not make an image secure or correct. They shape the structure of the artifact, but a minimal image can still ship vulnerable application code, a misconfigured service, or a dependency with a known flaw. The sources describe how images are built and standardized; they do not certify the contents. Treating a clean, small image as proof of safety is a category error: it answers whether the build followed a disciplined structure, not whether what is inside is trustworthy. A reader who needs assurance about the application must look to the code and the dependency scan, not to the layer count.
+
+The hidden cost is maintenance and a trade-off with debuggability. A minimal runtime image is smaller and has fewer components, but it may lack a shell and the utilities an engineer needs to diagnose a failure in production. Multi-stage builds keep build tools out of the runtime image, which is good for size and exposure, but they add structure that must be understood and maintained. The effort spent chasing smaller images is real, and it is only worth it when size, rebuild time, or exposure actually matter to the team. Applying every rule to every image can produce complexity that outweighs the benefit.
+
+The main failure mode is believing that deleting a file in a later layer removes it from the image. Because layers are additive, a secret written in an early layer and removed in a later one is still recoverable from the layer history by anyone who can pull the image. The fix is never to write the secret in the first place and to supply it at runtime. A related failure is pinning to a moving tag and assuming the base is fixed; a rebuild can then pull a different base and change behavior without any change to the Dockerfile. Both failures arise from treating the image as a single file rather than a history of layers.
+
+There is a boundary around the method. It covers the structure of layered, spec-conforming images, not orchestration, runtime privileges, network policy, or the provenance of a base image. The sources describe the image format and the build model; they do not address how a container is run in production or who is allowed to deploy it. A well-structured image can still be run with excessive privileges or connected to the wrong network. The honest limit is that image hygiene is one layer of a larger deployment practice, and it cannot substitute for the operational controls that sit outside the image.
+
+Because specifications, builders, and base images evolve, the practice needs a scheduled review. Each rule should be recorded with a recheck condition: when the builder version changes, when the OCI specification is revised, or when the base image is replaced. Without that record, a future reviewer cannot tell which choices were deliberate and which were inherited defaults. The image will still build; the reasoning that made it small, fast, and reproducible is what makes the review possible.
+
+The counterargument that image hygiene is only a build-time optimization is fair for teams with no deployment pain and incomplete where images are distributed widely, because a leaked layer travels to every registry and host that pulls it.
+
+## A decision test
+
+1. State the decision the image change is meant to improve.
+2. Choose a minimal base image appropriate to the runtime.
+3. Order Dockerfile instructions by how often they change.
+4. Keep secrets and build-only tools out of the runtime layers.
+5. Pin the base tag to a fixed version or digest.
+6. Scan the final image and confirm the history holds no sensitive files.
+7. Record a recheck condition for builder, spec, and base-image changes.
+
+An image practice is useful only when the layer choices and their consequences are both recorded. The test turns a build into a sequence of decisions with a visible rationale, so a reviewer can see why the base was chosen and when the rule must be revisited. It fails when an image is declared good simply because it is small. For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Docker (software) - Wikipedia](https://en.wikipedia.org/wiki/Docker_(software)) — Container images and the tooling around them.
+- Open Container Initiative, 2026. [Open Container Initiative - Open Container Initiative](https://opencontainers.org/) — The open specifications behind container images.

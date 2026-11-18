@@ -1,10 +1,71 @@
 ---
 title: "Zero Trust Best Practices"
-description: "Reserved title for a future NOVANDRI article: Zero Trust Best Practices."
-date: 2026-11-17
+description: "Zero trust removes implicit trust from network access, but a framework cannot enforce itself. Read the risk-mapping mechanism, a worked example, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Security
+  - Framework
+  - Zero trust
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Zero trust is often sold as a product, which is why teams buy a tool and assume the job is done. The Wikipedia entry on zero trust architecture describes a model that removes implicit trust, while NIST SP 800-30 describes a risk assessment process. The real problem is that a security model and a risk method are different things, and confusing them leaves the controls untested.
+
+**Direct answer:** Treat zero trust as an access model whose controls are chosen and checked through a risk assessment, not as a single product. The sources describe the model and the assessment process; the mapping between them is a synthesis. Verify identity and context at each access request, then reassess the risks the controls leave behind.
+
+**Delta:** This article adds a control-to-risk mapping beyond the sources: it maps each zero-trust control to a risk assessment decision, with claim status explicit.
+
+## The mechanism
+
+The Wikipedia entry on zero trust architecture describes a model in which no implicit trust is granted based on network location. Access is verified per request rather than assumed after a single login. The practical consequence is that a control such as continuous verification shifts the decision from one moment to every resource request, which means identity and device signals must be available at the time of access. A policy that cannot see those signals cannot enforce the principle, and the gap appears in daily use rather than in a diagram.
+
+NIST SP 800-30 describes a systematic process for conducting risk assessment, covering threats, vulnerabilities, impact, and likelihood. The practical consequence is that it supplies a way to decide which controls matter most, because not every asset carries the same risk. A team can rank what to protect first instead of applying uniform rules everywhere. The process does not mandate a particular control; it gives a structure for recording why one control was chosen over another and what risk remains.
+
+The two sources connect where neither is specific. Zero trust states what to enforce, while risk assessment says where to spend effort. Neither prescribes a product. The practical consequence is that a control which looks correct on paper can fail in practice if the assessment never considered the threat it was meant to stop. The assessment should be an input to control selection, so the highest-risk access paths are addressed first and the residual risk is named explicitly rather than absorbed into a general policy.
+
+The output is a mapping from each access decision to a risk owner and a reassessment condition. The practical consequence is that when a control changes, the risk picture changes with it, so the two artifacts have to be reviewed together. Boundaries and recheck conditions are local choices rather than requirements stated in the sources, and they must be marked as inferred. The discipline is to keep the model and the assessment in the same review cycle so neither drifts away from the other.
+
+## A worked example
+
+The following is hypothetical and illustrative. A company replaces flat network access with a zero-trust model and runs a risk assessment before rollout. Three checks decide the plan. First, an identity check: is every access request tied to a verified user and device rather than to a network location? Second, a risk check: has the team listed the threats the control is meant to reduce, with impact and likelihood recorded for the main access paths? Third, a coverage check: are the highest-risk assets protected first, with a residual risk owner named for what remains? The assessment shows that a legacy application cannot support per-request verification, so it is isolated and given a compensating control. The outcome is a staged rollout with a documented exception, not a blanket policy applied to everything at once. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Zero trust removes implicit trust based on network location | `source-reported` | Wikipedia, Zero trust | 2026-11-18 | Entry revised |
+| SP 800-30 provides a process for risk assessment | `source-reported` | NIST SP 800-30 | 2026-11-18 | Revision published |
+| Risk assessment should drive which controls are prioritized | `inferred` | Derived from the sources | 2026-11-18 | Threat model changes |
+
+The first two rows are factual claims taken directly from the sources. The third is an inference, because neither source ranks a particular organization's assets or links a specific control to a specific threat. Recheck the source claims when the entry or the NIST revision changes, and the inferred claim when the threat model changes.
+
+## What it cannot do
+
+A zero-trust model cannot by itself tell an organization which threats to prioritize. It states a principle about trust, not a threat catalogue. NIST SP 800-30 supplies an assessment method, but neither source ranks a particular company's assets or decides what is valuable enough to protect first. A team that adopts the principle without assessing risk ends up with uniform controls that may be too weak where it matters and too strong where it does not. The model is a starting rule, not a complete security program.
+
+The hidden cost is identity and telemetry work. Per-request verification needs reliable identity records, device posture signals, and logs that can actually be reviewed. Building and maintaining these is a program rather than a configuration change, and it touches directories, endpoints, and applications. Legacy systems that cannot participate need compensating controls, and each exception becomes a permanent maintenance item with an owner. The cost is paid in engineering time and in the discipline to keep records accurate, not in the price of a single tool.
+
+The main failure mode is treating a product as the whole program. A tool can enforce policy, but if no risk assessment defined the policy, the tool will enforce the wrong thing efficiently. A second failure mode is exception sprawl: temporary bypasses added for compatibility accumulate and quietly restore the implicit trust the model was meant to remove. A third is policy that outruns its signals, where verification is assumed but the identity or device data is stale. All three can coexist with a dashboard that reports policies enabled.
+
+There is a boundary around coverage. Zero trust addresses access to resources, not the security of the resource once access is granted. It does not patch an application, fix a misconfigured database, or stop an authorized user who misuses legitimate access. Risk assessment helps show what lies outside the control, but the model does not cover it. A team that reads zero trust as protection against every breach will discover the gap only after an incident that the access layer did nothing to prevent.
+
+Because threats and systems change, both the controls and the risk assessment need periodic review. Access policies, identity signals, and exceptions should be owned by a named party with a recorded recheck condition. Without that record, a future reviewer cannot tell which exceptions were justified and which were leftovers from an old system. The controls and the assessment must be revisited together, since changing one without the other recreates exactly the gap the review was meant to close.
+
+The counterargument that a zero-trust product is fair for enforcing policy is incomplete when no risk assessment has decided what the policy should protect.
+
+## A decision test
+
+1. List assets and the access paths that reach them.
+2. Run a risk assessment with threats, impact, and likelihood.
+3. Verify identity and device at each access request.
+4. Prioritize controls for the highest-risk assets first.
+5. Isolate or compensate for systems that cannot support verification.
+6. Name an owner for each residual risk and each exception.
+7. Review the controls and the assessment together on a recheck date.
+
+A zero-trust program is only as sound as the risk assessment behind it. This test turns a security label into a sequence of checks a reviewer can audit, so the controls reflect ranked risk rather than the default settings of a product. For further reading, see [Related](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Zero trust architecture - Wikipedia](https://en.wikipedia.org/wiki/Zero_trust_security_model) — Security model with no implicit trust.
+- NIST, 2026. [SP 800-30 Rev. 1, Guide for Conducting Risk Assessments | CSRC](https://csrc.nist.gov/pubs/sp/800/30/r1/final) — The standard threat-modelling method.

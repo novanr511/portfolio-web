@@ -1,10 +1,69 @@
 ---
 title: "What Prompt Injection Defenses Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What Prompt Injection Defenses Actually Measures."
-date: 2026-11-17
+description: "Injection defenses are sold as solved, but each blocks a slice of the attack surface. See what a defense measures, where it fails, and how to decide."
+date: 2026-11-18
 tags:
-  - Planned
-  - AI
+  - AI Security
+  - Threat Modeling
+  - Prompt Injection
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A language model cannot inherently separate an instruction from the data it is asked to process, which is the root of prompt injection. The Wikipedia entry on prompt injection and the OWASP Gen AI risk archive describe the attack classes and the ranked risks, but a defense passing an internal check is often read as a general guarantee. The real problem is that a filtered test set tells you which attacks were tried, not which attacks are possible.
+
+**Direct answer:** A prompt injection defense measures resistance to a defined set of crafted inputs under a defined setup. It narrows one path, such as instruction hierarchy or tool scoping, rather than closing the trust boundary. The sources frame injection as a persistent risk with layered mitigations, not as a problem with a single fix.
+
+**Delta:** This article adds a measurement framing beyond the sources: it maps each defense to the specific assurance it earns, with claim status explicit.
+
+## The mechanism
+
+The attack works because model input is a single stream of text. The Wikipedia entry distinguishes direct injection, where a user crafts the malicious instruction, from indirect injection, where the instruction arrives inside retrieved documents, web pages, or tool output. The practical consequence is that the trust boundary extends to every source the model reads. Treating only the chat box as untrusted leaves the retrieval pipeline wide open, and an application that quotes external content is quoting a potential attacker.
+
+Defenses sit at different layers. The source material and the OWASP Gen AI archive point to mitigations such as input filtering, delimiters and instruction hierarchy, output checks, and least-privilege tool access. Each addresses a route rather than the class as a whole. A delimiter helps when the model honors it, an input filter helps when the phrasing matches a known pattern, and scoped permissions help when a successful injection has few privileges to abuse. The practical consequence is that defenses are complementary layers of friction, not interchangeable substitutes for one another.
+
+Measurement is where claims get stretched. A defense is typically evaluated by running a suite of attack prompts and recording the success rate, but the number is bounded by the coverage of that suite. The practical consequence is that a low success rate means the system resisted those specific cases under those conditions. It does not bound performance against novel phrasing, other languages, or encoded payloads. Three ingredients shape the result: the diversity of the test set, the privileges the model holds, and whether an attacker can inject through a secondary channel such as a document or a tool result.
+
+## A worked example
+
+The following is hypothetical and illustrative. A support agent can search a knowledge base and read customer tickets, and a malicious instruction is planted in a retrieved article. Three checks decide the reading. First, where does untrusted content enter, and does the model treat retrieved text as data or as a command? Second, what can a successful injection reach, given the tools and data the agent is allowed to use? Third, does the evaluation suite include indirect, embedded attacks, or only direct user prompts? The outcome is partial. An instruction-hierarchy prompt blocks simple direct attempts, but the embedded article still influences one response, and only limited tool permissions keep the damage contained.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Injection is described as crafted input that overrides intended instructions, with direct and indirect forms | `source-reported` | Wikipedia: Prompt injection | 2026-11-18 | Attack taxonomy is updated |
+| OWASP lists prompt injection among its top risks for LLM applications | `source-reported` | OWASP GenAI | 2026-11-18 | A new Top 10 version is released |
+| No single defense covers every path, so assurance is bounded by test coverage and tool scope | `inferred` | Derived from the sources | 2026-11-18 | New attack classes or tools appear |
+
+The first two rows report statements the sources make directly, so they carry source-reported status and a dated verification. The third row follows from combining the attack taxonomy with the layered mitigations and stays inferred. Each row records a recheck condition, because a new attack class, a broader tool surface, or a revised risk ranking can change the conclusion without any change to the deployed prompt.
+
+## What it cannot do
+
+It cannot offer a guarantee. Model behavior is probabilistic, and a filter tuned on one phrasing can miss a paraphrase that carries the same intent. The Wikipedia treatment presents injection as a structural property of instruction-following systems rather than a single bug with a patch, and the OWASP archive treats it as a ranked risk to manage across the application lifecycle. The practical consequence is that the honest output of a defense program is a reduced likelihood along measured paths, not a certificate of safety. Any claim phrased as the system being immune to injection has already left what the evidence supports.
+
+It hides a real cost. Every added layer can introduce latency, false positives that block legitimate requests, and maintenance work as phrasing and models change. Instruction hierarchy consumes context that could hold task information, input filters need constant tuning, and output checks can degrade helpful answers. A team that stacks mitigations without measuring the user impact may buy a small reduction in attack success at the price of a noticeably worse product. That trade-off is invisible if the only dashboard tracks blocked prompts, because successful blocks are easy to count while frustrated users and missed tasks are not.
+
+The failure modes cluster around coverage and privilege. Indirect injection through retrieved content is routinely under-tested because it requires building realistic documents rather than a list of hostile strings. Multilingual and encoded payloads stretch filters trained on English examples. Most importantly, a successful injection is only as dangerous as the tools it can call, so an agent with write access to a database or the ability to send messages turns a harmless-looking compliance failure into a material incident. Measuring prompt resistance while ignoring tool permissions reports a fraction of the actual exposure.
+
+The boundary is epistemic. An evaluation can show that a defense worked on a sample, but it cannot prove the absence of an input that defeats it, and non-deterministic outputs make the same prompt behave differently across runs. Results must be dated, tied to a specific model version, and paired with the privileges that were in scope. A score copied from a blog post or a vendor deck is not transferable to a different system. Regular review is part of the control, because the model, the tools, and the attacker's playbook all move.
+
+Counterargument: the view that layered filtering and instruction hierarchy solve the practical problem is fair against unsophisticated direct prompts, and incomplete against indirect injection or agents with broad tool access.
+
+## A decision test
+
+1. Enumerate every channel through which the model reads untrusted text.
+2. Inventory the tools and data a successful injection could reach.
+3. Match the evaluation suite to those channels, including indirect content.
+4. Record the attack success rate with the exact model and tool scope.
+5. Reduce privileges so that a bypass has a small blast radius.
+6. Track false positives and latency alongside blocked attacks.
+7. Re-run the tests after any model, prompt, or tool change.
+
+Injection defenses are measurable, but what they measure is narrower than what the marketing implies. The useful question is not whether a filter exists but which paths it covers, what an attacker gains on bypass, and how the result will be rechecked. Anchoring the claim to those three points keeps the assurance honest.
+
+For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Prompt injection - Wikipedia](https://en.wikipedia.org/wiki/Prompt_injection) — Attacks that hijack model instructions via input.
+- OWASP Gen AI Security Project, 2025. [LLMRisks Archive - OWASP Gen AI Security Project](https://genai.owasp.org/llm-top-10/) — The OWASP Top 10 for LLM Applications 2025, where prompt injection is ranked LLM01:2025.

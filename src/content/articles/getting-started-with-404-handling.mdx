@@ -1,10 +1,69 @@
 ---
 title: "Getting Started with 404 Handling"
-description: "Reserved title for a future NOVANDRI article: Getting Started with 404 Handling."
-date: 2026-11-17
+description: "A 404 is a status code, not an error policy. See how status semantics map to recovery decisions, with claim status explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Protocol analysis
+  - HTTP status codes
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A 404 is the most common signal that a requested resource is missing, yet many teams treat it as a template problem rather than a protocol decision. The real problem is that a not-found response can be reported with the wrong status, leaving clients and crawlers to guess whether content is gone, moved, or merely mislabeled. That ambiguity turns a simple status code into a recovery decision nobody owns.
+
+**Direct answer:** RFC 9110 defines 404 as the origin server not finding a current representation for the target resource, or being unwilling to disclose one. Wikipedia notes that servers typically return a custom message, but the status line is the signal that machines trust. The bounded claim: recovery depends on whether the absence is a move, a temporary gap, or a permanent removal.
+
+**Delta:** This article adds a status-to-recovery mapping beyond the sources: it maps each class of absence to a status and a client action, with claim status explicit.
+
+## The mechanism
+
+RFC 9110 defines the 404 status code as the origin server not having found a current representation for the target resource, or not being willing to disclose that one exists. Status codes are semantic signals about the outcome of a request, carried on the status line and separate from the response body. The practical consequence is that a 404 says the resource is absent at the origin; it does not say the request was malformed, which is a 400 concern, or that the server failed, which is a 5xx concern. A custom error page is an application-level nicety layered on a protocol-level fact, and the two should not be confused.
+
+Wikipedia notes that a 404 is commonly encountered when a URL is mistyped or a page has been moved or deleted, and that web servers usually return a customized message, sometimes with a search box or a site map. This is where the distinction between a real 404 and a soft 404 matters. A soft 404 returns a success status while carrying a not-found message in the body. Because machines act on the status line, a soft 404 advertises success while the content says missing, creating ambiguity for crawlers and analytics. The practical consequence is that teams should measure the status returned, not the text rendered.
+
+The 404 sits among nearby alternatives, each with a different meaning. A 410 Gone signals that the resource was intentionally removed and is not expected to return. A 3xx redirect signals that the resource has moved and a new location is available. Choosing among them is a decision about the intent behind the absence, not about template design. Neither source tells a team which URL deserves which status; that judgment depends on a local content inventory and must be marked as inferred. Treating every absence as a 404 throws away the information those alternatives carry.
+
+The useful output is a handling policy that maps each class of URL to a status and an action: recover a moved resource with a redirect, mark an intentionally retired one as gone, or serve a 404 with a body that helps a visitor recover. That policy, rather than a single generic error template, is the decision instrument. It shows where reuse of a status is appropriate and where a different signal is warranted. It also makes the rationale reviewable, because the status and the reason for choosing it are recorded together. A team that writes the mapping down can later explain why an old path redirects while another returns gone, instead of guessing from template code.
+
+## A worked example
+
+The following is hypothetical and illustrative. A documentation site reorganizes its URLs, and visitors report landing on pages that say the content could not be found. Three checks decide the handling. First, what does the status line actually say for an affected URL, and is the response a genuine 404 or a success status with a not-found body? Second, what is the nature of the absence, and does the old path have a known new location, a deliberate retirement, or no clear replacement? Third, does the response body give a real visitor a recovery path through links or search without presenting the error as a normal article? The review finds that most affected URLs return a soft 404 and that several have known destinations. The team converts the soft responses to real 404s, adds redirects for moved pages, and marks retired pages as gone. The outcome is a consistent signal for both people and crawlers. The details are hypothetical; the decision method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| 404 means no current representation, or a refusal to disclose one | `source-reported` | RFC 9110, HTTP Semantics | 2026-11-18 | Specification revised |
+| A soft 404 pairs a success status with a not-found message | `source-reported` | HTTP 404, Wikipedia | 2026-11-18 | Crawler behavior changes |
+| Each class of absence maps to a local status and recovery action | `inferred` | Derived from the sources | 2026-11-18 | URL inventory changes |
+
+The first two rows report what the specification and the reference article state. The third is an inference about how classes of absence map to statuses, because neither source assigns a status to a specific URL. Recheck the source rows when the specification or crawler conventions change, and the inferred row whenever the site's URL inventory is reorganized.
+
+## What it cannot do
+
+Handling 404 responses correctly does not recover lost content. The status reports an absence; it cannot restore a deleted page or repair a broken internal link. Treating a well-formed 404 as a fix confuses reporting with repair. A team still needs a content inventory, a link audit, and an owner for the pages that should exist, because the status line will faithfully report a missing resource no matter why it is missing. The signal is accurate; the underlying content problem is a separate piece of work that a status code cannot perform.
+
+The hidden cost is that correct handling takes more effort than a default template. Auditing URLs, deciding per class whether a path should redirect, return gone, or return not found, maintaining a redirect map, and distinguishing soft from hard responses all require work that a single catch-all page avoids. That asymmetry is why soft 404s persist long after they are noticed. The cost is paid in inventory maintenance and in the discipline to update the map whenever URLs are added, moved, or retired. Making the mapping a prerequisite for site changes keeps that work from being skipped under deadline pressure.
+
+The main failure mode is letting a template stand in for a decision. A success status carrying an error message wastes crawl budget and pollutes analytics with pages that appear healthy. A blanket redirect sends visitors to irrelevant destinations and conceals the fact that content is genuinely gone. A generic 404 with no recovery path leaves a visitor at a dead end. None of these is a server bug; all are choices about how to signal absence that were never made explicitly. The question worth asking is what the absence means and what a client should do next. A defensible setup states that answer alongside the status it chooses.
+
+There is a boundary around the method. It covers the semantics of not-found responses and the nearby alternatives, not search ranking, not information architecture, and not the editorial quality of a custom page. It cannot tell a team which URLs matter to its audience or which retired content should be restored. It can only show whether the chosen status is consistent with the intent behind the absence. That is a narrower contribution than the way 404 handling is often discussed, where a status code is asked to carry the weight of a whole content strategy.
+
+Because pages and paths come and go, the mapping needs a refresh. Each URL class should carry its chosen status, the reason for it, and a recheck condition, and the choice between redirect and gone should be treated as a local decision rather than a value the standard supplies. Without that record, a future reviewer cannot tell which statuses were deliberate and which were defaults. The URLs will still be there; the rationale for how they are signaled is what makes the review possible. For further reading, see [Technical Writing, Documentation, API Docs, and Developer Experience](/articles/technical-writing-documentation-api-docs-and-developer-experience).
+
+## A decision test
+
+1. Take an inventory of URLs that currently return a not-found response.
+2. Check the status line for each, not only the rendered body.
+3. Classify each absence as moved, temporarily missing, or permanently gone.
+4. Choose a status consistent with that class, including redirect or gone.
+5. Give the response body a recovery path for real visitors.
+6. Record the status, the class, and a recheck condition.
+7. Verify with a fresh request that the status and the body agree.
+
+A 404 practice is useful only when the status and the recovery action are both recorded. The test turns an ambiguous missing page into a sequence of decisions with a visible rationale, so a reviewer can see why a path redirects while another returns not found. The numbers in any single audit matter less than the habit of pairing each class of absence with a deliberate, recheckable signal.
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [HTTP 404 - Wikipedia](https://en.wikipedia.org/wiki/HTTP_404) — HTTP status for a missing resource.
+- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
