@@ -1,10 +1,82 @@
 ---
 title: "Disaster Recovery: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: Disaster Recovery: a Decision Framework."
-date: 2026-11-17
+description: "Recovery is a set of choices made before a disruption. Read the framework, a worked example, and why a backup is not a recovery plan."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Disaster recovery is often reduced to keeping backups, which ignores the decisions that determine whether those backups can be used. The Wikipedia entry describes restoring systems after a disruptive event, and NIST's incident-handling guide treats recovery as part of a lifecycle. The framework starts with the service, not the tool.
+
+**Direct answer:** Define the acceptable loss, choose a recovery approach that meets it, and test the restore before relying on it. The sources describe the practice; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented recovery concepts from local choices about acceptable loss.
+
+## The mechanism
+
+The first decision is acceptable loss. The disaster-recovery entry describes restoring systems, but restoration takes time, and the question is how much time and data the organisation can afford to lose. Those two numbers — recovery time and recovery point — are the requirements that every other decision follows.
+
+The second decision is the approach. A system that can be rebuilt from definitions recovers differently from one that depends on a restored image. The right approach depends on the architecture, which is why a generic plan rarely fits. Choosing without understanding the dependencies produces a plan that works in a document.
+
+The third decision is testing. A backup that has never been restored is an assumption. The NIST lifecycle treats preparation and recovery as parts of the same process, and testing is what connects them. A restore test reveals the missing credentials, the incompatible version, and the step nobody documented.
+
+The sequence is: set acceptable loss, map dependencies, choose the approach, test the restore, then record the result. Each step is local work, so the conclusions are `inferred`; the concepts are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team plans recovery for a database supporting a customer-facing service.
+
+Three checks decide. First, how much downtime and data loss are acceptable, stated as requirements? Second, can the database be restored from a backup within that time, including the steps that are usually forgotten? Third, has a restore been tested recently, and what did the test reveal?
+
+The outcome is a plan with a verified limitation. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Disaster recovery restores systems after disruption | `source-reported` | Wikipedia, Disaster recovery | 2026-11-18 | Definition changes |
+| Recovery is part of the incident lifecycle | `source-reported` | NIST SP 800-61 | 2026-11-18 | Guidance updated |
+| Test the restore before relying on it | `inferred` | Derived from the lifecycle | 2026-11-18 | System changes |
+
+## Why a backup is not a plan
+
+A backup is a copy of data. A recovery plan is a set of steps to restore a service, including people, decisions, and dependencies. Confusing the two produces confidence that disappears at the moment it is needed.
+
+A plan also has to account for people. A restore procedure that depends on one individual will fail when that person is unavailable, which is exactly the condition a disaster creates. Documenting the steps and training more than one person is part of the design, not an optional refinement.
+
+The test should also include the decision to declare a disaster. A team that waits for certainty before acting will lose time, and the criteria for declaring should be written before an event. That criterion belongs with the recovery requirements, because the two together determine whether the plan can be executed in time.
+
+The restore test should include the application, not only the data, since a restored database with a broken service is not recovery.
+
+A plan that has never been tested is a description of intent, and a test is what turns it into evidence.
+
+Acceptable loss should be stated in time and data, since a vague goal cannot guide a design.
+
+The plan should be revisited whenever a dependency changes, since a restore path relies on the system it describes.
+
+The test should record the time actually taken, since an unmeasured restore rarely matches the assumed one.
+
+## What it cannot do
+
+It cannot guarantee that a disruption will be survivable. It does not remove the need for monitoring. And it cannot restore data that was never captured.
+
+The counterargument that frequent backups are enough is fair for simple systems and incomplete where dependencies matter.
+
+## A decision test
+
+1. State acceptable downtime and data loss.
+2. Map dependencies.
+3. Choose a recovery approach.
+4. Test a restore.
+5. Record what the test revealed.
+6. Set a recheck condition.
+
+For the incident side, see [Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Disaster recovery - Wikipedia](https://en.wikipedia.org/wiki/Disaster_recovery) — Restoring systems after a disruptive event.
+- Paul Cichonski, Thomas Millar, Tim Grance, Karen Scarfone (NIST), 2012. [SP 800-61 Rev. 2, Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final) — The incident-response capability lifecycle: preparation, detection and analysis, containment/eradication/recovery, and post-incident activity.
