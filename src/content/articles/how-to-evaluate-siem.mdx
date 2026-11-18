@@ -1,10 +1,63 @@
 ---
 title: "How to Evaluate SIEM"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate SIEM."
-date: 2026-11-17
+description: "A SIEM is only as good as the logs and the response it enables. Read the evaluation criteria, a worked test, and why an alert count is a weak measure."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Security
+  - Operations
+  - Evaluation
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A SIEM is often evaluated by the number of alerts it produces, which rewards noise. The useful question is whether it detects the events that matter, with enough context for a responder to act, which the SIEM entry describes for collection and correlation, as the NIST incident-handling guide covers response, as the observability article treats signals as evidence from a system.
+
+**Direct answer:** Evaluate a SIEM against a defined set of detection cases, with measured true and false positives, response time, and log coverage. The SIEM entry provides the structure, and NIST SP 800-61 covers incident handling. The boundary: no tool guarantees security, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as the red-teaming article explains why untested failures remain.
+
+## The criteria
+
+**Log coverage.** Which relevant sources actually send data, which the SIEM entry treats as the base, as the NIST log-management guidance requires for collection, as the data-governance article requires for provenance? A tool cannot detect what it cannot see.
+
+**Detection quality.** Which of the defined cases does it detect, with how many false positives, which the evaluation-rubric article requires for concrete criteria, as the alert-fatigue literature treats noise as a failure, as the SRE alerting workbook ties signals to objectives?
+
+**Context for response.** Does an alert include enough information for a responder to decide, which the NIST incident guide treats as part of handling, as the incident-response article requires for containment, as the decision-memo article requires for evidence?
+
+**Cost and operation.** Licensing, storage, and tuning are real costs, which the cost estimator requires, as the cloud-cost article advises, as the unit-economics article requires for contribution.
+
+Three consequences follow. The test set should be defined before evaluation, as the rubric article requires, as the benchmarks article warns about easy cases. The false-positive rate matters as much as detection, as the alert-fatigue literature advises, as the SRE workbook requires. And the result should be recorded with residual risk, as the decision-memo article requires.
+
+## A worked test
+
+The following is hypothetical and illustrative. A team evaluates a SIEM against a fixed set of twenty incident scenarios.
+
+Three checks decide. First, are all relevant log sources sending data, as the SIEM entry and NIST guidance require, with provenance, as data governance requires? Second, how many scenarios were detected, and how many false positives appeared, as the rubric article requires, with a measure tied to an objective, as the SRE workbook advises? Third, could a responder act on each alert, as the NIST incident guide and incident-response article require, with enough context, as the decision-memo article requires?
+
+Three conclusions follow. Detection count alone is weak, which the false-positive check reveals. Log coverage is a precondition, as the SIEM entry advises. And the decision should be recorded with residual risk, as the decision-memo article requires, as the risk article requires.
+
+## Why the evaluation is a system test
+
+A SIEM sits between log producers and responders, so evaluating it in isolation misses the parts that decide whether it works. If a source is not sending data, no correlation rule can recover the event, which the SIEM entry and the NIST guidance make clear, as the data-governance article requires for provenance, as the observability article treats signals as evidence from a system. The first test is therefore coverage, as the worked test applies, as the evaluation-rubric article requires for concrete criteria.
+
+The second test is what happens after detection. An alert that lacks context shifts the work to the responder, which the NIST incident guide treats as part of handling, as the incident-response article requires for containment, as the decision-memo article requires for evidence. A tool can score well on detection and still fail the operational test, which the false-positive check shows, as the SRE alerting workbook advises for signals tied to objectives, as the risk article requires residual risk.
+
+## What SIEM evaluation cannot do
+
+It cannot prove security, which the publication standard forbids claiming, as the red-teaming article treats testing as partial, as the risk article requires residual risk. It does not guarantee that future incidents are detected, which the benchmarks article warns about, as the monitoring article advises for change triggers. And it cannot replace incident response, which the NIST guide treats as a process, as the incident article requires for containment.
+
+The counterargument that more alerts mean better detection is wrong about false positives, which the worked test shows, as the SRE alerting workbook advises for signals tied to objectives.
+
+## A decision test
+
+1. Define a fixed set of detection cases, as the rubric article requires.
+2. Verify log coverage from relevant sources, as the SIEM entry and NIST guidance require.
+3. Measure detection and false positives, as the rubric article requires.
+4. Check that alerts contain actionable context, as the NIST incident guide advises.
+5. Count licensing, storage, and tuning costs, as the cost estimator requires.
+6. Record residual risk, as the risk-assessment article requires.
+7. Review after a log-source or tool change, as the monitoring article advises.
+
+For the response process, see [Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response); for the signals, see [Observability](/articles/observability-logging-metrics-tracing-alerting).
+
+## Further Reading
+
+- Wikipedia contributors, 2026. [Security information and event management - Wikipedia](https://en.wikipedia.org/wiki/Security_information_and_event_management) — How SIEM systems collect and correlate security events.
+- Paul Cichonski, Thomas Millar, Tim Grance, Karen Scarfone (NIST), 2012. [SP 800-61 Rev. 2, Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final) — The incident-response capability lifecycle: preparation, detection and analysis, containment/eradication/recovery, and post-incident activity.
