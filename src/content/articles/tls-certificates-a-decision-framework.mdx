@@ -1,13 +1,86 @@
 ---
 title: "TLS Certificates: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: TLS Certificates: a Decision Framework."
-date: 2026-11-17
+description: "A certificate binds a key to a name. Read the framework, a worked check, and why validity is not the same as trust."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Security
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+TLS certificates are often reduced to a green padlock, which hides the decisions behind them. The TLS entry describes the protocol, and the public-key certificate entry explains how certificates bind keys to identities. The framework starts from what a certificate is meant to prove.
+
+**Direct answer:** Decide what identity a certificate must establish, verify the chain and the name, then monitor expiry and revocation. The sources describe the mechanism; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked check, separating documented protocol facts from the local choices about names and renewal.
+
+## The mechanism
+
+Three points matter:
+
+- **Identity is the claim.** The certificate entry describes binding a key to an identity. A certificate for the wrong name does not secure the intended site.
+- **The chain establishes trust.** The TLS entry describes how the protocol relies on certificate validation. A self-signed certificate proves nothing to a browser by itself.
+- **Validity is time-bound.** Certificates expire, and expiry is a common cause of outages. Renewal is part of the system, not an occasional task.
+
+The sequence is: state the identity, check the chain, check the name, then monitor expiry. The identity decision is local, so it is `inferred`; the mechanism is `source-reported`.
+
+## A worked check
+
+*Illustrative.* A site is moved to a new host and users report certificate warnings.
+
+Three checks decide. First, does the certificate cover the exact hostname users visit, including the www variant? Second, is the chain complete, with the intermediate certificates served? Third, when does the certificate expire, and is renewal automated?
+
+The outcome is a specific fix rather than a general "check the certificate" response. The scenario is hypothetical; the check sequence is the contribution.
+
+## Why the name is the first check
+
+A certificate that is valid but issued for a different hostname will produce a warning, and the cause is not the certificate's age or issuer. Checking the exact name, including subdomains and the www variant, is the cheapest first step in a diagnosis. It is also the step most often skipped when the symptom is described as a certificate problem.
+
+The chain is the second check. Browsers rely on a path to a trusted root, and a server that omits an intermediate certificate can leave the path incomplete even though the certificate itself is valid. Serving the full chain is a configuration detail with a user-visible effect.
+
+## Why renewal is a design question
+
+A certificate that expires is a predictable failure, which makes it a design problem rather than an accident. Automating renewal removes the dependence on someone remembering a date. Monitoring the remaining validity is still useful, because automation can fail silently.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| TLS relies on certificate validation | `source-reported` | Wikipedia, Transport Layer Security | 2026-11-18 | Protocol changes |
+| Certificates bind keys to identities | `source-reported` | Wikipedia, Public key certificate | 2026-11-18 | Standards change |
+| Verify name and chain before expiry | `inferred` | Derived from the mechanism | 2026-11-18 | Host changes |
+
+## Why validity is not trust
+
+A certificate can be within its validity period and still fail to establish the right identity, because the name does not match or the chain is incomplete. Checking only the expiry date misses both. The full check is short, but it has to cover all three conditions.
+
+A final consideration is revocation. A certificate can be valid by date and name and still have been revoked, which is why browsers consult revocation information. Checking that behaviour is part of a complete diagnostic, even though it is rarely the cause of an everyday warning.
+
+The framework also has a scope limit. It covers the identity of the connection, not the trustworthiness of the site behind it. A correctly configured certificate on a malicious site is still a correctly configured certificate, and the distinction matters whenever the outcome is described as safe.
+
+A check should be recorded with the hostname and the date it was performed, because the same certificate can be correct for one name and wrong for another. A dated record also makes a later failure easier to diagnose, since the previous state is available for comparison.
+
+The check should include the exact hostname, since a certificate valid for one name can still fail for another.
+
+It should also state which issuer was expected to validate it.
+
+## What it cannot do
+
+It cannot guarantee that the site is safe, only that the connection is encrypted to a verified identity. It does not replace application security. And it cannot remove the need to monitor renewal.
+
+The counterargument that a padlock means safety is fair for transport encryption and incomplete for the content served.
+
+## A decision test
+
+1. State the identity to establish.
+2. Check the hostname match.
+3. Check the chain.
+4. Check expiry and renewal.
+5. Check revocation behaviour.
+6. Record the check and recheck date.
+
+For the HTTPS context, see [HTTPS, TLS, and SEO](/articles/https-tls-and-seo-diagnose-certificates-and-redirects).
 
 ## References & Further Reading
 

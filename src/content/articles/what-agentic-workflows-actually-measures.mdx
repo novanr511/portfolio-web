@@ -1,13 +1,82 @@
 ---
-title: "What Agentic Workflows Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What Agentic Workflows Actually Measures."
-date: 2026-11-17
+title: "What Agentic Workflows Actually Measure"
+description: "An agentic workflow is measured across a trajectory, not a final answer. Read what it measures, a worked example, and why a lucky success is weak evidence."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Evaluation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Agentic workflows are often evaluated by whether the final answer was correct, which hides how the result was produced. The Anthropic agent guidance describes checkpoints and escalation, and the decision-making entry covers the structure of a choice. The measurement question is whether the path was sound.
+
+**Direct answer:** Evaluate an agentic workflow on the trajectory — tool choices, intermediate states, recovery, and the final result — against a fixed task set. The sources describe the mechanism; the measurement rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked evaluation, separating documented agent patterns from the local choice of what to score.
+
+## The mechanism
+
+Three points matter:
+
+- **The path is observable.** The agent guidance describes checkpoints. A correct final answer can come from a lucky path that will not repeat.
+- **Recovery matters.** A tool failure is a normal event. The useful question is whether the agent detected it and took a fallback.
+- **Decisions need criteria.** The decision-making entry describes an owner and evidence. An agent that acts without a stated criterion is hard to evaluate.
+
+The sequence is: define a task set, score the trajectory, count recoveries, then check the result. Designing the task set is local judgement, so it is `inferred`; the agent patterns are `source-reported`.
+
+## A worked example
+
+*Illustrative.* An agent answers support questions using a knowledge tool and a refund tool.
+
+Three checks decide. First, did it call the right tools with valid arguments? Second, when a knowledge result was stale, did it detect the mismatch and escalate? Third, was the final answer correct for the right reasons, with a record of the steps?
+
+The outcome is a trajectory score with a recorded limitation. The scenario is hypothetical; the evaluation method is the contribution.
+
+## Why the task set matters more than the model
+
+An agent evaluated on a handful of happy-path tasks will look excellent and tell you little. The task set is the instrument, and it should include the conditions that cause trouble in practice: stale tool results, missing data, and ambiguous requests. Building it is work, but it is reusable across model changes.
+
+Scoring the trajectory requires deciding what counts as a good step. The agent guidance describes checkpoints, which give a natural place to record state. A reviewer can then see not only whether the agent reached the goal, but whether it took an authorised path to get there. That distinction matters when the agent can call tools that change things.
+
+## Why escalation belongs in the score
+
+An agent that hands a task to a person is not necessarily failing. In many designs it is the correct behaviour. A task set that treats every handoff as an error will reward agents that guess, which is the opposite of the intended design. Recording expected escalation alongside the expected answer is the fix.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Agent guidance describes checkpoints and tools | `source-reported` | Anthropic agent guidance | 2026-11-18 | Guidance changes |
+| Decisions have owners and evidence | `source-reported` | Wikipedia, Decision making | 2026-11-18 | Source revised |
+| Score the trajectory, not only the result | `inferred` | Derived from the agent model | 2026-11-18 | Agent design changes |
+
+## Why a lucky success is weak evidence
+
+A final answer that is correct despite a wrong tool call teaches the wrong lesson. On the next task, with different tools, the same behaviour may fail. Trajectory scoring catches this because it records the steps, not just the endpoint.
+
+A final consideration is cost. A workflow that reaches the right answer by trying many tools is correct and expensive, and a score that ignores cost will favour it. Recording token spend and tool calls alongside the trajectory gives a fuller picture of what deployment would require.
+
+The task set also needs a review condition. Tools and prompts change, and a set built for one version of the system may no longer represent it. A short note about what would require new tasks keeps the evaluation aligned with the system it is meant to measure.
+
+The score should also distinguish a failure of the model from a failure of the surrounding system, because the two call for different fixes. A wrong tool schema is an integration problem; a wrong decision with a correct schema is a model problem. Recording the distinction is what makes the evaluation actionable.
+
+## What it cannot do
+
+It cannot cover every future task. It does not guarantee deployment behaviour when tools change. And it cannot prove safety from a passing test set.
+
+The counterargument that a final-answer score is enough is fair for a single task and incomplete for a system that acts repeatedly.
+
+## A decision test
+
+1. Build a fixed task set.
+2. Score tool choices and states.
+3. Count recoveries and escalations.
+4. Check the final result.
+5. Record failures by cause.
+6. Set a recheck trigger.
+
+For the method, see [Agent Evaluation Examples](/articles/agent-evaluation-examples).
 
 ## References & Further Reading
 
