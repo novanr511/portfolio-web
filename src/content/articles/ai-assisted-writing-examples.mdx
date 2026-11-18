@@ -1,10 +1,71 @@
 ---
 title: "AI-assisted Writing Examples"
-description: "Reserved title for a future NOVANDRI article: AI-assisted Writing Examples."
-date: 2026-11-17
+description: "A bounded look at where AI assistance helps technical writing and where it fails: drafting, summarising, and editing, with the verification steps each use requires."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Writing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI writing tools are often judged by how fluent the output looks, which is the wrong test for professional work. An assistant can produce a polished paragraph that is subtly wrong, and the smoother the prose the easier the error is to miss. The useful question is not whether the tool can write, but which parts of a writing task it can safely take on and which still need human judgement.
+
+**Direct answer:** AI assistance is most reliable on bounded, verifiable tasks such as turning notes into a first draft, summarising supplied material, and suggesting edits to existing text. It is unreliable wherever accuracy, original judgement, or accountability matter, because it can fabricate detail and cannot be responsible for the result. Treat its output as a draft to check, not a conclusion to publish.
+
+**Delta:** This article adds a bounded task map beyond the sources: it maps the use-case and technical-writing concepts to the specific decision of which writing steps to delegate, with claim status made explicit.
+
+## The mechanism
+
+The Anthropic use-case guides describe writing as a set of tasks where a model can help, from drafting to rewriting, while emphasising that the human remains responsible for the result. That framing has a direct practical consequence: the assistance is useful when the task can be checked. A first draft converts rough notes into readable prose, and the writer can compare it against the notes. A rewrite can be accepted or rejected line by line. In both cases the human has a reference to verify against, which is what makes the delegation safe and the time saved real.
+
+The Wikipedia entry on technical writing describes it as communication that conveys complex information to a specific audience with clarity and precision. This changes what good output looks like. In technical work, fluency is secondary to correctness: a plain sentence that states the right constraint is better than an elegant one that blurs it. An assistant is good at restructuring a paragraph for readability and poor at knowing which detail matters to a particular reader. The practical consequence is that the writer must supply the context the tool lacks, including the audience, the purpose, and the facts that must not change during the rewrite.
+
+The failure mechanism is plausible fabrication. A language model completes text by predicting what comes next, so it can produce a confident sentence that cites a source that does not exist or states a number it has invented. In creative work that may be harmless; in technical documentation it is a defect that can mislead a reader. The only reliable defence is a verification loop: every factual claim, citation, and number in the assistant output is checked against the source material before it is kept. Without that loop, the tool turns a small time saving at the start into a large correction later, often after the text has already reached other people.
+
+## A worked example
+
+The following is hypothetical and illustrative. A documentation writer asks an assistant to turn a set of engineer notes into a short setup guide. The tool produces a clear draft in seconds. Three checks decide what survives. First, factual match: the writer compares every command and default value against the notes and finds two invented flags that must be removed. Second, audience fit: the draft assumes prior knowledge the intended readers do not have, so the writer adds definitions. Third, verification of any external claim: the guide mentions a limit the assistant supplied, which the writer confirms against the official source before keeping it. The outcome is a usable guide that took less time than writing from scratch, but only because the draft was treated as raw material rather than a finished document. Skipping any of the three checks would have published a plausible but partly wrong guide.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Writing is a documented use case with human review | `source-reported` | Anthropic (Use-case guides) | 2026-11-18 | if the published guidance changes |
+| Technical writing prioritises precision for an audience | `source-reported` | Wikipedia (Technical writing) | 2026-11-18 | if the working definition is revised |
+| Verification is required for factual output | `inferred` | Derived from the sources | 2026-11-18 | if models become reliably factual |
+
+The table marks what the sources say separately from the article's conclusion. The two source-reported rows are descriptive. The inferred row follows from the way these tools produce text, but it is a working rule rather than a guarantee: verification is required today because errors are possible, not because the sources claim every output is wrong. If that changes, the cost of checking will fall and the rule can be relaxed.
+
+## What it cannot do
+
+An assistant cannot take responsibility for what it writes. In professional documentation, someone must be accountable for whether a statement is true and whether it is safe for a reader to act on. The model has no stake in that outcome and no way to know when it is wrong. This is not a minor limitation that better phrasing will fix; it is structural. The tool produces text that resembles the requested answer, while the writer must decide whether that answer is correct. Any workflow that treats the output as publishable without review transfers a responsibility the tool cannot accept onto a reader who reasonably assumed the text was checked. That is why the human review step in the guidance is not a courtesy but the core of the process.
+
+The hidden cost is verification. A draft that saves an hour of typing can consume that hour in checking, especially when the subject is technical and errors are subtle. The writer must read every sentence with the suspicion normally reserved for a draft from an unreliable colleague. There is also a cost to voice: repeated use tends to smooth prose toward a generic, competent style that loses the specificity a publication may depend on. The time saved at the start is often repaid at the end, with interest, in correction and careful editing. A team that measures only drafting speed will miss this cost entirely and may conclude the tool is faster than it is.
+
+A distinctive failure mode is confident invention. The tool may add a plausible detail that is not in the source, state a number with precision it does not have, or cite a reference that does not exist. Because the prose is fluent, these errors survive casual reading. A related problem is that the assistant tends to agree with the framing it is given, so it will reinforce a mistaken premise instead of challenging it. The writer who uses it to think, rather than only to draft, can end up with polished prose built on an unexamined assumption. Original judgement cannot be delegated, and a tool that reflects your framing back at you will not tell you when the framing itself is wrong.
+
+There are boundaries where assistance should not be used. Where writing must be original, such as a position paper or a first-person account, generating text from a model undercuts the point. Where content is sensitive, confidential, or regulated, sending material to an external tool may breach policy or law. And where the audience needs to trust the author's direct expertise, hidden assistance raises ethical questions about attribution and honesty. In these cases the honest choice is to write without the tool or to disclose its use clearly, rather than quietly relying on output that nobody can genuinely own. The reputational cost of a discovered shortcut can exceed the time it saved.
+
+The practice also needs review. Models change, their failure patterns shift, and the policies governing their use are still developing. A task that was unsafe to delegate last year may become acceptable with better verification, and a task that seemed harmless may turn out to carry new risk. A writer should keep a short list of which steps are delegated and which are reserved, and revisit it when the tool or the rules change. Treating the division of labour as fixed is how small assumptions become lasting mistakes. A periodic check keeps the workflow aligned with what the tool can currently do well.
+
+The counterargument that the output is only a draft is fair for speed and incomplete for responsibility. A draft still shapes what gets published, and a fluent wrong sentence is harder to notice than a rough right one, so calling it a draft does not remove the need to check it carefully.
+
+## A decision test
+
+1. State what the writing must achieve and who will read it.
+2. Decide which steps are bounded and verifiable, such as drafting from notes.
+3. Reserve judgement-heavy steps, such as claims and conclusions, for yourself.
+4. Give the tool the source material and required facts explicitly.
+5. Check every claim, number, and citation against the source.
+6. Read the result for voice and audience fit before accepting it.
+7. Revisit the division of labour when the tool or policy changes.
+
+The test is only useful if verification is treated as part of the task, not as an optional extra. Delegating the easy part and keeping the hard part is a reasonable division, provided the hard part includes deciding what is true. Record which steps you delegate and review that choice as the tools improve, so the boundary stays honest.
+
+For related context, see [Technical Writing: Documentation, API Docs and Developer Experience](/articles/technical-writing-documentation-api-docs-and-developer-experience).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Technical writing - Wikipedia](https://en.wikipedia.org/wiki/Technical_writing) — Writing for technical audiences and purposes.

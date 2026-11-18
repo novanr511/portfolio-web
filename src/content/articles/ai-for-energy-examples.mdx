@@ -1,10 +1,73 @@
 ---
 title: "AI for Energy Examples"
-description: "Reserved title for a future NOVANDRI article: AI for Energy Examples."
-date: 2026-11-17
+description: "Where AI helps in energy systems, how to test an application against a baseline, and why the compute cost and changing conditions limit the claim."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Energy
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Energy teams are being asked to apply AI to forecasting, equipment monitoring and scheduling while also accounting for the electricity that AI systems themselves consume. The IEA Energy and AI report frames both sides of that relationship, describing AI as a growing user of electricity and as a set of tools that could improve energy systems. The practical problem is deciding which applications to fund and which claims to treat as unproven until they are tested locally.
+
+**Direct answer:** Use AI in energy for bounded tasks with measurable outputs: load and price forecasting, anomaly detection on equipment, and optimisation of known schedules. Treat the application as a tool with a cost and an owner, not as a strategy. The decisive question is whether a local measurement can show an improvement over a simple baseline under the conditions you actually face.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the sources: it maps the dual role of AI as electricity consumer and efficiency tool to a specific funding decision, with claim status made explicit.
+
+## The mechanism
+
+The IEA Energy and AI report treats AI as both a driver of electricity demand and a potential instrument for efficiency across energy systems. The practical consequence is that every AI energy project has two ledgers: the energy or cost it saves, and the energy and resources it consumes. A project that improves a forecast but adds unaccounted compute load can be a net negative. Before claiming a benefit, define the boundary of the system being measured, because a gain inside a narrow boundary can be a loss once the supporting infrastructure is included.
+
+Forecasting and detection are the clearest examples. Load forecasting, price forecasting and equipment anomaly detection are tasks where a model can be compared against a simple baseline using local historical data. The consequence is that the benefit can be tested rather than asserted. Because the output is numeric and checkable, a team can ask whether the model beats a seasonal average or a fixed rule on the same period. That testability is why these are good first candidates; it is not a promise that any particular model will win.
+
+Optimisation is the next category. Dispatch, maintenance scheduling and thermostat or charging schedules all involve choosing among known actions under constraints. AI techniques can search a larger space of schedules than a fixed rule. The consequence is that any gain must be measured against the rule it replaces and must include the cost of implementation and error. An optimiser that saves a small amount of energy but creates a comfort or reliability problem is a failed trade, not a success, and the metric chosen at the start determines whether that failure is even visible.
+
+The Federal Reserve Bank of St. Louis FRED database provides public time series that can anchor the economic assumptions behind an energy decision, such as prices, rates and activity. The consequence is that an AI forecast should be read against the economic conditions in which it was trained. If those conditions change, the relationship the model learned may weaken. This is why a scheduled recheck is part of the method rather than an optional extra: the source data can stay available while the world it described moves on.
+
+## A worked example
+
+The following is hypothetical and illustrative. A regional facility wants to use AI to reduce heating energy and proposes a model that adjusts schedules from weather and occupancy forecasts. Three checks decide whether to proceed. First, what is the baseline, and does the model beat a fixed schedule on the same weeks? Second, what is the total cost, including inference, retraining and the sensors the model needs? Third, which economic and operating conditions does the training period cover, and how would a mild winter or a price shift affect the result? The outcome is a decision to run a bounded trial or to keep the fixed rule. The numbers are illustrative; the sequence is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| AI is both a growing user of electricity and a potential efficiency tool | `source-reported` | IEA, Energy and AI | 2026-11-18 | Report updated or scope revised |
+| Public economic time series can check assumptions behind energy decisions | `source-reported` | Federal Reserve Bank of St. Louis, FRED | 2026-11-18 | A key series is discontinued or revised |
+| Local baseline comparison is the right test for an energy AI application | `inferred` | Derived from the sources | 2026-11-18 | Operating conditions or compute cost change |
+
+Two rows describe what the sources report: the dual role of AI in energy, and the availability of public economic data. The third row is a local rule, inferred rather than reported, that a baseline comparison is the appropriate test for a specific application. It should be revisited whenever the operating context or the cost of computation changes.
+
+## What it cannot do
+
+It cannot establish that an AI application is cost-effective in your particular setting. The sources describe possibilities at a general level, not outcomes for a specific site with its own equipment, tariffs and staff. The gap between a reported potential and a local result has to be closed by measurement, and that measurement has a cost of its own. A team that treats a general claim as a local forecast has skipped the only step that converts a possibility into a decision. The source can tell you what is plausible; it cannot tell you what is worthwhile for you.
+
+There is a hidden cost in running the model itself. Inference, periodic retraining, data pipelines and monitoring all consume resources, and the energy accounting is incomplete if it records only the savings produced by the optimisation. A project that reports the energy saved by a smarter schedule while omitting the compute used to produce that schedule is not a full accounting. The boundary matters here: a narrow system boundary can make a project look positive, while a wider boundary that includes the supporting infrastructure may erase the gain. Any claim of efficiency should state which boundary was used.
+
+A common failure mode is quiet drift. Models trained on historical conditions can degrade when the system changes: new equipment is installed, prices move, or an unusual season arrives. The dangerous part is that the model keeps producing numbers, so nothing looks broken. What changes is the reliability of those numbers. Without a drift check and a recheck date, an application that was justified at launch can keep running after its assumptions have expired, and the team will have no signal that the original decision needs to be revisited.
+
+There are boundaries where the approach should not be applied. Safety-critical or hard-to-reverse control decisions should keep a human operator or a conventional engineering rule as the final authority. AI can be a suggestion layer for tasks where errors are costly but recoverable; it is not a substitute for protection systems that must behave predictably under every condition. Using a probabilistic tool beyond that boundary transfers risk to people who never agreed to carry it, and it makes an incident harder to explain afterwards because the decision path is not fully specified.
+
+Finally, the approach needs review because both the technology and the energy context move. An application approved once should have a named owner who revisits the baseline, the compute cost and the drift signals on a defined cadence. That review is not bureaucracy; it is the mechanism that keeps an early yes from becoming a permanent yes. Without it, a project that was sound can silently stop being sound, and the organisation loses the ability to distinguish a working tool from a inherited assumption.
+
+The counterargument that AI can improve energy systems is fair for bounded, measurable tasks and incomplete for claims that it will transform a whole system without local verification.
+
+## A decision test
+
+1. Define the exact task and the system boundary.
+2. Identify a simple baseline to compare against.
+3. Measure the compute, data and sensor cost of the AI option.
+4. Check local conditions against relevant public economic data.
+5. Run a bounded trial with a named owner.
+6. Record the measured difference and set a recheck date.
+7. Stop, revise or scale based on that difference.
+
+A decision test like this is deliberately narrow. It does not decide whether AI belongs in energy as a category; it decides whether one application, in one setting, cleared a measurable bar. Repeating it across candidates builds a portfolio of tested uses rather than a list of borrowed claims, and the recheck date keeps each yes conditional on evidence rather than on momentum.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- International Energy Agency, 2025. [Energy and AI: Data Centres and Electricity Demand](https://www.iea.org/reports/energy-and-ai) — Primary data on how data-centre electricity demand is growing and what that implies for energy markets.
+- Federal Reserve Bank of St. Louis, 2026. [FRED economic data](https://fred.stlouisfed.org/) — The primary time-series database used for macro indicators.

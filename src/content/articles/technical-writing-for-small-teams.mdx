@@ -1,10 +1,73 @@
 ---
 title: "Technical Writing for Small Teams"
-description: "Reserved title for a future NOVANDRI article: Technical Writing for Small Teams."
-date: 2026-11-17
+description: "How a small team can build a documentation habit with defined readers, named owners and review tied to the work, and why docs alone cannot fix a confusing product."
+date: 2026-11-18
 tags:
-  - Planned
-  - Career
+  - Technology
+  - Method
+  - Documentation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Small teams often treat documentation as work that will happen after the product ships, which is why it rarely happens at all. The technical writing entry describes the practice of communicating technical information to a specific audience, and Write the Docs provides a community of documentation practitioners and shared resources. The practical problem is building a documentation habit that survives a small team's limited time and keeps pace with a changing product.
+
+**Direct answer:** For a small team, technical writing works when it has a named owner, a defined audience and a place in the normal workflow. Write for the reader's task, not the team's internal model. Keep a small set of documents current rather than a large set that drifts, and review them on the same cadence as the code they describe.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the sources: it maps audience-and-owner discipline to a documentation workflow decision, with claim status made explicit.
+
+## The mechanism
+
+Technical writing is the practice of communicating technical information to a particular audience for a particular purpose, with emphasis on clarity and usability. The practical consequence is that the first decision is who the reader is and what they are trying to do. Without that, engineers write for themselves, using the vocabulary and assumptions of the team rather than the needs of the person who has to install, call or troubleshoot the thing. A document without a defined audience is a draft that has not yet been aimed at anyone.
+
+Write the Docs treats documentation as a discipline with its own practices, tools and community of practitioners. The consequence is that a small team can borrow established patterns instead of inventing them: style guides, templates, review habits and a shared vocabulary. It also means treating documentation as something maintained rather than written once. The community framing turns docs from a one-off task into an ongoing practice with users, which changes both who owns it and when it is reviewed.
+
+Integration into the workflow is what keeps that practice alive. Documentation that lives apart from the work goes stale because nothing reminds anyone to update it. Documentation produced or reviewed alongside a change stays current because the change itself triggers the review. The consequence is concrete: put a doc check into the same list as code review, and keep a single source of truth so there is one place to look. The cost of a small, current document set is lower than the cost of a large, stale one that readers stop trusting.
+
+Audience layers matter even on a small team. End users, developers and operators need different documents because they are trying to do different things. Conflating them produces documentation that serves nobody well: a developer guide full of end-user steps and a user guide full of internal detail. The consequence is that a short map of which document serves which reader is worth keeping, and the same explanation should not be copied into several places. Duplication creates conflicting versions, and conflicting versions are how readers learn to ignore documentation altogether.
+
+## A worked example
+
+The following is hypothetical and illustrative. A four-person team ships a small internal API and notices repeated questions about how to authenticate and where to find error codes. Three checks shape the response. First, who is the reader and what single task are they trying to complete? Second, is there one location where the answer can live, with an owner who reviews it when the API changes? Third, is a full document the right artefact, or would a short example plus a note in the change checklist solve the repeated question? The outcome is one current page with an owner instead of several scattered explanations. The details are illustrative; the sequence is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Technical writing communicates technical information to a defined audience | `source-reported` | Wikipedia, Technical writing | 2026-11-18 | Definition or scope revised |
+| Documentation has a practitioner community and shared resources | `source-reported` | Write the Docs | 2026-11-18 | Community resources change substantially |
+| Documentation reviewed alongside code stays current longer | `inferred` | Derived from the sources | 2026-11-18 | Team workflow or review process changes |
+
+Two rows describe what the sources report: the audience-focused nature of technical writing, and the existence of a practitioner community with shared resources. The third row is a local rule, inferred rather than reported, that review tied to the work keeps docs current. It should be revisited when the team's workflow or review process changes.
+
+## What it cannot do
+
+Technical writing cannot fix a product that is confusing. Documentation explains a system; it does not repair an interface that misleads people or a workflow that has no clear path. When users repeatedly consult the docs to complete a basic task, the useful response may be to change the product rather than to add another paragraph. Treating documentation as a substitute for product clarity hides the real problem and lets a team feel productive while the underlying friction remains. The doc can reduce pain, but it should not be the only place the pain is addressed.
+
+There is an ongoing hidden cost. Every product change can invalidate a sentence, so writing a document is the beginning of the expense rather than the end of it. A small team must budget review time, and the phrase write it once is a myth in any system that changes. The maintenance cost is usually larger than the writing cost, which is why a smaller document set is cheaper over time. Teams that measure only the effort to produce docs and ignore the effort to keep them current consistently underestimate what they have committed to.
+
+The characteristic failure mode is drift. Documentation that is not tied to a change process goes stale quietly: a parameter changes, a step disappears, and the page still reads as authoritative. Readers notice first and lose trust; once they stop consulting the docs, the team has less feedback that anything is wrong, so maintenance drops further. This is a reinforcing failure, not a one-time mistake. Breaking it requires a link between the product change and the doc review, because goodwill and good intentions do not survive a busy release cycle.
+
+There are places where a formal document is the wrong tool. Not every decision needs a polished page; for a small team, a short conversation or a brief decision note can be the right artefact. Writing formal documentation for everything consumes the limited time the team has and produces volume that nobody reads. The discipline is to match the artefact to the need: a stable, repeated task deserves a maintained document, while a one-off choice may deserve only a line in a log. Over-documenting is a real failure, and it is rarely discussed as one.
+
+Finally, the practice needs review because both the audience and the product change. A guide written for an early user base may mislead a later one, and the person who owned a document may no longer own the code. Set a review cadence and attach each document to a specific owner, preferably someone close to the thing it describes. Without that, even good documentation decays, and a small team ends up with the worst of both worlds: the cost of maintaining docs and the distrust that comes from inaccurate ones.
+
+The counterargument that small teams cannot afford documentation is fair when time is scarce and incomplete when the cost of a wrong answer is high.
+
+## A decision test
+
+1. Name one reader and one task for each document.
+2. Choose a single location where documentation lives.
+3. Assign an owner to each document.
+4. Add a documentation check to the change checklist.
+5. Keep the set small and current rather than broad and stale.
+6. Set a review cadence that matches how fast the product changes.
+7. Delete documents that nobody uses.
+
+The test is designed for limited time, so it favours fewer, better-maintained artefacts over completeness. Each question can be answered in minutes, and the answers produce a small set of responsibilities rather than a large policy. Repeating the test after a release or a team change keeps the ownership current, which is more valuable than a one-time effort to document everything.
+
+For further reading, see [Technical Writing: Documentation, API Docs and Developer Experience](/articles/technical-writing-documentation-api-docs-and-developer-experience).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Technical writing - Wikipedia](https://en.wikipedia.org/wiki/Technical_writing) — Writing for technical audiences and purposes.
+- Write the Docs, 2026. [Write the Docs Documentation Guide](https://www.writethedocs.org/guide/) — The practitioner guide to documentation structure and style.
