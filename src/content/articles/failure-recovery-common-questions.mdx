@@ -1,10 +1,57 @@
 ---
 title: "Failure Recovery: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Failure Recovery: Common Questions."
-date: 2026-11-17
+description: "Recovery starts before the failure. Read the common questions, a worked example, and why restoring service is not the same as fixing the cause."
+date: 2026-11-18
 tags:
-  - Planned
-  - Career
+  - Engineering
+  - Reliability
+  - Operations
+  - Risk
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Recovery is often treated as what happens after a failure, which is too late to make it cheap. The NIST incident-handling guide treats preparation as part of the lifecycle, as the SRE alerting workbook ties detection to service objectives, as the rollback article treats reversibility as a design choice, as the disaster-recovery article argues for decisions made in advance.
+
+**Direct answer:** Recover by containing first, restoring service with a tested path, then finding and fixing the cause, with a record and a review. NIST SP 800-61 covers the lifecycle, and the SRE alerting workbook covers detection. The boundary: no process guarantees recovery, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as the incident article treats recovery as a process with uncertainty.
+
+## Common questions
+
+**What is the first step?** Contain the failure, which the NIST guide treats as the first response phase, as the incident article requires, as the rollback article advises on reverting a bad change, as the observability article treats signals as evidence.
+
+**How do I know it happened?** From a signal tied to an objective, which the SRE alerting workbook requires, as the error-budget article explains, as the observability article advises for logging, metrics, and tracing, as the 5xx article treats a status as a symptom.
+
+**Is restoring service enough?** No. A restore without a cause leaves the system exposed to the same failure, which the root-cause article treats as distinct from the symptom, as the incident article requires for a post-incident review, as the decision-memo article requires for a recorded judgement.
+
+**What about data?** A restore must consider data integrity, which the backup discussion in the disaster-recovery article treats, as the data-governance article requires provenance, as the risk article requires residual risk to be stated.
+
+Three consequences follow. Preparation should include a tested restore path, as the disaster-recovery article argues, as the rollback article advises on rehearsal, as the crisis-planning article argues for rehearsed response. Detection should be tied to objectives, as the SRE workbook requires. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises for follow-up.
+
+## A worked example
+
+The following is hypothetical and illustrative. A deploy causes a spike in failed requests after a database change.
+
+Three checks decide the response. First, is there a signal tied to an objective, as the SRE alerting workbook requires, with evidence from logs, as the observability article advises? Second, can service be restored with a tested path, as the rollback and disaster-recovery articles require, considering data integrity, as the data-governance article requires? Third, was the cause identified and recorded, as the root-cause and incident articles require, with a review, as the decision-memo article requires?
+
+Three conclusions follow. Containment comes before a fix, which the NIST guide advises. A restore without data checks is incomplete, as the disaster-recovery and data-governance articles advise. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises.
+
+## What failure recovery cannot do
+
+It cannot guarantee no future failure, which the publication standard forbids claiming, as the risk article requires residual risk, as the chaos-engineering literature treats failure as ongoing, as the red-teaming article treats testing as partial. It does not remove the need for monitoring, which the observability article treats as evidence, as the SRE workbook requires. And it cannot fix a system designed without reversibility, which the rollback article treats as a structural limit, as the disaster-recovery article advises for design.
+
+The counterargument that recovery is only about speed is fair for the immediate impact and incomplete for cause and data integrity, which the worked example shows, as the incident and data-governance articles advise.
+
+## A decision test
+
+1. Prepare a tested restore path, as the disaster-recovery article requires.
+2. Tie detection to an objective, as the SRE alerting workbook advises.
+3. Contain first, as the NIST guide requires.
+4. Verify data integrity on restore, as data governance requires.
+5. Find the cause, as the root-cause article advises.
+6. Record the decision and review, as the decision-memo article requires.
+7. State residual risk, as the risk-assessment article requires.
+
+For the lifecycle, see [Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response); for the design, see [Disaster Recovery](/articles/disaster-recovery-a-decision-framework).
+
+## Further Reading
+
+- Paul Cichonski, Thomas Millar, Tim Grance, Karen Scarfone (NIST), 2012. [SP 800-61 Rev. 2, Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final) — The incident-response capability lifecycle: preparation, detection and analysis, containment/eradication/recovery, and post-incident activity.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.
