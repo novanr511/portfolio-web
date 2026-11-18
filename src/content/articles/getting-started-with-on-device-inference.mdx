@@ -1,10 +1,69 @@
 ---
 title: "Getting Started with On-device Inference"
-description: "Reserved title for a future NOVANDRI article: Getting Started with On-device Inference."
-date: 2026-11-17
+description: "On-device inference pairs model compression with honest measurement. Read the benchmark and quantization mechanism, a hypothetical build, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Explanation
+  - On-device inference
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Getting started with on-device inference usually begins with a model that does not fit. Memory, power, and latency limits arrive before any accuracy target is agreed, and a benchmark score rarely transfers cleanly to a real device. The real problem is choosing what to compress and then measuring it in a way that means something.
+
+**Direct answer:** MLCommons maintains benchmark suites with defined workloads, rules, and metrics that make performance comparisons possible, while Jacob et al. describe integer-arithmetic-only quantization that maps weights and activations to integers to reduce compute and memory. On-device inference combines the two: shrink the model, then measure it under the target constraints. The sources supply the measurement method and the compression method; the build sequence is a synthesis.
+
+**Delta:** This article adds a compression-to-measurement map beyond the sources: it maps each model change to the check that validates it, with claim status explicit.
+
+## The mechanism
+
+On-device inference runs a model on the hardware in the user's hand or in installed equipment, without a round trip to a server. That changes the constraint set. Memory is fixed, thermal and power budgets are tight, and latency is felt directly by the user. The sources do not dwell on the product case, but the consequence is clear: a model that works in a data center may be unusable on the target device. The first practical decision is which device and which task define the budget.
+
+The MLCommons benchmark page describes a portfolio of benchmarks with defined workloads, metrics, and rules, including inference-focused suites. The value of such a definition is comparability: the same task and the same reporting rules let results from different implementations be set side by side. The limit is equally important. A benchmark result measures the benchmark workload under the benchmark's conditions, not an arbitrary application on an arbitrary device. Using it as a product forecast is a category error.
+
+The Jacob et al. paper addresses the model side. It describes a quantization scheme in which weights and activations are represented as integers with scale and zero-point parameters, so inference can run with integer arithmetic only, and it describes training with simulated quantization to preserve accuracy. The consequence is a smaller, cheaper model, but accuracy is a measured result rather than a guarantee. The build sequence is therefore local: baseline, quantize, re-measure accuracy, then measure latency and memory on the target hardware. That order matters more than any single tool choice, because each step can invalidate the one before it.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team wants an image classifier on a low-power embedded device with a fixed latency budget. Three checks decide the release. First, workload fit: does the benchmark task match the input size and classes the product actually uses? Second, accuracy: after integer quantization, does the model stay within an agreed tolerance of the floating-point baseline on the classes that matter? Third, device fit: on the target hardware, do measured latency and peak memory fit the budget with headroom? The review shows that memory fits but one class loses accuracy. The team retrains with simulated quantization for that class and repeats the measurement, recording the device firmware and runtime version alongside the result so another reviewer can reproduce it. The outcome is a validated compression decision, not a benchmark score copied from a report.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| MLCommons maintains benchmarks with defined workloads, metrics and rules | `source-reported` | MLCommons Benchmarks | 2026-11-18 | A benchmark suite or its rules are updated |
+| Integer-only quantization uses scale and zero-point and can be trained with simulated quantization | `source-reported` | Jacob et al., 2018 | 2026-11-18 | New quantization guidance supersedes the method |
+| A benchmark result transfers to a product only when workload and device match | `inferred` | Derived from the sources | 2026-11-18 | Target hardware or workload changes |
+
+The first two rows restate what the sources state directly and change when those sources are updated. The third row is an inference about transferability, not a claim made by either source. It deserves the most scrutiny, because a convenient benchmark number is easy to reuse in contexts the benchmark was never designed to represent.
+
+## What it cannot do
+
+Neither source tells a team what accuracy is good enough for a product. Benchmarks define how to measure a workload; quantization defines how to shrink a model. Neither defines the tolerance an application can accept. That is a product decision, and it must be made before compression begins or the resulting model cannot be judged.
+
+The hidden cost is validation work. Quantization often needs calibration or retraining, and both require data and compute. Accuracy must be checked class by class, because an average can hide a serious loss on a small group. Runtime versions, drivers, and device revisions all affect results, so the measurement has to be repeated when any of them changes. Calibration data also has to represent the cases the product will see, or the reported accuracy will be flattering in exactly the wrong way. The cost is recurring, not a one-time conversion.
+
+The main failure mode is chasing a benchmark number. A score obtained under defined conditions can look excellent while the product misses its latency target on the actual device. Integer-only arithmetic also assumes support in the hardware and runtime, and not every operation maps cleanly to it. A model may need mixed precision or a rewritten operator, which changes the very thing that was measured.
+
+The boundary is in what the sources cover. They do not specify how to measure sustained power, thermal throttling, or operating system scheduling on a phone, and they do not cover deployment, versioning, or rollback of an on-device model. A benchmark suite also defines its own categories; a workload outside those categories has no ready-made comparison. Neither source covers how a model is signed, distributed, or rolled back once it is on a user's device. Those gaps must be filled locally.
+
+The build therefore needs review at each handoff. Record the hardware, runtime, model version, and quantization settings alongside every result, and name a recheck condition for each. Without that record a later change looks like an improvement when it is only a different setup, and a result without its setup is hard to challenge and just as hard to trust. Review is especially important after a device refresh, because the constraint set can move under a model that has not changed.
+
+The counterargument that quantization is fair for fitting a model on a device is incomplete when the accuracy loss falls on a class the benchmark barely represents.
+
+## A decision test
+
+1. Define the on-device task, target device, and latency budget.
+2. Pick a benchmark workload that matches the task and input size.
+3. Record a floating-point accuracy baseline per class.
+4. Apply integer quantization and re-measure accuracy per class.
+5. Measure latency and peak memory on the target device.
+6. Compare against the product budget, not only the benchmark result.
+7. Record hardware, runtime, model version, and a recheck condition.
+
+A compression choice earns its place only when it survives measurement on the device that will run it. The test keeps benchmark results in their proper role as a comparison tool rather than a promise, and it leaves a record a reviewer can reproduce. For further reading, see [Related](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- MLCommons, 2026. [Benchmark work | Benchmarks - MLCommons](https://mlcommons.org/benchmarks/) — Open, comparable hardware and software performance measurements.
+- Jacob et al., 2018. [Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877) — Integer-only inference and why it needs a quantisation-aware training procedure.

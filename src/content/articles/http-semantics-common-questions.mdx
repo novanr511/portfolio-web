@@ -1,10 +1,71 @@
 ---
 title: "HTTP Semantics: Common Questions"
-description: "Reserved title for a future NOVANDRI article: HTTP Semantics: Common Questions."
-date: 2026-11-17
+description: "HTTP caching and method semantics decide when answers can be reused. Read how directives map to invalidation decisions, with claim status explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Protocol analysis
+  - HTTP caching
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+HTTP is often treated as a transport detail, so caching and method choice get decided by convention rather than by semantics. RFC 9110 defines what methods and status codes mean, and RFC 9111 defines when a response may be stored and reused. The practical failure is stale or duplicated data caused by ignoring those definitions, not by any bug in the server.
+
+**Direct answer:** HTTP semantics specify the meaning of methods, status codes, and header fields independently of any implementation. RFC 9111 adds rules for when a response is cacheable, how freshness is calculated, and how validators confirm a stored copy. The bounded claim: reuse is safe only when the method and the cache directives allow it.
+
+**Delta:** This article adds a directive-to-invalidation mapping beyond the sources: it maps each caching directive and method property to a reuse decision, with claim status explicit.
+
+## The mechanism
+
+RFC 9110 defines HTTP as a request-response protocol whose elements carry defined meanings. Methods such as GET, PUT, and DELETE are not interchangeable verbs: GET is defined as safe, meaning it is not expected to cause side effects, and a set of methods including GET, PUT, and DELETE are idempotent, meaning repeating them has the same intended effect as a single request. The practical consequence is that retry logic and prefetching can be reasoned about. A client may repeat an idempotent request after a network failure, but it should not assume a non-idempotent POST can be replayed without duplicating an effect, such as a payment or a form submission.
+
+RFC 9111 defines caching as the reuse of a stored response for a later equivalent request. A cache decides whether to store a response using rules such as whether the request method is cacheable, whether the status is final, and what the Cache-Control and Expires fields say. Freshness is the window in which a stored response may be used without revalidation; validators such as ETag and Last-Modified allow a conditional request that can return 304 Not Modified when the stored copy is still current. Directives such as max-age, no-store, and no-cache set the boundaries: no-store forbids storage, while no-cache permits storage but requires revalidation before reuse.
+
+The two documents connect at a point neither frames as a single decision. Method semantics determine whether a request may be repeated or reused at all; caching rules determine how long a stored response may stand in for a fresh one. A GET response with an explicit max-age can be reused until it goes stale, then revalidated with a conditional request; a POST response generally is not reused by default. The reuse decision is therefore the composition of a method property and a cache directive. Neither source tells a team which max-age fits its data, so that value is a local choice and must be marked as inferred.
+
+The useful output is a small table mapping each endpoint to its method, its cache directives, and the condition that invalidates it. That table, rather than a global caching default, is the decision instrument: it shows where reuse is safe and where a write must bypass the cache. It also makes the rationale reviewable, because the directive and the reason for it are recorded together. A team that writes directives down can later explain why a page was fresh for a minute or an hour, instead of guessing from code.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team serves a product catalogue through a GET endpoint and notices that price changes appear late for some users. Three checks decide the fix. First, does the method allow reuse at all, and is GET used here for a read with no side effects? Second, what do the response directives say: is there a max-age, and is a validator present for conditional revalidation? Third, what event should invalidate the stored copy when a price changes, and can that event purge the relevant cache key? The review finds a long max-age with no invalidation on price updates. The team shortens the freshness window, adds a validator, and triggers invalidation on the price-change event. The outcome is reuse that survives review. The numbers are hypothetical; the decision method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| RFC 9110 defines method, status, and header semantics | `source-reported` | RFC 9110, HTTP Semantics | 2026-11-18 | Specification revised |
+| RFC 9111 defines freshness, validators, and cache directives | `source-reported` | RFC 9111, HTTP Caching | 2026-11-18 | Specification revised |
+| Reuse follows from method property plus cache directive | `inferred` | Derived from the sources | 2026-11-18 | Endpoint behavior changes |
+
+The first two rows report what the two specifications define. The third is an inference about how method semantics and caching combine, because neither document presents that combination as one rule. Recheck the source rows when the specifications are revised and the inferred row when an endpoint's method or directive changes.
+
+## What it cannot do
+
+HTTP semantics do not guarantee correct application behaviour. They define the meaning of messages, not whether the data inside them is accurate or whether the endpoint does what the business expects. A GET can be correctly cached and still return a wrong price, because the source system is wrong. Treating a standards-conformant response as a correctness certificate confuses protocol validity with data truth. A team that needs assurance of accuracy must look to the data source and the domain owner, not to the response headers.
+
+The hidden cost is that correct caching is more work than a default. Computing freshness, maintaining validators, wiring invalidation to write events, and documenting directives all take effort that a single cache-all or cache-nothing setting avoids. That asymmetry is why teams fall back on blanket rules. The cost is paid in code paths for invalidation and in the discipline to change directives when an endpoint's semantics change. Making the endpoint mapping a prerequisite for caching keeps that work from being skipped under deadline pressure.
+
+The main failure mode is treating a cached response as equivalent to a fresh one without checking freshness. A long max-age with no invalidation serves stale data; an absent validator removes the option of cheap revalidation; a cacheable response to a method with side effects can duplicate an effect. None of these is a server bug; all are decisions about reuse that were never made explicitly. The relevant question is what event makes a stored copy wrong, and whether the directive and the invalidation path reflect it. A defensible setup states the event alongside the directive.
+
+There is a boundary around the method. It covers semantics and caching of messages, not the correctness of the application, the security of the transport, or the behaviour of clients that ignore directives. It does not validate data, repair a broken invalidation event, or compensate for a client that caches against the specification. It cannot tell a team what freshness its data needs; it can only show whether the chosen directives are consistent with the method and the invalidation story. That is a narrower contribution than it is often made out to be.
+
+Because the specifications and endpoints evolve, the mapping needs a refresh. Each endpoint should carry its directive and its recheck condition, and the choice of freshness should be treated as a local decision rather than a value the standards supply. Without that record, a future reviewer cannot tell which directives were deliberate and which were defaults. The endpoints will still be there; the rationale for reusing their responses is what makes the review possible.
+
+The counterargument that simple cache-all rules are fair for prototypes is incomplete when stale data or duplicated writes reach real users.
+
+## A decision test
+
+1. Name the endpoint and the method it uses.
+2. Decide whether the method is safe and idempotent, and whether reuse is allowed.
+3. State what a correct response means for that endpoint.
+4. Set the cache directives consistent with that definition.
+5. Identify the event that invalidates a stored copy.
+6. Record the directive and its recheck condition.
+7. Verify that fresh responses and invalidations behave as intended.
+
+An HTTP caching practice is useful only when method semantics and cache directives are both recorded. The test turns a reuse question into a sequence of decisions with a visible rationale, so a reviewer can see why a response may be stored and when it must be refreshed. For further reading, see [What AI Search Actually Measures](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- R. Fielding, M. Nottingham, and J. Reschke, 2022. [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110) — The normative definition of HTTP methods, status codes, and headers.
+- R. Fielding, M. Nottingham, and J. Reschke, editors, 2022. [RFC 9111: HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111) — The normative cache-control, freshness, validation, and invalidation rules.

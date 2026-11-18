@@ -1,10 +1,73 @@
 ---
 title: "Edge Computing at Scale"
-description: "Reserved title for a future NOVANDRI article: Edge Computing at Scale."
-date: 2026-11-17
+description: "Edge computing moves compute closer to data sources; this article maps latency and bandwidth needs to a placement decision, with evidence status made explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Architecture
+  - Distributed Systems
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often treat the cloud as one location and assume every workload belongs in a central region. That assumption breaks when round-trip latency or bandwidth cost dominates, because distance to the user becomes part of the system's behavior. The practical problem is deciding which work to move to the edge and which to keep central, without creating a fleet that is harder to operate than the problem it solves.
+
+**Direct answer:** Edge computing places computation and storage near the data source to reduce latency and bandwidth use; a content delivery network is a mature form of this proximity pattern for static content. Use the edge when response time or transfer cost governs the workload, and keep central compute when consistency and simple operations govern it. The decision is a placement trade-off, not a blanket replacement of the core.
+
+**Delta:** This article adds a placement rule beyond the sources: it maps latency and bandwidth needs to an edge-versus-core decision, with claim status explicit.
+
+## The mechanism
+
+Edge computing is a distributed paradigm that pushes computation and data storage closer to the location where it is needed, instead of relying on a single central server or cloud region. The stated rationale is improved response time and reduced bandwidth consumption, because data need not travel the full path to a distant data center and back. A content delivery network applies the same proximity idea to a narrower problem: a distributed set of servers delivers web content to users based on their geographic location, caching copies near the point of consumption. Both rest on one observation, that distance is a cost which can be reduced by moving work closer to where it is used.
+
+In practice this changes what the system is. A workload at the edge is split across many small sites, each with its own limits on memory, storage, and power, and each potentially out of contact with the center for intervals. The benefit is local and measurable: fewer network hops, less wide-area traffic, and responses that do not depend on a distant link. The cost is distributed: code must be deployed to many nodes, state must be reconciled, and failures become partial rather than global. A team that wants the latency benefit must also budget for the operational surface that benefit creates.
+
+The useful question is therefore not whether edge computing is good, but which properties of a workload make proximity worth its overhead. Workloads with tight interactive deadlines, large local data volumes, or intermittent connectivity gain the most from placement near the source. Workloads that require one consistent state, heavy training, or cross-site coordination tend to stay central, because distributing them multiplies the coordination problem. Content delivery shows the boundary clearly: caching immutable assets at the edge is straightforward, while caching data that changes frequently introduces staleness that must be actively managed.
+
+A consequence for measurement is that edge benefits must be observed locally. Aggregate averages hide the slow tail that proximity is meant to fix, so the relevant signals are the distribution of response times and the wide-area bytes transferred per request. Without those signals, a team can pay the operational cost of a distributed fleet without ever confirming the benefit that justified it.
+
+## A worked example
+
+The following is hypothetical and illustrative. Consider an application that processes sensor readings at remote sites and sends summaries to a central service. Engineers propose moving the parsing step from the central service out to each site. Three checks decide the placement. First, what does the latency budget require: if a decision must be made within a short window at the site, local processing removes the round trip. Second, how much data crosses the wide area: if raw readings are large and summaries are small, local processing cuts transfer cost. Third, what state must stay consistent: if each site needs the same up-to-date model, that shared state becomes a synchronization problem at the edge. The outcome is a split, with parsing and immediate decisions kept local while model updates and long-term storage remain central. The example shows the rule in action, not a verdict on any specific product.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Edge computing moves computation and storage closer to data sources to improve response time and save bandwidth | `source-reported` | Edge computing entry | 2026-11-18 | network topology or latency targets change |
+| A content delivery network distributes servers by proximity to deliver content to users | `source-reported` | CDN entry | 2026-11-18 | delivery architecture or caching model changes |
+| Workloads needing tight latency gain more from edge placement than workloads needing central consistency | `inferred` | Derived from the sources | 2026-11-18 | workload profile or consistency needs change |
+
+The first two rows rest on definitions stated in the reference entries and are treated as reported, not measured here. The third row is an inference drawn from those definitions: it follows from the proximity rationale but is not asserted by either source. Every row is dated and should be revisited if the architecture assumptions or the workload being evaluated change materially.
+
+## What it cannot do
+
+Edge computing does not remove the need for a central system; it redistributes work. There is still a place for aggregation, long-term storage, model training, and global coordination, and those functions do not become cheaper simply because part of the pipeline moved outward. Treating the edge as a replacement for the core leads teams to duplicate central capabilities at every site, which raises cost and encourages divergence. The realistic architecture is a division of labor, and the limit is that proximity helps only the portion of the workload that benefits from being nearby.
+
+The hidden cost is operational. One service becomes many deployments, each with its own configuration, monitoring, security patching, and failure modes. Software that assumes a stable, well-resourced host must be reworked for constrained nodes and intermittent links. Updates must be staged across a fleet, and rollback is harder when nodes are geographically dispersed or periodically disconnected. These costs are real even when they are absent from a latency benchmark, and they grow with the number of sites rather than the size of the code.
+
+A common failure mode is treating distributed state as if it were local. When a site loses its connection to the center, decisions made locally may diverge from the global view; when connectivity returns, reconciliation becomes a correctness problem. Cached content can go stale, and cached decisions can rest on outdated parameters. Systems that ignore this partition behavior produce subtle inconsistencies that are harder to debug than an outright outage, because each site appears healthy in isolation.
+
+The boundary is set by the workload's tolerance for inconsistency and its need for coordination. Workloads with immutable inputs and local outputs fit the edge well. Workloads governed by one shared state, or requiring heavy computation, fit poorly. Content delivery works precisely because cached assets are largely immutable; extending the same pattern to frequently changing data crosses that boundary. Knowing where the boundary lies requires examining the data flow, not just the latency requirement.
+
+Finally, the decision needs periodic review, not a one-time classification. Traffic patterns, network prices, and site conditions change, and a placement that was justified last year may be a liability now. A team should revisit the latency and bandwidth signals, confirm that the operational cost is still covered by the benefit, and check that the consistency model still holds. What it cannot do is set itself and stay correct; it needs the same measurement discipline as any other architectural choice.
+
+[Counterargument: "The counterargument that edge computing is always faster is fair for latency-bound requests and incomplete for coordinated workloads, where central consistency and simpler operations can outweigh the proximity gain."]
+
+## A decision test
+
+1. Define the workload's latency budget and where it is measured.
+2. Estimate wide-area data volume and the cost of moving it.
+3. Identify which state must remain consistent across sites.
+4. Classify inputs as immutable or frequently changing.
+5. Map latency and bandwidth needs to an edge or central placement.
+6. Budget the operational cost of the resulting fleet.
+7. Record the decision and the signals that would reverse it.
+
+Placement decisions are best treated as reversible hypotheses. Record the assumption behind each choice and the measurement that would falsify it, so the architecture can be corrected without a full rewrite. A short, explicit test keeps the edge from becoming a default that persists after its justification has disappeared.
+
+For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Edge computing - Wikipedia](https://en.wikipedia.org/wiki/Edge_computing) — Computing performed near the point of data generation.
+- Wikipedia contributors, 2026. [Content delivery network - Wikipedia](https://en.wikipedia.org/wiki/Content_delivery_network) — How distributed delivery affects the loading of web resources.

@@ -1,10 +1,73 @@
 ---
 title: "Omnichannel Retail Explained"
-description: "Reserved title for a future NOVANDRI article: Omnichannel Retail Explained."
-date: 2026-11-17
+description: "Omnichannel retail depends on shared data; this article maps point-of-sale and inventory signals to channel design, with evidence status made explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - Retail
+  - Operations
+  - Channel Management
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Retailers add online and offline channels and then discover that the channels compete with one another: a store and a website undercut each other on price or disagree about stock. The integration that is supposed to help is limited by systems that do not share data. The problem is designing channels so they reinforce rather than conflict, with point-of-sale and inventory signals as the practical test.
+
+**Direct answer:** Omnichannel retail coordinates online and offline channels around one customer journey; channel conflict is the friction that appears when those channels compete, and point-of-sale systems are where transactions and stock changes originate. Treat shared point-of-sale and inventory data as the prerequisite for reducing that conflict. Design the channel mix around common data rather than around separate channel accounts.
+
+**Delta:** This article adds an integration test beyond the sources: it maps point-of-sale and inventory signals to a channel-design decision, with claim status explicit.
+
+## The mechanism
+
+Omnichannel retail aims to give customers a coordinated experience across online and physical channels, so a person can move between them without friction. Channel conflict is the tension that arises when those channels compete rather than cooperate, for example when a store and a website chase the same sale or quote different prices. Point of sale is the system and location where a retail transaction is completed, and it is a primary source of data about what sold and what stock remains. These ideas connect directly: conflict often reflects the fact that each channel operates with its own view of price and stock.
+
+The practical consequence is that channel design is a data design problem. If the online channel cannot see store inventory, it cannot promise reliable pickup or show accurate availability, and customers receive contradictory signals. If prices are managed separately, channels can undercut one another, damaging trust and margin. Shared point-of-sale and inventory data let the channels present one view of the product, which is the foundation for treating them as complementary. Without that foundation, an omnichannel label describes an intention rather than an operational reality.
+
+Coordination shows up in specific capabilities: consistent pricing, accurate stock visibility, unified customer records, and fulfillment options that cross channels, such as buying online and collecting in store. Each depends on systems agreeing about the same facts. Where they do not, customers experience the seams, and the retailer experiences the conflict as lost sales or eroded margin. The useful question for a retailer is not how many channels it operates but whether those channels share the data needed to behave as one. A channel that cannot see the others is really a separate business wearing the same brand.
+
+The decision that follows is to evaluate each new channel against the integration that supports it. Adding a channel without shared inventory and point-of-sale data increases the surface for conflict rather than reducing it. The sources describe the concepts of conflict and point of sale but do not prescribe a particular integration architecture, so the mapping from data sharing to reduced conflict is a practical inference. The bounded conclusion is that shared data is a prerequisite for coordination, not a guarantee of it; good data makes cooperation possible, while policy and execution determine whether it happens.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retailer operates stores and a website with separate views of inventory and is considering in-store pickup. Three checks decide whether to proceed. First, inventory accuracy: can the website see current store stock reliably enough to promise pickup? Second, pricing consistency: will the same product carry the same price in both channels, avoiding internal undercutting? Third, point-of-sale integration: when a pickup happens, will the store's system record the sale so that stock and revenue stay consistent? The outcome depends on the answers. If all three checks hold, pickup can be offered as a coordinated service; if any fail, launching it would amplify conflict rather than reduce it. The example illustrates the test, not the behavior of any specific retailer.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Channel conflict arises when channels compete for the same customers or sales | `source-reported` | Channel conflict entry | 2026-11-18 | channel structure or pricing policy changes |
+| Point of sale is where retail transactions are completed and sales data is generated | `source-reported` | Point of sale entry | 2026-11-18 | transaction systems or data flows change |
+| Shared point-of-sale and inventory data reduce channel conflict | `inferred` | Derived from the sources | 2026-11-18 | integration or fulfillment design changes |
+
+The first two rows rest on definitions in the reference entries and are treated as reported rather than measured here. The third row is an inference drawn from those definitions: it follows from the idea that conflict comes from competing channel views, but neither source states it as a rule. Each row is dated and should be revisited when the channel mix, the transaction systems, or the inventory model changes.
+
+## What it cannot do
+
+Shared data is necessary but not sufficient. Point-of-sale and inventory feeds can agree and channels can still conflict because of pricing policy, incentives, or service design. A unified view of stock does not by itself make a store and a website cooperate; it only removes one reason they cannot. The sources define the concepts of conflict and point of sale, not a complete coordination model, so it would be wrong to treat data integration as a cure for every channel problem.
+
+The hidden cost of integration is substantial. Connecting store systems, online platforms, and inventory records requires ongoing reconciliation, because data drift and timing differences appear even when the systems are linked. Staff must be trained to trust and maintain the shared view, and legacy point-of-sale systems can resist the changes needed. The expense is not a one-time project: it continues as channels, products, and promotions change. A retailer that budgets only for the launch of a new channel will miss the recurring cost of keeping the data coherent.
+
+A common failure mode is promising capabilities the data cannot support. Showing stock as available when it is not leads to canceled orders and lost trust, which is a clearer expression of conflict than any pricing dispute. A second failure is measuring channels separately and rewarding each for its own numbers, which encourages behavior that harms the combined result. When channel teams compete on their own metrics, the organization recreates the very conflict that shared systems are meant to remove.
+
+The boundary is set by the scope of the sources. They describe what channel conflict and point of sale are, not an integration architecture or a validated design standard. The claim that shared data reduces conflict is an inference, so it should be applied as a hypothesis to test rather than a law. Any threshold for acceptable consistency or conflict is a local decision, and presenting it as something the sources establish would overstate the evidence.
+
+Finally, the design needs review. New channels, new fulfillment options, and changing customer expectations all alter where conflict appears, and an arrangement that works today can create friction tomorrow. A retailer should periodically recheck the three signals, confirm that stock visibility and pricing remain consistent, and verify that point-of-sale records still flow into the shared view. What it cannot do is declare the channel design finished; coordination is a condition that has to be maintained.
+
+[Counterargument: "The counterargument that more channels always mean more reach is fair for customer access and incomplete for profitability, because uncoordinated channels can compete away margin."]
+
+## A decision test
+
+1. Map the channels that touch the same customer journey.
+2. Check whether inventory data is shared and current across them.
+3. Check whether prices are consistent across channels.
+4. Verify that point-of-sale records feed the shared view.
+5. Identify any channel that operates on its own data.
+6. Design fulfillment options only where the data supports them.
+7. Record the design and the signals that would reveal new conflict.
+
+Channel design holds only as long as the data underneath it holds. Keep a short record of which shared facts each capability depends on, and revisit them whenever a channel or system changes. That turns the integration test into a routine check instead of a one-time project.
+
+For further reading, see [Related](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Channel conflict - Wikipedia](https://en.wikipedia.org/wiki/Channel_conflict) — Disputes between channels serving the same customer.
+- Wikipedia contributors, 2026. [Point of sale - Wikipedia](https://en.wikipedia.org/wiki/Point_of_sale) — Systems for recording transactions at the point of sale.

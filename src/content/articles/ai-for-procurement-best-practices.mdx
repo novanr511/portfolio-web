@@ -1,10 +1,71 @@
 ---
 title: "AI for Procurement Best Practices"
-description: "Reserved title for a future NOVANDRI article: AI for Procurement Best Practices."
-date: 2026-11-17
+description: "AI for procurement best practices map language-model assistance to the stages of sourcing. Read the mechanism, a worked example, the limits, and a decision test."
+date: 2026-11-18
 tags:
-  - Planned
-  - AI
+  - Procurement
+  - Applied AI
+  - Sourcing
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Most procurement AI advice treats the technology as a blanket upgrade to the whole function. Procurement is not one task but a chain of stages with different risks, and "use AI to improve procurement" gives no guidance on where a tool helps and where a person must stay accountable. The real problem is placing language-model assistance at the right stages without losing control of the commitments that follow.
+
+**Direct answer:** AI for procurement means applying language models to the text-heavy work in the buying process: summarizing proposals, extracting contract terms, drafting requests, and comparing bids. Wikipedia describes procurement as the multi-stage acquisition of goods and services, and Anthropic's use-case guide lists summarization, extraction, drafting, and analysis as tasks models handle well. The boundary is that these tools accelerate reading and comparison; they do not negotiate, authorize spend, or own supplier decisions.
+
+**Delta:** This article adds a stage-level map beyond the sources: it maps each procurement stage to a specific AI role and a specific human checkpoint, with claim status explicit.
+
+## The mechanism
+
+Procurement is a structured, document-heavy process. Wikipedia characterizes it as the acquisition of goods and services through stages such as identifying a need, sourcing suppliers, soliciting and comparing offers, negotiating terms, placing an order, and receiving and paying for the delivery. Much of the daily work is reading and reconciling documents: requests for quotation, supplier qualifications, contracts, and invoices. The practical consequence is a natural fit for language-model assistance, because the inputs are text, but also a clear exposure: an error made in an early document can propagate through every later stage.
+
+The use-case guide from Anthropic describes the categories of work language models handle: summarization, extraction of structured data from text, drafting, and analysis. Mapped onto procurement, these become summarizing long supplier proposals, pulling clause terms out of contracts, drafting request-for-proposal text, and comparing bids against a common set of criteria. The practical consequence is that the reading and comparison stages compress, while the stages that create obligations - selection and negotiation - remain human decisions that the tool can inform but not make.
+
+A useful best practice follows: keep accountability anchored at the decision points. The model processes language; it does not sign a contract or accept a delivery. A procurement team should state explicitly where the tool's output is advisory and where a named person signs off, especially for supplier selection and contract terms. This is not a limitation to apologize for but a design choice, because the party that owns the risk should be the party that makes the call.
+
+A second best practice concerns input quality. The guide emphasizes clear instructions and relevant context, and procurement data is frequently inconsistent: supplier documents vary in format, descriptions use different units, and terms are buried in prose. The practical consequence is that automation reliability is bounded by the documents fed into it. Standardizing templates and defining the fields to extract often does more for output quality than changing the model, and it should come before any attempt to scale the tool across categories.
+
+## A worked example
+
+The following is hypothetical and illustrative. A procurement team must evaluate twelve supplier bids for a services contract, each submitted as a long PDF with different formatting. The team uses a model to extract price, term length, liability cap, and renewal clause into a single comparison table. Check one: every extracted clause is spot-checked against its source paragraph before the table is trusted. Check two: the shortlist is reviewed against the original evaluation criteria, not against the model's ranking, so an unstated preference cannot hide in the summary. Check three: a named manager signs off on the final two suppliers. The outcome is that reading time falls, and the clause check catches one liability cap recorded incorrectly, which changes the shortlist.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Procurement is a multi-stage process of acquiring goods and services including sourcing and negotiation | `source-reported` | Procurement (Wikipedia) | 2026-11-18 | Procurement definitions or standard stage models change |
+| Language models assist with summarization, extraction, drafting and analysis tasks | `source-reported` | Anthropic use-case guides | 2026-11-18 | Guide scope or documented capabilities change |
+| Human sign-off at decision points reduces risk relative to full automation | `inferred` | Derived from the sources | 2026-11-18 | Evidence on automated procurement decisions is published |
+
+The table separates the sources from the conclusion drawn here. The first two rows rest on what the sources state: the shape of the procurement process and the kinds of tasks models perform. The third row is an inference about governance, since the sources do not evaluate sign-off rules directly. It should be read as a design recommendation to test, not a measured result.
+
+## What it cannot do
+
+The first limit is that these tools do not own accountability. A model can summarize a bid and extract a clause, but it cannot authorize spend or accept legal terms. Treating a fluent summary as a decision is a category error: the output is a representation of a document, not the document, and the obligations attach to the original contract. Any workflow that lets a generated summary stand in for the signed source has removed the very artifact that defines the agreement.
+
+The second limit is a hidden cost. Automation does not eliminate review; it moves it. If a model extracts fifty clause values, someone must still confirm that they are right, and the check is only as good as the reviewer's attention. Teams often discover that the time saved on reading is spent on verification, and that a reviewer who trusts the output stops checking carefully. The result can be a faster process with the same risk, or with more risk because scrutiny has quietly atrophied.
+
+A third failure mode is confident error in extracted terms. A language model can produce a plausible clause value that is wrong, especially when a document is poorly structured or a term is stated indirectly. In procurement, a single wrong figure - a liability cap, a renewal date, a price escalation - can change which supplier wins. This is why the worked example keeps the source paragraph in the loop. Verification against the original text is not bureaucracy here; it is the control that makes extraction usable.
+
+There is also a boundary to the claimed benefit. The use-case guide describes general capabilities, not procurement outcomes, and it does not guarantee accuracy on any particular contract. Performance depends on document quality, field definitions, and the review process around the tool. A team should not assume that success on a clean internal memo transfers to a messy supplier submission, or that a result in one category holds in another with different regulations and terms.
+
+Finally, the practice needs review. Supplier terms change, documents change format, and a model that extracted fields correctly last quarter can drift as inputs shift. A procurement team should sample outputs periodically, record where verification caught errors, and revisit the field definitions when error patterns appear. Without that loop, the process slowly loses the accuracy that justified it.
+
+The counterargument that procurement AI primarily saves time is fair for high-volume, low-value purchases where errors are cheap. It is incomplete for strategic contracts, where the value of the tool lies in making comparisons consistent and traceable, not merely in reading faster.
+
+## A decision test
+
+1. Which specific procurement stages will the tool touch, and which will it not?
+2. Are the fields to extract defined before the tool is applied?
+3. Is every extracted value checkable against a source paragraph?
+4. Is a named person accountable for supplier selection and contract terms?
+5. Are evaluation criteria fixed independently of the model's output?
+6. Has a sample of outputs been verified for accuracy on real documents?
+7. Is there a schedule to recheck accuracy as documents and suppliers change?
+
+The steps convert a broad ambition into a bounded deployment. The point is not to resist automation but to place it where text handling is the bottleneck and to keep human judgment where commitments are made. For the governance side of introducing a model into a workflow, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Procurement - Wikipedia](https://en.wikipedia.org/wiki/Procurement) — How organisations acquire goods and services.

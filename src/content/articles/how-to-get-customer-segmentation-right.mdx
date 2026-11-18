@@ -1,10 +1,71 @@
 ---
 title: "How to Get Customer Segmentation Right"
-description: "Reserved title for a future NOVANDRI article: How to Get Customer Segmentation Right."
-date: 2026-11-17
+description: "Customer segmentation groups buyers by shared attributes to guide decisions. Learn what data modeling and conjoint analysis cover, a worked example, and the limits of each."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Data Modeling
+  - Segmentation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Customer segmentation promises distinct groups that marketing can act on, but the groups depend on how data and preferences are modeled. The sources describe data modeling and conjoint analysis separately. The real problem is connecting a segmentation model to a decision that a team can defend.
+
+**Direct answer:** Customer segmentation groups buyers by shared attributes so that a team can treat groups differently. Data modeling supplies the structure for representing those attributes, and conjoint analysis estimates how people value product attributes through trade-offs. A segment is useful only when it changes a decision.
+
+**Delta:** This article adds a claim-status table and a model-to-decision mapping beyond the sources: it maps a segmentation model to a targeting choice, with claim status explicit.
+
+## The mechanism
+
+Data modeling is the process of defining how data is represented, including the entities, their attributes, and the relationships among them. The source describes models at conceptual, logical, and physical levels, moving from an abstract view of the domain toward a structure a system can store. Applied to customers, a data model decides what a customer record contains: identifiers, behaviors, attributes, and how those pieces connect. That decision comes before any grouping, because a segmentation can only use attributes that the model captured.
+
+Conjoint analysis addresses a different question. As the source describes it, it is a survey-based technique in which respondents make trade-offs between hypothetical products defined by attributes and levels. By observing which combinations people choose, a researcher can estimate how much each attribute contributes to preference. For segmentation, this adds a preference dimension that behavioral data alone may lack. Two customers with similar purchase histories can value different attributes, and conjoint data can reveal that difference.
+
+The practical consequence is that segmentation combines structure with measurement. The data model determines what can be stored and joined; conjoint analysis contributes estimates of what people value. A team then groups customers using both. The sources do not supply the grouping rule itself, so choosing variables, weights, and the number of groups is an inference. That choice is where segmentation succeeds or fails, because it sets whether the resulting groups are distinct, stable, and usable.
+
+A further consequence is that segments are local constructs rather than facts about the world. They reflect the attributes the model included and the preferences the survey measured. Change either input and the groups can shift. The mechanism is therefore a chain: a data model defines available attributes, conjoint analysis estimates preferences, a grouping rule produces segments, and a team uses those segments for targeting. Every link is a decision that should be recorded, because a segment that cannot be traced back to its inputs cannot be defended when a campaign underperforms.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retention team wants to segment subscribers to target a discount offer. Three checks shape the work. First, the data model is reviewed to confirm that the attributes used to form groups, such as tenure and plan type, are actually captured and consistently defined. Second, a conjoint survey is checked for whether the attributes tested, like price and feature set, reflect what subscribers genuinely trade off rather than what the team assumed. Third, each resulting segment is tested for actionability: can the team identify its members and reach them with a distinct offer? The checks reveal one segment defined by an attribute that is missing for many records and is dropped. The remaining segments receive targeted offers. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Data modeling defines entities, attributes, and relationships | `source-reported` | Data modeling - Wikipedia | 2026-11-18 | Definition revised |
+| Conjoint analysis uses trade-offs to estimate attribute value | `source-reported` | Conjoint analysis - Wikipedia | 2026-11-18 | Method description changed |
+| Choose grouping variables that trace to a targeting decision | `inferred` | Derived from the sources | 2026-11-18 | Data model or strategy changes |
+
+The first two rows describe the methods as the source entries present them and can be checked directly. The third row is a synthesis, because neither source specifies how to choose segmentation variables. Recheck the source rows if the entries change, and recheck the inferred row when the data model, available attributes, or targeting strategy changes.
+
+## What it cannot do
+
+A segmentation cannot tell you which customers will respond to an offer. It groups people by attributes and stated preferences, but the sources describe modeling and preference measurement, not individual response. Two customers in the same segment can behave very differently when actually contacted. The segment is a summary of similarity, not a prediction of action. A team that treats membership as destiny will target the group and be surprised when results vary within it. The grouping narrows the field; it does not decide the outcome.
+
+The hidden cost is the complexity of maintaining a model that stays valid. Customer attributes change, survey-based preferences age, and the groupings that once informed campaigns can drift out of date. There is also a cost to over-segmentation: as groups multiply, each becomes smaller and harder to reach, and the team spends more effort managing segments than acting on them. A model with many segments can look sophisticated while producing no distinct action. Neither source addresses this cost, so it is an inference from the gap between building a model and using it.
+
+The main failure mode is building segments that are not actionable. A group can be statistically clean yet impossible to identify in the systems that deliver campaigns, because the defining attribute was never stored where targeting happens. A related failure is letting the data model dictate the segments: if only a few attributes were captured, the grouping will reflect those attributes whether or not they matter. Conjoint results can also be overread, since stated trade-offs in a survey do not always match behavior in a purchase. The sources describe the methods without guaranteeing either problem away.
+
+There is a boundary around what these methods cover. Data modeling structures information; it does not decide which information is worth collecting. Conjoint analysis estimates preference among the attributes presented in the survey; it says nothing about attributes the researcher omitted. Segmentation built from both inherits these limits, so it can only reflect what was modeled and asked. It also cannot substitute for judgment about which differences are worth acting on. A statistically distinct segment that no team can serve with a different offer is an academic result, not a business tool.
+
+Because attributes and preferences shift, segments need periodic review. The data model should be checked against current records to confirm that defining attributes are still captured, and conjoint findings should be refreshed when products or prices change. Each segment should be tested for actionability against the channels the team actually uses. A record of which variables formed each segment and when they were last verified makes the system auditable. Without that record, campaigns continue to rely on groups whose meaning has quietly changed.
+
+The counterargument that finer segments are fair because they capture more detail is reasonable for analysis and incomplete for action, since a segment that cannot be reached delivers no value.
+
+## A decision test
+
+1. Name the decision the segmentation is meant to support.
+2. Verify that the data model captures the attributes you plan to use.
+3. Confirm that conjoint attributes reflect real trade-offs.
+4. Choose grouping variables that trace to that decision.
+5. Test each segment for actionability: can you identify and reach it?
+6. Drop segments that are small, unstable, or unservable.
+7. Record variables, sources, and a recheck date for each segment.
+
+Customer segmentation is useful when groups connect to a decision and can be acted on. The test keeps that connection visible, so a segment is defended by its inputs and its targetability rather than by its neatness. For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data modeling - Wikipedia](https://en.wikipedia.org/wiki/Data_modeling) — The structure and purpose of data models.
+- Wikipedia contributors, 2026. [Conjoint analysis - Wikipedia](https://en.wikipedia.org/wiki/Conjoint_analysis) — Measuring preferences across product attributes.

@@ -1,10 +1,73 @@
 ---
 title: "Infrastructure as Code: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Infrastructure as Code: Common Questions."
-date: 2026-11-17
+description: "A bounded guide to declarative provisioning, state, and drift, mapping common infrastructure questions to review decisions with explicit claim status."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Engineering Operations
+  - Declarative Provisioning
+  - Infrastructure as Code
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often automate infrastructure and then find themselves asking the same questions again: whether to keep mutable servers, how to handle the state file, and what a safe change review looks like. The practical problem is that infrastructure definitions get treated as ad hoc scripts rather than as reviewable, version-controlled artifacts. That habit turns routine changes into hard-to-predict events and makes ownership unclear.
+
+**Direct answer:** Infrastructure as code means defining and provisioning infrastructure through machine-readable definition files instead of interactive configuration or hand-run scripts. Declarative tools such as Terraform describe a desired end state and let the tool work toward it, so a change becomes a committed file diff that can be reviewed before it is applied. The practical consequence is that repeatability and review replace improvisation, but only when state and drift are managed deliberately.
+
+**Delta:** This article adds a decision map beyond the sources: it maps state and drift concepts to a review-gating decision, with claim status explicit.
+
+## The mechanism
+
+The sources distinguish declarative from imperative approaches. Imperative code lists the steps to reach a result; declarative code states the desired result and lets the tool determine the steps. This matters because the unit of change shifts from commands executed to declared state, and declared state is something a reviewer can inspect. A reviewer can reason about the end state rather than mentally replaying a procedure, which lowers the chance that an important side effect is missed.
+
+Terraform, as described in the source, uses a declarative configuration language and providers to manage resources across platforms. Its plan step shows what would change before apply. That separation gives teams a concrete review gate: the plan is the artifact to inspect, not the applied result. Destructive replacements can therefore be caught before they run, provided the plan is attached to the change request and someone actually reads it. Skipping this step collapses the benefit of the model into a straightforward automation script.
+
+State is the recorded mapping between the definition and the real resources. Because the tool compares desired state against recorded state, a change made out of band creates drift. Drift detection is thus a property of the model rather than an added feature. The consequence is operational: if engineers edit resources through a console, the next plan can propose updates that no one intended, and the review gate becomes the place where those surprises surface.
+
+Idempotence and convergence mean repeated application tends toward the same end state. Automation becomes safer to re-run, but convergence assumes the tool has accurate state and sufficient permissions. The mechanism buys consistency only within the boundary the definition covers, so partial coverage is a real limit rather than a minor detail.
+
+## A worked example
+
+The following is hypothetical and illustrative. A small platform team manages a staging environment with a declarative definition and a remote state store. An engineer needs to change an instance size and opens a pull request. Three checks are run before merge. First, a plan output is attached showing exactly which resources would be replaced, so a reviewer can see whether the change is in place or destructive. Second, the state lock status is checked to confirm no other run is mutating the same state at the same time. Third, the definition is compared against the live environment to detect any drift introduced by manual console edits. The plan shows only the intended instance change and no unexpected replacements, the lock is free, and the drift check reveals one manual security-group edit that is folded back into the definition before merge. Outcome: the change merges with a reviewable diff, applies cleanly, and leaves the recorded state consistent with reality.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Declarative tools describe a desired end state and converge toward it | `source-reported` | Wikipedia IaC | 2026-11-18 | tool documentation changes |
+| Terraform uses a configuration language, providers, and a plan/apply workflow | `source-reported` | Wikipedia Terraform | 2026-11-18 | a major tool version is released |
+| Unmanaged out-of-band edits create drift that surfaces at the next plan | `inferred` | Derived from the sources | 2026-11-18 | state storage or edit permissions change |
+
+The two reported claims restate what the sources describe about the model and the tool; they are stable but tied to documentation that evolves with the products. The inferred claim extends the state concept into an operational consequence and should be rechecked if the team changes how state is stored or who can edit resources. Keeping status explicit preserves the boundary between reported fact and derived implication.
+
+## What it cannot do
+
+The model only governs what the definition covers. Resources created by hand outside it are invisible to planning until they are imported, so partial coverage gives a false sense of control. A team can declare a polished core environment and still leave critical networking or permissions outside the definition, which means the most fragile parts are exactly the ones the review gate never sees.
+
+State carries a hidden cost. It can contain resource metadata and sometimes sensitive values, so it needs access control, encryption, and locking. A remote state store adds a shared dependency that every apply relies on, and concurrent runs contend for the same lock. What looks like a local file problem becomes a coordination problem as soon as more than one engineer or pipeline applies changes.
+
+A failure mode is that a plan can propose destructive replacements, such as replacing a database instance, which may destroy data even when the intent was a minor setting change. Idempotence is not the same as safety: applying repeatedly is safe relative to intent, but a wrong intent applies consistently and at scale. The tool faithfully converges to what was written, which is precisely why the written definition deserves scrutiny.
+
+The boundary is narrower than many teams assume. Declarative provisioning is a weak fit for one-off exploration or throwaway experiments where the overhead of a definition exceeds the benefit, and interactive work may be faster there. Multi-provider abstractions can also lag behind new provider features, so teams sometimes drop to native tooling and break the single source of truth that the approach depends on.
+
+This approach still needs ongoing review. Definitions require the same discipline as application code: peer review of plan output, policy checks, and controlled apply permissions. Tool licensing and ecosystem changes can affect reuse and distribution, so the tool choice itself belongs on a periodic review list rather than being treated as settled forever.
+
+Counterargument: "The counterargument that treating infrastructure as reviewable code is fair for repeatable shared environments is incomplete for ephemeral exploration where speed outweighs traceability, so the rule is a default rather than a universal mandate."
+
+## A decision test
+
+1. Scope the environment by listing exactly which resources the definition will manage.
+2. Choose a declarative tool and confirm provider coverage for each resource type.
+3. Establish a remote, access-controlled state store with locking enabled.
+4. Require a plan artifact to be attached to every change request before review.
+5. Check drift before applying and fold manual edits back into the definition.
+6. Gate apply on peer review and policy checks, and restrict who can run apply.
+7. Revisit the tool choice, license terms, and coverage on a fixed cadence.
+
+Used together, these steps turn recurring questions into checkpoints rather than debates. The test is pass or fail at each gate: no state lock, no merge; unexplained drift, no apply; unreviewed plan, no run. Skipping a gate does not remove the risk, it simply moves the risk into production where it is harder to see and more expensive to unwind.
+
+For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Infrastructure as code - Wikipedia](https://en.wikipedia.org/wiki/Infrastructure_as_code) — Managing infrastructure through definitions rather than manual steps.
+- Wikipedia contributors, 2026. [Terraform (software) - Wikipedia](https://en.wikipedia.org/wiki/Terraform_(software)) — Declarative infrastructure definition and change management.

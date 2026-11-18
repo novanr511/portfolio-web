@@ -1,10 +1,71 @@
 ---
 title: "AI for Product Research Pitfalls"
-description: "Reserved title for a future NOVANDRI article: AI for Product Research Pitfalls."
-date: 2026-11-17
+description: "AI can synthesise research text but cannot replace sampling and bias checks. Read how generated output maps to validity decisions, with claim status explicit."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Research design
+  - Product research
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Product teams increasingly use AI to summarise interviews and draft findings, which makes fluent text look like finished research. Anthropic's use-case guides describe patterns for working with a model, and the market research entry describes the process of gathering and interpreting information about a market and its customers. The real problem is that a coherent summary can hide a weak sample or an unchecked bias, and the fluency makes the gap hard to see.
+
+**Direct answer:** Market research is a process of defining a question, collecting information, analysing it, and reporting findings with attention to validity and bias. AI use-case guides describe how a model can assist with tasks such as synthesis and summarisation. The bounded claim: generated text is a draft, not evidence, until it is tied to a definition, a sample, and a bias check.
+
+**Delta:** This article adds an output-to-validity mapping beyond the sources: it maps each AI-generated research artifact to the validity check it still needs, with claim status explicit.
+
+## The mechanism
+
+The market research entry describes research as a process that starts with defining the problem and ends with reporting findings. It distinguishes primary research, such as surveys, interviews, and observation, from secondary research based on existing information. The practical consequence is that a finding is only as sound as the question and the method behind it. A clear problem definition determines what counts as evidence, and the chosen method determines what the evidence can support.
+
+Reliability and validity are central concerns in that process. A measure is reliable if it is consistent and valid if it actually captures what it claims to measure; sampling and bias determine whether collected information represents the intended population. The practical consequence is that a summary cannot repair a biased sample. If the input interviews came from one narrow segment, a well-written synthesis will confidently describe the wrong population. The flaw is in the design, not the prose.
+
+Anthropic's use-case guides catalogue common ways to apply a model, including analysis and summarisation patterns. These describe what a model can assist with, not whether the result is valid research. The practical consequence is that the guide's scope and the research process's scope are different. A model can compress a set of transcripts into themes, but it does not decide whether the transcripts were the right ones to collect. That decision stays with the research design.
+
+The two sources connect at the validity check. The guides supply a capability; the research process supplies the standard the output must meet. A generated theme is a candidate until it is checked against the original records and the sample definition. Because neither source assigns a specific check to a specific artifact, the mapping is local and must be marked as inferred. The useful output is a register that pairs each generated artifact with the validity check it still requires.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team asks a model to summarise fifteen customer interviews into three themes. Three checks decide whether the output is usable. First, does the summary trace each theme back to specific interview quotes? Second, who was interviewed, and does that sample represent the intended segment? Third, did the prompt lead the model toward themes the team already believed? The review finds that the sample came from one region and the prompt named the expected themes. The team broadens the sample and re-runs without leading language. The outcome is a checked artifact. The details are hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Market research is a defined process with validity and bias concerns | `source-reported` | Wikipedia, Market research | 2026-11-18 | Entry revised |
+| AI use-case guides describe model assistance patterns | `source-reported` | Anthropic, Use case guides | 2026-11-18 | Docs updated |
+| Generated research output needs a local validity check | `inferred` | Derived from the sources | 2026-11-18 | Research design changes |
+
+The first two rows report what each source describes. The third is an inference about applying research standards to generated output, because neither source pairs a specific artifact with a specific check. Recheck the source rows when the entries or docs change and the inferred row when the research design changes.
+
+## What it cannot do
+
+AI assistance does not make research valid. It can organise and phrase material, but it cannot supply a representative sample, a sound question, or an unbiased instrument. A generated finding can be perfectly written and still be unsupported. Treating a fluent output as validated research confuses presentation with method. A team that needs defensible findings must look to the design and the raw records, not to the summary.
+
+The hidden cost is that checking generated output takes effort that the tool seems to remove. Tracing each theme to source quotes, auditing the sample, and testing for leading prompts all require review time that a fast summary appears to save. That asymmetry is why generated findings get accepted unchecked. The cost is paid in reviewer attention and in the discipline to keep original records accessible. Making the checks a prerequisite prevents them from being skipped under deadline pressure.
+
+The main failure mode is prompt-driven confirmation. If a prompt names the expected themes, the model will often return those themes, which then look like independent findings. The result is a circular argument dressed as research. Without a record of the prompt and the sample, the bias cannot be seen. The relevant question is what was asked and of whom. A defensible artifact keeps the prompt and the source quotes alongside the summary.
+
+There is a boundary around this method. It covers the relationship between generated output and research validity, not statistical analysis, recruitment, or domain expertise. It does not tell a team what to research, replace a sampling plan, or certify a finding as true. It also does not resolve ethical or consent questions about using customer data with a model. The method can show which checks an artifact still needs; it cannot perform them. That is a narrower contribution than the phrase AI research suggests.
+
+Because the guides and research designs evolve, the register needs a refresh. Each generated artifact should carry its validity check and its recheck condition, and the check should be treated as a local decision rather than a value the sources supply. Without that record, a future reviewer cannot tell which outputs were verified and which were accepted on fluency. The summaries will remain; the evidence that they were checked is what makes the review possible.
+
+The counterargument that AI summaries are fair for speed is incomplete when a biased sample is presented as a finding.
+
+## A decision test
+
+1. Define the research question before generating anything.
+2. Identify the sample and who it represents.
+3. Record the prompt used to generate the output.
+4. Trace each generated theme to source records.
+5. Check for leading language and confirmation bias.
+6. Pair each artifact with the validity check it needs.
+7. Record the check and its recheck condition.
+
+An AI research practice is useful only when output and validity check are both recorded. The test turns a fluent summary into a sequence of decisions with a visible rationale, so a reviewer can see what was checked and when it must be revisited. For further reading, see [Voice of Customer: Turning Feedback into Decisions](/articles/voice-of-customer-turning-feedback-into-decisions).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Market research - Wikipedia](https://en.wikipedia.org/wiki/Market_research) — Gathering information about markets and customers.

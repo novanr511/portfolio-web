@@ -1,10 +1,71 @@
 ---
 title: "What Continuous Learning Actually Measures"
-description: "Reserved title for a future NOVANDRI article: What Continuous Learning Actually Measures."
-date: 2026-11-17
+description: "Continuous learning in ML is often a proxy metric with a retraining trigger. See what concept drift and MLOps actually measure, a worked example, limits, and a decision test."
+date: 2026-11-18
 tags:
-  - Planned
-  - Career
+  - Machine Learning
+  - MLOps
+  - Concept Drift
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+"Continuous learning" sounds like a model that keeps getting wiser on its own. In most production systems it is something narrower: a pipeline that watches for change, detects a problem, and retrains. The real problem is that teams report a number from this pipeline as though it measured learning, when it usually measures a proxy that can move for reasons unrelated to genuine improvement.
+
+**Direct answer:** What continuous learning systems actually measure is a signal of drift or performance change that triggers retraining, not learning itself. Wikipedia's concept-drift entry describes change over time in the statistical relationship a model relies on, and its MLOps overview covers the monitoring and retraining practices that keep models usable in production. The boundary is that the measured quantity is a proxy - a distribution distance, a performance metric, or an alert - and it should be labeled as such.
+
+**Delta:** This article adds a measurement-focused layer beyond the sources: it maps each drift signal to the decision it can and cannot support, with claim status explicit.
+
+## The mechanism
+
+Concept drift is the starting point. Wikipedia's entry describes it as a change over time in the statistical properties of the data or the relationship between inputs and the target variable, so that a model fitted on earlier data becomes less valid. A classifier trained last quarter may be solving a relationship that no longer holds. The practical consequence is that accuracy measured at training time is not accuracy in production, and a single validation score cannot certify a model indefinitely.
+
+Drift comes in different forms, and the form determines the right signal. The concept-drift overview distinguishes sudden, gradual, incremental, and recurring change, and it separates real drift, where the decision boundary itself shifts, from virtual drift, where the input distribution changes without altering that boundary. A single alert threshold tuned to catch a sudden shift will miss a slow one. The practical consequence is that monitoring must be matched to the plausible drift type: distribution checks for virtual drift, and performance or label-based checks for real drift.
+
+MLOps supplies the operational machinery. Wikipedia's MLOps overview describes the practices used to deploy and maintain models reliably, including monitoring, versioning, reproducibility, and managed retraining pipelines. A continuous-learning setup typically watches a metric, compares it to a baseline or threshold, and kicks off a retraining and validation sequence when the signal crosses that line. The practical consequence is that "continuous learning" is better understood as continuous monitoring plus conditional retraining, with the learning event gated by a measured trigger.
+
+That reframing exposes the measurement problem. Labels often arrive late or not at all, so teams substitute input-distribution monitoring for ground-truth performance. The reported number then measures how far inputs have moved, not whether predictions got worse. Even when labels are available, a performance metric is a summary that can hide which subgroup degraded. The practical consequence is that the headline metric is a proxy whose validity must be stated: what it tracks, how it relates to the real objective, and what would make it misleading.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team runs a classifier whose input distribution begins to shift after a source system changes how it records a field. Three checks are applied. First, an input-distribution monitor flags the shift, catching a virtual drift early. Second, the team waits for delayed performance labels and checks whether real drift accompanied the input change, rather than assuming it did. Third, retraining is gated behind a fixed validation set held from the original problem definition. The outcome is that the input signal triggers a retraining run, but the validation gate shows the label definition has also changed, so the new model is not promoted; the team fixes the upstream recording instead.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Concept drift is change over time in the statistical relationship a model learns | `source-reported` | Concept drift (Wikipedia) | 2026-11-18 | Drift taxonomies or definitions are revised |
+| MLOps covers monitoring, versioning and retraining of production models | `source-reported` | MLOps (Wikipedia) | 2026-11-18 | Standard MLOps scope changes |
+| Continuous learning systems measure proxy signals rather than learning directly | `inferred` | Derived from the sources | 2026-11-18 | A direct, validated measure of learning is defined |
+
+The table keeps source claims separate from the article's conclusion. The first two rows report what the sources describe: drift and the practices that manage it. The third row is an inference about what a monitored metric represents, since the sources outline the machinery but do not grade the metric's meaning. It is a caution about interpretation, not a measured finding.
+
+## What it cannot do
+
+The first limit is that a proxy is not the objective. A distribution distance can spike during a harmless seasonal change, and a stable distribution can conceal a shift in how inputs map to the target. When a team reports the proxy as proof that the model is learning, it is answering a different question from the one it intends. The discipline is to name the quantity on a dashboard: input drift, delayed performance, or alert count, and to state which decision each one can justify.
+
+The second limit is a hidden cost in the feedback loop. A retrained model shapes the data it will see next, because its predictions influence which cases are labeled or acted on. Over time this can produce a self-reinforcing loop in which the system confirms its own prior errors and the drift monitor sees a world the model helped create. Continuous learning can therefore degrade while every internal metric looks stable, a failure that is invisible to a pipeline checking only its own signals.
+
+A third failure mode is automation bias. When retraining is automatic, teams stop asking whether a retrained model is better on the problem that matters. The validation gate helps, but only if the validation set reflects the current problem definition. The worked example shows the danger: a signal said retrain, and the gate caught that the labels themselves had changed. Without that gate, the pipeline would have promoted a model trained on a redefined task.
+
+There is also a boundary to what drift detection can claim. Detecting that the data has moved is not the same as knowing how to respond, and it is not the same as improvement. A drift alert tells a team where to look; it does not choose the fix, which may be retraining, a data-pipeline repair, or a decision to stop using the model. Treating detection as resolution skips the diagnosis that determines which action is appropriate.
+
+Finally, the practice needs review. The relationship between a proxy and the true objective can weaken as systems and users change, so a metric that was a good early warning last year may be noise now. Teams should periodically check whether drift alerts preceded real performance problems and retire signals that do not. Without that check, the monitoring layer accumulates dashboards that are watched but not trusted.
+
+The counterargument that proxy monitoring is the only practical option when labels arrive late is fair for many production systems, where waiting for ground truth is not viable. It is incomplete as a claim that the proxy measures learning, because a convenient signal and a meaningful one are different things.
+
+## A decision test
+
+1. What exact quantity is being reported, and is it a proxy or an outcome?
+2. Which drift type is the monitor designed to catch: sudden, gradual, or recurring?
+3. Does the signal distinguish virtual drift from real drift where it matters?
+4. Is the link between the proxy and the true objective stated and checked?
+5. Is retraining gated behind a validation set that reflects the current problem?
+6. Could the model's own outputs be feeding back into the monitored data?
+7. Is there a review date to test whether alerts actually predicted problems?
+
+The steps turn a loose claim about continuous learning into a set of checkable properties. The aim is not to dismiss monitoring but to state honestly what each signal measures and what decision it can support. For the data side of this problem, see [Data Quality in Practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Concept drift - Wikipedia](https://en.wikipedia.org/wiki/Concept_drift) — Changes in the relationship a model learned.
+- Wikipedia contributors, 2026. [MLOps - Wikipedia](https://en.wikipedia.org/wiki/MLOps) — Practices for deploying and maintaining ML systems.

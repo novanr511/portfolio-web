@@ -1,10 +1,73 @@
 ---
 title: "Stablecoins: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: Stablecoins: a Decision Framework."
-date: 2026-11-17
+description: "Stablecoins promise price stability but differ in how they hold it. Read the backing models, the failure modes, and a decision test for a specific token."
+date: 2026-11-18
 tags:
-  - Planned
   - Finance
+  - Decision Making
+  - Stablecoins
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Stablecoins are routinely described as digital dollars, but the label hides designs with different backing, different failure modes, and different regulatory treatment. The real problem is deciding what stable means for a specific use and what happens when the mechanism holding the peg is stressed. The stablecoin reference describes the main design families, while the FCA sets out its approach to cryptoassets.
+
+**Direct answer:** A stablecoin is a cryptoasset designed to hold a stable value relative to a reference, usually a fiat currency. Designs differ in how they achieve this: some hold reserves, some over-collateralize with other assets, and some use algorithmic supply rules. The decision is which design's risks you can accept for your use, not whether the category is safe in general.
+
+**Delta:** This article adds a claim-status table and a stablecoin evaluation test beyond the design overview and the regulator's material: it maps backing models to failure modes, with claim status explicit.
+
+## The mechanism
+
+The starting concept is a design goal, not a guarantee. A stablecoin is a cryptocurrency intended to keep a stable value against a reference asset, commonly a fiat currency. The practical consequence is that the first question is what the reference is and what stable is supposed to mean. A token that tracks a currency, one that tracks a basket, and one that promises a policy-defined value are different propositions even if all are called stablecoins.
+
+The design families achieve stability in different ways, and each carries a distinct source of risk. Fiat-backed tokens hold reserves intended to cover the units in circulation. Crypto-backed tokens hold collateral worth more than the issued value to absorb price swings. Algorithmic tokens adjust supply against demand to keep the price near the target. The practical consequence is that the dominant risk changes with the model: reserve quality and liquidity for the first, collateral volatility for the second, and mechanism fragility for the third.
+
+For reserve-backed designs, the key question is what backs the token and how that claim is verified. A statement of full backing is only as strong as the evidence for the reserves and their liquidity. The practical consequence is that an evaluator must look past the label to the composition of reserves, the cadence of attestations, and the terms on which holders can redeem. A token that is fully backed on paper but holds illiquid assets behaves differently under a wave of redemptions.
+
+The regulatory layer adds a separate question. The FCA categorizes cryptoassets and sets out the risks it associates with them, with different activities falling under different parts of its framework. The practical consequence is that regulatory status, disclosures, and any protections attach to a specific token and a specific jurisdiction. They cannot be assumed from the fact that a token is described as a stablecoin. For any real use, the rules that apply where the user and the issuer sit must be checked directly.
+
+## A worked example
+
+The following is hypothetical and illustrative. A small business considers accepting a stablecoin to settle a cross-border invoice and applies three checks. First, what is the reference and the backing model, and does the business understand the dominant failure mode of that model? Second, what do the reserve or collateral disclosures and redemption terms say, and can the business actually redeem on reasonable terms? Third, if the token depegs by a material amount before conversion, what is the loss and who bears it? If the model is understood, the disclosures are adequate, and a depeg would not threaten the margin on the invoice, the business accepts the token with a prompt conversion rule. If any check fails, it asks for another payment method.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Stablecoins aim to hold a stable value against a reference asset | `source-reported` | Wikipedia: Stablecoin | 2026-11-18 | The design taxonomy changes |
+| The FCA categorizes cryptoassets and warns of their risks | `source-reported` | FCA Cryptoassets | 2026-11-18 | The regulator updates its scope |
+| Backing model determines the dominant failure mode | `inferred` | Derived from the sources | 2026-11-18 | The token changes its backing mechanism |
+
+The first two rows report what the sources state about the asset class and the regulator's approach. The third row is an inference: different backing mechanisms concentrate risk in different places. No row claims that a named token is safe or will hold its peg, which would require current evidence about a specific issuer.
+
+## What it cannot do
+
+A stablecoin cannot guarantee its peg. The stability is a target maintained by reserves, collateral, or supply rules, and each mechanism can fail under stress. A depeg can occur when redemptions outpace liquid reserves, when collateral falls faster than it can be topped up, or when a supply mechanism loses credibility. A user who treats the peg as certain is taking an unpriced risk. The decision framework exists to make that risk explicit before it is taken.
+
+It also has costs that are easy to miss. Moving in and out of a token can involve exchange spreads, network fees, and gateway charges. Redemption may be limited to certain counterparties or subject to minimums and delays, so a holder who assumes instant conversion at par may be wrong. For a business, these costs can erase the settlement advantage that made the token attractive. They belong in the evaluation alongside the price-stability claim.
+
+The main failure mode is confusing the label with the mechanism. Two tokens marketed as stablecoins can have entirely different risk profiles, yet users often treat them as interchangeable. A reserve-backed token with audited, liquid assets and an algorithmic token with no external collateral are not the same instrument. Judging by the category label rather than the backing model is how users end up holding a risk they did not intend to take.
+
+There is a boundary around protections. A stablecoin is not the same as a bank deposit, and the safeguards that apply to deposits may not apply here. Regulatory treatment varies by jurisdiction and by activity, so a token that is acceptable in one context may be restricted in another. A user cannot assume that a regulator's authorization of a related activity extends to the token itself. The specific legal position must be checked for the specific use.
+
+Finally, the evidence needs ongoing review. Reserves change, attestations are published on a schedule, algorithms are adjusted, and regulators revise their scope. A decision based on a snapshot of a token's backing can become outdated without any change on the user's side. That is why the evaluation needs a dated record and a trigger tied to reserve disclosures, mechanism changes, or rule changes. Without it, a decision that was sound when made can quietly stop being sound.
+
+Counterargument: "The counterargument that stablecoins are inherently risky is fair for algorithmic designs with fragile mechanisms and incomplete for well-reserved fiat-backed tokens used for short settlement."
+
+## A decision test
+
+1. Name the reference the token promises to track and what stable means for your use.
+2. Identify the backing model and the dominant risk it carries.
+3. Check what reserves or collateral exist and how they are verified.
+4. Review redemption terms, fees, limits, and the path to conversion.
+5. Check the regulatory status in the relevant jurisdictions.
+6. Stress the specific use: what is your loss if the token depegs before you convert?
+7. Record the decision with the date and a trigger tied to reserve or rule changes.
+
+The test reduces a broad claim about a category to a bounded decision about a token and a use. Each step asks for a fact that can be checked and dated, and the stress question makes the downside concrete. The aim is not to accept or reject stablecoins on principle but to know which change in the token would change the answer.
+
+For further reading, see [Decision Memos](/articles/decision-memos-that-survive-review).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Stablecoin - Wikipedia](https://en.wikipedia.org/wiki/Stablecoin) — Cryptocurrency designed to track a stable value.
+- UK Financial Conduct Authority, 2026. [Cryptoassets: Our Work | FCA](https://www.fca.org.uk/firms/cryptoassets) — Primary regulatory guidance on cryptoasset promotion and disclosure.

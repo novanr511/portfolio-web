@@ -1,10 +1,73 @@
 ---
 title: "Model Cards without the Hype"
-description: "Reserved title for a future NOVANDRI article: Model Cards without the Hype."
-date: 2026-11-17
+description: "Model cards document intended use, metrics, and limits. Read how to write one that informs a release decision, with a claim-status table and a worked review."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Governance
+  - Model Cards
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often treat a model card as a form to fill out after training, producing a document that lists scores but never informs a decision. The result is a card that records how a model performed while leaving reviewers unable to tell whether it is fit for a specific use. Both the model-card proposal and the NIST AI RMF treat documentation as a decision input rather than an afterthought.
+
+**Direct answer:** A model card is a structured report of a model's intended use, training and evaluation data, metrics broken out by relevant conditions, ethical considerations, and known limitations. The NIST AI RMF organizes risk work into Govern, Map, Measure, and Manage functions that such a report can support. Used together, they turn a card from a marketing summary into a reviewable record tied to a deployment decision.
+
+**Delta:** This article adds a claim-status table and a deployment review test beyond the card proposal and the risk framework: it maps documented fields to a go-or-hold decision, with claim status explicit.
+
+## The mechanism
+
+The model-card proposal asks authors to describe a model in a standard format: its intended use, the data used to train and evaluate it, its performance metrics, ethical considerations, and caveats. The concept is that a reader who was not part of the development team should be able to understand both what the model does well and where it should not be relied on. The practical consequence is that a card is not a scoreboard. It is a brief that lets a reviewer compare the model's documented strengths and limits against the use they have in mind.
+
+A second element is disaggregation. A single aggregate metric can hide weak performance for a subgroup or under a condition that matters to the deployment. The proposal recommends reporting performance across relevant conditions rather than as one number. The practical consequence is that a team can ask whether the reported quality holds for the people and settings the model will actually encounter, instead of accepting an average that may not describe any real case.
+
+The NIST AI RMF supplies the process around that record. Its Govern, Map, Measure, and Manage functions describe how an organization assigns ownership, identifies context, evaluates risk, and responds. Documentation feeds each function: a card makes the model's boundaries visible so they can be mapped to a context and measured against criteria. The practical consequence is that the card is an input to an ongoing cycle, not a one-time artifact filed at release.
+
+The two sources therefore fit together as facts and process. The card supplies structured facts about the model; the framework supplies the activities that turn those facts into a decision. The practical consequence is that neither works alone. A card with no owner or review trigger drifts out of date, and a risk process with no concrete model information has nothing to act on. The value lies in the linkage between a documented field and a named decision maker.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team is considering a model that screens loan applications and must decide whether to deploy it for a limited pilot. The card reports overall accuracy and breaks performance out by applicant group, and the team applies three checks. First, does the intended-use field match the pilot, or is the card written for a different product? Second, do the disaggregated metrics show acceptable performance for every group the pilot will include, not just the aggregate? Third, are the limitations and ethical considerations specific enough to tell reviewers what would make the model unsafe in this context? If the use matches, subgroup performance holds, and the limits are concrete, the team records a go decision with a review date. If any check fails, the pilot is held and the card is revised.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Model cards specify intended use, data, metrics, and limitations | `source-reported` | Mitchell et al. | 2026-11-18 | The card proposal is revised |
+| NIST AI RMF organizes risk work into four functions | `source-reported` | NIST RMF | 2026-11-18 | NIST updates the framework |
+| A card informs a decision only when fields are tied to an owner and trigger | `inferred` | Derived from the sources | 2026-11-18 | Ownership or release process changes |
+
+The first two rows report what the sources state. The third row is an inference: a structured record becomes decision-relevant only when someone is responsible for acting on it. No row claims that this particular model is safe, which would require evidence the sources do not provide.
+
+## What it cannot do
+
+A model card cannot establish that a model is safe. It records evidence and states limits, but a document is not a verification. A reviewer can read that performance was disaggregated and still cannot tell whether the groups reported are the ones that matter in their setting. The card narrows the question; it does not answer it. Treating a completed card as a certificate is the most common way the instrument is misused.
+
+There is a maintenance cost that is easy to underestimate. A card describes a model at a point in time, tied to a particular dataset and set of metrics. When training data changes, a model is retrained, or new use cases appear, the card must be updated or it becomes actively misleading. A stale card is worse than no card because it carries the authority of a formal document while describing a system that no longer exists. The cost is reviewer time and discipline, not just writing.
+
+The failure mode is checkbox compliance. Fields can be filled with boilerplate: an intended-use statement written so broadly that it covers everything, a limitations section that says only that results may vary, and metrics reported without context. Such a card satisfies a format without informing a decision. This is why the review test matters more than the template. The question is not whether a card exists but whether a reader can reach a conclusion from it.
+
+A further boundary concerns scope. The card proposal focuses on the model as an artifact, while the risk framework focuses on the system and its context. A model that is acceptable in one application may be unacceptable in another, even with identical code. The card cannot carry the context of every future use, so a new deployment requires a fresh mapping of the documented limits to the new situation. Reusing a card across uses without that step is a category error.
+
+Finally, the framework is guidance, not a guarantee. Following a documented process does not by itself satisfy a regulator or remove harm. It makes the reasoning visible and reviewable, which is different from making it correct. A team still has to judge the evidence, choose thresholds, and accept responsibility. None of that can be delegated to a form.
+
+Counterargument: "The counterargument that model cards add paperwork is fair for low-stakes internal experiments and incomplete for models that affect people, where a record of limits is the only defense against misuse."
+
+## A decision test
+
+1. Name the specific use and decision the card must support.
+2. Record intended use and out-of-scope uses in plain language.
+3. List training and evaluation data with their provenance.
+4. Report metrics disaggregated by the groups relevant to the use.
+5. State ethical considerations and known limitations without hedging.
+6. Assign an owner and a review trigger tied to the risk functions.
+7. Record the go-or-hold decision with the date and evidence used.
+
+The test turns a document into a review. Each step is cheap relative to an unreviewed release, and the recorded date makes the decision revisitable when the model or its context changes. The aim is not to produce a perfect card but to know which field would change the answer.
+
+For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Margaret Mitchell et al., 2019. [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) — The reporting template used to document intended use, evaluation, and limitations.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

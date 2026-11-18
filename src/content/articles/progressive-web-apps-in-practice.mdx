@@ -1,10 +1,75 @@
 ---
 title: "Progressive Web Apps in Practice"
-description: "Reserved title for a future NOVANDRI article: Progressive Web Apps in Practice."
-date: 2026-11-17
+description: "A progressive web app is a set of capabilities, not a product category. Read how offline, installation and quality metrics fit together, and how to decide."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Implementation
+  - Web-Performance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Progressive web apps are often sold as a cheaper alternative to native apps. The real problem is that the label bundles several distinct capabilities, so a team can adopt the term without deciding which ones matter. The web.dev learning material describes the building blocks, and Web Vitals describes a separate set of quality metrics. Conflating the two produces an app that is installable but slow, or fast but useless offline.
+
+**Direct answer:** A progressive web app is a web app that uses a service worker, a manifest, and HTTPS to offer capabilities such as installation, offline support, and re-engagement, as described in the web.dev learning material. Web Vitals are a separate set of metrics covering loading, interactivity, and visual stability. The boundary: being installable does not make an app fast or useful offline.
+
+**Delta:** This article adds a claim-status table and a capability-to-decision test beyond the two web.dev references: it maps each capability to a product decision, with claim status explicit.
+
+## The mechanism
+
+A service worker is a script that sits between the app and the network, intercepting requests and deciding how they are answered. That is what makes caching and offline behavior possible. The practical consequence is that offline support is an application design question, not a switch. Someone has to decide which resources are cached, when they are updated, and what the user sees when the network is absent. A service worker that caches the wrong thing serves stale content with full confidence.
+
+The web app manifest supplies the metadata a browser uses when it offers installation: a name, icons, and a display mode. The practical consequence is that installability is a capability, not a verdict on quality. A browser can offer to install an app that is slow, and a fast app may never prompt if the manifest is incomplete. Installation matters only when users return often enough for a home-screen icon to change behavior.
+
+HTTPS is a prerequisite for service workers because they require a secure context. The practical consequence is that deployment correctness is part of the feature, not an afterthought. A broken certificate or a mixed-content page can disable the very capability the project was built to deliver, so the security setup belongs in the plan.
+
+Web Vitals address a different question. They are metrics for loading, interactivity, and visual stability that help quantify how a page feels to users. The practical consequence is that a progressive web app and a good Web Vitals profile are independent goals that must both be pursued. One describes what the app can do; the other describes how well it performs. Treating either as proof of the other is the central mistake this article is meant to prevent.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retailer wants a progressive web app to increase repeat visits among shoppers with unreliable connections. Three checks decide the scope. First, can the app render a useful page from cache when the network is absent, rather than showing an error? Second, is the manifest complete and the HTTPS setup sound, so that installation can actually be offered on the target browsers? Third, do the key Web Vitals stay within acceptable ranges on a mid-range device, not just on a fast office laptop? If all three hold, the team ships installability with a limited offline catalog and a performance budget. If the offline page is empty or the metrics are poor, the capability is deferred until the basics work. The scenario is hypothetical; the decision structure is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Service workers enable caching and offline behavior | `source-reported` | web.dev Learn PWA | 2026-11-18 | PWA guidance is updated |
+| Web Vitals measure loading, interaction and stability | `source-reported` | web.dev Web Vitals | 2026-11-18 | The metric set changes |
+| Installability alone does not improve retention | `inferred` | Derived from the sources | 2026-11-18 | Product data changes |
+
+The first two rows are reported by the two sources and describe capabilities and metrics separately. The third row is an inference from that separation: a capability and a quality score answer different questions, so one cannot stand in for the other. No row claims that a particular app improved retention, because the sources provide no such data.
+
+## What it cannot do
+
+A progressive web app cannot replace every capability of a native app. Platform-specific APIs, distribution through app stores, and integration with device features remain governed by different systems. Framing the web app as a full substitute sets expectations the technology may not meet on the platforms your users actually hold. The decision should start from which capabilities are needed, not from a belief that one form is universally better.
+
+It also has a hidden maintenance cost. A service worker is long-lived code that persists between visits, which means a bug can survive longer than a bug in ordinary page scripts. Cache invalidation and update strategy require ongoing attention, and a stale cache can quietly serve old content to returning users. The team that ships a service worker without a clear update rule has taken on a responsibility that does not end at launch.
+
+A common failure mode is an offline mode that appears to work but serves misleading data. A cached product page with an old price, or a stale dashboard that looks current, can do more harm than an honest error message. This is why the offline check in the worked example asks whether the rendered page is useful, not merely whether it appears. The capability is only valuable when the content can be trusted.
+
+There is a boundary in the measurement story as well. Web Vitals quantify aspects of loading, interactivity, and stability, but they do not measure whether a user completed a task. A page can score well and still be the wrong page, and an app can score poorly on one interaction that users rarely perform. The metrics are a constraint on the work, not a definition of success, so they belong alongside product evidence rather than in place of it.
+
+Finally, both sources are living references. Browser behavior, the metric set, and the guidance around installation can change. A decision recorded today should name the date of the guidance it used, and the capability set should be reviewed when that guidance changes. Without a review trigger, the team cannot tell whether the app stopped meeting the standard or the standard moved.
+
+A metric can also become a target that crowds out the goal. A team measured only on installability may optimize the install prompt rather than the reason to return, and a team chasing a score may improve the measured interaction while neglecting the task around it. The same pattern applies to the offline cache: it is easy to cache the page that is convenient to cache rather than the page the user needs. Keeping the product question next to the metric is what prevents the capability from becoming an end in itself.
+
+Counterargument: "The counterargument that installability is all that matters is fair for a frequently used tool and incomplete when the cached experience is slow or wrong."
+
+## A decision test
+
+1. Name the user problem the app should solve offline.
+2. Confirm HTTPS and a complete manifest on the target browsers.
+3. Check that a service worker caches a useful, current experience.
+4. Measure loading, interactivity, and stability on a realistic device.
+5. Define an update rule for cached content before launch.
+6. Decide which native capabilities are genuinely required.
+7. Record the decision with a date and a review trigger for guidance changes.
+
+The test keeps the capability set separate from the quality bar. Each check is a question with a local answer, so the result is a decision you can defend rather than a label you have adopted. Reviewing it when the references change is what keeps it honest.
+
+For further reading, see [What AI Search Measures](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- web.dev, 2026. [Learn PWA - web.dev](https://web.dev/learn/pwa) — Progressive web app fundamentals and service workers.
+- web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.
