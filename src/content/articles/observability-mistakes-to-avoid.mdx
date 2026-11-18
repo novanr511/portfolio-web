@@ -1,10 +1,80 @@
 ---
 title: "Observability Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: Observability Mistakes to Avoid."
-date: 2026-11-17
+description: "Observability is about questions you can answer later. Read the mistakes, a worked example, and why more dashboards do not mean more insight."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Observability is often treated as a collection of tools, which hides that it is a property of the questions a system can answer. The observability entry describes inferring internal state from external signals, and the SRE alerting workbook relates signals to objectives. The mistakes concern the gap between data and answers.
+
+**Direct answer:** Design signals around the questions you will need to answer, with a baseline and a clear trigger, then verify that a question can actually be answered. The sources describe the concepts; the method is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented concepts from local choices about what to measure.
+
+## The mechanism
+
+The first mistake is collecting without a question. The observability entry describes signals, which are useful only when they bear on a decision. A dashboard added because it was available produces data nobody reads, and the cost is in storage and attention.
+
+The second mistake is ignoring the baseline. The SRE alerting workbook relates signals to objectives, which requires knowing what normal looks like. A number without a baseline cannot tell you whether anything changed, and a alert threshold chosen without one is a guess.
+
+The third mistake is treating logs as a complete account. The observability entry describes inference from external signals, which is limited by what was emitted. A log that lacks a key field cannot answer a question later, and no tool can recover it.
+
+The sequence is: list the questions, choose signals, set a baseline, then test that a question can be answered. The choices are local, so the conclusions are `inferred`; the concepts are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team adds monitoring to a service and cannot answer why a request was slow during an incident.
+
+Three checks decide. First, was the question defined before the signals were chosen? Second, is there a baseline for what normal latency looks like, with a trigger tied to an objective? Third, do the logs contain the field needed to segment the slow requests?
+
+The outcome is a gap in the design rather than a general tooling review. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Observability infers state from signals | `source-reported` | Wikipedia, Observability | 2026-11-18 | Definition changes |
+| Alerts should relate to objectives | `source-reported` | Google SRE workbook | 2026-11-18 | Practice changes |
+| Choose signals from questions | `inferred` | Derived from both | 2026-11-18 | System changes |
+
+## Why more dashboards help less
+
+A dashboard that does not change a decision is a cost, and a collection of them makes it harder to find the one that matters. Reducing the set to questions the team will actually ask is the practical discipline.
+
+A further consideration is that observability has a retention cost. Detailed logs are useful for investigation and expensive to keep, and the retention rule should reflect the questions that may be asked later rather than a default. A short window that is never questioned can discard the evidence an incident needs.
+
+The signals also need an owner. A metric that nobody reviews will drift out of relevance, and a baseline that nobody maintains will stop describing the system. Assigning responsibility is part of the design, not an administrative detail after the tooling is installed.
+
+The third limitation is that an alert is not an answer. It points to a change, and a person still has to decide what it means. A system that generates alerts without a response path produces noise, which is the mistake the workbook exists to prevent.
+
+A signal without a baseline cannot say whether anything changed, which is why the baseline belongs in the design.
+
+A log that lacks a key field cannot answer a later question, and no tool can recover what was never emitted.
+
+An alert is a pointer to a change, not an answer, and a response path is part of the system.
+
+A dashboard that changes no decision is a cost, not an insight.
+
+The questions a system must answer should be defined before the signals are chosen.
+
+A retention rule should reflect the questions that may be asked later.
+
+## A decision test
+
+1. List the questions the system must answer.
+2. Choose signals that bear on them.
+3. Set a baseline and a trigger.
+4. Check that logs contain the needed fields.
+5. Remove signals nobody uses.
+6. Record the design and recheck condition.
+
+For the alert side, see [Alerting on SLOs](/articles/slos-metrics-that-matter).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Observability - Wikipedia](https://en.wikipedia.org/wiki/Observability) — Inferring internal state from external signals.
+- Google, 2016. [Alerting on SLOs](https://sre.google/workbook/alerting-on-slos/) — How to alert on symptoms and burn rate rather than on causes.
