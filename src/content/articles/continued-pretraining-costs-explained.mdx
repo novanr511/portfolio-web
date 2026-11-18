@@ -1,10 +1,71 @@
 ---
 title: "Continued Pretraining Costs Explained"
-description: "Reserved title for a future NOVANDRI article: Continued Pretraining Costs Explained."
-date: 2026-11-17
+description: "Continued pretraining adapts a base model on more data, and its cost tracks corpus size and compute. Learn the definitions, a worked estimate, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Explanation
+  - Pretraining
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Continued pretraining takes an already trained language model and trains it further on additional data, often to adapt it to a domain. The sources cover the pretraining method itself and the cloud infrastructure used for machine learning work. The real problem is that teams often treat continued pretraining as a cheap fine-tuning step, when it re-enters a compute-heavy phase on an entirely new corpus.
+
+**Direct answer:** Continued pretraining extends the pretraining objective on more data, so its cost tracks corpus size and training compute rather than a small labeled set. The sources describe the pretraining approach and the cloud resources that support ML; the cost framing is a synthesis. Budget it as a training run, not as a fine-tune.
+
+**Delta:** This article adds a claim-status table and a compute-driven cost decision test beyond the sources: it maps each cost driver to a budgeting decision, with claim status explicit.
+
+## The mechanism
+
+The BERT paper describes pre-training as a distinct phase in which a deep bidirectional transformer learns from large amounts of unlabeled text. The objective uses masked language modeling and next sentence prediction before the model is adapted to specific tasks with labeled data. The practical consequence is that pretraining is defined by exposure to raw text at scale, not by a narrow task dataset. Continued pretraining re-enters this same phase with a new corpus, so it inherits the same scale dynamics.
+
+The Google Cloud architecture source organizes AI and machine learning resources around data, training infrastructure, and deployment. Training runs consume compute and storage, and those resources are provisioned and billed as part of a cloud workload. The practical consequence is that cost is a function of how long a run lasts and what hardware it occupies. Any estimate must begin from the resources a training job actually requests, not from the label attached to the technique.
+
+The main cost drivers follow from those two definitions. Corpus size, sequence length, model size, and the number of training steps determine how much compute a run consumes. Because continued pretraining pushes another corpus through the same objective, the bill scales with data volume and compute intensity rather than with the size of a downstream label set. The sources establish what pretraining is and what resource categories exist; they do not provide a cost formula or a token price.
+
+That gap matters for how the estimate is framed. Hardware choice, token counts, and cloud pricing are local facts that the sources do not supply. They should be marked as inferred or as items to verify against a current price list. Keeping the definitional claims separate from the budgeting assumptions lets a reviewer see which parts of the estimate are grounded and which are choices made by the team. It also prevents a method description from being read as a cost guarantee.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team considers continued pretraining to adapt a base language model to a new technical corpus. Three checks decide the review. First, is the added corpus large enough to justify a full training run rather than task-level fine-tuning? Second, what compute and storage will the run consume, given the model size and sequence length? Third, does the budget treat this as a training phase with its own cost line, rather than as a cheap add-on? The review finds the corpus is substantial and the run must be budgeted as pretraining. The outcome is a budgeting decision, not a claim about any specific dollar amount. The scenario is hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Pretraining is a distinct phase before task fine-tuning | `source-reported` | Devlin et al., BERT | 2026-11-18 | Method revised |
+| Cloud architecture organizes AI/ML resources around data, training, and deployment | `source-reported` | Google Cloud, Architecture Center | 2026-11-18 | Documentation changes |
+| Cost tracks corpus size and training compute | `inferred` | Derived from the sources | 2026-11-18 | Pricing or model size changes |
+
+The first two rows are factual claims drawn from the sources. The third is an inference about what drives cost, because neither source supplies a pricing model. Recheck the definitional rows when the sources are revised, and the inferred row when hardware prices, model size, or the chosen corpus changes.
+
+## What it cannot do
+
+This framing does not produce a dollar figure. The sources describe a pretraining method and a set of cloud resource categories; they contain no price list, no hardware benchmark, and no estimate for a particular run. Any number attached to a continued pretraining project comes from local pricing and local scale assumptions, not from these sources. Treating the framing as a quote would misrepresent what it supports.
+
+The hidden cost is everything around the training loop. A corpus must be collected, cleaned, deduplicated, and stored before a run begins. Experiments must be tracked so that a failed or unhelpful run can be diagnosed. Storage, data transfer, and checkpointing all consume budget even when the model is not actively training. Failed runs are common in practice, and each one still bills for the compute it used. A cost model that counts only the successful run understates the true spend.
+
+The main failure mode is confusing continued pretraining with fine-tuning. Fine-tuning adapts a model on a comparatively small labeled set and is cheap by design. Continued pretraining processes a large unlabeled corpus through the pretraining objective and is not cheap. When a team budgets the former and runs the latter, the overrun appears only after the bill arrives. The vocabulary sounds similar, which is exactly why the distinction must be stated before budgeting begins.
+
+There is a boundary around what these sources support. They do not model whether added data improves downstream performance, how quickly a run converges, or whether a domain corpus helps at all. They do not address catastrophic forgetting, data quality effects, or the choice between continued pretraining and other adaptation methods. A decision about whether to run the job at all requires evidence the sources do not provide.
+
+Because hardware prices and corpora change, the estimate needs a periodic review. Each assumption about size or compute should carry a recheck condition, and the run should be re-scoped when the corpus grows. Without that record, a future reviewer cannot tell which cost inputs were deliberate and which were rough guesses made early in planning.
+
+The counterargument that continued pretraining is fair for deep domain adaptation is incomplete when a smaller fine-tune would reach the same target.
+
+## A decision test
+
+1. State the adaptation goal and the target domain.
+2. Estimate the size of the additional corpus.
+3. Check whether fine-tuning could meet the goal instead.
+4. List the compute and storage the run would consume.
+5. Confirm cloud pricing for the chosen hardware.
+6. Record the estimate with explicit assumptions.
+7. Set a recheck date for pricing and corpus size.
+
+The estimate is useful only when its drivers are visible and owned. The test turns a method label into a sequence of budgeting decisions with a clear recheck point, so a reviewer can see what the number rests on and when it must be revised. For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Jacob Devlin et al., 2019. [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805) — Bidirectional encoder pretraining and the masked-language-model objective.
+- Google Cloud, 2026. [AI and machine learning resources | Cloud Architecture Center | Google Cloud Documentation](https://cloud.google.com/architecture/ai-ml) — Cloud architecture resources for AI and ML, including the Well-Architected framing, used as a primary source for implementation structure.

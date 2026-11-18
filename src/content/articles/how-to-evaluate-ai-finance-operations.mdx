@@ -1,10 +1,71 @@
 ---
 title: "How to Evaluate AI Finance Operations"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate AI Finance Operations."
-date: 2026-11-17
+description: "A practical way to assess an AI finance use case against its task type and NIST risk functions, with a worked review and explicit claim limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Evaluation
+  - Finance Operations
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI tools are appearing in finance workflows faster than evaluation practices can keep up. Anthropic's use-case guides describe recurring task patterns where a language model assists with work, while NIST's AI Risk Management Framework sets out how an organisation should govern and assess AI risk. The real problem is knowing whether a particular finance deployment is ready to use, rather than merely plausible in a demonstration.
+
+**Direct answer:** Evaluate an AI finance operation by first naming the task pattern it follows, then checking whether evidence exists for each risk function: govern, map, measure, and manage. The use-case guides help identify the task; the NIST framework supplies the assessment structure. A pilot that performs well on a demo but has no owner, no measured error rate, and no escalation path is not yet evaluated.
+
+**Delta:** This article adds a decision-facing test beyond the sources: it maps a finance AI use case to the NIST functions, with claim status explicit.
+
+## The mechanism
+
+Anthropic's guides to common use cases catalogue recurring patterns in which a language model contributes to a task, such as summarising documents, extracting information, or drafting text. Each pattern has a different shape of input, output, and likely error. The practical consequence is that evaluation has to start by identifying which pattern a deployment follows. A tool that extracts figures from invoices and a tool that drafts a narrative report fail in different ways, so a single generic evaluation cannot serve both. Naming the task narrows the questions that matter.
+
+NIST's AI Risk Management Framework organises risk work into functions. Governing means assigning ownership, policy, and accountability. Mapping means understanding the context in which the system is used and what can go wrong. Measuring means assessing performance and risk with evidence. Managing means acting on what was found, including mitigation and monitoring. The practical consequence is that a finance operation needs evidence at each function, not just a good accuracy number. Strong measurement cannot compensate for the absence of an owner or an escalation path, because those are separate functions.
+
+The synthesis is to read a deployment through both lenses at once. The use-case guides tell you what kind of task is being automated and therefore what kind of errors to expect; the framework tells you what organisational evidence should surround it. Mapping a specific finance use case to the risk functions is a judgement about how to combine the two, not a step either source states directly, and it is marked inferred below. That mark matters because the mapping is what makes the evaluation concrete, and it should not be mistaken for a conclusion the sources themselves reached.
+
+## A worked example
+
+The following is hypothetical and illustrative. A finance team proposes using a language model to extract figures from invoices for reconciliation. The first check is task match: extraction from documents is a recognised pattern, and the team names the fields it needs. The second check is measurement: the tool is run on a labelled sample of past invoices, and the error rate on each field is recorded rather than relying on a demo. The third check is governance: an owner is named, and a rule is set for escalating low-confidence extractions to a human reviewer. The outcome is conditional approval, limited to the sampled document types and paired with an ongoing audit. The scenario is invented; the task patterns and risk functions come from the sources.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Anthropic's guides describe common task patterns for applying a language model | `source-reported` | Guides to common use cases (Anthropic) | 2026-11-18 | Guides updated with new patterns |
+| NIST AI RMF organises risk work into govern, map, measure, and manage functions | `source-reported` | AI Risk Management Framework (NIST) | 2026-11-18 | Framework revision published |
+| Mapping a finance use case to the RMF functions yields an evaluation checklist | `inferred` | Derived from the sources | 2026-11-18 | Use case or regulatory context changes |
+
+The first two rows report what the sources say. The third is a practical method for combining them, not a finding of either source, so it is marked inferred. Its value depends on the specific use case and the regulatory setting, which is why it should be rechecked when either changes. The table keeps that dependency from being forgotten once the checklist is in use.
+
+## What it cannot do
+
+A use-case guide is not a performance guarantee for your data. It describes patterns in the abstract, drawn from general applications, and says nothing about accuracy on the particular invoices, reports, or records a finance team actually handles. A task can match a documented pattern perfectly and still fail on messy local inputs. The guides are a starting point for framing the evaluation, not a substitute for running it. Treating a documented pattern as evidence of fitness confuses an example with a result, and the more polished the example, the easier that confusion becomes.
+
+The NIST framework is voluntary and does not certify a system. It structures risk work; it does not declare a deployment safe or approved. A team can complete an assessment that references all four functions and still have made a poor judgment about tolerance for error. The framework deliberately leaves thresholds and acceptable risk to the organisation using it, so passing an evaluation is always relative to a locally chosen standard. Without that standard written down, a favourable assessment is hard to interpret and easy to overread.
+
+The hidden cost is the work of maintaining evidence. A measured error rate is a snapshot taken on a particular sample at a particular time. Inputs drift, processes change, and models are updated, so the number that justified approval can quietly stop describing the live system. Keeping the assessment current takes an owner, a schedule, and a record of changes, none of which the sources supply. Teams that treat evaluation as a one-time gate rather than an ongoing practice will find their evidence stale precisely when it is needed for a review or an incident.
+
+A common failure mode is evaluating the model while ignoring the workflow. A language model can be accurate in isolation and still cause errors when its output is pasted into a spreadsheet without a confidence check, or when no one is accountable for a wrong figure. The risk functions exist to catch this, but only if the assessment covers the surrounding process, not just the tool. Evaluation that stops at model accuracy misses the points where errors become financial consequences, and those points are usually human handoffs rather than the model itself.
+
+The boundary is between a task pattern and a control decision. The sources describe patterns and a risk structure; deciding what error rate is acceptable for a given finance process is a local judgment. That judgment depends on materiality, regulation, and the reversibility of mistakes, none of which the sources address. Evaluation therefore produces evidence for a decision, not the decision itself, and the quality of the outcome depends on a team willing to set its own thresholds explicitly and revisit them when conditions change.
+
+Counterargument: "The counterargument that a structured evaluation adds overhead is fair for low-stakes, reversible tasks with easy review and incomplete where errors feed directly into financial reporting or controls."
+
+## A decision test
+
+1. Name the task pattern the deployment follows and define its expected output.
+2. Identify the context of use and what a plausible error would cost.
+3. Assign an owner, a policy, and an escalation path for the tool.
+4. Measure performance on a labelled, representative local sample.
+5. Record error rates by field or task rather than as a single figure.
+6. Define a mitigation and a monitoring rule for the residual risk.
+7. Set a review date and re-evaluate when inputs or the model change.
+
+The test turns two general sources into a concrete readiness check. Each step produces evidence for one of the risk functions, and the closing steps make sure that evidence stays current. A deployment that passes is not certified; it has simply been examined against the questions that determine whether its use is defensible, with the thresholds set and owned locally.
+
+For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

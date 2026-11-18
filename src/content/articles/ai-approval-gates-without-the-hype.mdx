@@ -1,10 +1,73 @@
 ---
 title: "AI Approval Gates without the Hype"
-description: "Reserved title for a future NOVANDRI article: AI Approval Gates without the Hype."
-date: 2026-11-17
+description: "A practical approval gate maps AI risk classification to a named decision. Read the mechanism, a worked example, and what a gate cannot cover."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Governance
+  - Approval Gates
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Approval gates for AI systems tend to fail in one of two ways. Either they become a rubber stamp that slows every project, or they become an inconsistent judgment that depends on which reviewer happens to be available. The real problem is turning a legal framework and a voluntary risk framework into a repeatable decision without turning the process into theater.
+
+**Direct answer:** An AI approval gate is a defined decision point where a system's risk classification, controls, and residual risk are checked before a named scope of use. The EU AI Act provides the legal structure of risk tiers and high-risk obligations, and the NIST AI RMF provides a voluntary process of govern, map, measure, and manage. The gate connects them: it maps the classification to an approve, reject, or escalate decision.
+
+**Delta:** This article adds a classification-to-decision map beyond the sources. It maps each risk tier to a concrete approval right and evidence requirement, with claim status explicit.
+
+## The mechanism
+
+The EU AI Act is organised around the idea that different AI uses carry different levels of risk, and that obligations should scale with that risk. Systems are grouped into tiers that range from prohibited practices, through high-risk uses with substantial duties, to limited-risk uses with transparency duties, and minimal-risk uses with few obligations. For high-risk systems, the Act describes duties such as risk management, data governance, technical documentation, record keeping, human oversight, and accuracy, robustness, and cybersecurity. The practical consequence is that the tier a system falls into determines how heavy its approval gate should be.
+
+The NIST AI RMF is voluntary and process-oriented rather than legal. It organises work into four functions: govern, map, measure, and manage. Govern sets the organisation's risk tolerance and accountability; map identifies the context and the risks; measure assesses and evaluates those risks; manage treats and monitors them. The framework also describes trustworthiness characteristics that a system should exhibit. Where the Act asks what duties apply, the RMF asks how an organisation builds the capability to meet them. Together they give a gate both a threshold and a method.
+
+A gate built from these sources is a short set of checks tied to classification, not a long generic form. A minimal-risk internal drafting aid might need only a recorded classification and a named owner. A high-risk use, such as one that affects employment or access to services, needs documented controls for each applicable duty and an explicitly accepted residual risk. The gate produces a record: what the system is, which tier it occupies, what evidence exists, who reviewed it, and what decision followed.
+
+Timing matters as much as content. A gate at intake catches a classification before design hardens. A gate before deployment checks that controls actually exist. A gate after a material change, such as a new data source or model, catches drift in the original classification. Treating the gate as a recurring decision rather than a one-time signature is what keeps it aligned with a framework that expects ongoing risk management.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team builds an assistant that ranks job applicants for a hiring workflow, a use the Act's framing would treat as high risk. The gate has three checks. First, classification: the reviewer records the use as high risk and notes the affected decision, which sets the gate to the full tier rather than the light one. Second, evidence: the reviewer verifies that data governance notes, technical documentation, and a logging plan exist for the system, and marks the two items still missing. Third, human oversight: the reviewer confirms a named person can override a ranking and that the workflow leaves time for that override. The outcome is an escalate decision rather than an approval: the two missing evidence items block launch, and the gate record assigns an owner and a recheck date. No deployment happens until those items close.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| The EU AI Act scales obligations by risk tier, with high-risk uses subject to more duties | `source-reported` | EU AI Act Explorer | 2026-11-18 | The Act text or official guidance is amended |
+| The NIST AI RMF organises risk work as govern, map, measure and manage | `source-reported` | NIST AI RMF | 2026-11-18 | NIST revises the framework |
+| Mapping a tier to a named approval decision reduces inconsistent reviewer judgment | `inferred` | Derived from the sources | 2026-11-18 | Gate outcomes still vary by reviewer |
+
+The first two rows are taken directly from the frameworks and are stable until those documents change. The third row is an inference about how a gate behaves in practice, not a claim the frameworks make. It is the row most likely to need revision, because reviewer behavior can drift even when the documents stay fixed. Readers should treat the table as a snapshot tied to the verification date.
+
+## What it cannot do
+
+An approval gate is a snapshot of what was known at review time, not a continuous guarantee. A system can pass a gate and then behave differently once real users and real data arrive. The frameworks themselves expect ongoing risk management, so a gate that is treated as a permanent seal of approval works against their intent. The honest framing is that the gate records a decision under a specific set of conditions, and those conditions can change.
+
+A second limit is the gap between legal classification and practical safety. Placing a system in a tier answers a legal question about which duties apply. It does not by itself prove that the system is safe, fair, or accurate in its particular context. A team can satisfy the documentation duties of a tier and still ship a system with a serious unexamined failure mode. The gate should therefore be read as a compliance checkpoint plus a risk conversation, not as the risk conversation itself.
+
+There is a real hidden cost. Every gate consumes reviewer attention, and attention is finite. When gates are too heavy for low-risk work, teams learn to route around them, classify their work downward, or fill forms without thought. That is worse than no gate, because it creates a false record of oversight. The design task is to make the light path genuinely light so that the heavy path retains credibility for the cases that need it.
+
+The main failure mode is checklist compliance without understanding. A reviewer can tick that human oversight exists without asking whether the oversight is meaningful in the workflow. A reviewer can confirm documentation exists without checking whether it is current. The gate is only as good as the questions behind each row, which is why the rows should be specific and evidence-linked rather than generic.
+
+Finally, the gate cannot make value judgments for the organisation. Deciding how much residual risk is acceptable, or which affected groups deserve extra protection, is a governance choice that sits above the framework. It also cannot settle questions outside the jurisdiction the framework covers. Those decisions need a named owner, a documented rationale, and a scheduled review, because a gate without an owner decays into habit.
+
+Counterargument: the claim that approval gates slow delivery is fair when gates are uniform and document-heavy, and incomplete when gates are tiered, because tiering keeps the light path fast and concentrates scrutiny where an affected decision warrants it.
+
+## A decision test
+
+1. **Classify the use** against the Act's risk tiers before design hardens.
+2. **Set the gate depth** to match the tier rather than applying one form to all work.
+3. **List the required evidence** for each applicable duty, such as documentation and logging.
+4. **Identify the oversight control** and confirm it is workable in the real workflow.
+5. **State the residual risk** and name who accepts it.
+6. **Record the decision** as approve, reject, or escalate, with an owner and date.
+7. **Name the change triggers** that reopen the gate, such as a new data source or model.
+
+A gate earns its place only if it changes at least one decision. If a review never blocks, escalates, or changes a control, it is a ceremony. The test above is meant to keep each row answerable, so that a reviewer can point to the evidence and the decision it produced. That is the difference between a gate that governs and a gate that merely documents.
+
+For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- EU AI Act Explorer, 2026. [EU Artificial Intelligence Act | Up-to-date developments and analyses of the EU AI Act](https://artificialintelligenceact.eu/) — A structured, readable resource on the EU AI Act text, obligations and timelines; secondary reference for the deployer perspective.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

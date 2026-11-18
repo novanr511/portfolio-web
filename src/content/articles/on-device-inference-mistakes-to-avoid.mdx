@@ -1,10 +1,71 @@
 ---
 title: "On-device Inference Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: On-device Inference Mistakes to Avoid."
-date: 2026-11-17
+description: "Why benchmark speed and user experience must both be measured for on-device models, with a worked in-browser case and explicit claim limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Evaluation
+  - On-device Inference
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+On-device inference is often justified by latency and privacy, then judged by a single speed number taken in ideal conditions. MLCommons publishes benchmarks that standardise how machine-learning performance is measured, while web.dev defines Web Vitals as user-centred measures of a page experience. The real problem is that a model can look fast in a benchmark and still make an application feel slow, because the two sources measure different things.
+
+**Direct answer:** Evaluate on-device inference on two axes: standardised benchmark performance for the target hardware, and user-experience impact measured with Web Vitals where the model runs in a browser. A benchmark shows what the model can do under a defined workload; Web Vitals show what the user actually feels. Reporting one without the other gives an incomplete and potentially misleading picture of readiness.
+
+**Delta:** This article adds a decision-facing split beyond the sources: it maps benchmark throughput and user-experience metrics to a shipping decision, with claim status explicit.
+
+## The mechanism
+
+MLCommons develops benchmarks for machine-learning systems across deployment scenarios. A benchmark defines a workload, a set of metrics, and rules for how results are produced, so that performance can be compared across hardware and software under conditions that are held constant. The practical consequence is that a speed claim means little without a defined workload behind it. Before asking whether a model is fast enough for a device, a team needs to know what task, input size, and precision the number refers to. A benchmark supplies that common ground and makes comparisons meaningful rather than anecdotal.
+
+Web Vitals define a set of metrics focused on user experience for the web, covering loading, interactivity, and visual stability. These metrics translate technical behaviour into terms that track how a page feels to a person using it. The practical consequence for on-device inference is that a model running in a browser competes with rendering and interaction for the same main thread and resources. If inference blocks that thread or inflates page weight, the user sees a slow or unstable page even when the model itself runs quickly. The model's speed is not the same as the application's responsiveness.
+
+The synthesis is to read a deployment through both sources at once. Benchmarks answer whether the model meets a throughput target under a standard workload; Web Vitals answer whether the surrounding experience degrades when the model runs. Combining the two into a shipping check is a judgement about how to use the sources, not something either states directly, and it is marked inferred below. That mark matters because the split is the practical contribution here, and it should not be presented as a conclusion either source reached on its own.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team ships an in-browser image classifier and wants to know whether it is ready. The first check is benchmark performance: the model is measured on a representative device class with a defined input size, giving a comparable throughput figure. The second check is user experience: the team watches interaction and loading metrics while inference runs, not just on an idle page. The third check is resource cost: memory use and sustained load are observed to detect thermal or battery effects that a short benchmark hides. The outcome is a decision to move inference off the main thread into a worker to protect responsiveness. The scenario is invented; the benchmark and metric concepts come from the sources.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| MLCommons publishes standardised ML benchmarks across deployment scenarios | `source-reported` | Benchmarks (MLCommons) | 2026-11-18 | Benchmark suites or rules updated |
+| Web Vitals define user-centred metrics covering loading, interactivity, and stability | `source-reported` | Web Vitals (web.dev) | 2026-11-18 | Core metrics revised |
+| On-device readiness requires both benchmark throughput and user-experience measurement | `inferred` | Derived from the sources | 2026-11-18 | Deployment target or runtime changes |
+
+The first two rows report what the sources define. The third is a practical way of combining them for a shipping decision, not a claim either source makes, so it is marked inferred. Its relevance depends on the deployment target and runtime, and it should be rechecked when either changes. The table keeps that condition attached so the split is not treated as universal advice that holds in every context.
+
+## What it cannot do
+
+A benchmark is not your workload. It uses a defined task, input, and configuration so that results are comparable, which means it deliberately abstracts away the details of a specific application. A model that performs well on a standard benchmark can be slower on a particular input distribution, precision setting, or device the benchmark does not represent. The number is a reference point, not a promise. Teams that quote a benchmark as proof of real-world speed skip the step of checking whether the benchmark conditions resemble their own, and that step is where most of the useful information lives.
+
+Web Vitals do not measure model quality. They describe how a page behaves for a user, not whether predictions are correct or whether the model is appropriate for the task. A deployment can have excellent interaction metrics and still produce wrong answers, and a team can overread a clean scorecard as evidence that the feature works. The two axes are complementary precisely because neither substitutes for the other. Confusing user-experience health with model correctness is a category error that no amount of good measurement on one side can fix.
+
+A common failure mode is blocking the main thread. Inference that runs synchronously during page rendering can delay interaction and hurt stability, even when the model's own compute time is short. The benchmark will not reveal this, because it measures the model in isolation rather than its effect on the page. The hidden cost is that the regression appears intermittent: it shows up on slower devices or under load, which makes it easy to miss in development on fast hardware. By the time it is noticed, the behaviour may be baked into the application architecture.
+
+Device diversity is another boundary. On-device means running across hardware with different processors, memory, and thermal behaviour. A result measured on one phone class does not transfer to a cheaper device that throttles under sustained load. Short benchmarks especially hide this, because they finish before heat becomes a constraint. The sources supply a method for standardised measurement and a set of user metrics, but neither describes the specific device fleet a product will run on. That local knowledge has to be added by the team, and it is what turns a generic result into a relevant one.
+
+The split therefore needs a date and an owner. Runtimes improve, models change, and browser metrics are revised, so a readiness judgment made today can stop being accurate. Neither source provides a schedule for rechecking; both describe concepts rather than a maintenance process. Setting a local review point is what keeps the evaluation from becoming a one-time benchmark quote. Without it, the deployment is assessed against conditions that no longer hold, and the gap between measured speed and felt experience quietly widens again.
+
+Counterargument: "The counterargument that this dual check is excessive for a small, offline feature is fair where no user interaction depends on it and incomplete where inference runs inside a latency-sensitive interface."
+
+## A decision test
+
+1. Define the target device class and the real input the model will process.
+2. Measure throughput against a benchmark with a comparable workload and precision.
+3. Run inference during live interaction and record the relevant user metrics.
+4. Check memory use and behaviour under sustained load.
+5. Confirm the model does not block the main thread where responsiveness matters.
+6. Verify that model quality is assessed separately from experience metrics.
+7. Assign an owner and a review date for both measurement axes.
+
+The test keeps the two sources in their proper roles. Each step gathers evidence on either model performance or user experience, and the closing steps make sure model quality is not forgotten and the check stays current. A deployment that passes is not proven good; it has been examined on the axes that determine whether it will feel fast and behave responsibly in the hands of a user.
+
+For further reading, see [Responsible AI: Ethics, Fairness, and Regulatory Compliance](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
+
+## References & Further Reading
+
+- MLCommons, 2026. [Benchmark work | Benchmarks - MLCommons](https://mlcommons.org/benchmarks/) — Open, comparable hardware and software performance measurements.
+- web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.

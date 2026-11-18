@@ -1,10 +1,71 @@
 ---
 title: "Data Quality in Practice"
-description: "Reserved title for a future NOVANDRI article: Data Quality in Practice."
-date: 2026-11-17
+description: "Data quality is a governance problem before a tooling one. Read how ownership maps to missing-data handling, a worked example, and the limits of a quality check."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Data
+  - Method
+  - Data governance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Data quality is usually treated as a cleanup step that happens after data arrives. The data governance entry describes the ownership and policies that govern data as an asset, and the pandas missing-data guide documents how missing values are detected and handled. The real problem is that quality failures are decided upstream, by definitions and ownership, long before any cleaning code runs.
+
+**Direct answer:** Data quality in practice is a governance problem before it is a tooling problem: assign ownership, define what correct means for each field, then apply consistent handling of missing values. The sources describe governance and missing-data mechanics; the sequence is a synthesis. A technical fix cannot repair a field whose meaning no one owns.
+
+**Delta:** This article adds a claim-status table and a governance-to-handling test beyond the sources: it maps each ownership decision to a missing-data handling rule, with claim status explicit.
+
+## The mechanism
+
+Data governance is the set of roles, policies, and processes that ensure data is available, usable, consistent, and protected. The entry frames data as an asset that needs formal management rather than an incidental byproduct of systems. The practical consequence is that quality has an owner. When a field's meaning is disputed or a value is wrong, the first question is who is accountable for that field, not which tool can patch it. Without an owner, every fix is local and the same defect reappears in the next pipeline.
+
+The pandas missing-data guide supplies the practical mechanics of one class of defect. It documents how missing values are represented, how they are detected, and how they can be filled, dropped, or interpolated. The guide also notes that the right treatment depends on why the data is missing, not merely that it is missing. The practical consequence is that a blanket rule such as filling with the mean can distort a dataset as badly as the missingness it tries to remove. Handling has to be chosen per field, with the reason for missingness recorded.
+
+The two sources connect at a point neither states directly. Governance decides who defines a field and what correct means; the missing-data mechanics decide how a specific defect is treated. A field owner can specify, for example, that a blank status value means not yet recorded rather than unknown, and that rule then determines whether the value is filled, dropped, or kept. The choice of treatment is therefore a governed decision, not a coding preference. Neither source prescribes a specific rule for a specific field, so any such rule is local and must be marked as inferred.
+
+The output is a mapping from each field to an owner, a definition of correct, and a documented handling rule. That mapping, rather than a generic quality score, is the decision instrument. It shows where a defect is a one-off cleaning task and where it is a symptom of an unresolved definition. The value lies in the sequence: assign ownership, define correctness, choose handling, then document. A dataset maintained in that order can be audited later, because the rule and the reason are recorded together.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team finds that a customer-status field is blank in a share of records. Three checks decide the handling. First, who owns the field and what does a blank mean under the agreed definition? Second, is the missingness random or concentrated in one source system? Third, would filling the blanks change any downstream metric materially? The review shows the blanks come from one legacy feed and that the field owner defines them as not yet recorded. The team fixes the feed and keeps the blanks distinct from unknown. The outcome is a durable correction, not a one-time patch. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Data governance assigns roles and policies for data | `source-reported` | Wikipedia, Data governance | 2026-11-18 | Definition revised |
+| pandas documents detection and handling of missing data | `source-reported` | pandas, Missing data | 2026-11-18 | Library version changes |
+| Choose handling per field from an owned definition | `inferred` | Derived from the sources | 2026-11-18 | Schema changes |
+
+The first two rows are factual claims drawn directly from the sources. The third is an inference about how governance and handling connect, because neither source assigns a specific rule to a specific field. Recheck the governance definition when the source entry changes, the handling mechanics when the library version changes, and the inferred claim when the schema changes.
+
+## What it cannot do
+
+A data-quality practice does not guarantee correct data. It establishes ownership and consistent handling, but the underlying source can still be wrong. A governed field with a documented rule can carry a value that is accurately recorded and still factually false. The sources describe governance and missing-data mechanics, not a method for verifying truth. Treating a governance sign-off as a correctness certificate is a category error: it answers whether the process was followed, not whether the value is right. A reader who needs assurance of truth must look to the source system and the domain expert.
+
+The hidden cost is that governance is slow and organizational. Assigning owners, agreeing definitions, and documenting rules take time and require cooperation across teams that may not share priorities. The pandas mechanics are cheap by comparison. That asymmetry is why teams reach for the technical fix and skip the governance work. The cost is paid in meetings and in the willingness to settle a disputed definition. Making the definition step a prerequisite for cleaning is what keeps it from being bypassed under deadline pressure.
+
+The main failure mode is applying a handling rule without knowing why the data is missing. The guide makes clear that the reason matters, yet pipelines routinely fill or drop values by default. A fill that is reasonable for a randomly missing field can be badly wrong when missingness signals something, such as a customer who declined to provide a value. Without a recorded reason, the rule cannot be reviewed. The relevant question is what the missingness means, and whether the chosen treatment preserves that meaning. A defensible handling rule states the reason alongside the method.
+
+There is a boundary around the method. It covers the fields that are defined and owned, not the tacit knowledge that sits outside the catalogue. It does not validate the source system, correct a broken feed, or recover data that was never recorded. It does not replace a domain expert, because it draws on the expert's definition rather than supplying one. A governance-and-handling check cannot tell an analyst what a field should contain; it can only show whether the handling is consistent with an agreed definition. That is a narrower contribution than it is often made out to be.
+
+Because the source entry and the library version evolve, the practice needs a refresh and the rules need periodic review. Each field rule should be recorded with a recheck condition, and the definition of correct should be treated as a local decision rather than a value the sources supply. Without that record, a future reviewer cannot tell which rules were deliberate and which were defaults. The dataset will still be there; the reasoning behind its handling is what makes the review possible.
+
+The counterargument that pandas handling rules are fair for quick cleaning is incomplete when no field owner has defined what the missing value means.
+
+## A decision test
+
+1. Name the field and the question it is meant to answer.
+2. Assign an owner for that field.
+3. Define what a correct value means.
+4. Diagnose why values are missing.
+5. Choose a handling rule consistent with that definition.
+6. Record the rule and its recheck condition.
+7. Verify that downstream metrics are unchanged or explained.
+
+A data-quality practice is useful only when ownership and handling are both recorded. The test turns a defect into a sequence of decisions with a visible rationale, so a reviewer can see who defined the field and when the rule must be revisited. For further reading, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data governance - Wikipedia](https://en.wikipedia.org/wiki/Data_governance) — Policies and accountable ownership of data.
+- pandas developers, 2026. [Working with missing data — pandas documentation](https://pandas.pydata.org/docs/user_guide/missing_data.html) — The different sentinels pandas uses for missing values — NaN, NaT, None and pandas.NA — and the isna/notna detection methods.
