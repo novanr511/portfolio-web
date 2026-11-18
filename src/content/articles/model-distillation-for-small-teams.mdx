@@ -1,14 +1,55 @@
 ---
 title: "Model Distillation for Small Teams"
-description: "Reserved title for a future NOVANDRI article: Model Distillation for Small Teams."
-date: 2026-11-17
+description: "Distillation trades a large teacher for a smaller student. Read how it works, a worked plan, and why the teacher is not a free label machine."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - ML
+  - Efficiency
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A small team rarely has the budget to run a frontier model on every request. Distillation is the idea of training a smaller model to imitate a larger one, which makes it attractive as a cost lever. The catch is that the student inherits the teacher's mistakes as well as its skills, and the teacher's outputs are not ground truth, as the original distillation paper frames the transfer of knowledge, as the model-compression article treats it as one option among several.
 
+**Direct answer:** Distillation trains a student on a teacher's outputs for a defined task, then deploys the student where the cost saving matters. Hinton, Vinyals, and Dean's paper is the primary source, and quantization is a complementary compression technique. The boundary: a student does not exceed its teacher by magic — it approximates behaviour on the distribution it was trained on, which the benchmarks article warns about generalising, as the cost estimator requires an honest accounting of training and inference spend.
+
+## The mechanism
+
+**A teacher produces soft targets.** Instead of a hard label, the teacher gives a distribution over answers, which carries information about how close the alternatives are, as the distillation paper explains. A weaker signal — just the top answer — throws that away, as the data-quality article warns about losing information at the source.
+
+**A student learns the distribution.** The student is trained to match the teacher's outputs, which the distillation-in-practice article describes for a specific task, as the training-recipes material advises on a stable loop. The task should be narrow, which the evaluation-rubric article requires for concrete criteria.
+
+**Compression is separate.** Quantization reduces the precision of weights, which the quantization article explains, as the edge-compression article covers on-device inference. Distillation changes the model's behaviour; quantization changes its representation, as the model-compression article distinguishes the approaches.
+
+**Cost moves, it does not disappear.** Teacher calls during data creation cost money, which the cost estimator requires you to count, as the routing article treats cost per correct answer as the decision metric. The saving appears only if inference volume is high enough, as the worked plan below shows.
+
+Three consequences follow. The student should be evaluated on real cases, as the evaluation article requires, not only on how closely it matches the teacher. The teacher's errors should be filtered, which the data-curation article advises for quality, as the hallucination article warns about confident wrong labels. And the result should be recorded with the full cost, as the decision-memo article requires.
+
+## A worked plan
+
+The following is hypothetical and illustrative. A team answers 50,000 support questions a month with a large model and considers distilling a small one.
+
+Three checks decide. First, is the task narrow and measurable, which the distillation-in-practice article requires? A fixed set of question types with clear success criteria, as the evaluation-rubric article advises, makes the student testable. Second, what does the teacher data cost, as the cost estimator asks, with teacher calls to build a labelled set, as the data-curation article advises for quality control? Third, does the student meet the bar on held-out cases, as the evaluation article requires, with a fallback to the teacher for low-confidence answers, as the routing article describes?
+
+Three conclusions follow. If the student is accurate enough on the defined task, the per-request cost falls, which the cost estimator calculates. If the task broadens, the student may degrade, which the benchmarks article warns about, as the monitoring article advises for change triggers. And the decision should be recorded with the total cost, as the decision-memo article requires.
+
+## What distillation cannot do
+
+It cannot create capability the teacher lacks, which the distillation paper treats as a transfer of knowledge, as the hallucination article warns about wrong teacher labels. It does not remove the need for evaluation on real cases, which the evaluation-rubric article requires, as the benchmarks article warns about applying broad results. And it does not guarantee a saving at low volume, which the cost estimator makes explicit, as the worked plan shows for teacher-data cost.
+
+The counterargument that a smaller model is always cheaper is fair about per-request price and incomplete about total cost, which the cost estimator requires to include data creation, as the decision-memo article requires for a recorded judgement.
+
+## A decision test
+
+1. Define a narrow task with clear success criteria, as the rubric article requires.
+2. Treat teacher outputs as labels to be filtered, as the data-curation article advises.
+3. Evaluate the student on held-out real cases, as the evaluation article requires.
+4. Consider quantization as a complementary lever, as the compression article explains.
+5. Compute total cost including teacher data, as the cost estimator requires.
+6. Set a fallback to the teacher, as the routing article recommends.
+7. Record the decision and review after scope changes, as the decision-memo article requires.
+
+For the method, see [Distillation in Practice](/articles/distillation-in-practice-teacher-to-student-on-your-task); for the cost, see [LLM Cost Estimator](/articles/llm-cost-estimator-how-to-predict-your-monthly-bill).
 
 ## Further Reading
 

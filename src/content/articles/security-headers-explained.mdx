@@ -1,16 +1,57 @@
 ---
 title: "Security Headers Explained"
-description: "Reserved title for a future NOVANDRI article: Security Headers Explained."
-date: 2026-11-17
+description: "Response headers set browser rules that reduce whole classes of attacks. Read the important ones, a worked config, and what they cannot protect."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Security
+  - Web
+  - HTTP
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Security headers are response headers that tell a browser how to behave — whether to allow a page in a frame, which sources of scripts are permitted, whether to use HTTPS exclusively. They are cheap to set and easy to misconfigure, which is why a copied set can give a false sense of protection, as the OWASP ASVS material treats controls as something to verify, as the threat-modeling article argues for a defined boundary.
 
+**Direct answer:** Use security headers to enforce behaviour the browser can control — HTTPS upgrade, MIME handling, framing, and content policy — with a deployment that tests for breakage. MDN documents HSTS, and OWASP ASVS provides the verification standard. The boundary: headers cannot fix server-side vulnerabilities, which the security fundamentals article treats as a separate domain, and a strict content policy can break a site if deployed without testing, as the rollout guidance in the incident article recommends for staged changes.
+
+## The headers
+
+**Strict-Transport-Security (HSTS)** tells browsers to use HTTPS for the host, which MDN describes for the header's effect. It reduces downgrade risk, which the HTTPS-and-SEO article covers for certificate and redirect diagnosis, as the TLS discussion explains for the underlying protocol.
+
+**Content-Security-Policy (CSP)** restricts which sources may load scripts and other resources, which the XSS discussion in the OWASP material treats as a defence, as the output-handling article explains for untrusted content. A policy in report-only mode is a way to learn before enforcing, which the rollout guidance recommends.
+
+**X-Content-Type-Options** prevents MIME sniffing, which MDN documents for the header, as the file-upload discussion in the threat-modeling article treats content type as a boundary.
+
+**Frame-ancestors or X-Frame-Options** limits embedding, which the clickjacking material in OWASP covers, as the trust-boundary article explains for what a browser can enforce.
+
+Three consequences follow. Headers are defence in depth, which the zero-trust article treats as a principle, as the security checklist requires per-tool controls. They should be tested in staging, as the deployment guidance recommends for staged changes, as the error-handling article covers diagnosis. And they should be verified after deployment, which the diagnostics article advises for checking the actual response, as the observability article treats signals as evidence.
+
+## A worked config
+
+The following is hypothetical and illustrative. A site enables HSTS, a report-only CSP, MIME sniffing protection, and frame restrictions.
+
+Three checks decide the rollout. First, does the site work correctly over HTTPS with valid certificates, which the HTTPS-and-SEO article requires for diagnosis, as MDN's HSTS reference advises before enabling the header? Second, does the report-only CSP reveal legitimate resources that would be blocked, as the OWASP ASVS material treats as verification, as the staged rollout guidance recommends? Third, do the headers appear in the actual response, which the diagnostics article advises checking, as the server-logs article treats requests as evidence?
+
+Three conclusions follow. Report-only prevents breakage, which the rollout guidance supports. A header set without verification is a claim, as the diagnostics article warns. And the config should be reviewed after an application change, as the monitoring article advises.
+
+## What headers cannot do
+
+They cannot fix a server-side injection flaw, which the security fundamentals article treats as a separate domain, as the prompt-injection article explains for input trust. They do not replace a content policy that is actually correct, which the CSP discussion implies, as the output-handling article advises. And they cannot guarantee a security outcome, which the publication standard forbids claiming, as the risk-assessment article requires residual risk.
+
+The counterargument that a framework sets them automatically is fair and incomplete, which the verification step in the worked config shows: a claim about a header is different from evidence of its response, as the diagnostics article advises.
+
+## A decision test
+
+1. Identify the browser behaviours you want to enforce, as the threat-modeling article advises.
+2. Check HTTPS readiness before HSTS, as MDN's reference requires.
+3. Deploy CSP in report-only mode first, as the rollout guidance recommends.
+4. Verify the headers in an actual response, as the diagnostics article advises.
+5. Test embedded and upload flows for breakage, as the threat article treats these as boundaries.
+6. Review after an application change, as the monitoring article advises.
+7. Record the config, as the decision-memo article requires.
+
+For the protocol base, see [HTTPS, TLS, and SEO](/articles/https-tls-and-seo-diagnose-certificates-and-redirects); for the security discipline, see [Cybersecurity Fundamentals](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response).
 
 ## Further Reading
 
 - MDN Web Docs, 2026. [Strict-Transport-Security header - HTTP | MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security) — Reference for the HSTS response header and its security effect.
-- OWASP Foundation, 2026. [OWASP API Security Top 10](https://owasp.org/API-Security/editions/2023/en/0x11-t10/) — The API-specific risk list that complements the web-application list.
+- OWASP Foundation, 2026. [OWASP Application Security Verification Standard](https://owasp.org/www-project-application-security-verification-standard/) — A verification framework for web application security controls.
