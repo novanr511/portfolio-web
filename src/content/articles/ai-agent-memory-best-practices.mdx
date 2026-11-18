@@ -1,13 +1,84 @@
 ---
 title: "AI Agent Memory Best Practices"
-description: "Reserved title for a future NOVANDRI article: AI Agent Memory Best Practices."
-date: 2026-11-17
+description: "Agent memory is a choice about what to keep. Read the practices, a worked example, and why remembering more can make an agent worse."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Agents
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Agent memory is often treated as a store that should hold everything, which ignores that retrieval determines what is useful. The Anthropic agent guidance describes how context is managed, and the knowledge-graph entry covers structured relationships. The practices concern what to keep and what to surface.
+
+**Direct answer:** Store durable facts with provenance, retrieve a small relevant set, and treat working state as separate from long-term memory. The sources describe context and structure; the practices are a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented guidance from local choices about what to store.
+
+## The mechanism
+
+The first practice is separating layers. The agent guidance describes managing context, which includes what the current task needs and what should persist. Mixing the two means a long conversation carries material that no longer matters, which can displace what does.
+
+The second practice is provenance. The knowledge-graph entry describes entities and relationships, which is closer to a reliable memory than a free-text summary. A fact with a source and a date can be checked; a summary without either cannot.
+
+The third practice is retrieval. A memory that cannot surface the right item is no better than no memory, and a larger store makes retrieval harder. Testing what is actually retrieved, on real cases, is the control.
+
+The sequence is: define what persists, attach provenance, retrieve a small set, then verify on real tasks. The choices are local, so the conclusions are `inferred`; the guidance is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A support agent remembers customer preferences across sessions.
+
+Three checks decide. First, which facts are durable enough to store, and where did each come from? Second, how many items are retrieved for a new request, and are they relevant to the current question? Third, what happens when a stored preference is wrong or out of date?
+
+The outcome is a design with an update path. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Context is actively managed in agents | `source-reported` | Anthropic agent guidance | 2026-11-18 | Guidance changes |
+| Knowledge graphs structure entities and relations | `source-reported` | Wikipedia, Knowledge graph | 2026-11-18 | Definition changes |
+| Store little, source it, retrieve selectively | `inferred` | Derived from both | 2026-11-18 | Tasks change |
+
+## Why remembering more can be worse
+
+A larger store increases the chance that retrieval surfaces the wrong item, and wrong context can change a decision more than missing context. The limit is retrieval quality, not capacity, which is why more storage is not automatically an improvement.
+
+A further issue is that stored memory can be wrong without any sign of error. A preference inferred from one conversation may not hold generally, and an agent that acts on it will repeat the mistake. Giving the user a way to correct stored facts is part of the design, not an optional feature.
+
+The store also has a retention cost. Facts that persist indefinitely accumulate, and the older ones become less likely to be relevant. A rule for when to discard or review an item keeps the memory useful, which is a different discipline from simply adding more.
+
+Finally, memory should be evaluated on the tasks it supports. A store that looks well organised but does not improve task outcomes is a cost, and the only way to know is to compare with the memory disabled.
+
+A stored fact without a date cannot be judged for relevance, which is why provenance is part of the memory.
+
+A larger store makes retrieval harder, which is why relevance matters more than capacity.
+
+A user should be able to correct a stored fact, since an inferred preference can be wrong.
+
+Memory should be evaluated by the tasks it improves, not by the amount it stores.
+
+A record without a source is difficult to trust when the decision depends on it.
+
+The retrieval layer deserves as much attention as the store itself.
+
+## What it cannot do
+
+It cannot create facts that were never stored. It does not guarantee that the right item surfaces. And it cannot remove the need to check the memory against reality.
+
+The counterargument that a bigger memory is always better is fair for stable facts and incomplete when retrieval is imperfect.
+
+## A decision test
+
+1. Define what persists.
+2. Attach source and date.
+3. Retrieve a small set.
+4. Test on real tasks.
+5. Provide an update path.
+6. Record the design and recheck condition.
+
+For the boundary, see [Agent Memory](/articles/ai-agent-memory-without-the-hype).
 
 ## References & Further Reading
 

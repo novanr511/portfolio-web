@@ -122,7 +122,7 @@ export default async function ProjectStudyPage({
       />
 
       <div className="mx-auto max-w-6xl px-6 pb-16 pt-14 sm:pt-20">
-        <div className="lg:grid lg:grid-cols-[248px_minmax(0,1fr)] lg:gap-12">
+        <div className="lg:grid lg:grid-cols-[264px_minmax(0,1fr)] lg:gap-12">
           {/* Sticky table of contents — desktop only */}
           <aside className="hidden lg:block">
             <TableOfContents headings={study.headings} />

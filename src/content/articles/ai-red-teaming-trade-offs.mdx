@@ -1,13 +1,84 @@
 ---
 title: "AI Red Teaming Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: AI Red Teaming Trade-Offs."
-date: 2026-11-17
+description: "Red teaming trades coverage for depth. Read the trade-offs, a worked exercise, and why a finding count is not a safety result."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Security
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Red teaming is often reported by the number of findings, which rewards breadth over relevance. The NIST adversarial-ML taxonomy describes categories of attack, and the OWASP LLM list identifies risks for language-model applications. The trade-off is how much of each category a team can test well.
+
+**Direct answer:** Choose depth in the categories that matter to the deployment, record the conditions of each finding, and retest after mitigation. The sources provide the categories; the choice is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked exercise, separating documented taxonomies from local judgements about scope.
+
+## The mechanism
+
+The first trade-off is coverage versus depth. The NIST taxonomy provides categories, but a team with limited time cannot probe each one deeply. Choosing a few categories based on the system's actual use produces better evidence than a shallow pass over all of them.
+
+The second trade-off is reproduction versus discovery. The OWASP list describes risks, and a finding that cannot be reproduced is hard to verify after a fix. Recording the exact conditions costs effort at discovery and saves it at retest.
+
+The third trade-off is severity versus count. A single critical failure is more important than many cosmetic ones, but a count treats them alike. Severity should be defined before the exercise and applied consistently, which is a local decision.
+
+The sequence is: choose categories, define severity, record conditions, then retest. The choices are local, so the conclusions are `inferred`; the taxonomies are `source-reported`.
+
+## A worked exercise
+
+*Illustrative.* A team has a week to test a support assistant that can call a refund tool.
+
+Three checks decide. First, which categories matter most — untrusted input, unauthorised actions, or data leakage? Second, can each confirmed failure be reproduced from a recorded condition? Third, after a mitigation, was the same probe run again with the same result?
+
+The outcome is a small set of verified findings. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Attacks can be taxonomised | `source-reported` | NIST AI 100-2 E2025 | 2026-11-18 | New taxonomy |
+| LLM risks have identified categories | `source-reported` | OWASP LLM Top 10 | 2026-11-18 | New edition |
+| Depth in relevant categories beats shallow coverage | `inferred` | Derived from the taxonomies | 2026-11-18 | System changes |
+
+## Why a finding count is weak
+
+A count depends on how hard the team looked and how broadly it defined a finding. Two exercises on the same system can produce different counts without any difference in safety, which is why severity and reproduction are more useful measures.
+
+A further consideration is that the team running the exercise knows the system, which shapes what it tries. An outside perspective often finds different failures, and a program that never changes its testers will converge on the same findings. Rotating the people or the method is part of keeping the exercise useful.
+
+The findings also age. A system that is updated after a test has changed, and a finding that was fixed may reappear in a new form. Treating red teaming as a recurring activity rather than a milestone is the practical response, with each round recorded against the version it tested.
+
+None of this makes the system safe. It produces evidence about specific attempts under specific conditions, which is valuable precisely because it does not overclaim.
+
+The exercise should be repeated after material changes, since a finding from an older version may no longer apply.
+
+A finding that cannot be reproduced cannot be verified as fixed, which is why conditions belong in the record.
+
+Depth in a relevant category is more useful than shallow coverage of many, given limited time.
+
+The test set should reflect the system's actual use, not a generic list of attacks.
+
+A clean exercise says more about the probes that were tried than about the system's overall safety.
+
+The scope of an exercise should be stated alongside its findings.
+
+## What it cannot do
+
+It cannot prove the absence of failures. It does not replace monitoring. And it cannot remove the need for a decision about what risk is acceptable.
+
+The counterargument that a broad exercise is better is fair for discovery and incomplete for the depth needed to verify a fix.
+
+## A decision test
+
+1. Choose categories from the system's use.
+2. Define severity in advance.
+3. Record probe conditions.
+4. Confirm and rank failures.
+5. Mitigate and retest.
+6. Record what remains untested.
+
+For the method, see [AI Red Teaming](/articles/ai-red-teaming-a-practical-methodology).
 
 ## References & Further Reading
 
