@@ -1,10 +1,57 @@
 ---
 title: "Getting Started with AI Approval Gates"
-description: "Reserved title for a future NOVANDRI article: Getting Started with AI Approval Gates."
-date: 2026-11-17
+description: "An approval gate should stop a real risk, not slow everything. Read where to place one, a worked example, and why a gate needs an owner."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Governance
+  - Risk
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An approval gate is a pause where a person must confirm an action before the system continues. Teams add gates to feel safe, which produces rubber stamps and delays when gates sit on low-risk steps, as the Anthropic agent guidance treats checkpoints as part of a design, as the NIST AI RMF frames trustworthiness as a property across the lifecycle, as the human-in-the-loop article argues for meaningful review.
+
+**Direct answer:** Place a gate where the action is high-impact, hard to reverse, or uncertain, and give the reviewer authority and information to decide. Anthropic's agent guidance covers checkpoints, and the NIST AI RMF provides the governance frame. The boundary: a gate is a control, not a guarantee, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as the red-teaming article explains why untested failures remain.
+
+## Where to place a gate
+
+**High-impact actions.** Sending money, changing a record, or publishing externally, which the tool-calling article treats as an authorisation boundary, as the AI-in-HR article treats hiring as a high-impact decision, as the legal article treats formal duties, as the risk-assessment article requires likelihood and impact.
+
+**Hard-to-reverse actions.** A step whose effects cannot be undone, which the rollback article treats as a structural limit, as the decision-memo article requires a reversal condition, as the risk article requires residual risk to be stated.
+
+**Uncertain output.** A low-confidence result that a model should not act on alone, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises checks, as the agent guidance treats escalation as a tool.
+
+**A gate needs an owner.** Someone accountable for the decision, which the governance checklist requires, as the decision-memo article requires for a recorded judgement, as the monitoring article treats as a review trigger.
+
+Three consequences follow. Low-risk steps should not be gated, which the agent guidance advises for efficiency, as the small-team decision article argues for proportionality. The reviewer needs information, not just a button, as the explainability article argues for traces, as the decision-memo article requires for evidence. And the gate should be reviewed, as the monitoring article treats as a trigger, as the risk article requires residual risk.
+
+## A worked example
+
+The following is hypothetical and illustrative. A support agent can draft a reply, read the knowledge base, and issue a refund.
+
+Three checks decide where gates go. First, which actions are high-impact or hard to reverse, as the tool-calling and rollback articles ask, with the refund as the candidate, as the risk-assessment article requires for impact? Second, does the reviewer see the evidence — the policy citation and the refund details, as the legal-research and explainability articles advise, with a record, as the decision-memo article requires? Third, can low-risk steps run without a gate, as the agent guidance advises, with escalation for uncertainty, as the human-in-the-loop article recommends?
+
+Three conclusions follow. The refund deserves a gate; the draft and search do not, which the impact check reveals. Review needs evidence, as the explainability and decision-memo articles advise. And the gate should be recorded with an owner, as the governance checklist requires.
+
+## What approval gates cannot do
+
+They cannot guarantee a correct decision, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as the red-teaming article treats testing as partial. They do not remove the need for monitoring, which the observability article treats as evidence from a system, as the monitoring article advises. And they cannot fix a process with no accountable owner, which the governance checklist treats as a gap, as the small-team decision article advises.
+
+The counterargument that every action should be gated is fair for safety and wrong about rates and attention, which the agent guidance advises, as the human-in-the-loop article argues for meaningful review, as the worked example shows.
+
+## A decision test
+
+1. Identify high-impact and hard-to-reverse actions, as the risk-assessment and rollback articles require.
+2. Gate those, not low-risk steps, as the agent guidance advises.
+3. Give the reviewer evidence and authority, as the explainability article advises.
+4. Assign an accountable owner, as the governance checklist requires.
+5. Record the decision, as the decision-memo article requires.
+6. Review after a tool or policy change, as the monitoring article advises.
+7. State residual risk, as the risk-assessment article requires.
+
+For the design, see [Human-in-the-Loop by Design](/articles/human-in-the-loop-by-design); for the boundary, see [Tool Calling Reliability](/articles/tool-calling-reliability-when-function-calls-fail-in-agent-systems).
+
+## Further Reading
+
+- Anthropic, 2026. [Building effective AI agents](https://www.anthropic.com/engineering/building-effective-agents) — Guidance on agent design including checkpoints and human oversight.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

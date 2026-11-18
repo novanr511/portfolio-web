@@ -1,10 +1,57 @@
 ---
 title: "HSTS Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: HSTS Metrics that Matter."
-date: 2026-11-17
+description: "HSTS is a browser rule with a lifetime. Read what to measure, a worked deployment, and why the header cannot fix a broken certificate."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Security
+  - Web
+  - HTTP
+  - Measurement
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+HSTS tells a browser to use HTTPS for a host, which makes downgrade attacks harder. The metric that matters is not whether the header was added but whether it is present, correct, and intact on every response, as MDN's HSTS reference explains the directive, as the OWASP ASVS material treats controls as something to verify, as the security-headers article treats a header set as a claim until checked.
+
+**Direct answer:** Measure HSTS by the presence and correctness of the header on real responses, its max-age and scope, and the absence of mixed content or certificate errors. MDN documents the directive, and OWASP ASVS provides the verification frame. The boundary: HSTS is defence in depth, not a fix for a broken certificate or mixed content, which the HTTPS-and-SEO article treats as separate diagnostics, as the publication standard forbids guaranteed security outcomes.
+
+## The metrics
+
+**Presence on every response.** The header should appear on HTTPS responses, which MDN's reference describes, as the diagnostics article advises checking the actual response, as the observability article treats signals as evidence. A header on one endpoint only is a partial control, as the security-headers article advises for verification.
+
+**max-age and scope.** The lifetime and whether subdomains are included, which MDN's reference explains, as the preload discussion treats a longer commitment, as the decision-memo article requires for a recorded judgement, as the risk-assessment article requires residual risk.
+
+**Certificate validity.** A valid certificate must exist for HSTS to help, which the HTTPS-and-SEO article treats as a diagnostic, as the TLS discussion explains the protocol, as the security article treats controls as separate.
+
+**No mixed content.** Pages that load resources over HTTP undermine the rule, which the HTTPS-and-SEO article advises diagnosing, as the security-headers article covers related browser rules, as the diagnostic article recommends for verification.
+
+Three consequences follow. The header should be checked in production, as the diagnostics article advises, as the observability article treats signals as evidence. The max-age should be chosen deliberately, as MDN's reference advises, as the decision-memo article requires. And the result should be reviewed after an infrastructure change, as the monitoring article treats as a trigger.
+
+## A worked deployment
+
+The following is hypothetical and illustrative. A site enables HSTS with a long max-age after checking its HTTPS setup.
+
+Three checks decide whether the deployment is sound. First, do all endpoints return the header on HTTPS responses, as MDN's reference requires, with verification from actual responses, as the diagnostics article advises? Second, is the max-age and subdomain scope appropriate, as MDN's reference explains, with a recorded decision, as the decision-memo article requires, as the risk article requires residual risk? Third, are certificates valid and free of mixed content, as the HTTPS-and-SEO article advises, as the security-headers article treats related controls?
+
+Three conclusions follow. A header on one endpoint is a partial control, which the first check reveals. A long max-age is a commitment, as MDN's reference advises, as the decision-memo article requires. And the deployment should be reviewed, as the monitoring article advises, as the verification article recommends for evidence.
+
+## What HSTS metrics cannot do
+
+They cannot prove security, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as the security-headers article treats headers as defence in depth. They do not fix an invalid certificate, which the HTTPS-and-SEO article treats as a separate diagnostic, as the TLS discussion explains. And they cannot remove the need for other controls, which the OWASP ASVS material treats as a set, as the security article argues for a defined boundary.
+
+The counterargument that enabling HSTS solves HTTPS is fair about downgrade protection and incomplete about certificates and mixed content, which the worked deployment shows, as the HTTPS-and-SEO article advises.
+
+## A decision test
+
+1. Check the header on actual HTTPS responses, as MDN's reference and diagnostics advise.
+2. Verify max-age and subdomain scope, as MDN's reference explains.
+3. Confirm valid certificates, as the HTTPS-and-SEO article advises.
+4. Check for mixed content, as the HTTPS-and-SEO article recommends.
+5. Verify related headers, as the security-headers article advises.
+6. Record the decision and residual risk, as the decision-memo and risk articles require.
+7. Review after an infrastructure change, as the monitoring article advises.
+
+For the directive, see [MDN HSTS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security); for the related controls, see [Security Headers Explained](/articles/security-headers-explained).
+
+## Further Reading
+
+- MDN Web Docs, 2026. [Strict-Transport-Security header - HTTP | MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security) — Reference for the HSTS response header and its security effect.
+- OWASP Foundation, 2026. [OWASP Application Security Verification Standard](https://owasp.org/www-project-application-security-verification-standard/) — A verification framework for web application security controls.
