@@ -1,10 +1,57 @@
 ---
 title: "ETL Orchestration Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: ETL Orchestration Mistakes to Avoid."
-date: 2026-11-17
+description: "Orchestration decides when pipelines run and what happens when they fail. Read the mistakes, a worked example, and why a green job is not a correct result."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Data
+  - Engineering
+  - Pipelines
+  - Operations
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+ETL orchestration is often treated as scheduling, which ignores the harder parts: dependencies, retries, and what a successful run actually means. The ETL entry describes extract, transform, and load stages, as the Airflow entry covers orchestration of task dependencies, as the data-governance article requires provenance, as the observability article treats signals as evidence, as the risk article requires residual risk.
+
+**Direct answer:** Orchestrate pipelines with explicit dependencies, idempotent tasks, measured quality, and a clear failure path. Wikipedia's ETL entry provides the stages, and Airflow covers orchestration. The boundary: a completed run does not guarantee correct data, which the data-quality article warns, as the risk article requires residual risk, as the publication standard forbids guaranteed outcomes.
+
+## The mistakes
+
+**Confusing completion with correctness.** A job that finishes may have loaded wrong data, which the data-quality article warns, as the data-governance article requires provenance, as the evaluation-rubric article requires criteria, as the observability article treats signals, as the dashboard article argues, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+**Implicit dependencies.** A task that assumes another finished is a hidden coupling, which the Airflow entry treats, as the ETL entry describes stages, as the technical-debt article warns about complexity, as the data-modeling entry advises, as the monitoring article advises for review, as the decision-memo article requires a record, as the risk article requires residual risk.
+
+**Unsafe retries.** A retry that duplicates rows corrupts the result, which the ETL entry implies, as the data-quality article warns, as the data-governance article requires provenance, as the rollback article treats reversibility, as the incident article requires containment, as the monitoring article advises for review, as the risk article requires residual risk.
+
+**Missing lineage.** If a figure cannot be traced to its source, which the data-governance article requires, as the ETL entry describes stages, as the observability article treats signals, as the dashboard article argues, as the analytics article recommends, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+Three consequences follow. The stages should be explicit, as the ETL entry and Airflow entry advise, as the technical-debt article warns, as the data-modeling entry advises, as the monitoring article advises, as the decision-memo article requires, as the risk article requires residual risk, as the data-quality article warns, as the data-governance article requires provenance, as the evaluation-rubric article requires criteria, as the observability article treats signals, as the dashboard article argues, as the rollback and incident articles advise, as the analytics article recommends, as the decision-memo article requires for a record.
+
+## A worked example
+
+The following is hypothetical and illustrative. A nightly pipeline completes but reports a duplicated row count.
+
+Three checks decide. First, is the task idempotent, as the ETL entry and data-quality article advise, with a safe retry, as the rollback article advises? Second, are dependencies explicit, as the Airflow entry advises, with a trace, as the observability article recommends? Third, can the figure be traced to its source, as the data-governance article requires, with a recorded decision, as the decision-memo article requires, as the risk article requires residual risk?
+
+Three conclusions follow. Completion is not correctness, which the checks reveal. Idempotence matters, as the rollback and data-quality articles advise. And the decision should be recorded, as the decision-memo article requires.
+
+## What orchestration cannot do
+
+It cannot create data quality, which the data-quality article treats as upstream, as the publication standard forbids guaranteed outcomes, as the risk article requires residual risk. It does not replace monitoring, which the observability and monitoring articles require, as the dashboard article argues, as the rubric article requires criteria, as the incident article requires containment. And it cannot fix an unclear model, which the data-modeling entry treats, as the technical-debt article warns, as the decision-memo article requires a record, as the risk article requires residual risk.
+
+The counterargument that a scheduler solves reliability is fair for timing and incomplete for correctness, which the worked example shows, as the data-quality and data-governance articles advise, as the observability article treats signals, as the risk article requires residual risk.
+
+## A decision test
+
+1. Make dependencies explicit, as the Airflow entry advises.
+2. Make tasks idempotent, as the ETL entry and data-quality article advise.
+3. Measure correctness, as the evaluation-rubric article requires.
+4. Record lineage, as data governance requires.
+5. Monitor signals, as the observability article advises.
+6. Test the failure path, as the incident article requires.
+7. Record the decision and residual risk, as the decision-memo and risk articles require.
+
+For the stages, see [What ETL Orchestration Measures](/articles/what-etl-orchestration-actually-measures); for the pipelines, see [Data Pipelines](/articles/data-pipelines-airflow-prefect-and-orchestrating-etl-at-scale).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Extract, transform, load - Wikipedia](https://en.wikipedia.org/wiki/Extract,_transform,_load) — The stages and orchestration of data pipelines.
+- Wikipedia contributors, 2026. [Apache Airflow - Wikipedia](https://en.wikipedia.org/wiki/Apache_Airflow) — Orchestration of data pipelines and task dependencies.
