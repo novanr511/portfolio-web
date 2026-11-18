@@ -1,10 +1,88 @@
 ---
 title: "Tool Calling Examples"
-description: "Reserved title for a future NOVANDRI article: Tool Calling Examples."
-date: 2026-11-17
+description: "A tool call is a structured request with an authorisation boundary. Read examples, a worked failure, and why a valid schema is not a safe call."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Tool calling is often described as giving a model functions to use, which hides the boundary: the model requests, and the system decides whether to execute. Anthropic's tool-use documentation describes the request format, and OpenAI's structured-output guide covers schema enforcement. The examples show where the boundary matters.
+
+**Direct answer:** Treat a tool call as a request with a schema, an authorisation check, and a verified result — not as an instruction the system must obey. The sources describe the format; the boundary rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked failure, separating documented formats from local authorisation decisions.
+
+## The mechanism
+
+Three points matter:
+
+- **Schema defines shape.** The structured-output guide describes enforced formats. A valid call can still be the wrong call.
+- **Authorisation is separate.** The tool-use documentation describes how models request tools. Whether the request is permitted is a system decision.
+- **Results need verification.** A call can succeed technically and return stale or wrong data. The agent guidance treats checkpoints as controls.
+
+The sequence is: define the schema, check authorisation, execute, then verify the result. Authorisation is local policy, so it is `inferred`; the format is `source-reported`.
+
+## Worked examples
+
+*Illustrative.* An assistant can read a knowledge base and issue refunds.
+
+In one case, the model calls the refund tool with a valid schema but without confirming the amount with the user. The system should require a human check before execution, because the format is correct and the action is consequential. In another case, a knowledge result is stale; the agent should detect the mismatch and escalate rather than answer from it.
+
+The outcome is a boundary design with recorded controls. The scenarios are hypothetical; the separation of format from authorisation is the contribution.
+
+## Why results need checking
+
+A tool can return a well-formed result that is stale, incomplete, or from the wrong record. The model has no way to know this from the schema, which is why a verification step belongs in the design. For consequential actions, the check should happen before execution, not after.
+
+## What changes with state
+
+Read-only tools and state-changing tools share a format and deserve different controls. A wrong read can produce a wrong answer; a wrong write can change a customer record. Classifying tools by consequence is the step that makes authorisation decisions consistent across a system.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Models can request structured tool calls | `source-reported` | Anthropic tool-use docs | 2026-11-18 | API changes |
+| Outputs can be constrained to a schema | `source-reported` | OpenAI structured outputs | 2026-11-18 | API changes |
+| Check authorisation before execution | `inferred` | Derived from the request model | 2026-11-18 | Policy changes |
+
+## Why a valid schema is not a safe call
+
+A schema answers the question of whether a request is well-formed. It does not answer whether the request should be carried out. Conflating the two is the most common failure in tool-calling systems, because the technical check passes just before a consequential action.
+
+A final constraint is that a tool call is only as good as the descriptions the model reads. A vague description of what a tool does will produce plausible but incorrect calls, and no schema can fix that. Writing tool descriptions is therefore part of the engineering work, not a documentation afterthought.
+
+The examples also show why failures need to be grouped by cause. A malformed call, an unauthorised call, and a stale result each point to a different fix. Grouping them under a single tool error category hides which control is missing and makes the same problems recur.
+
+A final point concerns the interface a tool exposes. A tool with many optional parameters gives a model many ways to call it wrongly, while a narrow interface makes mistakes easier to spot. Designing the interface is therefore part of the safety work, not an implementation detail to revisit after a failure.
+
+The same logic applies to results. A tool that returns a large, unstructured response forces the model to interpret more, which creates more chance of error. Returning the fields the task needs is a small design change with a measurable effect on reliability.
+
+" A narrow tool interface is a safety control, not just a convenience for the model.
+
+The result belongs in the failure record alongside the call that produced it.
+
+## What it cannot do
+
+It cannot guarantee that a model chooses the right tool. It does not replace verification of the result. And it cannot remove the need for a human check on high-impact actions.
+
+The counterargument that a valid call is enough is fair for read-only tools and incomplete for tools that change state.
+
+## A decision test
+
+1. Define each tool's schema.
+2. Classify tools by consequence.
+3. Add authorisation checks.
+4. Verify results.
+5. Escalate on uncertainty.
+6. Record failures by cause.
+
+For the boundary, see [Tool Calling Reliability](/articles/tool-calling-reliability-when-function-calls-fail-in-agent-systems).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Tool use with Claude - Claude Platform Docs](https://docs.anthropic.com/en/docs/build-with-claude/tool-use/overview) — How client tools are defined, called and validated in an agent loop.
+- OpenAI, 2026. [Structured model outputs | OpenAI API](https://platform.openai.com/docs/guides/structured-outputs) — The official guide to constrained decoding and schema-enforced model outputs.

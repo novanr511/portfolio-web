@@ -1,10 +1,88 @@
 ---
 title: "Campaign Measurement at Scale"
-description: "Reserved title for a future NOVANDRI article: Campaign Measurement at Scale."
-date: 2026-11-17
+description: "At scale, measurement breaks on identity and timing. Read the issues, a worked example, and why more dashboards do not mean better evidence."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Method
+  - Measurement
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Campaign measurement at scale fails for structural reasons rather than a lack of tools. Google's measurement documentation describes conversion tracking, and the analytics event documentation covers event collection. The difficulty is connecting the two across systems and time.
+
+**Direct answer:** Measure campaigns by defining the conversion, aligning identity across platforms, and using a comparison for effect claims. The sources describe the mechanics; the measurement rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked audit, separating documented platform behaviour from local decisions about definitions.
+
+## The mechanism
+
+Three issues dominate:
+
+- **Definition drift.** A conversion in one platform is not necessarily the same event as in another. The measurement documentation describes tracking, not your definition.
+- **Identity gaps.** Event collection records actions, but joining them to a person across platforms is a separate problem. The event documentation covers collection, not identity resolution.
+- **Attribution claims.** A platform can report credit, which the attribution literature treats as a rule rather than a cause.
+
+The sequence is: define the event, check how each platform records it, align the window, then use a comparison for effect. The comparison is local work, so it is `inferred`; the mechanics are `source-reported`.
+
+## A worked audit
+
+*Illustrative.* Two platforms report different conversion counts for the same campaign.
+
+Three checks decide. First, do they define a conversion the same way — a purchase, or a signup counted as a purchase? Second, do they use the same attribution window and the same identity matching? Third, which figure agrees with the order system, the closest independent reference?
+
+The outcome is a reconciliation, not a choice of preferred dashboard. The scenario is hypothetical; the audit method is the contribution.
+
+## Why identity breaks first
+
+At scale, the same person appears in several systems under different identifiers. A campaign platform may count a conversion that the analytics system attributes to another source, and neither is necessarily wrong. The mismatch is a property of the measurements, not an error anyone can fix by choosing a better dashboard.
+
+The practical response is to decide which system is the reference for the business outcome, usually the one closest to the transaction, and treat platform figures as views. That decision should be recorded so the team does not relitigate it whenever the numbers disagree.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Platforms document conversion tracking | `source-reported` | Google Ads measurement docs | 2026-11-18 | Product changes |
+| Events can be collected and structured | `source-reported` | Analytics event docs | 2026-11-18 | Platform changes |
+| Reconcile definitions before comparing figures | `inferred` | Derived from measurement practice | 2026-11-18 | Tracking changes |
+
+## Why more dashboards do not help
+
+An additional dashboard adds another view of the same unresolved definitions. Unless the event and the window are aligned, a comparison across dashboards is measuring the platforms' rules. Reconciliation against an independent record, such as orders, is what turns the numbers into evidence.
+
+A further limit is time. A platform can report a conversion immediately and revise it later as identities resolve, which means the same campaign has different numbers depending on when it is read. Recording the observation date is therefore part of the measurement, not a detail for the report footer.
+
+None of this removes the need for incrementality tests. Reconciliation makes the figures consistent; a comparison is still required to know whether the campaign caused the outcome. A team that does only the first will have reliable numbers that answer the wrong question.
+
+A final consideration is the cost of the measurement system itself. A large stack of platforms, event schemas, and reconciliation work has a running cost in people and time. A team that spends more on measurement than the decisions it informs has inverted the purpose of the system, which is a question worth asking when the number of dashboards grows.
+
+The useful discipline is to keep only the measurements that change a decision. A report nobody acts on is a cost, and removing it is often more valuable than adding another view. Recording which decisions each report supports makes that judgement possible.
+
+A measurement that nobody acts on should be removed before another one is added.
+
+The date of each observation belongs in the record, because the figures can be revised after they are first reported.
+
+The reference system should be named in the report so that a reader knows which figure to trust when the dashboards disagree.
+
+## What it cannot do
+
+It cannot prove causation from platform credit. It does not remove the need for a comparison design. And it cannot fix a conversion that was defined wrongly at the start.
+
+The counterargument that the platform number is authoritative is fair as a record of its rules and incomplete as a business result.
+
+## A decision test
+
+1. Define the conversion.
+2. Document each platform's definition.
+3. Align windows and identity.
+4. Reconcile with an independent record.
+5. Use a comparison for effect.
+6. Record the decision and recheck date.
+
+For the credit question, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation).
+
+## References & Further Reading
+
+- Google Ads Help, 2026. [About attribution models - Google Ads Help](https://support.google.com/google-ads/answer/6259715) — First-party documentation of attribution models and their limits.
+- Google Analytics Help, 2026. [About events (Google Analytics 4)](https://support.google.com/analytics/answer/9322688) — How an event is defined as a measurable interaction or occurrence, and why the event model determines what can be reported at all.
