@@ -1,10 +1,75 @@
 ---
 title: "Continuous Learning Best Practices"
-description: "Reserved title for a future NOVANDRI article: Continuous Learning Best Practices."
-date: 2026-11-17
+description: "Deployed models degrade as data changes. Read how concept drift and MLOps shape continuous learning, with a worked example and explicit claim status."
+date: 2026-11-18
 tags:
-  - Planned
-  - Career
+  - AI
+  - Method
+  - Operations
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A model that performs well at launch can degrade quietly as the world it learned from changes. Teams often treat deployment as the finish line, so the shift is noticed only after decisions have worsened. Continuous learning is the discipline of detecting that change and responding to it in a controlled way.
+
+**Direct answer:** Continuous learning means monitoring for concept drift and feeding the signal back into a versioned retraining pipeline. The sources describe drift and the MLOps lifecycle; the rule that connects a drift signal to a retraining decision is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example beyond the sources: it maps drift detection to a retraining decision, with claim status explicit.
+
+## The mechanism
+
+Concept drift describes a change in the statistical relationship a model learned, such as when the distribution of inputs shifts or the mapping from input to outcome changes. The source distinguishes gradual, sudden, and recurring forms. The practical consequence is that a single training snapshot cannot be assumed to stay valid; what was true at training time may stop being true in production.
+
+MLOps brings versioning, automated testing, and monitoring to the machine learning lifecycle. It treats a model as a system that moves through stages, not a file that is handed over once. Continuous training and continuous monitoring are part of that lifecycle, so a retraining event is a controlled release with a record, not an ad hoc notebook run.
+
+Putting the two together produces a loop: monitor the input and outcome distributions, compare them to a documented baseline, and treat a sustained deviation as a trigger to retrain. The trigger matters because a drift alert on its own has no operational meaning. It must be tied to a decision someone is authorized to make.
+
+Versioning is what makes the loop safe. Each retrained model should be tied to the data period it saw and the evaluation that justified it. That record turns a retraining decision into something reviewable, and it allows a rollback when the new version performs worse.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team runs a model that scores incoming applications, and its launch accuracy was strong. Six months later the average score is unchanged, but the share of one applicant category has doubled.
+
+Three checks decide the response. First, is the input shift gradual or sudden, since that changes how quickly a retrain is needed? Second, has the outcome for that category changed, or only its volume? Third, does the current evaluation set still represent the live population? The outcome is a decision to retrain on a refreshed window, with the old version kept for rollback. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Concept drift covers changes in learned relationships over time | `source-reported` | Wikipedia, Concept drift | 2026-11-18 | Definition changes |
+| MLOps applies lifecycle versioning and monitoring | `source-reported` | Wikipedia, MLOps | 2026-11-18 | Practice changes |
+| Tie drift signals to a versioned retraining decision | `inferred` | Derived from the sources | 2026-11-18 | Pipeline changes |
+
+The two source-reported rows describe the concepts; the inferred row is the local choice that connects them. The drift entry defines what changes, and the MLOps entry defines how a response is governed. Recheck conditions are tied to material changes in the definitions or the pipeline, not to the passage of time.
+
+## What it cannot do
+
+Continuous learning cannot tell you that a model is correct. It can tell you that something has changed and that a response is due. A drift signal starts an investigation; it does not complete one, and treating it as proof of a problem will train the team to ignore the alerts.
+
+It does not remove the need for labels. Outcome drift can only be measured once outcomes arrive, and in many systems that lag is long. Input monitoring is an earlier proxy, but a proxy is not the thing itself. A team that relies only on input shifts may retrain in response to harmless variation while missing a serious change in a small segment.
+
+There is a hidden cost in retraining frequency. Each retrain consumes compute and engineering attention, and each new version needs its own evaluation and approval. A pipeline that retrains on every fluctuation produces churn, and the team spends its time reviewing releases instead of understanding the model. The discipline is to retrain on sustained, decision-relevant change, not on noise.
+
+A failure mode is silent feedback. If a model's own outputs influence the data it later learns from, a bias can be amplified with each cycle. Drift monitoring that watches only aggregate distributions will miss this, because the aggregate may look stable while the feedback loop narrows the range of cases the model sees. Spotting it requires segment-level review and a record of what the model was allowed to observe.
+
+The boundary is that these sources describe concepts, not a threshold. They do not say how large a drift must be before a retrain is justified. That threshold is a local decision that depends on the cost of a wrong prediction and the cost of a retrain. It must be set by the team and reviewed when either cost changes, because a threshold copied from another context carries assumptions that do not transfer.
+
+Counterargument: "The counterargument that watching accuracy is enough is fair for a static, well-understood input space and incomplete when the relationship between inputs and outcomes drifts over time."
+
+## A decision test
+
+1. Document the baseline the model was trained against.
+2. Monitor input distributions for sustained shifts.
+3. Monitor outcomes when labels become available.
+4. Classify the drift as gradual, sudden, or recurring.
+5. Decide whether the shift is decision-relevant.
+6. Retrain on a refreshed window and keep the old version.
+7. Record the trigger, the decision, and the recheck condition.
+
+Continuous learning is a loop, not a one-time configuration, and its value comes from the quality of the decision at its center. A team that can explain why it retrained, and can point to the signal that prompted it, has a process that survives review. A team that cannot should fix the record before adding more automation.
+
+For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Concept drift - Wikipedia](https://en.wikipedia.org/wiki/Concept_drift) — Changes in the relationship a model learned.
+- Wikipedia contributors, 2026. [MLOps - Wikipedia](https://en.wikipedia.org/wiki/MLOps) — Practices for deploying and maintaining ML systems.

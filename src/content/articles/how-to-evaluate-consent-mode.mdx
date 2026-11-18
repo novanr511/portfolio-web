@@ -1,10 +1,72 @@
 ---
 title: "How to Evaluate Consent Mode"
-description: "Reserved title for a future NOVANDRI article: How to Evaluate Consent Mode."
-date: 2026-11-17
+description: "A consent-mode check is not a compliance verdict. Read how vendor guidance and state regulations frame an evaluation and what testing alone cannot establish."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Privacy
+  - Method
+  - Evaluation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Evaluating consent mode means checking that a technical signal produces the behavior a policy promises. Google's Analytics Help describes how consent states change tag behavior and where modeling fills reporting gaps, while the California Privacy Protection Agency publishes regulations governing consumer rights and opt-outs. The real problem is that teams evaluate the implementation and the legal obligation as one thing, so a passing tag test is read as a compliance conclusion.
+
+**Direct answer:** Evaluate consent mode on two separate tracks: does the tag behave as configured under each consent state, and does that behavior satisfy the applicable rules? The vendor guidance informs the first; the regulations inform the second. A result is only as strong as the weaker track.
+
+**Delta:** This article adds a claim-status table and a two-track evaluation test beyond the sources: it maps each check to a decision, with claim status explicit.
+
+## The mechanism
+
+Google's documentation sets out consent states and the behaviors that follow, including the role of advanced consent mode and modeled data when consent is denied. For evaluation, this defines the expected behavior to test against: a granted state should allow the configured tags, and a denied state should constrain them. The consequence is that the vendor guidance gives a concrete specification for the technical track, and a test without such a specification has no pass condition. It can only report what happened, not whether it was correct.
+
+The California Privacy Protection Agency publishes regulations that implement state privacy law, covering consumer rights, opt-out of sale or sharing, and recognition of opt-out preference signals. These rules bear on consent mode because a technical signal is only meaningful if the processing it gates is subject to the rule in question. The consequence is that the legal track asks a different question from the technical one: not whether the tag obeyed the state, but whether the state was the right control for that purpose. An opt-out right and a consent gate are not interchangeable.
+
+The sources provide a behavior specification and a regulatory baseline but not a combined evaluation procedure. Designing that procedure is a synthesis and is marked inferred. A reasonable structure runs the technical check first, because a tag that does not honor its state fails regardless of law, then the legal check, because correct behavior under the wrong basis still fails. Other teams may reverse the order, and the claim is only that keeping the tracks separate prevents a clean result on one from masking a gap in the other.
+
+The output of an evaluation is a paired record: for each purpose, a technical result and a legal result, each with its own evidence. That pairing is the decision instrument. Without it, a reviewer sees only a green test and cannot tell which question it answered, so a narrow pass is easily read as a broad assurance.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team audits its consent-mode setup before an expansion. Three checks structure the evaluation. First, under each consent state, does the tag behave as the vendor guidance specifies? Second, does the purpose to which the tag relates fall under an opt-out right in the applicable regulations, and is that right honored? Third, is modeled data labeled so a reader can distinguish it from observed data? The audit finds that tags obey their states but one purpose lacks a documented opt-out path, and a report omits the model label. The team fixes the path and the label. The outcome is a specific remediation, not a declaration that the site is compliant everywhere. The findings are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Vendor guidance defines consent-state behavior and modeled data | `source-reported` | Google Analytics Help | 2026-11-18 | Consent mode docs updated |
+| State regulations cover opt-out rights and preference signals | `source-reported` | CPPA Regulations | 2026-11-18 | Regulations amended |
+| Separating technical and legal tracks improves evaluation results | `inferred` | Derived from the sources | 2026-11-18 | Applicable law or tag set changes |
+
+The first two rows reflect what the sources state and should be rechecked when the guidance or regulations change. The third is an inference, since neither source defines an evaluation procedure. Recheck it when applicable law or the tag set changes.
+
+## What it cannot do
+
+An evaluation cannot certify compliance. It produces evidence about specific questions at a point in time: whether tags behaved as configured, whether a purpose had the required control. Neither the vendor guidance nor the regulations turn that evidence into a verdict, and a passing check in one jurisdiction says nothing about another. A report should present findings, not a stamp of approval, because the scope of the check is always narrower than the scope of the obligation.
+
+The hidden cost is repetition. Consent behavior depends on the current tag set, the current consent platform, and the current interpretation of the rules, all of which change. An evaluation that is not repeated goes stale quietly, because the test result stays green while the underlying configuration drifts. The cost is paid in scheduled re-testing and in the discipline to keep the paired record current, and it is invisible until someone asks for evidence that no longer matches the site.
+
+A common failure mode is testing only the granted state. Tags often behave correctly when consent is given and incorrectly when it is denied, yet many checks verify only the easy path. Another is conflating the signal with the right: a tag may honor an opt-out preference signal correctly while the underlying purpose remains one for which the law requires more. Both failures hide behind a clean result, which is why the denied path deserves at least as much attention as the granted one.
+
+There is a boundary around what a technical test can show. It can observe that a tag stayed quiet; it cannot establish that the processing was lawful or that the consent was informed. Nor does the vendor guidance resolve questions of purpose limitation or retention. Those require a separate legal review, and an evaluation that claims to cover them has overstated its reach. The honest report names what was tested and leaves the rest open.
+
+Because law and configuration move, the evaluation needs a review cadence. Each finding should carry a recheck condition, so a regulatory amendment or a new tag triggers a fresh check rather than a quiet assumption. Without that record, a future reviewer cannot tell whether a pass reflected the current rules or an older set, and the evaluation stops being reliable evidence.
+
+The counterargument that a single green tag test is fair for a quick sanity check is incomplete when the result is used to answer a legal question.
+
+## A decision test
+
+1. Inventory tags, purposes, and consent states.
+2. For each state, verify behavior against vendor guidance.
+3. Identify which purposes fall under applicable opt-out rules.
+4. Verify the required controls for those purposes.
+5. Check that modeled figures are labeled as estimates.
+6. Record technical and legal results separately.
+7. Attach a recheck condition to each finding.
+
+Evaluation is useful when it answers a bounded question. The two-track test keeps a passing tag check from being read as a compliance verdict, and it forces the legal question to be answered on its own evidence rather than borrowed from a technical pass.
+For further reading, see [Related](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Google, 2026. [Consent mode on websites and mobile apps - Analytics Help](https://support.google.com/analytics/answer/9976101) — Google consent mode behaviour and signals.
+- California Privacy Protection Agency, 2026. [California Privacy Protection Agency — Regulations](https://cppa.ca.gov/regulations/) — The California privacy rules and the implementing regulations.

@@ -1,10 +1,72 @@
 ---
 title: "AI Roadmap Planning at Scale"
-description: "Reserved title for a future NOVANDRI article: AI Roadmap Planning at Scale."
-date: 2026-11-17
+description: "A roadmap is a sequence of decisions under uncertainty. Read how use-case guidance and a risk framework map to sequencing choices, with a worked example."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Planning
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An AI roadmap at scale is often mistaken for a list of models to adopt. The Anthropic use-case guides describe common task patterns such as summarization, extraction, and classification, while NIST's AI Risk Management Framework sets out functions for governing and managing risk. The real problem is that teams sequence use cases by excitement rather than by readiness and risk, then find the plan cannot survive review.
+
+**Direct answer:** Treat a roadmap as an ordered set of bets, each tied to a use case and a risk posture. Select candidates the use-case guidance shows are tractable, then apply the risk functions to decide which move first. The sequence is a judgment, not something either source prescribes.
+
+**Delta:** This article adds a claim-status table and a use-case-to-sequence test beyond the sources: it maps each candidate to a roadmap position, with claim status explicit.
+
+## The mechanism
+
+The Anthropic use-case guides organize common Claude applications into task patterns, each with practical advice on structuring the interaction. Their value for planning is that they turn a vague ambition to use AI into named, bounded tasks. A roadmap built from named tasks can be estimated and contested; one built from ambition cannot. The practical consequence is that the first planning step is to describe each candidate as a specific use case rather than as a technology, because a technology label hides what the system is actually being asked to do.
+
+NIST's AI Risk Management Framework is a voluntary framework organized around functions commonly summarized as govern, map, measure, and manage. It is designed to be used across the lifecycle and adapted to context, with trustworthiness characteristics such as validity, safety, transparency, privacy, and fairness. For planning, it supplies a risk lens rather than a schedule: each candidate can be examined for what must be governed and what must be measured before it advances. The framework does not hand a team a date or a priority, only a set of questions to answer.
+
+The sources provide a task vocabulary and a risk vocabulary but not a sequencing rule. Deciding which use case moves first is a synthesis and is marked inferred. A reasonable rule is to favor candidates that are well-bounded by the use-case guidance and low in unmanaged risk, then advance to riskier ones as measurement capacity grows. Other organizations may weight risk differently, and the claim here is only that the mapping makes the weighting visible so a reviewer can challenge it.
+
+The output of roadmap planning is an ordered list, each entry carrying its use case, its risk posture, and the evidence needed to advance it. That record is the decision instrument. Without it, a roadmap is a collection of unranked ambitions, and reviewers cannot tell why one item precedes another or what evidence would change the order.
+
+## A worked example
+
+The following is hypothetical and illustrative. A large team considers three AI use cases: document summarization, customer classification, and an automated decision affecting individuals. Three checks set the order. First, is the task bounded and described by the use-case guidance, or open-ended? Second, what does the risk framework require to govern and measure it before launch? Third, does the team already have the evaluation capacity to detect failure? Summarization is bounded and low risk and moves first; classification follows after an evaluation harness is in place; the automated decision is deferred pending governance review. The outcome is a sequence justified by readiness, not a forecast of value. The use cases and order are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Use-case guidance organizes common AI tasks into bounded patterns | `source-reported` | Anthropic use-case guides | 2026-11-18 | Platform docs updated |
+| The AI RMF organizes risk work into govern, map, measure, manage | `source-reported` | NIST AI RMF | 2026-11-18 | Framework revision published |
+| Ranking use cases by readiness and risk improves roadmap decisions | `inferred` | Derived from the sources | 2026-11-18 | Risk appetite or context changes |
+
+The first two rows rest on what the sources state and should be rechecked when the platform docs or the framework are revised. The third is an inference, because neither source ranks use cases for a roadmap. Recheck it when the organization's risk appetite or operating context changes.
+
+## What it cannot do
+
+A roadmap cannot predict which use cases will pay off. The use-case guides describe task patterns, not outcomes in a particular organization. The risk framework manages risk, not value. A plan that presents its sequence as a forecast overstates what either source supports, because the sequence is an ordered bet and bets can be wrong. A roadmap is a tool for deciding what to try next under uncertainty, not a promise about returns.
+
+The hidden cost is maintenance. A roadmap that carries risk posture and evidence requirements per item takes effort to keep current, because both the use-case landscape and the risk context shift. Teams that treat the document as a one-time artifact let it drift until no one trusts the order. The cost is paid in recurring review, not in writing the first draft, and it grows with the number of items because every item carries its own assumptions.
+
+A common failure mode is sequencing by visibility. A demo-friendly use case jumps the queue because it photographs well, while a low-risk but unglamorous one waits. The risk framework offers no protection against this on its own; it only works if applied consistently to every candidate. A roadmap that skips risk review for favored items is a wish list with a framework attached, and the omission is hard to see once the plan has been circulated.
+
+There is a boundary around what risk management can express. The framework is voluntary and context-dependent, so it does not produce a pass or fail score that settles a decision. Nor does the use-case guidance say when a task is ready for production at scale. Both inform judgment, and neither replaces the decision about whether an organization can support a system once deployed. A team still has to make the call and own it.
+
+Because context changes, the order needs periodic review. Each entry should carry a recheck condition, so a shift in risk posture or in available evaluation capacity can move an item deliberately. Without that record, a future reviewer cannot tell whether the sequence reflected a real assessment or the enthusiasm of a particular quarter, and the roadmap loses its value as a decision record.
+
+The counterargument that ranking by readiness is fair for early pilots is incomplete when a use case carries regulatory or safety risk that dominates all other factors.
+
+## A decision test
+
+1. Name each candidate as a bounded use case.
+2. Map it to the task patterns in the use-case guidance.
+3. Identify the governance and measurement the risk framework requires.
+4. Assess available evaluation capacity for detecting failure.
+5. Rank by readiness and risk, not by visibility.
+6. Attach the evidence needed for each item to advance.
+7. Assign a recheck condition to every position.
+
+A roadmap is useful when its order can be defended. The test turns ambition into a ranked set of bets, each tied to a use case and a risk posture, so a demo cannot outrank a real readiness assessment.
+For further reading, see [Related](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

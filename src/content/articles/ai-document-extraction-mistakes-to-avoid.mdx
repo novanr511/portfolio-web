@@ -1,10 +1,71 @@
 ---
 title: "AI Document Extraction Mistakes to Avoid"
-description: "Reserved title for a future NOVANDRI article: AI Document Extraction Mistakes to Avoid."
-date: 2026-11-17
+description: "Extraction errors look clean in JSON. Read how field validation and escalation turn extracted data into a governed step, with a worked example and limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Document extraction
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams use AI to pull fields from invoices, forms, and contracts because the output arrives as clean, structured data. That cleanliness is misleading: a field can be present, correctly formatted, and wrong. The real problem is that extraction errors propagate into downstream systems before anyone notices, because nothing in the output marks which values are uncertain.
+
+**Direct answer:** AI document extraction is dependable only when its output is validated against the source and treated as a governed risk step. The Anthropic use-case guides describe extraction patterns; the NIST AI Risk Management Framework supplies the surrounding risk process. Treat every extracted field as a candidate value with a measured error rate, and route low-confidence or high-stakes fields to a human.
+
+**Delta:** This article adds a validation-and-escalation mapping beyond the sources: it maps an extracted field and its confidence to a review decision, with claim status explicit.
+
+## The mechanism
+
+The Anthropic use-case guides collect practical patterns for applying a model to common work, including turning unstructured documents into structured fields. In a typical extraction pipeline, a prompt asks the model to return values that match a defined schema. The practical consequence is that structure is an instruction, not a guarantee. A response can conform to the schema perfectly while containing a value that is not in the document, because the model satisfied the format without grounding the content.
+
+That gap is where most extraction mistakes live. A blank field may be filled with a plausible guess rather than left empty. A table may be read with columns shifted, so a quantity lands in the price field. A total may be copied from the wrong line. None of these errors is visible in the JSON: the types are right and the keys are present. The practical consequence is that mechanical schema checks catch malformed output but not wrong values, so teams need a second check that compares the extracted value back to the source.
+
+The NIST AI Risk Management Framework provides the structure for that second check. Its Govern, Map, Measure, and Manage functions ask an organization to define risk tolerances, measure performance, and decide how risks are handled. The practical consequence is that extraction becomes a measurable control: each field gets an observed error rate, a tolerance for how much error is acceptable, and a defined path for cases that fall outside it. The framework does not supply those numbers; it supplies the discipline for recording them.
+
+The sources connect where neither is specific. An extraction result often carries a confidence signal, and governance decides what that signal means for a given field. A confidence below an agreed tolerance can trigger human review; a high-stakes field might require review regardless of confidence. Neither source fixes a tolerance for a particular document type, so any such cutoff is local and must be marked as inferred. The output is a mapping from each extracted field to a validation or escalation action, with the observed error rate recorded beside it.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team extracts totals from supplier invoices to post them to a ledger. Three checks decide whether a value is trusted. First, a schema check confirms that the required fields exist and parse as numbers. Second, a source check recomputes the total from extracted line items and confirms the figure appears in the document. Third, an escalation check applies the agreed tolerance: a total whose confidence falls below it goes to a reviewer instead of posting automatically. The outcome is that routine invoices post unattended while uncertain ones are held. This is a method, not a claim about achieved accuracy; the numbers are hypothetical.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Use-case guides describe patterns for extracting structured data | `source-reported` | Anthropic guides | 2026-11-18 | Docs updated |
+| AI RMF organizes risk work into Govern, Map, Measure, Manage | `source-reported` | NIST AI RMF | 2026-11-18 | Framework revised |
+| Per-field tolerance and escalation are local decisions | `inferred` | Derived from the sources | 2026-11-18 | Document types change |
+
+The first two rows are factual claims taken from the sources. The third is an inference, because neither source fixes a tolerance for a specific document or field. Recheck the guide claim when the documentation is updated, the framework claim when the NIST document is revised, and the inferred claim when the document types flowing through the pipeline change.
+
+## What it cannot do
+
+Extraction cannot establish that a value is true. It produces a structured guess from a document, and a guess that matches the schema is still a guess. A validator that checks types and ranges will pass a wrong value that happens to be well formed. The practical distinction is between conformance and correctness: the model can satisfy the output contract while failing the business question. Anyone who needs assurance that a recorded total is right must compare it with the source or with an independent calculation, not with the extraction output itself.
+
+The hidden cost is the validation layer. Measuring per-field error rates needs labeled examples, and maintaining them needs review time that eats into the automation savings. Human escalation is the most expensive part, precisely because it catches the cases the model cannot handle. Teams that skip this cost get faster pipelines and quieter errors. The investment pays off only where a wrong field is costly enough to justify the check. Deciding where that line sits is a business decision, not a model decision.
+
+The main failure mode is drift. New document templates, scanned images, and unusual layouts change the error profile without changing the code. A tolerance set on clean digital invoices may be far too loose for photographed forms. Confidence scores can also be poorly calibrated, so a confident wrong value passes the gate. The relevant question is not the average accuracy reported on a benchmark, but the error rate on the specific documents flowing through the pipeline today. That requires ongoing sampling and review, not a one-time evaluation.
+
+There is a boundary around the method. It extracts information that is present in a document; it does not authenticate the document, detect a forged signature, or resolve an ambiguity that requires domain judgment. It cannot tell a correct total from a deliberately falsified one. It does not interpret a contract clause or decide which of two conflicting figures is authoritative. For those judgments a domain reviewer is still required. The extraction step narrows the work by structuring the document, but it does not replace the expertise that interprets it.
+
+Because templates, documents, and models change, the tolerances and error rates need periodic review. A gate that was safe on last quarter's invoice set may admit errors on a new supplier's format. The tolerance and the escalation path should be owned by a named party, with a recorded recheck condition. Without that record, a future reviewer cannot tell which thresholds were measured and which were convenient defaults. The output and the policy governing it must be revisited together.
+
+The counterargument that extraction is fair for high-volume, low-stakes forms is incomplete when a single wrong field feeds a financial record.
+
+## A decision test
+
+1. Is the required schema defined for the document type?
+2. Has an error rate been measured for each field on real documents?
+3. Is there a check that compares extracted values back to the source?
+4. Is a tolerance set per field, with a named owner?
+5. Does low confidence or high stakes trigger human review?
+6. Are blank fields preserved rather than filled with guesses?
+7. Is there a recheck condition for new templates or model changes?
+
+An extraction pipeline is trustworthy to the degree that its errors are measured and its escalations are owned. The test turns a plausible-looking output into a sequence of checks with a visible rationale, so a reviewer can see which fields are validated, which are escalated, and when the tolerances must be revisited. For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

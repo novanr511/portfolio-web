@@ -1,10 +1,73 @@
 ---
 title: "Consent Mode: Common Questions"
-description: "Reserved title for a future NOVANDRI article: Consent Mode: Common Questions."
-date: 2026-11-17
+description: "A bounded guide to what consent mode does and does not do, mapping Google tag behaviour to GDPR consent duties with clear claim status."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Consent Management
+  - Consent Mode
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often install consent mode and assume the measurement question is settled, or assume it makes them compliant. Both readings are wrong in different ways. The technical signal and the legal duty are separate layers, and confusing them produces reports that look complete but rest on no valid basis.
+
+**Direct answer:** Consent mode is a Google configuration that tells tags whether a user has granted consent and adjusts how those tags collect and send data. Google's help documentation describes that behaviour, while the GDPR text sets the legal conditions for lawful processing: consent must be freely given, specific, informed, and unambiguous. The practical move is to treat consent mode as measurement plumbing, not as a compliance certificate.
+
+**Delta:** This article adds a clear separation beyond the sources: it maps consent signals to reporting and legal decisions, with claim status explicit.
+
+## The mechanism
+
+Google's help entry describes consent mode as a way for a site or app to communicate a user's consent state to Google tags, which then adapt their behaviour. When consent is granted, tags can operate with the full set of data collection features. When it is denied, the tags restrict what they send. The practical consequence is that the data pipeline becomes conditional: the same page can produce different data depending on a state the analytics platform does not itself decide.
+
+The GDPR text defines consent as any freely given, specific, informed, and unambiguous indication of the data subject's wishes, given by a statement or clear affirmative action. It also establishes that processing needs a lawful basis and that data minimisation and purpose limitation apply. The practical consequence is that the validity of the consent is a legal question about how the choice was obtained, not a technical question about which tags fired.
+
+The two layers meet at the consent interface. Consent mode can only act on the state it is given, so a banner that pre-ticks boxes, hides the reject option, or fires tags before a choice is made undermines the signal at its source. Conversely, a well-designed banner cannot rescue a tag setup that ignores the state it receives. The practical consequence is that both the user interface and the tag configuration must be checked; neither compensates for a failure in the other.
+
+A fourth consideration is what happens to missing data. Where consent is denied, reporting can include behavioural modelling that estimates aggregate outcomes rather than observing each event. The practical consequence is that some reported conversions are modelled estimates, not direct measurements. A team using those numbers for fine-grained attribution is drawing conclusions from a reconstruction, so the mechanism ends with a distinction between observed and modelled data that the reporting layer must preserve.
+
+## A worked example
+
+The following is hypothetical and illustrative. An online retailer has enabled consent mode and sees conversion volumes recover after a drop, with no change in traffic. Three checks decide how the numbers should be read. First, the banner is inspected: rejection must be as easy as acceptance, and no tag may fire before a choice. Second, the tag configuration is checked against the consent state, so that denied consent actually restricts collection. Third, reports are separated into observed and modelled conversions before any campaign comparison. The outcome: the recovered totals are usable for broad trend reporting but not for precise per-campaign attribution, and the compliance conclusion depends on the banner, not on the presence of consent mode.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Consent mode adjusts Google tag behaviour to the consent state | `source-reported` | Consent mode help - Google | 2026-11-18 | Google updates the consent mode documentation |
+| GDPR requires consent to be freely given, specific, informed, and unambiguous | `source-reported` | GDPR legal text - EU | 2026-11-18 | The regulation or its interpretation changes |
+| Consent mode does not by itself establish a lawful basis | `inferred` | Derived from the sources | 2026-11-18 | Regulators issue new guidance on consent signals |
+
+The first two rows restate what the sources say and are comparatively stable, though product documentation moves faster than law. The third row is an inference from holding the two layers apart. It is a planning assumption, not a legal opinion, and it should be rechecked whenever platform documentation or regulatory guidance changes.
+
+## What it cannot do
+
+Consent mode does not give consent, and it does not replace a consent management platform. It is a signalling mechanism: it reports a state that must have been validly obtained elsewhere. A team that treats installation as compliance has confused the pipe with the permission. The practical consequence is that every question about whether consent was freely given remains unanswered by the configuration, and those are the questions a regulator would ask first.
+
+The hidden cost sits in data quality. Once consent is denied and outcomes are modelled, reported numbers are estimates with uncertainty that a dashboard rarely shows. The loss is not only volume but granularity: segment-level and user-level detail thins out, and comparisons across periods with different consent rates become unreliable. Implementation adds its own cost, because tag firing order, region-specific settings, and multiple consent frameworks must be maintained. The practical consequence is that the apparent recovery of reporting after configuration deserves scrutiny before it is used as evidence of anything.
+
+A common failure mode is firing tags before consent is registered. When analytics or advertising tags run on page load, the consent state arrives too late, and the configuration cannot undo collection that already happened. A related failure is designing a banner that makes rejection difficult or buries it behind extra steps, which calls into question whether consent was freely given. The practical consequence is that the two most consequential errors occur before the data pipeline is considered, in interface and ordering decisions that a measurement review alone will not catch.
+
+There are boundaries to the tool's reach. Consent mode describes Google's behaviour on sites and apps that implement it; it says nothing about other processors, about cookies set by third parties outside that configuration, or about processing that relies on a lawful basis other than consent. A site with a complex vendor stack still needs an inventory of what each tag does. The honest boundary is that consent mode is one component of a measurement and privacy programme, not the programme itself, and using it as a shield invites exactly the gaps it cannot close.
+
+Finally, the setup needs review because both consent rates and documentation change. A design that produced clear signals last year can drift as new tags are added or as regulatory guidance is clarified. The practical requirement is to document which tags respect the consent state, to check the banner periodically, and to record when reporting relies on modelled rather than observed data. Without that discipline, the team cannot explain a change in reported outcomes, and the explanation matters more than the number.
+
+The counterargument that consent mode is pointless because it does not create compliance is fair for teams seeking a legal guarantee and incomplete for teams that need conditional measurement, where it genuinely preserves useful aggregate signal under a valid consent regime.
+
+## A decision test
+
+1. State the reporting or compliance question the consent setup must support.
+2. Confirm that consent is obtained freely, specifically, informedly, and unambiguously.
+3. Verify that no analytics or advertising tag fires before a choice is made.
+4. Check that the consent state reaching the tags matches the user's actual choice.
+5. Separate observed from modelled outcomes in reports.
+6. Inventory other processors and tags outside the consent mode configuration.
+7. Schedule a review when documentation, tags, or banner design changes.
+
+These steps put the user's choice ahead of the reporting layer. The test is passed when the team can show how consent was obtained, how the tags behaved, and which reported figures were modelled, and failed when the configuration is offered as proof of compliance. Revisit the test whenever the tag inventory or the banner changes.
+
+For further reading, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Google, 2026. [Consent mode on websites and mobile apps - Analytics Help](https://support.google.com/analytics/answer/9976101) — Google consent mode behaviour and signals.
+- European Union, 2016. [General Data Protection Regulation (GDPR) - Legal Text](https://gdpr-info.eu/) — Full text of the EU data protection regulation.

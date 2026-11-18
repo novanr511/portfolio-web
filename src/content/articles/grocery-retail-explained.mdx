@@ -1,10 +1,71 @@
 ---
 title: "Grocery Retail Explained"
-description: "Reserved title for a future NOVANDRI article: Grocery Retail Explained."
-date: 2026-11-17
+description: "Grocery retail is an operating system for perishables and throughput. Learn how store layout and point-of-sale data connect to decisions, with a worked example."
+date: 2026-11-18
 tags:
-  - Planned
   - Retail
+  - Operations
+  - Grocery retail
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A grocery store looks like a simple place to buy food, but it runs on tightly coupled decisions about assortment, shelf space, and perishable stock. The grocery store entry describes the store format and its departments, and the point of sale entry describes the system that records transactions. The real problem is that these two layers are often managed separately, so inventory records and sales data drift apart.
+
+**Direct answer:** A grocery store is a perishable-inventory operation organised into departments, and a point-of-sale system is the transaction layer that records sales and often updates inventory. Linking the two lets a manager see which departments sell and which stock ages. The sources describe the formats and the POS role; neither provides a stocking rule.
+
+**Delta:** This article adds a shelf-to-ledger map beyond the sources: it maps each department decision to the POS signal that verifies it, with claim status explicit.
+
+## The mechanism
+
+A grocery store is a retail format selling food and household products, typically organised into departments and aisles. The entry describes how the format ranges from small neighbourhood shops to larger supermarkets and how perishable goods sit alongside shelf-stable ones. The practical consequence is that space and freshness are both limited resources. A decision to give more shelf space to one category takes it from another, and a decision about how much perishable stock to order has a short deadline attached. Those trade-offs are local to a department and to a particular store.
+
+A point-of-sale system is the hardware and software used to complete sales transactions. The entry describes how it replaces a simple cash register and can handle payment, capture the items sold, and feed inventory records. The practical consequence is that each sale becomes a data point rather than just a payment. When the transaction system is connected to stock records, a manager can in principle see what left the shelf and compare it with what was ordered. That link is a design choice, not an automatic property of every system.
+
+The two sources connect at a point neither states directly. The grocery entry describes the format and its departments; the POS entry describes a transaction system. Neither says how to use transaction data to check a stocking decision. The useful distinction is between a sale, which the POS records, and demand, which the manager must infer. Spoilage, theft, and a stockout can all make sales figures diverge from demand, and none of those events is the same as a transaction. The mapping must account for that gap.
+
+The output is a mapping from each department decision to the signal that can test it, together with the records needed to interpret the signal. That mapping is the decision instrument: it shows where a manager has direct evidence and where the evidence is only indirect.
+
+## A worked example
+
+The following is hypothetical and illustrative. A store manager reviews the dairy department because reported sales look steady while weekly waste is high. Three checks decide the response. First, do POS sales match the recorded withdrawals from stock? Second, are spoilage and shrinkage recorded separately from sales rather than folded into them? Third, does the reorder rule use both sales velocity and remaining shelf life? The review finds that sales are steady but the department has been over-ordering perishable lines, with waste recorded in a separate log. The outcome is a revised replenishment rule and a note explaining why sales alone were misleading. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Grocery stores organise food and household goods into departments | `source-reported` | Wikipedia, Grocery store | 2026-11-18 | Entry revised |
+| Point-of-sale systems record transactions and can feed inventory | `source-reported` | Wikipedia, Point of sale | 2026-11-18 | Entry revised |
+| Reconcile POS sales with department-level stock movement | `inferred` | Derived from the sources | 2026-11-18 | System integration changes |
+
+The first two rows summarise the sources: the grocery format with its departments and the POS system that records transactions. The third is inferred because neither source prescribes a reconciliation method. Recheck the format row when the entry changes, the POS row when transaction systems change, and the inferred row when the store's systems or departments are reorganised.
+
+## What it cannot do
+
+A shelf-to-ledger map does not run the store. It connects a department decision to a transaction signal, but it does not set the assortment, price, or stocking level. The grocery store entry describes a retail format and the point of sale entry describes a transaction system; neither supplies a replenishment rule. A manager who expects the map to decide how much to order will be disappointed. The map shows where evidence exists, not what the evidence means for a perishable category. The decision still belongs to someone who knows the department.
+
+The hidden cost is reconciliation. POS records what was sold, not what was spoiled, stolen, or misplaced, so a manager must maintain separate records for waste and shrinkage before sales data can be read as demand. That record-keeping is unglamorous and easy to skip during a busy week, and once skipped the sales figures silently become wrong. There is also a cost in integration: linking a transaction system to inventory and department records takes work that a single-store view can hide. A store that skips this work will find its apparent evidence unreliable.
+
+The main failure mode is reading a sale as a complete signal. A product that sold out early may have lost sales rather than demonstrated perfect demand, and a product that did not sell may have been placed where customers could not see it. Because the sources do not describe these edge cases, the interpretation is local and must be tested against stock records. A reviewer should ask whether the POS figure reflects demand or merely what was available to buy. A figure that looks clean can still be an artifact of an empty shelf.
+
+The scope is limited to the format and the transaction layer. It does not cover supplier negotiation, pricing strategy, food safety rules, or the economics of perishables beyond the general observation that the format handles them. It does not explain how to design a store layout or how to choose a POS vendor. It is a way to align two records, not a complete operations manual. Questions of safety, compliance, and vendor selection need other sources and, in some cases, specialist review.
+
+Both entries change as retail formats and transaction systems evolve, so each mapping needs a recheck condition. A new POS feature or a change in departments can break a previously valid link between a sale and a stock record. Each decision should record which signal was used and how waste was separated from sales. Without that record, a later reader cannot tell whether a replenishment choice was based on demand or on an uncorrected transaction count. The record is what makes the decision reviewable.
+
+The counterargument that POS data is fair for tracking sales is incomplete when spoilage and stockouts are read as changes in demand.
+
+## A decision test
+
+1. Name the department and the decision to be checked.
+2. Identify the POS signal that relates to it.
+3. Separate sales from waste and shrinkage.
+4. Check whether stockouts or placement distorted the signal.
+5. Compare the signal to the department stock record.
+6. Adjust the decision and record the reason.
+7. Set a recheck condition tied to a system or layout change.
+
+A grocery decision is defensible when the sale, the stock record, and the waste record agree or when a discrepancy is explained. The test connects a department choice to the signal that can verify it, so a reviewer can see whether a low sales figure reflected demand or a stockout. For further reading, see [Voice of Customer](/articles/voice-of-customer-turning-feedback-into-decisions).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Grocery store - Wikipedia](https://en.wikipedia.org/wiki/Grocery_store) — Retail store selling food and household goods.
+- Wikipedia contributors, 2026. [Point of sale - Wikipedia](https://en.wikipedia.org/wiki/Point_of_sale) — Systems for recording transactions at the point of sale.

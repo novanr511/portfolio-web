@@ -1,10 +1,72 @@
 ---
 title: "Consent Mode Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Consent Mode Trade-Offs."
-date: 2026-11-17
+description: "Consent mode adjusts measurement to user choices, but it is not permission. Read how consent signals map to lawful decisions and where modeling cannot help."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Privacy
+  - Method
+  - Consent
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Consent mode is often described as a compliance feature, which hides what it actually is: a way to adjust tags and measurement according to a consent signal. Google's Analytics Help describes consent mode as communicating the user's choices to Google tags, while GDPR Article 6 sets the conditions under which processing personal data is lawful. The real problem is that teams mistake a technical signal for a legal basis and then treat a modeled number as if it were observed.
+
+**Direct answer:** Consent mode is a technical control, not a lawful basis. It communicates consent states so tags behave accordingly, but Article 6 still requires a valid ground for processing. Use it to honor choices, not to argue that denied consent was never needed.
+
+**Delta:** This article adds a claim-status table and a signal-to-lawfulness test beyond the sources: it maps each consent state to a processing decision, with claim status explicit.
+
+## The mechanism
+
+Google's documentation describes consent mode as a mechanism that lets tags read a user's consent state and adjust their behavior, with states such as granted or denied for specific purposes. In its advanced form, consentless pings and modeling can fill gaps in reporting when consent is withheld. The practical consequence is that the tool operates at the level of signal and behavior: it can make a tag quieter, but it cannot by itself make a processing activity lawful. A quiet tag is a configuration result, not a legal conclusion.
+
+GDPR Article 6 lists the lawful bases for processing personal data, including consent, contract, legal obligation, vital interests, public task, and legitimate interests. Processing is lawful only where at least one applies, and consent is one basis among several with conditions of its own. The consequence is that a team must identify the basis for each purpose before asking what a consent signal should do. If a purpose rests on a basis other than consent, a denied consent state may not be the relevant control at all.
+
+The sources describe a measurement mechanism and a legal standard but do not connect them into a decision rule. Mapping a consent state to a lawful processing decision is a synthesis and is marked inferred. A reasonable rule is to let the legal basis decide whether processing may occur at all, and let consent mode decide how tags behave once that question is settled. Other jurisdictions may weight bases differently, and the claim is only that the mapping keeps the two questions separate so neither silently answers the other.
+
+The output of a consent-mode review is a table of purposes, each with its lawful basis, its consent state, and the tag behavior that follows. That record is the decision instrument. A team that cannot name the basis for a purpose will tend to treat a denied signal as a minor reporting inconvenience rather than as a boundary, and will tune the tool instead of examining the processing.
+
+## A worked example
+
+The following is hypothetical and illustrative. A site team reviews its analytics setup after noticing that reported conversions diverge from orders. Three checks frame the review. First, for each purpose, what lawful basis under Article 6 applies? Second, what does each tag actually do when the consent state is denied, beyond sending a quieter ping? Third, are modeled figures labeled as modeled rather than presented as observed? The review finds one purpose relying on consent but still firing a tag when denied, and a report that presents modeled totals without a label. The team pauses the tag and marks the report. The outcome is a corrected boundary, not a claim that the discrepancy vanishes. The figures are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Consent mode communicates consent states so tags can adjust behavior | `source-reported` | Google Analytics Help | 2026-11-18 | Consent mode docs updated |
+| GDPR Article 6 lists lawful bases including consent and legitimate interests | `source-reported` | GDPR Info Art. 6 | 2026-11-18 | GDPR text or guidance revised |
+| Mapping consent states to lawful bases improves processing decisions | `inferred` | Derived from the sources | 2026-11-18 | Legal guidance or jurisdiction changes |
+
+The first two rows rest on the source documents and should be rechecked when those are updated. The third is an inference, because neither source defines a combined workflow. Recheck it when legal guidance changes or when the site expands into a new jurisdiction.
+
+## What it cannot do
+
+Consent mode cannot create a lawful basis. It is a technical control that signals and enforces choices, and whether processing is lawful is a separate question answered by law. A denied signal that is honored makes a tag compliant in behavior, but it does not retroactively justify processing that lacked a basis. Treating the tool as permission is the central category error, and it is tempting precisely because the tool is easy to configure while the legal question is not.
+
+The hidden cost is complexity at the boundary. Implementing consent states across tags, regions, and purposes requires a consent management layer, ongoing configuration, and testing whenever tags change. Modeling adds another cost: it fills reporting gaps with estimates, and estimates carry uncertainty that a clean number hides. Both costs are paid in engineering time and in the discipline to label what is modeled, which is a small habit that is easy to drop under pressure to show a tidy report.
+
+A common failure mode is treating modeled data as measured. Advanced consent mode can estimate conversions where consent is denied, but an estimate is not an observation. Reports that blend the two without a label invite decisions that look evidence-based but rest on an assumption. Another failure mode is a tag that ignores the denied state, which turns a signaling mechanism into a false assurance that the configuration is correct.
+
+There is a boundary around what a consent signal covers. Article 6 bases other than consent, such as contract or legal obligation, may apply to different purposes, and a single signal cannot express all of them. Nor does consent mode settle questions about data sharing, retention, or transfers, which other rules govern. The tool is one instrument in a broader compliance program, not the program itself, and a review that stops at the tool has stopped too early.
+
+Because both technology and law move, the mapping needs periodic review. Each purpose should carry its basis and a recheck condition, so a change in guidance or tag configuration can be reviewed deliberately. Without that record, a team cannot tell whether a tag was paused for a reason or simply left behind by an update, and the next reviewer inherits a configuration with no memory.
+
+The counterargument that modeling is fair for protecting reporting continuity is incomplete when estimates are used as if they were consented observations.
+
+## A decision test
+
+1. List each processing purpose and its data.
+2. Assign a lawful basis under Article 6 to each.
+3. Determine the consent state that gate requires.
+4. Configure tags to honor that state.
+5. Verify behavior when consent is denied, not just granted.
+6. Label modeled figures distinctly from observed ones.
+7. Record the basis and a recheck condition per purpose.
+
+Consent mode is useful when it is subordinated to a lawful-basis decision. The test separates whether processing is allowed from how a tag should behave, so a signal is not mistaken for permission and a modeled total is not mistaken for measured truth.
+For further reading, see [Related](/articles/data-governance-managing-data-as-an-asset).
+
+## References & Further Reading
+
+- Google, 2026. [Consent mode on websites and mobile apps - Analytics Help](https://support.google.com/analytics/answer/9976101) — Google consent mode behaviour and signals.
+- GDPR Info, 2016. [Art. 6 GDPR – Lawfulness of processing - General Data Protection Regulation (GDPR)](https://gdpr-info.eu/art-6-gdpr/) — The lawful bases for processing personal data under GDPR.

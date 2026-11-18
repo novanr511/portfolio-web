@@ -1,10 +1,73 @@
 ---
 title: "Faceted Navigation Explained"
-description: "Reserved title for a future NOVANDRI article: Faceted Navigation Explained."
-date: 2026-11-17
+description: "Faceted navigation lets shoppers filter by attributes. See how facets and web analytics fit together, a worked design decision, and where the method breaks."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Explanation
+  - Faceted Navigation
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A product search that returns thousands of results is only useful if a shopper can narrow it. Faceted navigation is the common answer, but the real problem is deciding which facets to expose: too few and shoppers cannot refine, too many and the catalog fragments into near-duplicate paths. Web analytics is the evidence needed to make that decision.
+
+**Direct answer:** Faceted search is a technique that lets a user narrow results by applying filters built from attributes or categories, such as brand, size, or price. Wikipedia's faceted search entry describes the approach, and its web analytics entry defines the measurement of site usage that can show which facets people actually use. The boundary: facets are a navigation structure; analytics reports behavior, not what the structure should be.
+
+**Delta:** This article adds a claim-status table and a mapping from usage data to a facet decision beyond the sources: it maps analytics evidence to the choice of which facets to expose, with claim status explicit.
+
+## The mechanism
+
+Wikipedia's faceted search entry describes a retrieval technique in which results are narrowed by applying one or more filters, called facets, that correspond to attributes or categories of the items. A shopper might combine a brand with a size and a price range, and each facet typically presents the values available within the current result set. The practical consequence is that navigation becomes a process of progressive refinement rather than a single query. The design of the facets determines which refinements are possible at all, so the structure is not neutral.
+
+That design is a taxonomy decision. Facets only work when the underlying attributes are consistent: a color facet is useful if products carry a clean color value, and useless if the field is filled inconsistently. The practical consequence is that the quality of faceted navigation is bounded by the quality of the catalog data behind it. A team can add facets freely, but it cannot add attributes that the product data does not reliably contain.
+
+Wikipedia's web analytics entry defines the measurement, collection, analysis, and reporting of web data to understand and optimize web usage. That definition matters here because faceted navigation generates many combinations, and only usage data can show which combinations shoppers actually take. The practical consequence is that the facet set should be reviewed against behavior: a facet nobody uses still adds interface clutter and URL combinations, while a facet used heavily deserves prominence. Analytics turns an opinion about the interface into an observed pattern.
+
+The output of combining the two sources is a decision rule, not a specification. The sources describe a technique and a measurement field; they do not prescribe a particular facet set, layout, or URL scheme. The useful move is to treat each facet as a hypothesis about how people refine, then check it against analytics. That mapping from observed behavior to a navigation choice is a local decision built on the two described concepts, not a rule either source states.
+
+## A worked example
+
+The following is hypothetical and illustrative. An e-commerce site offers facets for brand, size, color, and price on a clothing category. Three checks guide the review. First, the attribute check: does each facet map to a consistently populated product field, or does the color field contain free text that produces dozens of near-identical values? Second, the combination check: do certain facet pairs lead to zero-result states or generate many near-duplicate URLs? Third, the usage check: does the analytics data show that shoppers actually use each facet on the path to a purchase? The review finds that the color facet is rarely used and creates duplicate paths, while price is used heavily. The outcome is to remove the color facet and promote the price range. The details are hypothetical; the mapping from usage data to facet choice is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Faceted search lets users filter results by multiple attributes or categories | `source-reported` | Faceted search - Wikipedia | 2026-11-18 | the definition is revised |
+| Web analytics measures, collects, analyses, and reports web data | `source-reported` | Web analytics - Wikipedia | 2026-11-18 | the entry's definition is revised |
+| Usage data can indicate which facets are worth exposing | `inferred` | Derived from the sources | 2026-11-18 | user behaviour or site structure changes |
+
+The first two rows report definitions stated directly by the sources and can be checked against them. The third is an inference: it follows from combining a navigation technique with a field that measures usage, but neither source says usage data should determine the facet set. Recheck the definition rows when the source entries change, and the inferred row when catalog attributes or shopper behavior shift.
+
+## What it cannot do
+
+Faceted navigation cannot define the taxonomy it presents. It is a way of exposing attributes, not a source of those attributes. The sources describe the technique; they do not tell a team which attributes matter for its products or customers. A facet set built without domain input will look complete while reflecting the wrong distinctions. The structure can only be as good as the categories fed into it, and no amount of interface polish repairs a poorly chosen attribute.
+
+It cannot guarantee findability when the underlying data is inconsistent. If a product field is missing or mislabeled, the facet built on it will mislead. A shopper who filters by a value that is present on only some relevant products gets an incomplete result set and no obvious reason why. The failure is silent, because the interface works exactly as designed; the data behind it is the problem. That is why the data check precedes the interface decision in any review.
+
+The hidden cost is combinatorial. Each facet and value multiplies the number of possible result pages, and many combinations produce empty or near-duplicate results. That proliferation is expensive to compute, clutters the interface, and complicates any attempt to manage URLs. The sources describe the technique, not the operational burden of maintaining it at catalog scale, so that cost is easy to underestimate during design. A facet that looks harmless on a mockup can be costly once every value is live.
+
+There is a boundary around what the sources support. They provide a definition of faceted search and a definition of web analytics, not a rule for search indexing or a usability standard. Claims that a particular facet layout improves rankings or conversions go beyond what these sources establish. Analytics can report what happened; it cannot by itself prove that a facet caused a change in behavior. Treating a reported pattern as a causal verdict overstates the evidence the field provides.
+
+Because catalogs and behavior change, the facet set needs scheduled review. Attributes drift, products are added with new values, and shopper habits move. A practical cadence is a periodic check of which facets are used, which produce empty results, and which still map to clean data. Each facet should carry an owner and a review condition. Without that, an interface that once fit the catalog gradually stops doing so, and nobody is responsible for noticing the drift.
+
+The counterargument that more facets give shoppers more control is fair for a small, clean catalog and incomplete when combinations create empty results, duplicate paths, and a harder interface.
+
+## A decision test
+
+1. List the attributes the catalog records cleanly and consistently.
+2. Check analytics for which filters shoppers actually use on the path to a result.
+3. Identify facet combinations that produce empty or near-duplicate results.
+4. Remove facets with no clear data source or no observed use.
+5. Promote the facets that carry the most refinement traffic.
+6. Record each facet with an owner and a review condition.
+7. Recheck the set whenever the catalog structure or usage pattern changes.
+
+The test turns a navigation problem into a reviewable choice. Each facet is tied either to clean data and observed use or marked for removal, so a reviewer can see why the interface looks the way it does and what evidence supports each filter.
+
+For further reading, see [What AI Search Actually Measures](/articles/what-ai-search-actually-measures).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Faceted search - Wikipedia](https://en.wikipedia.org/wiki/Faceted_search) — Filtering by multiple attribute facets.
+- Wikipedia contributors, 2026. [Web analytics - Wikipedia](https://en.wikipedia.org/wiki/Web_analytics) — Collection and interpretation of website behaviour data.

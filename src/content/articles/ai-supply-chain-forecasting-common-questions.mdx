@@ -1,10 +1,73 @@
 ---
 title: "AI Supply Chain Forecasting: Common Questions"
-description: "Reserved title for a future NOVANDRI article: AI Supply Chain Forecasting: Common Questions."
-date: 2026-11-17
+description: "AI can support supply chain forecasting, but where does it help? See the bounded role, a worked inventory decision, and what the sources cannot establish."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Explanation
+  - Supply Chain Forecasting
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Supply chain teams are often told that AI will forecast demand for them. The real problem is that a fluent answer about a supply chain is not the same as a reliable input to an inventory decision. The two sources describe a broad field of management and a set of common AI use cases; the useful question is where those two actually meet.
+
+**Direct answer:** Supply chain management is the coordination of the flow of goods, from raw materials through production to the inventory that reaches a customer. Anthropic's use-case guides describe common tasks AI systems are applied to and how to approach them. The boundary: AI can help organize unstructured signals around a forecast, but the sources do not present it as a replacement for a quantitative demand model or a guarantee of accuracy.
+
+**Delta:** This article adds a claim-status table and a mapping from use-case guidance to a forecasting decision beyond the sources: it maps the task to a keep-or-delegate choice, with claim status explicit.
+
+## The mechanism
+
+Wikipedia's supply chain management entry describes the management of the flow of goods and services, including the transformation of raw materials into finished products and the movement and storage of inventory. The field spans sourcing, production planning, logistics, and demand planning. The practical consequence is that a forecast is not an isolated number: it feeds purchasing, inventory, and delivery decisions that are linked across the chain. An error at the forecasting step propagates into cash tied up in stock or into missed sales.
+
+Anthropic's use-case guides describe recurring ways people apply AI systems, such as working with text, extracting structure from documents, and summarizing information, together with guidance on starting from a clear task. The practical consequence is that the useful unit of analysis is a specific task, not the vague goal of forecasting. Summarizing a supplier's note about a delay, or extracting lead-time changes from a shipment document, is a bounded task that fits these patterns and can be checked.
+
+Where the two connect is the unstructured material surrounding a forecast. Supply chains generate messages, reports, and notices that a quantitative model does not read. AI assistance can turn that material into structured signals a planner can evaluate. The practical consequence is that the value sits at the edges of the forecast: preparing inputs, flagging changes, and explaining context, rather than producing the demand number itself. Those edges are where the described use cases and the described field overlap.
+
+The output is a division of labor, not a method. The sources describe a management field and a set of use cases; they do not provide a validated forecasting algorithm or an accuracy figure. The defensible move is to assign the unstructured preparation to AI assistance while keeping the quantitative forecast and the final decision under review. That mapping from task type to owner is a local decision built on the two sources, not a procedure either one prescribes.
+
+## A worked example
+
+The following is hypothetical and illustrative. A retailer is planning inventory for a product during a promotion and is considering using AI to help. Three checks structure the decision. First, the scope check: is the proposed task bounded, such as extracting lead-time changes from supplier notes, rather than the open-ended goal of predicting demand? Second, the baseline check: is there a quantitative forecast to compare against, so the AI output is an input rather than the answer? Third, the oversight check: does a person review the signal before it changes a purchase order? The review finds that a supplier note flags a delay, the planner adjusts the baseline, and the final order stays under human control. The outcome is a flagged risk handled in time. The scenario is hypothetical; the mapping from task to decision is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Supply chain management covers the flow and transformation of goods and inventory | `source-reported` | Supply chain management - Wikipedia | 2026-11-18 | the definition is revised |
+| Use-case guides describe common AI applications and how to approach them | `source-reported` | Anthropic use-case guides | 2026-11-18 | the guides are updated |
+| AI assistance works best on unstructured signals around a forecast, not as the forecast itself | `inferred` | Derived from the sources | 2026-11-18 | model capabilities or guidance change |
+
+The first two rows report what the sources state directly and can be checked against them. The third is an inference drawn from combining a field defined around physical flows with use cases centered on text and structure; neither source makes that division of labor explicit. Recheck the source rows when the entries or guides are updated, and the inferred row when model capabilities or the available use-case guidance changes.
+
+## What it cannot do
+
+It cannot replace a quantitative demand model. A forecast that drives purchase orders needs a baseline grounded in historical demand and a stated treatment of uncertainty. The use-case guides describe how AI can assist with tasks; they do not establish it as a demand planning model. A team that lets generated output set inventory levels without a quantitative anchor is treating a language task as a statistical one, and the sources give no basis for that equivalence.
+
+It cannot repair missing or poor data. The value of AI assistance on supply chain documents depends on those documents being present and reasonably consistent. If supplier notices are incomplete or lead times are recorded loosely, the extracted signal inherits those gaps. The management source describes the flows involved, not a guarantee that the inputs are clean. A fluent summary of bad data is still bad data, and it is harder to question precisely because it reads well.
+
+The characteristic failure mode is automation bias. A confident, well-written signal tends to be trusted, especially when it arrives faster than a human analysis would. In a supply chain, that trust can translate into a purchase order placed on a hallucinated detail. Detection requires that the output cite its source and that a person retain authority over the final number. The guidance emphasizes building effective systems and verifying results, not blind acceptance of the first answer.
+
+There is a boundary in what the sources support. They describe a management discipline and a catalog of common AI use cases; they do not promise an accuracy level, a return on investment, or fitness for a specific industry. Any claim that this setup improves forecast accuracy by a given amount goes beyond the evidence. What can be claimed is narrower: these are the tasks AI is commonly applied to, and this is a field with linked decisions that those tasks can support. That is a description of scope, not a performance guarantee.
+
+Because guidance and capabilities change, the division of labor needs review. New use cases appear, models change, and a task that once required close oversight may become routine, or the reverse. Each AI-assisted step should carry a recheck condition tied to an update in guidance or model behavior. Without that record, a planner may keep delegating a task under assumptions that no longer hold, and the review has no trigger that would bring the change to light.
+
+The counterargument that AI can handle forecasting end to end is fair for exploratory summaries and incomplete when a specific number drives inventory spend without a baseline and a reviewer.
+
+## A decision test
+
+1. Name the specific task AI would assist with, in one sentence.
+2. Check whether it fits a described use case such as extraction or summarization.
+3. Confirm a quantitative baseline forecast exists to compare against.
+4. Decide where a person reviews and approves the output.
+5. Verify the output can point back to its source document.
+6. Record the task with a recheck condition tied to guidance updates.
+7. Keep the final inventory decision with the owner, not the tool.
+
+The test keeps the assistive role bounded and the decision accountable. Each step either ties the task to a described use case or marks it as needing a human gate, so a reviewer can see which part of the forecast is automated and which part is owned.
+
+For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Anthropic, 2026. [Guides to common use cases - Claude Platform Docs](https://docs.anthropic.com/en/docs/about-claude/use-case-guides) — Production use-case guides for ticket routing, customer support agents, content moderation, legal summarization and commerce agents.
+- Wikipedia contributors, 2026. [Supply chain management - Wikipedia](https://en.wikipedia.org/wiki/Supply_chain_management) — Management of the flow of goods and services.

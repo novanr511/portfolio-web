@@ -1,10 +1,72 @@
 ---
 title: "Cache Invalidation Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Cache Invalidation Trade-Offs."
-date: 2026-11-17
+description: "A cache saves time until it serves stale data. Read how invalidation strategies map to freshness decisions, a worked example, and where a purge stops being a fix."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Caching
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Caching stores a copy of data so the next request is faster, but that copy becomes wrong the moment the source changes. The Wikipedia entry on cache invalidation describes the act of declaring stored copies invalid so they can be refreshed, and the entry on content delivery networks describes the distributed edge servers that hold many such copies. The real problem is that teams treat invalidation as an afterthought, then discover that the mechanism they chose fixes how much staleness they can tolerate.
+
+**Direct answer:** Invalidation is a decision about how much staleness is acceptable, not a switch that makes a cache correct. Time-based expiry, explicit purging, and versioned keys each trade freshness against cost and complexity. Pick the strategy that matches the data's rate of change, and accept that a purge is a blunt instrument with a real price.
+
+**Delta:** This article adds a claim-status table and a strategy-to-decision test beyond the sources: it maps each invalidation approach to a freshness decision, with claim status explicit.
+
+## The mechanism
+
+Cache invalidation, as the reference entry describes it, is the process of declaring cached data no longer valid so it can be refreshed or evicted. Caching works by trading correctness risk for speed: serving a stored copy avoids a slower trip to the source. The practical consequence is that every cache carries an implicit promise about how fresh its copies are, and invalidation is the mechanism that keeps that promise honest. Without a rule for when a copy becomes invalid, a cache silently drifts away from its source while every request still appears fast.
+
+A content delivery network, the other reference entry explains, is a distributed set of servers that deliver content to users based on location, reducing latency and origin load by serving cached copies from edge nodes. This multiplies the invalidation problem, because one logical object may exist in many places at once. A change at the origin does not propagate by itself, so a purge or expiry rule must reach every edge that holds the object. The consequence is that invalidation cost grows with distribution, and a strategy that works for a single in-process cache may not survive a CDN.
+
+The sources describe the need for invalidation but do not prescribe one strategy. Common approaches include time-to-live expiry, explicit purging, and versioned or content-addressed keys. Time-based expiry bounds staleness without tracking individual objects, but it keeps serving old copies until the timer fires. Explicit purging removes a known object on demand, but it requires knowing which objects changed. Versioned keys sidestep invalidation by making a new version a new key. The mapping from approach to decision is a synthesis and is marked inferred.
+
+The output of a cache design review is a stated freshness tolerance per data class and an invalidation rule that meets it. That statement is the decision instrument. A team that cannot say how stale a given object may be cannot choose between expiry, purging, and versioning, and will default to whichever is easiest to implement.
+
+## A worked example
+
+The following is hypothetical and illustrative. A product team caches a pricing page behind a CDN and reviews its invalidation strategy after a price change reaches some users late. Three checks frame the review. First, what is the maximum staleness the business will tolerate for a published price? Second, how many edge locations hold the object, and does the chosen purge reach all of them? Third, can the object be given a versioned key so a change becomes a new URL instead of an invalidation event? The review concludes that a one-hour expiry is acceptable for marketing copy but not for price, so the team adopts versioned asset keys for price data and keeps expiry for the rest. The outcome is a per-data-class decision, not a claim that all staleness disappears. The counts and pages are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Cache invalidation declares stored copies invalid so they can be refreshed | `source-reported` | Wikipedia: Cache invalidation | 2026-11-18 | Article definition revised |
+| CDNs serve cached copies from distributed edge servers to reduce latency | `source-reported` | Wikipedia: Content delivery network | 2026-11-18 | CDN architecture guidance changes |
+| Choosing an invalidation strategy by freshness tolerance improves decisions | `inferred` | Derived from the sources | 2026-11-18 | Data change rate or architecture changes |
+
+The first two rows are factual descriptions from the reference entries and should be rechecked when those entries change. The third is an inference, because neither source defines a strategy-selection workflow. Recheck it when the rate of change in the data or the shape of the distribution changes.
+
+## What it cannot do
+
+Cache invalidation does not make data correct at the source. It only manages copies. If the origin publishes a wrong value, a perfect purge distributes that wrong value faster and to more places. The reference entries describe mechanisms for refreshing stored copies, not for validating what is stored in the first place. A team that treats a clean invalidation policy as a correctness guarantee has confused freshness with accuracy, and the confusion is expensive because the cache makes the error look fast rather than wrong.
+
+The hidden cost is operational load. Explicit purging requires a map of which objects changed and a path to every edge that holds them, and that map is itself a system to maintain. Time-based expiry avoids the map but pays in stale windows. Versioned keys shift work onto build and naming conventions. Each option moves cost rather than removing it, and the cost is rarely visible in a latency dashboard, which is why teams underestimate it until an incident forces a purge under pressure.
+
+A common failure mode is the thundering herd. When many copies expire at once, or a broad purge clears a popular object, requests collapse onto the origin at the same instant. The CDN entry explains how edge caches absorb load, and losing that absorption for even a moment can overwhelm the source. Successful invalidation is therefore timed and staged, not simply triggered, and a policy that ignores load symmetry can turn a freshness fix into an availability problem.
+
+There is a boundary around what invalidation can express. It cannot tell a team which data deserves freshness, only how to enforce a choice once made. That judgment is a business decision about the cost of a stale price versus the cost of a purge. Nor does a purge guarantee that intermediate caches, browsers, or client libraries have released the old copy, because each layer may hold its own copy with its own rule. A CDN purge is only one layer in a chain.
+
+Because data and architecture change, the mapping needs periodic review. Each data class should carry its freshness tolerance and a recheck condition, so a future reviewer can tell why expiry was chosen for one object and versioning for another. Without that record, invalidation rules accrete, and no one can say which are deliberate and which are leftovers from a past incident.
+
+The counterargument that a short global expiry is fair for simple sites is incomplete when data changes at different rates or copies live at many edges.
+
+## A decision test
+
+1. Classify data by how costly staleness would be.
+2. State a maximum freshness window per class.
+3. Inventory where copies live, including edges and browsers.
+4. Choose expiry, purging, or versioning for each class.
+5. Check that the purge path reaches every relevant copy.
+6. Stage invalidation to avoid a simultaneous origin load spike.
+7. Record the rationale and a recheck condition per decision.
+
+Invalidation is a trade among freshness, cost, and complexity, and the right point depends on the data. The test forces a freshness decision before a mechanism is chosen, so a purge is not mistaken for a correctness fix and a global timer is not mistaken for a policy.
+For further reading, see [Related](/articles/decision-memos-that-survive-review).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Cache invalidation - Wikipedia](https://en.wikipedia.org/wiki/Cache_invalidation) — Keeping cached data consistent with source data.
+- Wikipedia contributors, 2026. [Content delivery network - Wikipedia](https://en.wikipedia.org/wiki/Content_delivery_network) — How distributed delivery affects the loading of web resources.

@@ -1,10 +1,73 @@
 ---
 title: "Computer-use Agents Costs Explained"
-description: "Reserved title for a future NOVANDRI article: Computer-use Agents Costs Explained."
-date: 2026-11-17
+description: "Computer-use agents act through a screen, and each step costs tokens. See the cost drivers, a worked build decision, and when a direct API is the better choice."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Cost Modeling
+  - Computer Use Agents
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Computer-use agents can operate software through the same interface a person uses, which makes them attractive for tasks with no clean integration. The real problem is cost: a task that looks simple can expand into many steps, each carrying the context of a screen and an action. Understanding what drives that cost is what separates a sensible use from an expensive demo.
+
+**Direct answer:** A computer-use agent sees a screen and acts through cursor and keyboard to complete tasks, as described in Anthropic's announcement. The same source introduced the capability at an early stage, and the agent guidance stresses starting simple and adding guardrails. The boundary: these sources describe a capability and a design approach, not a price list or a reliability guarantee.
+
+**Delta:** This article adds a claim-status table and a mapping from cost drivers to a build decision beyond the sources: it maps steps and retries to a computer-use-versus-API choice, with claim status explicit.
+
+## The mechanism
+
+Anthropic's announcement introduced computer use as a capability that lets a model work through a computer interface: viewing the screen and issuing actions such as moving a cursor, clicking, and typing. The practical consequence is that software with no programmatic interface becomes reachable through the same actions a person would take. That breadth is the appeal, because it removes the need to build a dedicated integration for every tool a workflow touches.
+
+The cost follows from the loop. Each action requires the agent to take in the current screen state and decide the next step, and screen content is part of the context the model processes. A task that takes many steps consumes a round of that context for each one, plus the screenshots that describe the state at each point. The practical consequence is that cost scales with the length of the interaction, not with the size of the final answer. A short result can still be expensive to reach.
+
+Failures multiply that cost. When a step is wrong, the agent may need to recover, and recovery often means more steps and more screen context. Anthropic's engineering guidance on building effective agents recommends starting with a simple design, giving the agent only the tools it needs, and adding guardrails and evaluation rather than assuming a first attempt will work. The practical consequence is that reliability work is cost work: fewer failed steps mean fewer paid rounds and less time spent waiting.
+
+The output is a comparison, not a verdict. The two sources describe a capability and a set of design principles; they do not supply per-action prices or a total cost for a task. The defensible move is to reason about the drivers that are visible in the description, steps, screen context, and retries, and compare them with the cost of a direct alternative. That mapping is a local decision built on the sources, not a figure either one publishes.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team needs data from a legacy desktop application that has no API and is considering a computer-use agent. Three checks frame the decision. First, the alternative check: is there any structured route, such as a report export or a database connection, that avoids driving the interface? Second, the step check: roughly how many actions and screenshots does one transaction require, and how often does a step fail and need retrying? Third, the oversight check: does a person verify the extracted values before they are used? The review finds that a monthly export covers most of the volume, so computer use is reserved for a small residual task with a step cap. The outcome is a hybrid approach, not full automation. The scenario is hypothetical; the mapping from cost drivers to decision is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Computer use lets a model operate a computer through screen, cursor, and keyboard actions | `source-reported` | Anthropic, Computer use announcement | 2026-11-18 | the capability or availability changes |
+| Effective agent design starts simple and adds tools, guardrails, and evaluation | `source-reported` | Anthropic, Building effective AI agents | 2026-11-18 | the guidance is updated |
+| Cost scales with steps, screenshots, and retries, so a direct API is often cheaper for structured tasks | `inferred` | Derived from the sources | 2026-11-18 | pricing or the mix of tasks changes |
+
+The first two rows report what the sources state directly and can be checked against them. The third is an inference about how cost scales with steps and retries, drawn from the described loop rather than from a published price. Recheck the source rows when the capability or the agent guidance changes, and the inferred row when pricing or the mix of tasks changes.
+
+## What it cannot do
+
+It cannot replace a direct integration for structured work. When a task can be expressed as a call to an API or a query against a database, driving a screen adds steps without adding value. Each unnecessary click is paid for in context and time, and it introduces a chance of error that a direct call would not have. The sources present computer use as a way to reach interfaces that lack such alternatives, not as a default replacement for them. Choosing it for a task with a clean interface is paying a premium for no benefit.
+
+It is fragile in the face of interface change. A computer-use agent depends on the layout it sees, so a moved button, a new dialog, or a different resolution can break a flow that worked before. The announcement described an early capability, and that status matters: reliability is not comparable to a stable integration. The practical consequence is ongoing maintenance, because the target software can change without the agent's designer doing anything. A flow that passes today may need repair after an unrelated update to the application.
+
+The hidden cost is verification. A wrong click may produce a plausible result, such as a value copied from the wrong row, with no obvious signal that anything failed. Catching that requires human review or an independent check, and that labor is part of the true cost of the approach. The agent guidance emphasizes evaluation and guardrails precisely because output cannot be assumed correct. A cost model that counts only model usage will miss this line item, and a budget built on it will be too optimistic.
+
+There is a boundary in what the sources establish. They describe a capability and offer design guidance; they do not provide reliability targets, service levels, or a guarantee that a given task will complete. Claims that a computer-use agent will work across any software without oversight go beyond what is supported. What can be said is narrower: the capability exists, it works through the interface, and effective use appears to depend on simple designs and verification. Treat any stronger claim as unverified.
+
+Because the capability and guidance evolve, the cost decision needs review. Availability, model behavior, and recommended practices change, and an approach that was too expensive or too unreliable last quarter may become viable. Each assumption about steps or retry rates should carry a recheck condition tied to an update in the capability or the guidance. Without that, a team keeps paying for a task that a newer option handles more cheaply, and nobody has a reason to revisit the choice.
+
+The counterargument that computer use handles any graphical task is fair for rare legacy workflows and incomplete for high-volume work where a direct API is cheaper and more predictable.
+
+## A decision test
+
+1. Check whether a structured alternative such as an API or export exists.
+2. Estimate the number of steps and screenshots one transaction requires.
+3. Estimate how often a step fails and must be retried.
+4. Add the cost of a human verification step to the estimate.
+5. Cap the steps allowed per task to bound runaway cost.
+6. Record each assumption with a recheck condition tied to capability updates.
+7. Choose computer use only for the residual tasks no direct route can cover.
+
+The test turns a capability into a bounded choice. Each step either justifies the interface-driven route or points to a cheaper alternative, so a reviewer can see what the agent is being paid to do and under what conditions that assessment would change.
+
+For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Anthropic, 2024. [Computer use, Claude 3.5 Sonnet, and Claude 3.5 Haiku \ Anthropic](https://www.anthropic.com/news/3-5-models-and-computer-use) — A primary vendor description of computer-use agents that operate a GUI through screenshots and actions.
+- Anthropic, 2026. [Building effective AI agents](https://www.anthropic.com/engineering/building-effective-agents) — Guidance on agent design including checkpoints and human oversight.

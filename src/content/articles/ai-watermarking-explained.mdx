@@ -1,10 +1,71 @@
 ---
 title: "AI Watermarking Explained"
-description: "Reserved title for a future NOVANDRI article: AI Watermarking Explained."
-date: 2026-11-17
+description: "Watermarking for LLM text is a statistical control, not a proof. Read how detection scores map to governance decisions, a worked example, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Content provenance
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams that publish machine-generated text often need a way to say where it came from. Plain text carries no provenance, and detectors that inspect finished text without cooperating with the generator are unreliable. Watermarking takes a different route: it puts a signal into the text as it is produced, so that provenance can be tested later.
+
+**Direct answer:** An LLM watermark is a statistical signal added during generation by nudging token choices toward a keyed subset, then recovered by a test that compares observed token frequencies with chance. The Kirchenbauer paper reports a detectable signal; the NIST AI Risk Management Framework describes how to govern such a control. The result is evidence of provenance, not a guarantee of authorship, and detection needs the generation process under your control.
+
+**Delta:** This article adds a governance mapping beyond the sources: it maps a detector's statistical score to a documented risk decision, with claim status explicit.
+
+## The mechanism
+
+The Kirchenbauer method operates at decoding time. A hash of the recent token context partitions the vocabulary into a green list and a red list. During sampling, a small bias is added to the logits of green-list tokens, so a watermarked model is slightly more likely to choose them. A detector that knows the key and the hash rule recounts how many tokens fall in the green list and compares that count with what chance would predict, producing a z-score. The practical consequence is that detection is statistical: it returns a score and a p-value, not a yes-or-no label, and it only works when the same key and algorithm are available at detection time.
+
+That statistical nature creates a tunable trade-off. A stronger bias makes the signal easier to detect but can nudge word choice enough to degrade quality; a weaker bias preserves fluency but shrinks the signal. The paper reports that the watermark can survive some edits, but rewriting, translation, or regenerating the passage can weaken or remove it. The practical consequence is that a watermark is a deterrent and a forensic aid, not a tamper-proof seal. A team should expect a probability of detection that depends on text length and on how much the text has been changed.
+
+The NIST AI Risk Management Framework supplies the surrounding discipline. It organizes risk work into four functions - Govern, Map, Measure, and Manage - and treats transparency and provenance as part of managing AI risk. The practical consequence is that a watermark is one control inside a risk process, not a standalone answer. Under Measure, the team records false-positive and false-negative rates; under Govern, it assigns ownership of the key and the decision threshold; under Manage, it decides what action a detection triggers.
+
+The two sources connect at a point neither states directly. The watermark produces a statistic; the risk framework supplies a place to decide what that statistic means for a given use case. A detection score becomes actionable only when someone owns the threshold and records the error rates behind it. Neither source supplies a universal threshold, so any specific cutoff is local and must be marked as inferred. The output is a mapping from a detection score to a documented action, with the statistic and the decision kept separate.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team publishes AI-assisted product descriptions and wants readers to be able to verify provenance. Three checks decide the approach. First, do they control generation? They run their own decoding stack, so they can apply the green-list bias and hold the key. Second, what are the error rates on their own content? They run the detector on a held-out set of human-written and generated descriptions and record false positives and false negatives rather than assuming published figures transfer. Third, what does a detection warrant? They set a threshold that triggers human review, not automatic rejection. The outcome is a documented control with an owned key and a measured error rate. The numbers are hypothetical; the verification method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Watermark biases token sampling toward a keyed green list | `source-reported` | Kirchenbauer et al. | 2026-11-18 | Method revised |
+| AI RMF organizes risk work into Govern, Map, Measure, Manage | `source-reported` | NIST AI RMF | 2026-11-18 | Framework version changes |
+| Detection threshold is a governed local decision | `inferred` | Derived from the sources | 2026-11-18 | Use case or risk tolerance changes |
+
+The first two rows are factual claims taken directly from the sources. The third is an inference, because neither source fixes a detection threshold for a particular use case. Recheck the method claim when the watermark algorithm changes, the framework claim when the NIST document is revised, and the inferred claim when the use case or risk tolerance changes.
+
+## What it cannot do
+
+A watermark cannot prove authorship. The detector returns a statistic, and a statistic carries error. A low p-value is evidence that text was generated with the keyed method, not proof that a particular person or model produced it, and a high score cannot rule out generation that simply missed the key. Treating a detection as a verdict is a category error: it answers how surprising the token distribution is under a model of chance, not who wrote the text. Anyone using the signal in a consequential decision has to keep that distinction visible.
+
+The hidden cost is operational. Watermarking requires control of the generation stack, because the bias must be applied while tokens are sampled. Teams that call a third-party API with no access to logits cannot apply this method at all. Keys must be generated, stored, rotated, and protected, and a leaked key lets others remove or forge the signal. There is also a quality cost: a strong enough bias to survive paraphrasing can make word choice measurably worse. These costs are paid in engineering time and in a small, continuous tax on output quality.
+
+The main failure mode is assuming the signal survives real-world editing. Paraphrasing, translation, summarization, and simple rewriting can all erode it. Detection is also weaker on short passages, where there are too few tokens for the statistic to separate from chance. An adversary who knows the scheme can deliberately steer tokens back toward the red list. The practical question is not whether the watermark works on clean output, but whether it still works after the text has been edited as it will be in practice.
+
+There is a boundary around what the method covers. It marks text only when the generator cooperates by applying the bias. It cannot detect output from an unrelated model, cannot identify intent, and cannot settle a copyright or plagiarism dispute. It does not replace a provenance record that logs which system produced a document and under what policy. A watermark is a hint embedded in the text; a provenance ledger is an external record. Conflating the two overstates what a statistical mark can carry.
+
+Because models, decoding strategies, and content change, the signal and its error rates need periodic review. A threshold that was safe on last year's model may produce different false-positive rates on a new one. The key and the decision rule should be owned by a named party, with a recorded recheck condition. Without that record, a future reader cannot tell whether a detection policy was deliberate or inherited by default. The evidence and the decision must be revisited together.
+
+The counterargument that watermarking is fair as a low-cost deterrent is incomplete when a detection score is treated as proof of authorship in a high-stakes decision.
+
+## A decision test
+
+1. Do you control the generation step where the bias must be applied?
+2. Is the watermark key owned, stored, and rotatable by a named party?
+3. Have you measured false-positive and false-negative rates on your own content?
+4. Does the signal survive the edits your text actually undergoes?
+5. Is the detection threshold a recorded decision, not a default?
+6. Does a detection trigger review rather than an automatic verdict?
+7. Is there a recheck condition tied to model or policy changes?
+
+A watermark is useful when the statistic and the decision it drives are both documented. The test keeps provenance evidence separate from the governance choice that acts on it, so a reviewer can see who owns the key, what the measured error rates were, and when the threshold must be revisited. For further reading, see [Responsible AI](/articles/responsible-ai-ethics-fairness-and-regulatory-compliance).
+
+## References & Further Reading
+
+- John Kirchenbauer et al., 2023. [A Watermark for Large Language Models](https://arxiv.org/abs/2301.10226) — A statistical watermarking method for generated text, with which it can and cannot prove.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

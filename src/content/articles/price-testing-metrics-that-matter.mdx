@@ -1,10 +1,73 @@
 ---
 title: "Price Testing Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: Price Testing Metrics that Matter."
-date: 2026-11-17
+description: "A price test that moves revenue but ignores margin and confidence can mislead. Learn which metrics matter in an A/B price test, a worked example, and the limits."
+date: 2026-11-18
 tags:
-  - Planned
   - Marketing
+  - Experimentation
+  - Pricing Metrics
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A price change is easy to make and hard to evaluate. Teams often read a short-term revenue bump as proof that the new price works, when the same result could come from a temporary novelty effect, a shift in who bought, or simple chance. The real problem is choosing metrics that separate a genuine pricing effect from noise and from the cost of the change itself.
+
+**Direct answer:** An A/B price test randomizes visitors into old and new price groups and compares outcomes under controlled conditions. The metrics that matter are not just conversion and revenue but contribution margin per visitor and the statistical confidence behind any difference. Pricing theory adds that the right price depends on cost, demand, competition, and perceived value, so one test at one price point cannot identify an optimum.
+
+**Delta:** This article adds a metric-selection decision beyond the A/B testing and pricing sources: it maps each candidate metric to the decision it can and cannot support, with claim status explicit.
+
+## The mechanism
+
+A/B testing, as the source describes it, is a randomized experiment with a control and a treatment, where subjects are assigned to one or the other and their outcomes are compared. Randomization is what makes the comparison meaningful, because it balances other factors across groups on average. Applied to price, the control sees the existing price and the treatment sees the new one, while every other element of the offer is held constant. The practical consequence is that any systematic difference in outcomes can, with enough data, be attributed to the price rather than to who happened to see it.
+
+Statistical significance is the guardrail. The source treats significance as a judgment about whether an observed difference is likely to be real rather than a product of random variation, and notes that sample size, test duration, and multiple comparisons all affect that judgment. In price testing this matters because the metric of interest, revenue, is itself a product of two noisier metrics: conversion rate and average order value. A test that is underpowered for revenue can show a large but meaningless swing, and a test stopped early because the numbers look good has the same problem.
+
+Pricing theory supplies the second layer. Price is set against cost, demand, competition, and the value customers perceive, and the concept of elasticity describes how quantity demanded responds to a price change. A test reveals the response at the specific prices and moment it was run; it does not reveal the shape of the demand curve. The practical consequence is that a winning variant tells you one price beat another under these conditions, not that you have found the best price.
+
+The metric decision follows from that limit. Conversion rate answers whether the price changed buying behavior; revenue per visitor answers whether it changed the top line; contribution margin per visitor answers whether it changed profit after variable cost. Only the last connects directly to the business decision, because a price cut that lifts volume can still reduce profit if margin per unit falls faster than volume rises.
+
+## A worked example
+
+The following is hypothetical and illustrative. An online retailer tests a 10 percent price increase on a product, splitting visitors evenly between the current and new price for a fixed window. Three checks decide what the result means. First, statistical confidence: if the revenue difference falls inside the noise band at the planned sample size, the result is inconclusive regardless of its direction. Second, contribution margin per visitor: if the higher price lifts revenue per visitor but volume falls enough that margin per visitor is flat, the change creates no extra profit. Third, duration and novelty: if most of the lift appears in the first days, it may reflect a novelty response rather than a stable preference. The outcome is a decision to hold the test longer and judge on margin, not an immediate rollout on a headline revenue number.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| A/B testing compares randomized variants and judges differences by significance | `source-reported` | Wikipedia A/B testing | 2026-11-18 | When experiment methodology guidance changes |
+| Pricing depends on cost, demand, competition, and perceived value | `source-reported` | Wikipedia Pricing | 2026-11-18 | When pricing frameworks are revised |
+| Revenue alone is an incomplete price-test metric without margin and confidence | `inferred` | Derived from the sources | 2026-11-18 | When cost structure or test design changes |
+
+The source-reported rows restate what the two references state directly. The third row applies those ideas to metric choice and is an inference, not a quote. Recheck the first two rows if the reference material is revised; recheck the inferred row whenever variable costs, test duration, or the comparison metric changes.
+
+## What it cannot do
+
+A price test cannot identify the optimal price. It compares only the variants you show it, so it answers whether one tested price beat another, not where the peak of the demand curve sits. A team that runs a single two-arm test and declares a winner has learned a local comparison, not a pricing strategy.
+
+The hidden cost is in traffic and time. Detecting a reliable difference in a noisy revenue metric requires enough visitors, which means running longer or accepting a wider confidence band. During that window the business is exposed to a price it has not validated, and competitors, seasonality, and campaigns can shift the context in which the test runs. Longer tests reduce false positives but raise the chance that the world changes mid-experiment.
+
+The most common failure mode is peeking: checking results repeatedly and stopping when they look favorable. Because significance is a statement about how often a difference this large would appear by chance, repeatedly inspecting the data inflates the false-positive rate. A related failure is running many price points at once without adjusting for multiple comparisons, which eventually produces a winner by chance alone.
+
+The boundary is external validity. A price that wins for one product, channel, or season may not win for another. Elasticity varies by customer segment and context, and the test says nothing about long-term effects such as customer churn or brand perception that unfold after the experiment window. A short test can reward a price that extracts more now and costs more later.
+
+Because both the market and the reference methodology can change, the conclusion needs review. Costs move, competitors reprice, and statistical guidance on test design evolves. A result that justified a price last quarter should be revisited when any of those inputs shift, rather than treated as permanent.
+
+Counterargument: "The counterargument that a simple revenue comparison is good enough is fair for low-stakes, high-volume decisions and incomplete when margin, noise, or long-term customer effects determine the real outcome."
+
+## A decision test
+
+1. Define the decision the test must inform and the metric that maps to it.
+2. Fix the price variants and hold every other offer element constant.
+3. Determine the sample size and duration needed for the chosen metric.
+4. Randomize assignment and commit to the stopping rule in advance.
+5. Track conversion, revenue per visitor, and contribution margin per visitor.
+6. Check confidence and guard against peeking and multiple comparisons.
+7. Review the result against margin and recheck when costs or context change.
+
+Use the test to keep the metric tied to the decision. If the chosen metric is revenue but the decision is about profit, the test cannot answer it. The value of a price experiment lies in matching the measurement to the question before the first visitor is assigned.
+
+For further reading, see [Marketing Dashboards Without the Hype](/articles/marketing-dashboards-without-the-hype).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Pricing - Wikipedia](https://en.wikipedia.org/wiki/Pricing) — How prices are set and what they signal.
+- Wikipedia contributors, 2026. [A/B testing - Wikipedia](https://en.wikipedia.org/wiki/A/B_testing) — Controlled comparison of two variants.
