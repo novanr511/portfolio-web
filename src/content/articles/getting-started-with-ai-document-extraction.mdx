@@ -1,13 +1,55 @@
 ---
 title: "Getting Started with AI Document Extraction"
-description: "Reserved title for a future NOVANDRI article: Getting Started with AI Document Extraction."
-date: 2026-11-17
+description: "Document extraction is a data-quality problem before it is an AI problem. Read the starting steps, a worked example, and why a confident wrong field is costly."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Data
+  - Automation
+  - Engineering
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI document extraction looks like a clean win: feed in invoices or forms, get structured fields out. The difficulty is that a plausible wrong field is worse than an obvious miss, because downstream systems act on it, which the structured-output article treats as a reliability problem, as the data-quality article warns about bad inputs, as the hallucination article warns about confident invented detail.
+
+**Direct answer:** Start with a narrow document type, a defined schema, a measured baseline, and a human check on low-confidence fields. Anthropic's use-case guides cover extraction patterns, and OpenAI's structured-output guide covers schema-enforced results. The boundary: this is educational orientation, not a guarantee — extraction accuracy depends on document quality and definition, which the data-governance article requires you to source and date, as the publication standard forbids guaranteed outcomes.
+
+## The starting steps
+
+**Define the fields.** What exactly must be extracted, with what type and what rule, which the structured-output article requires for a schema, as the evaluation-rubric article demands for concrete criteria? A vague "extract the total" invites inconsistent results, as the data-governance article requires for a defined record.
+
+**Start with one document type.** A narrow set makes errors visible, as the integration blueprint recommends for bounded experiments, as the evaluation article advises for a fixed test set. Broadening too early hides failures, as the benchmarks article warns about applying results beyond conditions.
+
+**Measure against a baseline.** Have a labelled sample and score field-level accuracy, which the evaluation-rubric article requires, as the data-quality article advises for a quality bar, as the dashboard article argues for metrics tied to a decision.
+
+**Keep a human check.** Route low-confidence or high-cost fields to a person, which the human-in-the-loop article treats as meaningful review, as the hallucination article warns about confident wrong output, as the decision-memo article requires for a recorded judgement.
+
+Three consequences follow. The schema is the contract, which the structured-output article advises, as the data-governance article requires for provenance. The field-level score matters more than a document-level average, as the evaluation-rubric article requires, as the risk article requires residual risk to be stated. And the process should be reviewed when document types change, as the monitoring article treats as a trigger.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team extracts totals and dates from a single invoice format.
+
+Three checks decide the start. First, is each field defined with a type and a rule, as the structured-output article requires, with a schema the system must follow, as the OpenAI guide describes? Second, is there a labelled sample and a field-level score, as the rubric article requires, as the data-quality article advises? Third, are low-confidence fields routed to a person, as the oversight article advises, with a record of the decision, as the decision-memo article requires?
+
+Three conclusions follow. A schema makes the output testable, which the structured-output article argues. Field-level accuracy reveals which fields need a human, as the evaluation-rubric article advises. And the design should be reviewed after a format change, as the monitoring article recommends.
+
+## What document extraction cannot do
+
+It cannot create information missing from the document, which the data-quality article treats as an upstream problem, as the hallucination article warns about invented detail. It does not remove the need for a human check on high-cost fields, which the oversight article treats as meaningful review, as the decision-memo article requires. And it cannot guarantee accuracy across new formats, which the benchmarks article warns about, as the publication standard forbids guaranteed outcomes.
+
+The counterargument that extraction is fully solved by a model is fair on clean, defined formats and incomplete where documents vary or fields are ambiguous, which the worked example shows, as the data-quality and hallucination articles advise.
+
+## A decision test
+
+1. Define each field with a type and rule, as the structured-output article requires.
+2. Start with one document type, as the integration blueprint recommends.
+3. Build a labelled sample, as the evaluation-rubric article requires.
+4. Score field-level accuracy, as the rubric article requires.
+5. Route low-confidence fields to a person, as the oversight article advises.
+6. Source and date any relied-upon records, as the data-governance article requires.
+7. Record the decision and review on format change, as the decision-memo article requires.
+
+For the output contract, see [Structured Outputs](/articles/structured-outputs-common-questions); for the failure mode, see [Reducing Hallucinations](/articles/how-to-reduce-hallucinations-in-llm-applications).
 
 ## Further Reading
 
