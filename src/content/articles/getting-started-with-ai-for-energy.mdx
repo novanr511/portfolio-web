@@ -1,10 +1,63 @@
 ---
 title: "Getting Started with AI for Energy"
-description: "Reserved title for a future NOVANDRI article: Getting Started with AI for Energy."
-date: 2026-11-17
+description: "AI is used across energy systems, from forecasting to grid operations. Read where it fits, a worked example, and the physical limits."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Energy
+  - Infrastructure
+  - Climate
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+AI in energy is often discussed as a single thing, which hides the range of tasks: forecasting demand, predicting equipment failure, optimising a grid, or estimating the electricity use of data centres. The useful starting point is the physical system and the decision that needs improving, not the model.
+
+**Direct answer:** Apply AI where a decision has a measurable physical consequence and the data exists to support it — forecasting, maintenance, or operations. The IEA's energy reports provide primary context on demand and data-centre use, and the time-series article covers forecasting methods. The boundary: a model cannot change physics or supply constraints, which the energy-markets article explains for price and inventory, and a forecast is conditional, as the valuation literature treats any projection.
+
+## Where it fits
+
+**Forecasting.** Demand, renewable output, and equipment loads are time-series problems, which the time-series article covers for method and validation. A forecast should be scored against a naive baseline, as the forecasting article recommends, because a complex model that loses to persistence is not useful.
+
+**Maintenance.** Predicting failure in turbines, transformers, or pumps is anomaly detection with a physical consequence, which the anomaly-detection article describes for estimator families. The metric is avoided downtime, not model accuracy, as the evaluation-rubric article argues for outcome measures.
+
+**Operations.** Grid balancing and dispatch are optimisation problems under physical constraints, which the energy-markets article explains for supply and demand. AI can improve the inputs to a decision; the constraints remain, as the causal-inference article treats model output as different from a physical guarantee.
+
+**Data-centre demand.** The IEA reports on electricity use for AI infrastructure, which the data-centre electricity article covers for how to read such forecasts honestly. This is a demand-side consequence of AI rather than an application of it, and the distinction matters.
+
+## A worked example
+
+The following is hypothetical and illustrative. A utility wants to forecast next-day demand for a region to improve scheduling.
+
+Three checks decide whether a model helps. First, baseline: does the model beat a seasonal-naive forecast on a time-ordered holdout, as the time-series article requires? Second, consequence: does a better forecast reduce reserve capacity or fuel cost, which the energy-markets article treats as the physical and economic outcome? Third, failure mode: what happens on an extreme weather day when the training data has few examples, which the anomaly-detection article treats as tail risk?
+
+Three conclusions follow. The model is judged by a physical outcome, as the energy-markets article advises. A holdout that respects chronology is required, which the cross-validation guidance in the time-series article specifies. And the forecast should be labelled conditional, as the valuation article recommends for any projection with assumptions.
+
+## Reading the IEA material honestly
+
+The International Energy Agency publishes scenarios, not forecasts in the ordinary sense, and the difference matters when an energy decision depends on them. A scenario states a set of assumptions about policy, technology, and demand, then shows what follows if those assumptions hold, which the forecasting article treats as a conditional claim. A company that quotes a single number from an electricity report without its scenario and date has turned a conditional statement into a prediction it did not make.
+
+The data-centre electricity article explains this discipline in detail: check the base year, the scenario, and the geography, then ask whether the number describes current use or a projected path. It also distinguishes the electricity consumed by AI infrastructure from the electricity AI might help save elsewhere, which are different questions that are often combined in a single headline. A clear article on AI for energy should keep them separate, as the causal-inference article warns about treating association as effect.
+
+For a practitioner, the useful output of the IEA material is a boundary on the physical system, not a market forecast. It tells you what constraints are likely to matter, as the energy-markets article advises for reading supply and demand, and which assumptions to test in your own model, as the scenario-analysis article recommends for consequential decisions.
+
+## What AI for energy cannot do
+
+It cannot create generation capacity or change the fuel mix, which the energy-markets article treats as physical constraints. It cannot eliminate uncertainty in weather or demand, which the forecasting article frames as conditional. And it does not make a forecast into a decision — grid operations have rules and human oversight, which the human-in-the-loop article argues for high-impact systems.
+
+The counterargument that optimisation will solve the energy transition is too strong. It can improve the use of existing assets, which the IEA context supports, but the physical build remains a separate question, as the data-centre electricity article warns about reading forecasts honestly.
+
+## A decision test
+
+1. Identify the physical decision and its outcome, as the energy-markets article advises.
+2. Check that the data exists and is dated, as the data-governance article requires.
+3. Compare with a naive baseline on a time-ordered holdout, as the time-series article requires.
+4. Measure the physical consequence, not model accuracy, as the evaluation-rubric article advises.
+5. Test tail conditions such as extreme weather, as the anomaly-detection article recommends.
+6. Keep human oversight for high-impact operations, as the oversight article requires.
+7. Read IEA forecasts with dates and assumptions, as the data-centre electricity article advises.
+
+For the physical context, see [How Energy Markets Actually Work](/articles/how-energy-markets-actually-work); for the forecast caveat, see [Data Centre Electricity](/articles/data-centre-electricity-reading-the-iea-forecasts-honestly).
+
+## Further Reading
+
+- International Energy Agency, 2025. [Energy and AI: Data Centres and Electricity Demand](https://www.iea.org/reports/energy-and-ai) — Primary data on how data-centre electricity demand is growing and what that implies for energy markets.
+- International Energy Agency, 2026. [Electricity](https://www.iea.org/energy-system/electricity) — Global electricity demand and capacity outlook.
