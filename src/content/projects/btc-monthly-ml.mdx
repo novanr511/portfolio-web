@@ -1,6 +1,6 @@
 ---
-title: "92% Akurasi yang Bukan Edge: Studi Kasus Pipeline Machine Learning Bitcoin Bulanan"
-description: "Studi kasus walk-forward untuk arah penutup bulanan Bitcoin: 133 bulan uji, leakage control, tujuh model, aturan analitik satu baris, conformal prediction, dan agent RAG —plus mengapa angka 92% tidak bisa diperdagangkan."
+title: "Predicting Monthly Bitcoin Close Direction with Walk-Forward Stacking, Analytic Month-to-Date Rules, and Conformal Quantile Regression: A Comparative Evaluation Against Naive Baselines over 133 Out-of-Sample Months"
+description: "A walk-forward case study on monthly Bitcoin direction: 133 test months, leakage-controlled features, seven models, a one-line analytic rule, conformal prediction, and a RAG agent —and why the 92% figure is not tradable."
 date: 2026-11-18
 updated: 2026-11-18
 tags:
@@ -10,106 +10,106 @@ tags:
   - Data Leakage
   - Conformal Prediction
   - RAG
-inLanguage: id
+inLanguage: en
 ---
 
-## Ringkasan
+## Abstract
 
-Studi ini membangun dan mengevaluasi pipeline *machine learning* untuk mengklasifikasikan arah penutup bulanan Bitcoin (GREEN atau RED) di bawah protokol *walk-forward* yang ketat. Data dari empat penyedia eksternal —Returnsview, Bitstamp, BLS, dan Yahoo Finance— digabungkan dengan 71 peristiwa pilihan menjadi panel harian dan bulanan dengan 144–155 fitur. Tujuh kandidat model dievaluasi pada 133 bulan *out-of-sample* setelah penyelarasan dua sumber harga membuang tiga bulan yang berselisih tanda. Fraksi GREEN diamati pada enam *information sets* yang berbeda, mulai dari penutupan bulan sebelumnya (MS) hingga hari ke-27 bulan target (D27), dengan audit *look-ahead* pada akhir bulan (EOM).
+This study builds and evaluates a machine learning pipeline for classifying the direction of Bitcoin's monthly close (GREEN or RED) under a strict walk-forward protocol. Data from four external providers —Returnsview, Bitstamp, BLS, and Yahoo Finance— are joined with 71 hand-curated events into daily and monthly panels of 144–155 features. Seven candidate models are evaluated on 133 out-of-sample months after a two-feed price alignment step discards three months with conflicting signs. The GREEN fraction is examined across six information sets, from the previous month-end close (MS) to day 27 of the target month (D27), with a look-ahead audit at end-of-month (EOM).
 
-Temuan utamanya bersifat negatif dan justru merupakan kontribusi ilmiahnya. Pada D25, model mencapai akurasi 92.5% dan ROC-AUC 0.980, tetapi aturan deterministik tanpa parameter `sign(mtd_ret)` mencapai 94.0% —selisih −1.5 *percentage point*. Seluruh perbandingan model terhadap aturan tersebut memiliki *p*-valueHolm-adjusted 1.0; *frozen final holdout* 12 bulan menghasilkan akurasi 91.7% dengan edge 0.0. Ablasi menunjukkan penghapusan blok *month-to-date* menurunkan akurasi 5.3 *pp*, sementara penghapusan fitur event justru menaikkannya. Model distribusi harga berbasis *conformal quantile regression* kalah dari *baseline* Gaussian termuat pada kedua *cut-off* yang dipublikasikan, dan model *path* 12 bulan menghasilkan akurasi arah 30–65% dengan bias probabilitas −0.32…+0.01 *pp*.
+The main finding is negative, and that negativity is the contribution. At D25 the model reaches 92.5% accuracy and 0.980 ROC-AUC, but a deterministic, zero-parameter rule `sign(mtd_ret)` reaches 94.0% —a gap of −1.5 percentage points. Every model-versus-rule comparison has a Holm-adjusted *p*-value of 1.0; the 12-month frozen final holdout yields 91.7% accuracy with an edge of 0.0. Ablation shows that removing the month-to-date block costs 5.3 *pp*, while removing event features actually improves accuracy. A conformal quantile-regression price-range model loses to a conformally calibrated Gaussian baseline at both published cut-offs, and a 12-month path forecast returns directional accuracy of 30–65% with probability bias of −0.32…+0.01 *pp*.
 
-Kesimpulannya, angka 92% adalah `P(GREEN | pergerakan bulan sejauh ini)` —besar deskriptif yang naik karena sebagian besar bulan sudah terjadi pada saat prediksi dibuat— bukan sinyal yang dapat dieksekusi dengan harga penutup bulan sebelumnya. Studi ini sengaja tidak mengklaim *edge* ekonomi: tidak ada perhitungan PnL, Sharpe, slippage, atau biaya. Kontribusinya terletak pada disiplin evaluasi, kontrol kebocoran data, protokol perbandingan dengan *baseline* yang jujur, dan pelaporan hasil negatif.
+The conclusion is that 92% is `P(GREEN | move so far this month)` —a descriptive quantity that rises because most of the month has already happened by the time the forecast is made— not a signal executable at the prior month-end price. The study deliberately makes no economic claim: no PnL, Sharpe, slippage, or transaction costs are computed. Its value lies in evaluation discipline, leakage control, comparison against an honest baseline, and the reporting of negative results.
 
-**Kontribusi.** (i) Formalisasi *information set* sebagai variabel yang menentukan makna "akurasi" dalam peramalan bulanan; (ii) protokol validasi *walk-forward* dengan *inner selection*, *skill guard*, juara analitik, dan *frozen holdout*; (iii) perbandingan statistik berpasangan dengan koreksi multiple-testing; (iv) reproduksi penuh termasuk audit konsistensi 193 pemeriksaan dan *agent* RAG untuk narasi otomatis.
-
----
-
-## 1. Pendahuluan
-
-Dalam literatur populer, model peramalan harga sering dinilai dari satu angka akurasi. Angka tinggi dibaca sebagai bukti bahwa model "mampu memprediksi pasar". Terdapat dua kekeliruan dalam pembacaan tersebut. Pertama, akurasi tidak memiliki arti tanpa dinyatakannya momen prediksi dibuat: informasi yang tersedia di awal bulan dan di hari ke-25 berbeda secara fundamental. Kedua, akurasi tidak sama dengan *edge* yang dapat diperdagangkan; untuk itu diperlukan evaluasi ekonomi yang memperhitungkan harga eksekusi, biaya, dan kapasitas.
-
-Studi ini berangkat dari kegagalan. Versi pertama adalah model XGBoost tunggal dengan *expanding window*: akurasi 55.7%, setara dengan *baseline* "selalu tebak GREEN" sebesar 57.1%, dan ROC-AUC 0.392. Tidak ada sinyal. Alih-alih mengganti arsitektur, penulis mengubah pertanyaan yang diajukan kepada data.
-
-Pertanyaan penelitian dirumuskan sebagai berikut:
-
-- **RQ1.** Sejauh mana akurasi peramalan arah bulanan bergantung pada *timing* saat prediksi dibuat, dibandingkan dengan kompleksitas model?
-- **RQ2.** Apakah model pembelajaran mampu memberikan peningkatan yang signifikan secara statistik terhadap *baseline* deterministik yang hanya menggunakan tanda pergerakan *month-to-date*?
-- **RQ3.** Apakah hasil positif pada klasifikasi arah konsisten dengan hasil pada pemodelan distribusi harga dan peramalan jalur 12 bulan, ataukah keduanya mengungkap batas yang sama?
-
-Penulis berposisi sebagai pengembang web yang transisi ke data science; oleh karena itu desain studi menekankan hal-hal yang sering terlewat ketika fokus hanya pada model: definisi target, *release dating* data makro, dan konsistensi antara artefak eksperimen dengan laporan. Seluruh angka dalam artikel ini dibaca langsung dari direktori `outputs/` pada 18 November 2026 dan dapat diverifikasi ulang dengan prosedur di Bagian 12.
+**Contributions.** (i) A formalization of the *information set* as the variable that determines what "accuracy" means in monthly forecasting; (ii) a walk-forward protocol with inner selection, a skill guard, an analytic champion, and a frozen holdout; (iii) paired statistical testing with multiple-testing correction; (iv) a full reproduction package including a 193-check consistency audit and a RAG agent for automated narrative.
 
 ---
 
-## 2. Kerangka Konseptual: Timing adalah Variabel
+## 1. Introduction
 
-Misalkan `C_t` adalah harga penutup bulan `t` dan label bulanan didefinisikan sebagai:
+In popular accounts, forecasting models are often judged by a single accuracy figure. A high number is read as evidence that the model "can predict the market". Two errors are embedded in that reading. First, accuracy is meaningless without stating when the prediction was made: the information available at the start of a month and on day 25 are fundamentally different. Second, accuracy is not the same as a tradable edge; establishing that requires an economic evaluation that accounts for execution price, costs, and capacity.
+
+This study begins with a failure. The first version was a single XGBoost model with an expanding window: 55.7% accuracy, equal to the "always predict GREEN" baseline of 57.1%, and 0.392 ROC-AUC. There was no signal. Instead of changing architectures, the author changed the question asked of the data.
+
+The research questions are:
+
+- **RQ1.** How much does monthly directional forecast accuracy depend on *when* the prediction is made, relative to model complexity?
+- **RQ2.** Does a learned model deliver a statistically significant improvement over a deterministic baseline that uses only the sign of the month-to-date move?
+- **RQ3.** Are positive results on directional classification consistent with price-distribution modelling and 12-month path forecasting, or do those tasks reveal the same limitation?
+
+The author writes as a web developer transitioning into data science, so the design emphasizes the details often skipped when the focus is only on modelling: target definition, macro release dating, and consistency between experiment artifacts and the written report. Every number in this article is read directly from the `outputs/` directory on 18 November 2026 and can be re-verified with the procedure in Section 12.
+
+---
+
+## 2. Conceptual Framework: Timing Is a Variable
+
+Let `C_t` be the month-end close of month `t`, and define the monthly label as:
 
 ```text
-y_t = 1   jika  C_t > C_{t-1}        (GREEN)
-y_t = 0   jika  C_t < C_{t-1}        (RED)
-y_t = undefined  jika  C_t = C_{t-1} (tidak dilabeli)
+y_t = 1   if  C_t > C_{t-1}        (GREEN)
+y_t = 0   if  C_t < C_{t-1}        (RED)
+y_t = undefined  if  C_t = C_{t-1} (unlabelled)
 ```
 
-Definisi ini tampak sederhana, tetapi ia menuntut keputusan tentang kapan `y_t` boleh diketahui. Penulis memperkenalkan *information sets* `F_d`, yaitu himpunan informasi yang diizinkan saat prediksi untuk bulan `t` dibuat:
+The definition is simple, but it forces a decision about when `y_t` may be known. The study introduces *information sets* `F_d` —the information permitted at the moment the forecast for month `t` is made:
 
-| Set | Momen prediksi | Informasi yang diizinkan |
+| Set | Forecast moment | Information permitted |
 |---|---|---|
-| `MS` | Penutupan bulan `t-1` | Hanya bulan-bulan yang sudah selesai |
-| `D10`, `D13`, `D20`, `D25`, `D27` | Hari ke-`d` bulan `t` | `MS` + pergerakan harga *month-to-date* hingga hari `d` |
-| `EOM` | Akhir bulan `t` | **Lookahead** — audit saja, bukan forecast |
+| `MS` | Close of month `t-1` | Completed months only |
+| `D10`, `D13`, `D20`, `D25`, `D27` | Day `d` of month `t` | `MS` + month-to-date price movement through day `d` |
+| `EOM` | End of month `t` | **Lookahead** — audit only, not a forecast |
 
-Perbedaan ini mengubah interpretasi metrik. Akurasi pada `MS` adalah peramalan sejati: tidak ada informasi bulan target yang digunakan. Akurasi pada `D25` adalah estimasi `P(GREEN | informasi hingga hari ke-25)`. Akurasi pada `EOM` bukan peramalan sama sekali —ia menggunakan hasil akhir— dan disertakan hanya sebagai audit untuk menguji apakah model "menang" karena bocoran informasi.
+This changes the meaning of the metric. Accuracy at `MS` is a genuine forecast: no information from the target month is used. Accuracy at `D25` is an estimate of `P(GREEN | information through day 25)`. Accuracy at `EOM` is not forecasting at all —it uses the outcome— and is included only to test whether a model "wins" because of information leakage.
 
-Secara formal, untuk setiap set `F_d` penulis melatih dan mengevaluasi model yang sama. Satu-satunya perubahan adalah blok fitur yang boleh masuk. Dengan demikian, perbedaan akurasi antar set dapat diatribusikan pada kapan pertanyaan diajukan, bukan pada algoritma.
+Formally, the same model is trained and evaluated for each `F_d`; the only change is which feature block is admitted. Differences in accuracy across sets can therefore be attributed to *when the question is asked*, not to the algorithm.
 
-> *Insight inti:* "akurasi" tidak dapat dilepaskan dari *timing*. Menanyakan di hari ke-25 sangat berbeda dengan menanyakan di awal bulan —dan keduanya berbeda dengan melihat masa depan.
+> **Core insight:** "accuracy" cannot be separated from *timing*. Asking on day 25 is very different from asking at the start of the month —and both differ from seeing the future.
 
 ---
 
-## 3. Data, Provenance, dan Integritas Sumber
+## 3. Data, Provenance, and Source Integrity
 
-Empat penyedia data digabungkan, ditambah satu kalender peristiwa yang disusun manual.
+Four providers are combined, plus one manually curated event calendar.
 
-| Data | Sumber | Peran | Catatan |
+| Data | Source | Role | Notes |
 |---|---|---|---|
-| Return & close bulanan BTC | Returnsview API | Label | Bulan berjalan tidak pernah dipakai sebagai label |
-| OHLCV harian BTC | Bitstamp via GitHub mirror | Fitur | `mtd_ret`, `mtd_z_remaining` |
-| Makro AS: CPI, core CPI, PPI, NFP, unemployment, AHE | BLS API v2 | Fitur | *Release dating*: CPI +15 hari, PPI +16 hari, payroll +7 hari |
-| 19 series lintas aset | Yahoo Finance | Fitur | S&P 500, Nasdaq, VIX, DXY, emas, minyak, yield, ETH, COIN, MSTR, dll. |
-| Kalender peristiwa | Hand-curated, 71 event (2010–2025-06) | Fitur | Hanya "days since" / "count in trailing window" |
+| Monthly BTC return & close | Returnsview API | Label | The in-progress month is never used as a label |
+| Daily BTC OHLCV | Bitstamp via GitHub mirror | Features | `mtd_ret`, `mtd_z_remaining` |
+| US macro: CPI, core CPI, PPI, NFP, unemployment, AHE | BLS API v2 | Features | *Release dating*: CPI +15d, PPI +16d, payroll +7d |
+| 19 cross-asset series | Yahoo Finance | Features | S&P 500, Nasdaq, VIX, DXY, gold, oil, yields, ETH, COIN, MSTR, etc. |
+| Event calendar | Hand-curated, 71 events (2010–2025-06) | Features | Only "days since" / "count in trailing window" |
 
-Seluruh data diunduh sekali ke `data/raw/`; pipeline dapat dijalankan ulang dalam mode `--offline`. Provenance dicatat dalam registry yang memetakan setiap kolom ke sumber dan waktu pengambilan.
+All data is downloaded once into `data/raw/`; the pipeline can be re-run with `--offline`. Provenance is recorded in a registry mapping each column to its source and retrieval time.
 
-### 3.1 Release dating sebagai kontrol kebocoran
+### 3.1 Release dating as a leakage control
 
-Data makro BLS adalah contoh kebocoran yang tidak terlihat: nilai CPI untuk bulan `t` baru dirilis sekitar 15 hari setelah bulan berakhir. Jika fitur CPI bulan `t` dipakai untuk memprediksi `y_t` pada `MS` atau `D10`, model melihat informasi yang belum tersedia pada momen prediksi. Penulis menerapkan *release dating*: setiap series makro digeser ke tanggal rilisnya, sehingga prediksi pada hari `d` hanya boleh melihat rilis yang sudah terjadi. Ini adalah keputusan data, bukan hyperparameters model.
+BLS macro data is an example of leakage that is invisible unless you look for it: the CPI figure for month `t` is released roughly 15 days after that month ends. If the CPI value for month `t` is used to predict `y_t` at `MS` or `D10`, the model sees information that did not exist at prediction time. The study applies *release dating*: every macro series is shifted to its release date, so a forecast on day `d` may only use releases that had already occurred. This is a data decision, not a hyperparameter.
 
-### 3.2 Konflik dua feed harga
+### 3.2 Conflicting price feeds
 
-Label berasal dari Returnsview, sementara fitur *month-to-date* berasal dari Bitstamp. Keduanya adalah sumber independen dan ternyata tidak selalu sepakat. Pemeriksaan menunjukkan:
+Labels come from Returnsview while the month-to-date features come from Bitstamp. These are independent sources and they do not always agree:
 
-- median selisih return bulanan: **0.17 *pp***;
-- selisih maksimum: **18.6 *pp*** pada periode 2011–2013;
-- **3 bulan** berselisih **tanda** —label GREEN di satu feed, RED di feed lain.
+- median return difference: **0.17 *pp***;
+- maximum difference: **18.6 *pp*** during 2011–2013;
+- **3 months** disagree in **sign** —GREEN in one feed, RED in the other.
 
-Ketiga bulan tersebut dibuang dari sampel (`outputs/source_alignment.json`). Dari 196 bulan yang tersedia setelah penyelarasan, tersisa **133 bulan uji**. Keputusan ini memperkecil sampel, tetapi mencegah model belajar dari label yang tidak konsisten dengan fitur yang dipakai.
+Those three months are dropped (`outputs/source_alignment.json`). From 196 available months after alignment, **133 test months** remain. The decision shrinks the sample but prevents the model from learning labels that contradict the features used to predict them.
 
 ---
 
-## 4. Rekayasa Fitur dan Kontrol Kebocoran
+## 4. Feature Engineering and Leakage Control
 
-Setiap panel memiliki 144–155 fitur, dikelompokkan menjadi:
+Each panel carries 144–155 features, grouped as follows:
 
-1. **Momentum, volatilitas, drawdown, RSI** pada berbagai jendela;
-2. **Cross-asset returns** dari 19 series Yahoo Finance;
-3. **Makro yang sudah di-*release-date***;
-4. **Event features** dari 71 peristiwa;
-5. **Kalender** (musim, hari dalam bulan, dll.);
-6. **Lag return bulanan**;
-7. **Blok month-to-date** yang dihitung ulang untuk setiap `F_d`.
+1. **Momentum, volatility, drawdown, RSI** across multiple windows;
+2. **Cross-asset returns** from 19 Yahoo Finance series;
+3. **Macro features after release dating**;
+4. **Event features** from 71 curated events;
+5. **Calendar features** (seasonality, day of month, etc.);
+6. **Lagged monthly returns**;
+7. **Month-to-date block** recomputed for each `F_d`.
 
-Blok *month-to-date* merupakan inti dari eksperimen *timing*:
+The month-to-date block is the core of the timing experiment:
 
 ```text
 mtd_ret(d)      = (close_d / close_{t-1}^{EOM} - 1) * 100
@@ -118,83 +118,83 @@ mtd_z(d)        = mtd_ret(d) / sigma_rem(d)
 p_normal(d)     = Phi(mtd_z(d))
 ```
 
-di mana `H` adalah jumlah hari dalam bulan dan `Phi` adalah fungsi distribusi kumulatif normal standar. `p_normal(d)` adalah "P(GREEN) versi normal" berdasarkan asumsi bahwa sisa pergerakan bulan tidak terarah. Ia berfungsi sebagai juara analitik yang ikut bertanding dengan model pembelajaran (Bagian 5).
+where `H` is the number of days in the month and `Phi` is the standard normal CDF. `p_normal(d)` is the "normal-model P(GREEN)" under the assumption that the remaining move is directionless. It serves as the analytic champion that competes with the learned models (Section 5).
 
-**Disiplin pipeline.** Scaling, imputasi, dan *feature selection* berada di dalam objek `Pipeline` scikit-learn dan hanya di-*fit* pada *training window*. Tidak ada transformer yang pernah melihat data uji. Aturan ini memberlakukan kontrol kebocoran secara struktural: kebenaran tidak bergantung pada ingatan peneliti saat menjalankan eksperimen.
+**Pipeline discipline.** Scaling, imputation, and feature selection live inside a scikit-learn `Pipeline` and are fitted only on the training window. No transformer ever sees test data. This enforces leakage control structurally: correctness does not depend on the researcher remembering a rule during an experiment.
 
-*Ablasi* kemudian digunakan untuk menguji kontribusi tiap blok fitur (Bagian 8.2).
+Ablation is then used to test which feature block actually contributes (Section 7.5).
 
 ---
 
-## 5. Arsitektur Pemodelan
+## 5. Modelling Architecture
 
-Kandidat model terdiri dari model parametrik, pohon, dan model berbasis aturan:
+Candidate models span linear models, trees, and rule-based models:
 
-| # | Komponen | Peran |
+| # | Component | Role |
 |---|---|---|
-| 1 | LogisticRegression L1/L2 | *Linear baseline* |
-| 2 | RandomForest, ExtraTrees | *Ensemble* pohon |
-| 3 | XGBoost, LightGBM | *Gradient boosting*, sengaja shallow/regularized |
-| 4 | `rule_logreg`, `rule_controls_logreg` | *Anchor* analitik (3 fitur) |
-| 5 | `Phi(mtd_z)` | Juara analitik, 0 parameter, tanpa training |
+| 1 | LogisticRegression L1/L2 | Linear baseline |
+| 2 | RandomForest, ExtraTrees | Tree ensembles |
+| 3 | XGBoost, LightGBM | Gradient boosting, deliberately shallow/regularized |
+| 4 | `rule_logreg`, `rule_controls_logreg` | Analytic anchors (3 features) |
+| 5 | `Phi(mtd_z)` | Analytic champion, 0 parameters, untrained |
 
-Alur seleksi:
+Selection flow:
 
 ```text
-sumber → daily panel → monthly panel → walk-forward
-       → inner expanding validation → skill guard → champion
-       → forecast → dashboard / agent
+sources → daily panel → monthly panel → walk-forward
+        → inner expanding validation → skill guard → champion
+        → forecast → dashboard / agent
 ```
 
-**Inner expanding validation.** Di dalam setiap *training window*, validasi *expanding* kronologis memilih bobot *stacking*, threshold keputusan, dan meta-learner (regresi logistik di atas logit probabilitas anggota). Validasi ini tidak pernah menyentuh data uji.
+**Inner expanding validation.** Inside each training window, chronological inner validation selects stacking weights, the decision threshold, and a meta-learner (logistic regression on member logits). Inner validation never touches test data.
 
-**Skill guard.** Model dilarang mengeluarkan sinyal apabila ia tidak mengalahkan prediksi mayoritas dan ROC-AUC pada validasi inner di bawah 0.53. Tujuannya adalah mencegah sinyal palsu dari model yang secara statistik tidak lebih baik dari tebakan.
+**Skill guard.** The model is forbidden from emitting a signal unless it beats the majority prediction and its inner-validation ROC-AUC is at least 0.53. This prevents spurious signals from models that are not statistically better than a guess.
 
-**Analytic champion.** Aturan `Phi(mtd_z)` ikut bertanding pada holdout kronologis. *Stacking* hanya dipakai jika mengalahkan aturan tersebut; jika terjadi tie, kemenangan diberikan pada aturan analitik. Keputusan ini adalah *default* yang konservatif: kompleksitas harus membayar biayanya sendiri.
+**Analytic champion.** The `Phi(mtd_z)` rule competes on a chronological holdout. Stacking is used only if it beats the rule; ties are awarded to the analytic rule. The default is conservative: complexity must pay for itself.
 
-**Frozen final holdout.** 12 bulan terakhir tidak pernah dipakai untuk memilih model, threshold, atau konfigurasi. Holdout dibuka sekali di akhir (`outputs/final_holdout.json`).
-
----
-
-## 6. Protokol Evaluasi
-
-Protokol dirancang untuk menjawab RQ2 dengan standar statistik yang dapat dipertanggungjawabkan.
-
-- **Split:** 60 bulan training awal,随后 *expanding walk-forward*; 133 bulan *out-of-sample*.
-- **Metrik:** akurasi arah dan ROC-AUC per information set.
-- **Uji berpasangan:** McNemar untuk perbedaan proporsi pada prediksi berpasangan (model vs aturan tanda).
-- **Koreksi multiple testing:** prosedur Holm diterapkan pada seluruh perbandingan yang dilakukan. Tanpa koreksi ini, satu perbandingan yang kebetulan signifikan akan terlihat seperti temuan.
-- **Diebold–Mariano test:** digunakan sebagai pemeriksa tambahan untuk perbandingan akurasi prediktif.
-- **Ablasi:** menghapus satu blok fitur pada satu waktu untuk menguji sumber sinyal.
-- **Holdout:** 12 bulan terakhir dibuka sekali, setelah semua keputusan desain dibekukan.
-
-Studi ini secara sadar **tidak** menghitung PnL, Sharpe ratio, slippage, atau biaya transaksi. Akibatnya, tidak ada klaim *edge* ekonomi yang dapat dibuat dari hasil ini —dan penulis tidak membuatnya.
+**Frozen final holdout.** The last 12 months are never used to select a model, threshold, or configuration. The holdout is opened once at the end (`outputs/final_holdout.json`).
 
 ---
 
-## 7. Hasil
+## 6. Evaluation Protocol
 
-### 7.1 Kurva informasi
+The protocol is designed to answer RQ2 with defensible statistics.
+
+- **Split:** 60 initial training months followed by expanding walk-forward; 133 out-of-sample months.
+- **Metrics:** directional accuracy and ROC-AUC per information set.
+- **Paired test:** McNemar's test for differences in paired proportions (model vs sign rule).
+- **Multiple-testing correction:** Holm's procedure applied across all comparisons. Without it, one fortuitous significant comparison would look like a finding.
+- **Diebold–Mariano test:** an additional check for comparative predictive accuracy.
+- **Ablation:** one feature block removed at a time to locate the source of signal.
+- **Holdout:** the last 12 months opened once, after all design decisions are frozen.
+
+The study deliberately does **not** compute PnL, Sharpe ratio, slippage, or transaction costs. Consequently, no economic edge can be claimed from these results —and none is claimed.
+
+---
+
+## 7. Results
+
+### 7.1 Information curve
 
 <figure className="my-10 overflow-hidden rounded-xl border border-border">
   <img
     src="/images/projects/btc-monthly-ml/portfolio_01_information_curve.png"
-    alt="Akurasi arah meningkat dan cenderung naik makin dekat ke akhir bulan, untuk ekspektasi normal, aturan tanda, dan model walk-forward"
+    alt="Directional accuracy rises toward month end for the normal expectation, the zero-training sign rule, and the walk-forward model"
     className="w-full"
   />
   <figcaption className="mt-3 px-1 text-[13px] leading-relaxed text-muted">
-    <strong>Gambar 1.</strong> Akurasi sebagai fungsi hari prediksi. Garis putus-putus adalah ekspektasi model normal, garis hijau adalah aturan tanda tanpa training, dan titik oranye adalah model walk-forward yang dikirim. Sumber: outputs/information_curve.csv dan outputs/model_metrics.json.
+    <strong>Figure 1.</strong> Accuracy as a function of forecast day. The dashed line is the normal-model expectation, the green line the untrained sign rule, and the orange points the delivered walk-forward model. Source: outputs/information_curve.csv and outputs/model_metrics.json.
   </figcaption>
 </figure>
 
-Kurva menunjukkan pola yang mendominasi seluruh eksperimen: akurasi naik bersamaan dengan mendekatnya akhir bulan. Model, aturan tanda, dan ekspektasi normal semuanya bergerak ke arah yang sama. Penambahan kompleksitas tidak mengubah bentuk kurva.
+The curve shows the pattern that dominates every experiment: accuracy rises as month end approaches. Model, sign rule, and normal expectation all move in the same direction. Added complexity does not change the shape of the curve.
 
-### 7.2 Tabel hasil utama
+### 7.2 Main results table
 
-Berikut adalah ringkasan yang harus dibaca sebagai satu kesatuan —termasuk kolom *edge* dan *p*-value:
+The following summary must be read as a whole —including the edge and *p*-value columns:
 
 ```text
-133 bulan out-of-sample · 60 bulan training awal · expanding walk-forward
+133 out-of-sample months · 60 initial training months · expanding walk-forward
 
 Set     Model   sign(mtd_ret)   Edge       AUC     p_Holm
 MS      45.9%   n/a             n/a        0.418   n/a
@@ -204,208 +204,208 @@ D20     88.7%   88.0%           +0.8 pp    0.932   1.0
 D25     92.5%   94.0%           -1.5 pp    0.980   1.0
 D27     94.7%   94.0%           +0.8 pp    0.981   1.0
 EOM*    93.2%   —               —          0.991   —
-(* lookahead audit, bukan forecast)
+(* lookahead audit, not a forecast)
 ```
 
-Dua fakta menonjol. Pertama, *edge* model terhadap aturan tanda berkisar antara −1.5 dan +0.8 *pp* —besar yang lebih kecil daripada ketidakpastian sampel. Kedua, seluruh *p*-value yang dikoreksi Holm adalah 1.0: tidak ada satu pun perbedaan yang signifikan setelah akun diperhitungkan karena banyaknya konfigurasi yang dicoba.
+Two facts stand out. First, the model's edge over the sign rule ranges from −1.5 to +0.8 *pp* —smaller than the sampling uncertainty. Second, every Holm-adjusted *p*-value is 1.0: after accounting for the number of configurations tried, not a single difference is significant.
 
-### 7.3 Plot twist: mesin vs satu baris aturan
+### 7.3 The plot twist: the machine vs one line of code
 
 <figure className="my-10 overflow-hidden rounded-xl border border-border">
   <img
     src="/images/projects/btc-monthly-ml/portfolio_02_edge_vs_sign_rule.png"
-    alt="Edge model terhadap aturan tanda berkisar antara minus 1.5 sampai plus 0.8 percentage point dengan p_Holm 1.0 untuk semua timing"
+    alt="Model edge over the sign rule ranges from minus 1.5 to plus 0.8 percentage points with p_Holm equal to 1.0 at every timing"
     className="w-full"
   />
   <figcaption className="mt-3 px-1 text-[13px] leading-relaxed text-muted">
-    <strong>Gambar 2.</strong> Seluruh mesin ML versus satu baris aturan. Setiap batang adalah selisih akurasi dalam percentage point; tidak ada batang yang signifikan setelah koreksi Holm. Sumber: outputs/model_metrics.json dan outputs/multiple_testing.json.
+    <strong>Figure 2.</strong> The entire ML machine versus a one-line rule. Each bar is an accuracy difference in percentage points; no bar is significant after Holm correction. Source: outputs/model_metrics.json and outputs/multiple_testing.json.
   </figcaption>
 </figure>
 
-Pada D25, model mencapai 92.5% sementara `sign(mtd_ret)` mencapai 94.0% —model **kalah** 1.5 *pp* dari aturan yang tidak memiliki parameter dan tidak perlu dilatih. Kalimat yang paling ringkas untuk hasil ini:
+At D25 the model reaches 92.5% while `sign(mtd_ret)` reaches 94.0% —the model **loses** by 1.5 *pp* to a rule with no parameters that requires no training. The most compact statement of this result:
 
 > *The most accurate part of the model was the part that needed no training at all.*
 
-### 7.4 Walk-forward dan holdout
+### 7.4 Walk-forward and holdout
 
 <figure className="my-10 overflow-hidden rounded-xl border border-border">
   <img
     src="/images/projects/btc-monthly-ml/portfolio_03_walkforward_curve.png"
-    alt="Akurasi kumulatif model D25 stabil di atas baseline mayoritas, namun baseline mayoritas bukan competitor yang tepat"
+    alt="Cumulative D25 accuracy stays above the majority baseline, but the majority baseline is not the right competitor"
     className="w-full"
   />
   <figcaption className="mt-3 px-1 text-[13px] leading-relaxed text-muted">
-    <strong>Gambar 3.</strong> Akurasi kumulatif D25 terhadap baseline mayoritas. Model terlihat stabil di atas baseline, tetapi baseline mayoritas bukan kompetitor yang tepat; kompetitor yang tepat ada di Gambar 2. Sumber: outputs/walk_forward_curve_D25.csv.
+    <strong>Figure 3.</strong> Cumulative D25 accuracy against the majority baseline. The model looks stable above the baseline, but the majority baseline is not the right competitor; the right competitor is in Figure 2. Source: outputs/walk_forward_curve_D25.csv.
   </figcaption>
 </figure>
 
-Kurva kumulatif ini adalah perangkap metodologis yang umum. Relative terhadap "selalu tebak GREEN", model terlihat jauh lebih baik. Relative terhadap aturan tanda, keunggulan itu hilang. *Frozen final holdout* 12 bulan memberikan akurasi **91.7%** dengan edge **0.0** terhadap aturan tanda —pemilihan model tidak menghasilkan keunggulan yang bertahan di data yang belum pernah dilihat.
+The cumulative curve is a common methodological trap. Relative to "always predict GREEN", the model looks far better. Relative to the sign rule, the advantage disappears. The frozen 12-month holdout gives **91.7%** accuracy with an edge of **0.0** over the sign rule —model selection produces no advantage that survives on unseen data.
 
-### 7.5 Ablasi
+### 7.5 Ablation
 
-Ablasi D25 menguji mana dari blok fitur yang benar-benar bekerja:
+The D25 ablation tests which feature block actually works:
 
-| Konfigurasi | Akurasi |
+| Configuration | Accuracy |
 |---|---|
 | Full | 92.48% |
-| Tanpa event | 93.99% |
-| Tanpa macro | 92.48% |
-| Tanpa month-to-date | 87.22% |
+| Without events | 93.99% |
+| Without macro | 92.48% |
+| Without month-to-date | 87.22% |
 
-Membuang event justru **menaikkan** akurasi 1.51 *pp*, sehingga klaim bahwa fitur makro atau kalender meningkatkan performa tidak didukung. Membuang blok *month-to-date* menurunkan akurasi 5.26 *pp*. Kesimpulannya sempit dan jelas: hanya sinyal *month-to-date* yang bekerja, dan sinyal itu sudah tersedia tanpa model.
+Removing events **raises** accuracy by 1.51 *pp*, so the claim that macro or calendar features improve performance is unsupported. Removing the month-to-date block lowers accuracy by 5.26 *pp*. The conclusion is narrow and clear: only the month-to-date signal works, and that signal is available without a model.
 
 ---
 
-## 8. Diskusi: Apa yang Sebenarnya Diprediksi Model
+## 8. Discussion: What the Model Actually Predicts
 
-Pada hari ke-25, pergerakan bulan sudah hampir final dan sudah diketahui oleh semua pelaku pasar. Akurasi 92.5% dengan demikian bukan peramalan masa depan; ia adalah pernyataan deskriptif `P(GREEN | pergerakan sejauh ini)`. Audit `EOM`, yang secara sengaja mengizinkan model mengintip akhir bulan, menghasilkan 93.2% —tidak lebih meyakinkan daripada set jujur D27 sebesar 94.7%. Jika mengintip hasil akhir saja tidak menambah keyakinan, maka angka tinggi itu memang berasal dari informasi yang sudah terlihat, bukan dari kemampuan menemukan pola tersembunyi.
+By day 25, the month's move is nearly final and already known to every market participant. The 92.5% figure is therefore not a forecast of the future; it is the descriptive statement `P(GREEN | move so far this month)`. The `EOM` audit, which deliberately lets the model peek at the final outcome, yields 93.2% —no more convincing than the honest D27 set at 94.7%. If peeking at the answer adds no confidence, the high accuracy comes from information already visible, not from a hidden pattern the model uncovered.
 
-Konsekuensi praktisnya: skor ini tidak dapat dieksekusi dengan harga penutup bulan sebelumnya. Untuk mengubahnya menjadi *edge* diperlukan setidaknya evaluasi terhadap harga eksekusi nyata, slippage, biaya, dan kapasitas. Tidak ada satu pun dari itu di studi ini.
+The practical consequence: this score cannot be executed at the previous month-end price. Turning it into an edge would require evaluation against real execution prices, slippage, costs, and capacity. None of that exists in this study.
 
 > *92% accuracy at day 25 does not mean we can predict Bitcoin. It means most of the month has already happened by day 25.*
 
-Penulis sengaja tidak menutupi bagian ini. Menjual angka 92% sebagai "model memprediksi Bitcoin" akan menghasilkan cerita yang lebih menarik, tetapi cerita itu akan salah.
+The author deliberately does not paper over this. Selling 92% as "the model predicts Bitcoin" makes a better story —and a false one.
 
 ---
 
-## 9. Dua Model Tambahan: Hasil Negatif Tetap Dilaporkan
+## 9. Two Additional Models: Negative Results Reported Anyway
 
-Untuk menguji apakah temuan pada klasifikasi arah bersifat spesifik atau merupakan gejala umum dari keterbatasan sinyal, dua model lain dibangun.
+To test whether the directional finding is task-specific or a symptom of a broader signal limit, two further models were built.
 
 ### 9.1 Price-range model
 
-Model distribusi harga dibangun dengan LightGBM *quantile regression* pada level 5/10/25/50/75/90/95%, dilengkapi kalibrasi *conformal* (Romano et al., 2019). Ia dibandingkan dengan *band* Gaussian yang dikalibrasi secara *conformal* sama. Metrik yang dipakai adalah CRPS (*continuous ranked probability score*), di mana lebih rendah lebih baik.
+The price distribution model uses LightGBM quantile regression at the 5/10/25/50/75/90/95% levels, with conformal calibration (Romano et al., 2019). It is compared against a Gaussian band calibrated conformally in the same way. The metric is CRPS (continuous ranked probability score), where lower is better.
 
-| Cut-off | CRPS model | CRPS naive band | Pemenang |
+| Cut-off | Model CRPS | Naive band CRPS | Winner |
 |---|---|---|---|
 | D13 | 8.547 | 8.204 | naive |
 | D25 | 3.542 | 3.481 | naive |
 
-Model pembelajaran kalah di kedua timing yang dipublikasikan, sehingga baseline yang dikirim adalah *band* Gaussian. Versi README lama yang hanya menampilkan satu timing di mana model menang sudah diperbaiki; pembuangan selektif semacam itu adalah bentuk *cherry-picking* dan tidak boleh dibiarkan dalam case study.
+The learned model loses at both published timings, so the deployed baseline is the Gaussian band. An older version of the README showed only the timing where the model won; that has been corrected. Selective reporting of this kind is cherry-picking and has no place in a case study.
 
 ### 9.2 12-month path forecast
 
-Model jalur dibangun dengan 300 *path* Monte Carlo menggunakan *block bootstrap* return 30 hari di ruang log, dengan *de-mean* dilakukan **setelah** penskalaan volatilitas. Fitur makro di-*carry forward*. Backtest menggunakan 24 *origin*, dengan **refit model sebelum setiap origin** —tanpa refit, evaluasi akan secara optimistis menggunakan parameter yang sudah melihat masa depan.
+The path model uses 300 Monte Carlo paths with a 30-day block bootstrap of log returns, with de-meaning performed **after** volatility scaling. Macro features are carried forward. The backtest uses 24 origins, with **refitting before each origin** —without refitting, the evaluation would optimistically use parameters that had already seen the future.
 
 <figure className="my-10 overflow-hidden rounded-xl border border-border">
   <img
     src="/images/projects/btc-monthly-ml/portfolio_04_horizon_bias.png"
-    alt="Akurasi arah forecast 12 bulan berkisar 30 sampai 65 persen dengan bias probabilitas negatif terhadap share GREEN aktual"
+    alt="Directional accuracy of the 12-month forecast ranges from 30 to 65 percent with probability bias against the actual GREEN share"
     className="w-full"
   />
   <figcaption className="mt-3 px-1 text-[13px] leading-relaxed text-muted">
-    <strong>Gambar 4.</strong> Akurasi arah per bulan ke-n dari origin (kiri) dan bias probabilitas terhadap share GREEN aktual (kanan). Sumber: outputs/horizon_accuracy.csv, 24 origin, model di-refit sebelum tiap origin.
+    <strong>Figure 4.</strong> Directional accuracy by month from origin (left) and probability bias against the actual GREEN share (right). Source: outputs/horizon_accuracy.csv, 24 origins, model refitted before each origin.
   </figcaption>
 </figure>
 
-Akurasi arah berkisar **30–65%** —mendekati coin flip— dengan `probability_bias` −0.32…+0.01 *pp*. Probabilitasnya tidak dipakai; yang berguna hanya rentang harga yang dihasilkan. Temuan ini konsisten dengan RQ3: keterbatasan yang sama muncul kembali ketika pertanyaan diubah dari "arah bulan ini" menjadi "jalur 12 bulan ke depan".
+Directional accuracy ranges from **30% to 65%** —close to a coin flip— with `probability_bias` of −0.32…+0.01 *pp*. The probabilities are not used; only the price ranges are useful. This is consistent with RQ3: the same limitation reappears when the question changes from "direction this month" to "the path over 12 months".
 
 ---
 
-## 10. Lapisan Produk
+## 10. Product Layer
 
-Agar riset tidak berhenti sebagai notebook, tiga lapisan produk dibangun.
+Three product layers keep the research from ending in a notebook.
 
-**Dashboard BI.** FastAPI + Plotly.js, tujuh halaman, *star-schema cube* dengan *cross-filter*, URL state, ekspor PNG/CSV, Plotly di-*vendor* agar bekerja offline, tema terang/gelap, dan badge **STALE DATA** ketika data atau *cut-off* sudah tua.
+**BI dashboard.** FastAPI + Plotly.js, seven pages, a star-schema cube with cross-filtering, URL state, PNG/CSV export, vendored Plotly for offline use, light/dark themes, and a **STALE DATA** badge when data or the cut-off is old.
 
-**Research agent.** LangGraph + RAG dengan penggabungan BM25 dan TF-IDF menggunakan *reciprocal rank fusion* atas artefak project. LLM kompatibel OpenAI dengan fallback offline, *checkpoint* SQLite, *run registry*, dan modul `number_audit` yang memverifikasi setiap angka persen dalam memo terhadap konteks yang di-retrieve.
+**Research agent.** LangGraph + RAG combining BM25 and TF-IDF with reciprocal rank fusion over project artifacts. An OpenAI-compatible LLM with an offline fallback, SQLite checkpoints, a run registry, and a `number_audit` module that verifies every percentage in a memo against retrieved context.
 
-**Audit script.** 193 pemeriksaan memastikan angka di dashboard dan laporan masih sama dengan file pipeline. Poin yang perlu ditekankan: audit ini menjamin **konsistensi**, bukan **validitas metode**. Ia menjawab "apakah angka di artikel sama dengan angka di outputs?", bukan "apakah metodenya benar?". Pemisahan ini penting agar alat bantu tidak disalahartikan sebagai bukti ilmiah.
+**Audit script.** 193 checks ensure numbers in the dashboard and reports still match the pipeline files. The point to emphasize: the audit guarantees **consistency**, not **method validity**. It answers "does the article match the outputs?", not "is the method correct?". Keeping these separate prevents a helper tool from being mistaken for scientific evidence.
 
 > *I built an audit that proves my dashboard is consistent. It cannot prove my method is right — that is a different, harder question.*
 
-Status terakhir: audit **193 checks, 0 failed**; test **55 passed, 1 skipped**.
+Final status: **193 checks, 0 failed**; tests **55 passed, 1 skipped**.
 
 ---
 
-## 11. Ancaman Validitas dan Batasan
+## 11. Threats to Validity and Limitations
 
-Studi ini memiliki batasan yang harus dinyatakan bersama hasilnya:
+The limitations must be stated alongside the results:
 
-1. **Sampel kecil.** 133 bulan *out-of-sample* untuk aset tunggal; interval kepercayaan lebar dan generalisasi ke aset lain tidak diuji.
-2. **Protokol post-hoc.** Sebagian eksplorasi terjadi sebelum protokol final ditetapkan; hal ini mengurangi kekuatan inferensi statistik meskipun *holdout* dibekukan.
-3. **Bukan vintage data.** Data makro BLS memakai nilai final/revisi, bukan nilai yang tersedia pada tanggal rilis historis. *Release dating* mengatasi ketersediaan waktu, bukan revisi nilai.
-4. **Tanpa evaluasi ekonomi.** Tidak ada PnL, Sharpe, biaya, atau kapasitas — sehingga tidak ada klaim tradability.
-5. **Akurasi late-month bersifat deskriptif.** Angka di D25/D27 adalah `P(GREEN | move sejauh ini)`, bukan sinyal yang bisa dieksekusi pada harga bulan sebelumnya.
-6. **Tidak financial advice.** Seluruh hasil adalah eksperimen riset, bukan rekomendasi investasi.
+1. **Small sample.** 133 out-of-sample months for a single asset; confidence intervals are wide and generalization to other assets is untested.
+2. **Post-hoc protocol.** Some exploration preceded the final protocol; this weakens statistical inference even though the holdout was frozen.
+3. **No vintage data.** BLS macro values are final/revised figures, not the values available at the historical release date. Release dating fixes availability in time, not later revisions.
+4. **No economic evaluation.** No PnL, Sharpe, costs, or capacity —so no claim of tradability.
+5. **Late-month accuracy is descriptive.** Figures at D25/D27 are `P(GREEN | move so far)`, not a signal executable at the prior month's close.
+6. **Not financial advice.** All results are research experiments, not investment recommendations.
 
-Terjemahan dari batasan-batasan ini adalah: studi ini layak dipamerkan sebagai latihan disiplin riset, bukan sebagai sistem prediksi yang siap dipakai.
+Translated, these limitations mean the study is worth presenting as an exercise in research discipline, not as a production-ready prediction system.
 
 ---
 
 ## 12. Reproducibility
 
-Struktur kode dan prosedur reproduksi:
+Code structure and reproduction procedure:
 
 ```text
 btcml/
-  config.py        konstanta, universe data, event calendar, holdout
-  sources.py       downloader + cache + peringatan stale
-  features.py      daily panel → monthly panel, alignment dua feed
+  config.py        constants, data universe, event calendar, holdout
+  sources.py       downloader + cache + stale warnings
+  features.py      daily panel → monthly panel, two-feed alignment
   models.py        candidate models + rule-anchored models
-  walkforward.py   engine, champion, skill guard, metrik, DM test, Holm
-  analysis.py      benchmark, ablasi, information curve
+  walkforward.py   engine, champion, skill guard, metrics, DM test, Holm
+  analysis.py      benchmark, ablation, information curve
   forecast.py      Monte Carlo path + backtest refit-per-origin
   range.py / range_runner.py   quantile + conformal price range
-  provenance.py    registry sumber data
+  provenance.py    data-source registry
   dashboard/       FastAPI + Plotly + star-schema cube
   agent/           LangGraph + RAG + number audit
   scripts/
-    make_portfolio_charts.py     chart artikel
-    make_ci_fixture.py           data sintetik deterministik untuk CI
-    audit_console.py             193 check konsistensi
+    make_portfolio_charts.py     article figures
+    make_ci_fixture.py           deterministic synthetic data for CI
+    audit_console.py             193 consistency checks
 ```
 
-Perintah reproduksi lengkap:
+Full reproduction:
 
 ```bash
 pip install -e ".[dev,agent]"
 python train_btc_monthly.py --offline --sets MS,D10,D13,D20,D25,D27 --live-day 13 --no-ranges
 python train_btc_monthly.py --offline --ranges-only --live-day 13
 python scripts/make_portfolio_charts.py
-python scripts/audit_console.py          # harus 0 failed
+python scripts/audit_console.py          # must be 0 failed
 PYTHONPATH=. python -m pytest tests/     # 55 passed, 1 skipped
 ```
 
-Katalog chart artikel (seluruhnya dibuat dari `outputs/`):
+Article figure catalogue (all generated from `outputs/`):
 
-| File | Isi |
+| File | Content |
 |---|---|
-| `portfolio_01_information_curve.png` | Akurasi vs hari prediksi |
-| `portfolio_02_edge_vs_sign_rule.png` | Edge + p_Holm (Gambar 2) |
-| `portfolio_03_walkforward_curve.png` | Akurasi kumulatif D25 |
-| `portfolio_04_horizon_bias.png` | Akurasi 12 bulan + bias |
+| `portfolio_01_information_curve.png` | Accuracy vs forecast day |
+| `portfolio_02_edge_vs_sign_rule.png` | Edge + p_Holm (Figure 2) |
+| `portfolio_03_walkforward_curve.png` | Cumulative D25 accuracy |
+| `portfolio_04_horizon_bias.png` | 12-month accuracy + bias |
 
-Kode sumber belum dipublikasikan sebagai repository publik; tautan akan ditambahkan jika tersedia.
+The source code is not yet published as a public repository; a link will be added once available.
 
 ---
 
-## 13. Kesimpulan
+## 13. Conclusion
 
-Lima pelajaran yang dapat diambil dari studi ini:
+Five lessons from this study:
 
-1. **Baseline yang jujur menyelamatkan narasi.** Tanpa aturan `sign(mtd_ret)`, angka 92.5% akan dibaca sebagai keberhasilan. Dengan aturan itu, angka yang sama dibaca sebagai keterangan bahwa sebagian besar bulan sudah terjadi.
-2. **Feature engineering mengalahkan kompleksitas model.** Blok *month-to-date* menyumbang 5.3 *pp*; seluruh mesin *stacking* menyumbang edge ≤ 2 *pp* dan tidak signifikan.
-3. **Konsistensi audit bukan validitas metode.** 193 pemeriksaan menjaga angka tetap sinkron; mereka tidak membuktikan metode benar.
-4. **Hasil negatif layak dipublikasikan.** Model quantile kalah, *path forecast* mendekati coin flip —dan keduanya dicatat, bukan disembunyikan.
-5. **Dashboard dan agent membuat riset bisa dikonsumsi.** Riset yang hanya hidup di notebook tidak bisa diaudit oleh pembaca; lapisan produk membuatnya dapat diperiksa.
+1. **An honest baseline saves the narrative.** Without the `sign(mtd_ret)` rule, 92.5% reads as success. With it, the same number reads as evidence that most of the month had already happened.
+2. **Feature engineering beats model complexity.** The month-to-date block contributes 5.3 *pp*; the entire stacking machine contributes an edge of at most 2 *pp*, statistically insignificant.
+3. **An audit of consistency is not validity.** 193 checks keep the numbers in sync; they do not prove the method right.
+4. **Negative results are publishable.** The quantile model lost and the path forecast approached a coin flip —both are recorded, not hidden.
+5. **A dashboard and an agent make research consumable.** Research that lives only in a notebook cannot be examined by readers; the product layers make it inspectable.
 
 > *The most accurate part of the model was the part that needed no training at all.*
 
-Nilai project ini bukan pada akurasi 92%-nya, melainkan pada proses yang membuktikan bahwa 92% itu **bukan** *edge* yang dapat diperdagangkan —dan pada keputusan untuk mengatakan terus terang.
+The value of this project is not its 92% accuracy, but the process that proved 92% is **not** a tradable edge —and the decision to say so plainly.
 
 ---
 
-## Referensi metodologis
+## Methodological references
 
-Metode yang dipakai dalam studi ini mengikuti literatur berikut (daftar ini merujuk metode, bukan klaim noveltas):
+The methods used follow the literature below. This list references methods, not claims of novelty:
 
 - Diebold, F. X. & Mariano, R. S. (1995). *Comparing predictive accuracy*. Journal of Business & Economic Statistics.
 - McNemar, Q. (1947). *Note on the sampling error of the difference between correlated proportions or percentages*. Psychometrika.
 - Holm, S. (1979). *A simple sequentially rejective multiple test procedure*. Scandinavian Journal of Statistics.
 - Romano, Y., Correa, J. & Candès, E. J. (2019). *Conformalized quantile regression*. NeurIPS.
-- Pedregosa, F. et al. (2011). *Scikit-learn: Machine learning in Python*. JMLR —untuk disiplin `Pipeline` dalam pencegahan kebocoran.
+- Pedregosa, F. et al. (2011). *Scikit-learn: Machine learning in Python*. JMLR —for `Pipeline` discipline in leakage prevention.
 
 ---
 
-*Disclaimer: ini adalah catatan riset, bukan financial advice. Tidak ada klaim bahwa model dapat dipakai untuk trading, dan tidak ada evaluasi PnL, biaya, atau kapasitas yang dilakukan.*
+*Disclaimer: this is a research note, not financial advice. No claim is made that the model can be used for trading, and no evaluation of PnL, costs, or capacity was performed.*

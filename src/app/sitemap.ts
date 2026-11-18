@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSortedArticles } from "@/lib/articles";
+import { getProjectStudies } from "@/lib/project-studies";
+import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 /**
@@ -9,6 +11,7 @@ import { site } from "@/lib/site";
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sortedArticles = await getSortedArticles();
+  const projectStudies = await getProjectStudies();
 
   // The site changes whenever the newest article changes
   const latestArticleDate = sortedArticles[0]
@@ -47,5 +50,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...articlePages];
+  const studyPages: MetadataRoute.Sitemap = projectStudies
+    .filter((study) => projects.some((p) => p.slug === study.slug && p.caseStudy))
+    .map((study) => ({
+      url: `${site.url}/projects/${study.slug}`,
+      lastModified: new Date(study.updated ?? study.date),
+      changeFrequency: "yearly",
+      priority: 0.8,
+    }));
+
+  return [...staticPages, ...articlePages, ...studyPages];
 }

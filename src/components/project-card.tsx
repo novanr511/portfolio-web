@@ -52,7 +52,7 @@ export function ProjectCard({ project }: { project: Project }) {
       </div>
       {project.caseStudy && (
         <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent">
-          Baca case study
+          Read case study
           <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
             →
           </span>
@@ -67,7 +67,7 @@ export function ProjectCard({ project }: { project: Project }) {
         href={`/projects/${project.slug}`}
         transitionTypes={["nav-forward"]}
         className="group block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        aria-label={`Baca case study: ${project.name}`}
+        aria-label={`Read case study: ${project.name}`}
       >
         {body}
       </Link>

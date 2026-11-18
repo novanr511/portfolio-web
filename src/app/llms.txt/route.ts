@@ -1,4 +1,5 @@
 import { getSortedArticles } from "@/lib/articles";
+import { getProjectStudies } from "@/lib/project-studies";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
@@ -9,6 +10,7 @@ import { site } from "@/lib/site";
  */
 export async function GET() {
   const sortedArticles = await getSortedArticles();
+  const studies = await getProjectStudies();
   const articleLines = sortedArticles
     .map(
       (a) =>
@@ -19,10 +21,15 @@ export async function GET() {
     .join("\n");
 
   const projectLines = projects
-    .map(
-      (p) =>
-        `- ${p.name} — ${p.tagline}. ${p.description} (Tech: ${p.tags.join(", ")})`
-    )
+    .map((p) => {
+      const study = p.caseStudy
+        ? studies.find((s) => s.slug === p.slug)
+        : undefined;
+      const title = study
+        ? `[${study.title}](${site.url}/projects/${p.slug})`
+        : p.name;
+      return `- ${title} — ${p.tagline}. ${p.description} (Tech: ${p.tags.join(", ")})${study ? ` (${study.readingTime})` : ""}`;
+    })
     .join("\n");
 
   const projectsSection = projects.length

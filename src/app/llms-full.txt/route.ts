@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import { getSortedArticles } from "@/lib/articles";
+import { getProjectStudies } from "@/lib/project-studies";
+import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 /**
@@ -11,6 +13,7 @@ import { site } from "@/lib/site";
  */
 export async function GET() {
   const sortedArticles = await getSortedArticles();
+  const studies = await getProjectStudies();
   const sections = await Promise.all(
     sortedArticles.map(async (a) => {
       const raw = await readArticleBody(a.slug);
@@ -18,13 +21,22 @@ export async function GET() {
     })
   );
 
+  const studySections = await Promise.all(
+    studies
+      .filter((s) => projects.some((p) => p.slug === s.slug && p.caseStudy))
+      .map(async (s) => {
+        const raw = await readStudyBody(s.slug);
+        return `## ${s.title}\n\n- URL: ${site.url}/projects/${s.slug}\n- Published: ${s.date}\n- Tags: ${s.tags.join(", ")}\n\n${raw.trim()}\n`;
+      })
+  );
+
   const body = `# ${site.name} — full content
 
 > ${site.description}
 
-Below is the complete, up-to-date content of every article on the site, in markdown. The canonical page URLs are listed under each heading.
+Below is the complete, up-to-date content of every article and project case study on the site, in markdown. The canonical page URLs are listed under each heading.
 
-${sections.join("\n---\n\n")}
+${[...sections, ...studySections].join("\n---\n\n")}
 `;
 
   return new Response(body, {
@@ -34,20 +46,26 @@ ${sections.join("\n---\n\n")}
 
 const cache = new Map<string, string>();
 
-async function readArticleBody(slug: string): Promise<string> {
-  const cached = cache.get(slug);
-  if (cached) return cached;
+function readBody(kind: "articles" | "projects", slug: string): Promise<string> {
+  const key = `${kind}/${slug}`;
+  const cached = cache.get(key);
+  if (cached) return Promise.resolve(cached);
 
-  const filePath = path.join(
-    process.cwd(),
-    "src",
-    "content",
-    "articles",
-    `${slug}.mdx`
-  );
-  const raw = await readFile(filePath, "utf8");
-  // Strip frontmatter — LLMs get the prose only
-  const body = matter(raw).content;
-  cache.set(slug, body);
-  return body;
+  return readFile(
+    path.join(process.cwd(), "src", "content", kind, `${slug}.mdx`),
+    "utf8"
+  ).then((raw) => {
+    // Strip frontmatter — LLMs get the prose only
+    const body = matter(raw).content;
+    cache.set(key, body);
+    return body;
+  });
+}
+
+function readArticleBody(slug: string): Promise<string> {
+  return readBody("articles", slug);
+}
+
+function readStudyBody(slug: string): Promise<string> {
+  return readBody("projects", slug);
 }

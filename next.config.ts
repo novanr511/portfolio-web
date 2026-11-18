@@ -13,10 +13,13 @@ const nextConfig: NextConfig = {
   },
   // Allow .mdx content files to be imported
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-  // /llms-full.txt reads article MDX files at request time —
-  // make sure they ship in the serverless bundle
+  // llms-full.txt reads MDX at request time — make sure both article and
+  // project case-study sources ship in the serverless bundle.
   outputFileTracingIncludes: {
-    "/llms-full.txt": ["./src/content/articles/**/*.mdx"],
+    "/llms-full.txt": [
+      "./src/content/articles/**/*.mdx",
+      "./src/content/projects/**/*.mdx",
+    ],
   },
   cacheComponents: true,
   partialPrefetching: true,
