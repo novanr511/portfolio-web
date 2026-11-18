@@ -1,10 +1,83 @@
 ---
 title: "Getting Started with System Design Interviews"
-description: "Reserved title for a future NOVANDRI article: Getting Started with System Design Interviews."
-date: 2026-11-17
+description: "A system design interview tests reasoning under constraints. Read how to prepare, a worked answer, and why a diagram is not a design."
+date: 2026-11-18
 tags:
-  - Planned
   - Career
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+System design interviews are often treated as a drawing exercise, which misses what is being tested. The systems-design entry describes the structure and components of large systems, and O*NET's task descriptions help define engineering roles. The interview is about how a candidate reasons when requirements are incomplete.
+
+**Direct answer:** Practise by stating requirements, naming constraints, designing a first version, then identifying its failure modes and what you would change. The sources define the domain; the practice sequence is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked answer outline, separating documented system concepts from the interview strategy described here.
+
+## The mechanism
+
+Three habits matter more than a library of diagrams:
+
+- **Clarify requirements.** The systems-design entry describes components and structure. A candidate who draws before asking questions is guessing at the problem.
+- **Name constraints.** Scale, latency, and consistency change the design. Stating them makes the trade-offs visible.
+- **Test the design.** A first version will have failure points. Naming them and proposing changes is often the most informative part of the answer.
+
+The sequence is: ask, constrain, sketch, stress-test, revise. The concepts are `source-reported`; the sequence is `inferred` interview advice.
+
+## A worked answer outline
+
+*Illustrative.* The prompt is to design a link shortener.
+
+Three checks structure the answer. First, what matters: read-to-write ratio, expected volume, and whether links expire? Second, what is the first design — a service, a store, and a redirect path? Third, what breaks first: a hot key, a database bottleneck, or a cache miss storm? What would you change?
+
+The outcome is a reasoned progression, not a perfect diagram. The scenario is hypothetical; the structure is the contribution.
+
+## Why the question phase is the issue
+
+Most candidates treat the opening minutes as a formality and rush to a diagram. That is a mistake because the requirements decide which trade-offs matter. A link shortener with a billion reads and one with ten thousand are different systems; an interviewer who gives an underspecified prompt expects the candidate to find out which one is being discussed.
+
+Asking questions is also a demonstration of how the candidate works with incomplete information, which is the normal condition for engineering work. A good question is specific: what is the expected read volume, what happens to links after expiry, and is the data durable? Each answer removes a branch from the design space and makes the eventual decisions defensible.
+
+## What the diagram should show
+
+A useful diagram shows boundaries and flows, not every component. It should make clear where state is stored, where requests enter, and what happens on the read path. Detail belongs in the explanation that follows, where the candidate can say which part they would instrument and which part they expect to fail first. A diagram that tries to answer everything at once usually answers nothing well.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Systems design concerns components and structure | `source-reported` | Wikipedia, Systems design | 2026-11-18 | Definition revised |
+| Roles have task-level descriptions | `source-reported` | O*NET | 2026-11-18 | Role taxonomy changes |
+| State requirements before drawing | `inferred` | Derived from design practice | 2026-11-18 | Interview format changes |
+
+## Why the first design is allowed to be wrong
+
+A candidate who proposes a simple design and then improves it demonstrates more than one who memorised a complex answer. The reason is that real systems start simple and evolve under constraints. An answer that skips the simple version cannot show how the candidate reasons about change.
+
+The stress-test is therefore the most valuable part. Naming a bottleneck and proposing a fix reveals whether the candidate understands the trade-off or has memorised a technology name. Interviewers can tell the difference.
+
+A final consideration is how the answer ends. A strong interview answer does not claim that the design is finished; it names what would be measured first and what would be changed as a result. That ending demonstrates an understanding that systems evolve under load and that design is a continuing activity. It also gives the interviewer something concrete to discuss, which is usually more valuable than a polished final diagram. Candidates who prepare by practising this closing step often find that the rest of the answer becomes easier, because the design is no longer a performance to memorise but a sequence of decisions to explain.
+
+## What it cannot do
+
+It cannot guarantee an offer, which depends on many factors. It does not test every engineering skill, and it does not replace domain experience.
+
+The counterargument that memorising architectures is the fastest preparation is fair for recognition and incomplete for a question that changes on the spot.
+
+## A decision test
+
+1. Ask clarifying questions.
+2. State the constraints.
+3. Sketch a first version.
+4. Identify failure modes.
+5. Propose specific changes.
+6. Explain the trade-offs.
+7. Record what you would revise next time.
+
+For the technical context, see [Technical Interviews](/articles/technical-interviews-that-test-systems-thinking).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Systems design - Wikipedia](https://en.wikipedia.org/wiki/Systems_design) — The structure and components of large systems.
+- U.S. Department of Labor, 2026. [O*NET OnLine](https://www.onetonline.org/) — The standard occupational taxonomy used to compare roles across industries.

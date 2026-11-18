@@ -1,10 +1,86 @@
 ---
 title: "Small Language Models Checklist"
-description: "Reserved title for a future NOVANDRI article: Small Language Models Checklist."
-date: 2026-11-17
+description: "A smaller model is a trade, not a downgrade. Read the checklist, a worked example, and why task fit matters more than parameter count."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Engineering
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Small language models are often chosen for cost, which overlooks the more important question: whether the task needs the capabilities of a larger model. The Wikipedia entry describes compact models and their trade-offs, and the serving paper covers the memory implications of deployment. The checklist starts with the task.
+
+**Direct answer:** Choose a small model when the task is narrow, measurable, and tolerant of the model's limits, then verify it on real cases before deploying. The sources describe the model class; the checklist is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked evaluation, separating documented model characteristics from local task decisions.
+
+## The mechanism
+
+Three checks matter:
+
+- **Task fit.** A small model can handle classification or extraction better than open-ended reasoning. The Wikipedia entry describes the class, not your task.
+- **Evaluation.** A model that performs well on a public benchmark may fail on local cases. The task-driven evaluation approach applies here.
+- **Serving cost.** The serving paper describes memory management. A smaller model reduces cost only if the task still succeeds.
+
+The sequence is: define the task, build a local test set, measure, then compare with a larger baseline. Building the test set is local work, so it is `inferred`; the model characteristics are `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team considers a small model for classifying support tickets into five categories.
+
+Three checks decide. First, is the label set stable and the task narrow? Second, does a local test set of real tickets show acceptable accuracy, including ambiguous cases? Third, does the saving remain after accounting for the fallback cases that still need a larger model?
+
+The outcome is a deployment decision with a recorded boundary. The numbers are hypothetical; the evaluation method is the contribution.
+
+## Why local evaluation decides
+
+Public benchmarks describe a model's behaviour on questions someone else chose. A local test set describes the cases your users actually send, including the ambiguous ones that benchmarks tend to omit. The gap between the two is where deployment decisions go wrong.
+
+Building the set is simpler than it sounds. A few hundred real examples, labelled by the outcome you need, are enough to reveal whether a smaller model preserves the behaviour that matters. Ambiguous cases belong in the set deliberately, because they are the ones a smaller model is most likely to mishandle.
+
+## Why the fallback belongs in the budget
+
+A smaller model that escalates uncertain cases is a reasonable design, but the escalations are part of the cost. Counting only the cheap path overstates the saving. Measuring the share of requests that fall back and the cost of handling them gives the figure that the finance conversation actually needs.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Small language models have distinct trade-offs | `source-reported` | Wikipedia, Small language model | 2026-11-18 | New model class |
+| Serving memory affects deployment cost | `source-reported` | PagedAttention paper | 2026-11-18 | Serving design changes |
+| Evaluate on local cases before choosing | `inferred` | Derived from task-driven evaluation | 2026-11-18 | Task changes |
+
+## Why the fallback decides the saving
+
+A small model that handles 90% of cases and sends the rest to a larger one can be a good design. The saving depends on the 10%, not on the headline accuracy. Measuring the full cost, including fallback, is the only way to know.
+
+A practical detail is how the fallback is triggered. If the system sends a request to the larger model whenever it is uncertain, the threshold that defines uncertainty becomes a cost decision. Setting it too low sends easy work to the expensive path; setting it too high produces wrong answers on the cheap path. Tuning that threshold against the local test set is usually more valuable than changing the model, because it works with the system that is already deployed.
+
+Another consideration is the shape of the task. Classification and extraction have clear success conditions, which makes a small model easy to evaluate. Open-ended generation does not, which is why the same model can look excellent in a demo and disappointing in production. The checklist should therefore begin with a statement of how success will be judged, not with a model name.
+
+The threshold should be revisited whenever the model or the traffic mix changes.
+
+A measured fallback rate is therefore part of the checklist, not an afterthought for the finance review.
+
+## What it cannot do
+
+It cannot match a larger model on every task. It does not remove the need for evaluation. And it cannot guarantee a lower total cost once fallback is counted.
+
+The counterargument that a smaller model is always cheaper is fair for serving cost and incomplete for total cost.
+
+## A decision test
+
+1. Define a narrow task.
+2. Build a local test set.
+3. Measure accuracy and failures.
+4. Compare with a larger baseline.
+5. Count fallback cost.
+6. Record the boundary and recheck trigger.
+
+For the deployment context, see [Edge AI Model Compression](/articles/edge-ai-model-compression-quantization-and-on-device-inference).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Small language model - Wikipedia](https://en.wikipedia.org/wiki/Small_language_model) — Compact language models and their trade-offs.
+- Woosuk Kwon et al., 2023. [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) — Continuous batching and paged KV-cache memory that raise serving throughput.
