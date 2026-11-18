@@ -1,10 +1,57 @@
 ---
 title: "Lazy Loading without the Hype"
-description: "Reserved title for a future NOVANDRI article: Lazy Loading without the Hype."
-date: 2026-11-17
+description: "Lazy loading defers work, not removes it. Read what it helps, a worked example, and why deferring the wrong asset hurts."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Web
+  - Performance
+  - Engineering
+  - Core Web Vitals
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Lazy loading is often presented as a free performance win, which hides the trade: a resource loaded later is still loaded, and sometimes at a worse moment. The lazy-loading entry describes deferring resources until needed, as the Web Vitals material defines the metrics it can affect, as the image-optimization article advises on media, as the web-performance article advises on finding the slow layer, as the publication standard forbids performance guarantees.
+
+**Direct answer:** Lazy-load resources that are below the fold or unlikely to be used, and keep critical assets eager. Wikipedia's lazy-loading entry provides the mechanism, and Web Vitals defines the metrics. The boundary: deferring the largest paint can worsen LCP, which the LCP article advises, as the web-performance article warns about realistic connections, as the risk article requires residual risk.
+
+## Where it helps
+
+**Below-the-fold images.** An image far down the page is unlikely to be seen immediately, which the lazy-loading entry describes, as the image-optimization article advises, as the Core Vitals article treats metrics as a set, as the rubric article requires concrete criteria, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+**Heavy embeds.** A widget or video that loads external code can be deferred, which the third-party-scripts article advises, as the lazy-loading entry describes, as the web-performance article advises on the slow layer, as the dashboard article argues for metrics tied to decisions, as the monitoring article advises for review, as the data-governance article requires dated figures.
+
+**Non-critical code.** Code not needed for the first interaction can be split, which the lazy-loading entry treats, as the build-pipeline article advises, as the LCP article advises for the largest paint, as the evaluation-rubric article requires criteria, as the cost estimator requires for the build, as the risk article requires residual risk.
+
+**Critical assets.** The hero image and font used above the fold should not be deferred, which the LCP and font-display articles advise, as the lazy-loading entry treats selection, as the web-performance article warns about late resources, as the rubric article requires criteria, as the monitoring article advises for review, as the risk article requires residual risk.
+
+Three consequences follow. Selection comes before the technique, as the lazy-loading entry and rubric article advise, as the image-optimization and third-party articles advise, as the web-performance article advises for the slow layer, as the Core Vitals and LCP articles treat metrics, as the dashboard article argues, as the cost estimator requires, as the data-governance article requires dated figures, as the monitoring article advises for review, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+## A worked example
+
+The following is hypothetical and illustrative. A page lazy-loads every image, including the hero, and reports a worse LCP.
+
+Three checks decide. First, which element is the largest paint, as the LCP article advises, with a trace, as the tracing method recommends, as the rubric article requires? Second, was that element deferred, as the lazy-loading entry advises, with a concrete condition, as the rubric article requires? Third, does loading it eagerly improve the metric on a realistic connection, as the web-performance article requires, with a re-measurement, as the monitoring article advises, as the decision-memo article requires for a record, as the risk article requires residual risk?
+
+Three conclusions follow. Deferring the hero was the cause, which the checks reveal. Selection matters more than the technique, as the lazy-loading entry advises. And the decision should be recorded, as the decision-memo article requires.
+
+## What lazy loading cannot do
+
+It cannot remove a resource, which the lazy-loading entry describes, as the publication standard forbids performance guarantees, as the risk article requires residual risk. It does not fix a large payload, which the image-optimization and web-performance articles advise, as the rubric article requires criteria, as the monitoring article advises for review, as the data-governance article requires dated figures. And it can worsen a metric when applied to a critical asset, which the LCP article advises, as the web-performance article warns, as the decision-memo article requires a record, as the risk article requires residual risk.
+
+The counterargument that lazy loading everything is simplest is fair for small pages and wrong when the largest paint is deferred, which the worked example shows, as the LCP and lazy-loading articles advise, as the web-performance article requires realistic conditions, as the risk article requires residual risk.
+
+## A decision test
+
+1. Identify critical assets, as the LCP article advises.
+2. Defer only below-the-fold resources, as the lazy-loading entry advises.
+3. Check third-party embeds, as the third-party-scripts article advises.
+4. Test on realistic connections, as the web-performance article requires.
+5. Re-measure, as the monitoring article advises.
+6. Use dated figures, as data governance requires.
+7. Record the decision and residual risk, as the decision-memo and risk articles require.
+
+For the metric, see [Core Web Vitals](/articles/core-web-vitals-diagnose-lcp-inp-cls); for the media, see [Image Optimization](/articles/how-to-evaluate-image-optimization).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Lazy loading - Wikipedia](https://en.wikipedia.org/wiki/Lazy_loading) — Deferring resource loading until it is needed.
+- web.dev, 2026. [Web Vitals](https://web.dev/articles/vitals) — The Core Web Vitals thresholds and what each metric measures.

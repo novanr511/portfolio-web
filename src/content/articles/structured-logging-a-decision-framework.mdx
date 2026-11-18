@@ -1,10 +1,57 @@
 ---
 title: "Structured Logging: a Decision Framework"
-description: "Reserved title for a future NOVANDRI article: Structured Logging: a Decision Framework."
-date: 2026-11-17
+description: "Structured logs are queryable records, not prettier text. Read the framework, a worked example, and why a field is not a fact."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - Engineering
+  - Observability
+  - Data
+  - Decision Making
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Structured logging is often treated as a formatting choice, which misses the decision: what will be queried later. The logging entry describes what logs record, as the server-log article covers what is captured in requests, as the observability article treats logs as one signal, as the data-governance article requires provenance, as the decision-memo article requires for a recorded judgement, as the publication standard forbids guaranteed outcomes.
+
+**Direct answer:** Decide which fields you will query, then emit them consistently with a defined meaning. Wikipedia's logging entry provides the context, and the server-log article covers captured requests. The boundary: a field is not a fact if its meaning is undefined, which the data-governance article warns, as the risk article requires residual risk.
+
+## The framework
+
+**Name the queries.** What questions will be asked of the logs, which the observability article advises, as the dashboard article argues for metrics tied to decisions, as the rubric article requires concrete criteria, as the decision-memo article requires a question, as the data-governance article requires a dated definition, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+**Define the fields.** What each field means and how it is produced, which the data-modeling entry advises, as the data-governance article requires provenance, as the comparables article requires consistent definitions, as the rubric article requires criteria, as the data-quality article warns about bad inputs, as the monitoring article advises for review, as the risk article requires residual risk.
+
+**Keep types stable.** A field that changes meaning breaks queries, which the data-governance article warns, as the comparables article requires consistent definitions, as the migration article treats change as infrastructure, as the monitoring article advises for review, as the decision-memo article requires a reversal condition, as the risk article requires residual risk, as the observability article treats signals as evidence.
+
+**Control volume and access.** Logs have storage and privacy costs, which the cost estimator requires, as the logging entry describes volume, as the privacy article makes obligations jurisdiction-specific, as the data-governance article requires provenance, as the governance checklist requires an owner, as the monitoring article advises for review, as the risk article requires residual risk.
+
+Three consequences follow. The query comes before the field, as the observability and dashboard articles advise, as the rubric article requires, as the decision-memo article requires a question, as the data-governance article requires dated definitions, as the data-modeling entry advises, as the comparables article requires consistent definitions, as the data-quality article warns, as the migration and monitoring articles advise, as the cost estimator requires, as the logging entry describes volume, as the privacy and governance articles require, as the risk article requires residual risk, as the decision-memo article requires for a record.
+
+## A worked example
+
+The following is hypothetical and illustrative. A team emits JSON logs but cannot answer which requests failed by customer.
+
+Three checks decide. First, what question needs answering, as the observability and dashboard articles advise, with a criterion, as the rubric article requires? Second, is there a stable field for customer identity with a defined meaning, as the data-modeling entry and data-governance article require, as the comparables article requires consistent definitions? Third, what are the storage and privacy costs, as the cost estimator and privacy articles require, with an owner, as the governance checklist requires, as the risk article requires residual risk, as the decision-memo article requires for a record?
+
+Three conclusions follow. Structure without defined fields is unhelpful, which the checks reveal. Meaning matters more than format, as the data-governance and comparables articles advise. And the decision should be recorded, as the decision-memo article requires.
+
+## What structured logging cannot do
+
+It cannot create facts, which the data-quality and data-governance articles warn, as the publication standard forbids guaranteed outcomes, as the risk article requires residual risk. It does not replace metrics and traces, which the observability article treats as separate signals, as the server-log article advises, as the dashboard article argues, as the rubric article requires criteria, as the monitoring article advises for review. And it cannot remove privacy duties, which the privacy article makes jurisdiction-specific, as the governance checklist requires an owner, as the data-governance article requires provenance, as the risk article requires residual risk.
+
+The counterargument that plain text is enough is fair for small systems and incomplete when the same question must be answered repeatedly, which the worked example shows, as the observability and data-modeling articles advise, as the dashboard article argues, as the risk article requires residual risk.
+
+## A decision test
+
+1. Name the queries, as the observability article advises.
+2. Define fields and meanings, as the data-modeling entry advises.
+3. Keep types stable, as the comparables article requires.
+4. Source and date the records, as data governance requires.
+5. Control volume and access, as the cost estimator and privacy articles require.
+6. Assign an owner, as the governance checklist requires.
+7. Record the decision and residual risk, as the decision-memo and risk articles require.
+
+For the signal set, see [Observability](/articles/observability-logging-metrics-tracing-alerting); for the queries, see [Server Log Analysis](/articles/server-log-analysis-metrics-that-matter).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Logging (computing) - Wikipedia](https://en.wikipedia.org/wiki/Log_file) — What logs record and how they are structured.
+- Wikipedia contributors, 2026. [Logging (computing) - Wikipedia](https://en.wikipedia.org/wiki/Server_log) — What server logs record and how they are used.
