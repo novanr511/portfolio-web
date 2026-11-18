@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     "About Novandri R.: a web developer and SEO specialist from Jakarta with years of WordPress and search work, now transitioning into data science and applied AI.",
   alternates: { canonical: "/about" },
   openGraph: {
+    siteName: site.name,
     title: "About — Novandri R.",
     description:
       "Web developer and SEO specialist from Jakarta, now transitioning into data science and applied AI.",

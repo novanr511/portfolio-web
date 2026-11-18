@@ -1,5 +1,5 @@
 export const site = {
-  name: "Novandri R.",
+  name: "Novandri",
   /** Short wordmark used in the header/footer logo */
   wordmark: "Novandri.",
   title: "Novandri R. — Web Developer, SEO Specialist & Aspiring Data Scientist",

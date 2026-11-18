@@ -33,6 +33,7 @@ export async function generateMetadata({
     keywords: [...article.tags],
     alternates: { canonical: `/articles/${article.slug}` },
     openGraph: {
+      siteName: site.name,
       type: "article",
       url: `${site.url}/articles/${article.slug}`,
       title: article.title,

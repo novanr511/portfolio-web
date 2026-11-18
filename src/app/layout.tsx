@@ -67,6 +67,23 @@ const gtmInitScript = `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());`;
 
+/** Site-wide WebSite identity so Google uses our name instead of the host label. */
+const webSiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site.url}/#website`,
+  url: site.url,
+  name: site.name,
+  description: site.description,
+  inLanguage: "en",
+  publisher: {
+    "@type": "Person",
+    "@id": `${site.url}/#person`,
+    name: site.author.name,
+    url: site.url,
+  },
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -76,6 +93,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} h-full antialiased`}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <Script id="gtm-init" strategy="afterInteractive">
           {gtmInitScript}

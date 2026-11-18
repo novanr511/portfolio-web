@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     "In-depth articles on learning AI, retrieval-augmented generation (RAG), LangChain, LangGraph, and building reliable systems with large language models.",
   alternates: { canonical: "/articles" },
   openGraph: {
+    siteName: site.name,
     title: "Articles — Novandri R.",
     description:
       "In-depth articles on learning AI, RAG, LangChain, LangGraph, and building reliable LLM systems.",

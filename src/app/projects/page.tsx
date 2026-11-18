@@ -4,6 +4,7 @@ import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { ProjectCard } from "@/components/project-card";
 import { projects } from "@/lib/projects";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     "Project case studies are in progress. Selected work in web development, WordPress, Next.js, and applied AI will be published here.",
   alternates: { canonical: "/projects" },
   openGraph: {
+    siteName: site.name,
     title: "Projects — Novandri R.",
     description:
       "Case studies are being prepared; articles cover the same areas from the inside.",

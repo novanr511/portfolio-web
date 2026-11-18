@@ -7,19 +7,11 @@ import { getSortedArticles } from "@/lib/articles";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
-/** Home page JSON-LD: WebSite + Person — helps both search and AI engines */
+/** Home page JSON-LD: Person — WebSite identity lives in the root layout */
 function homeJsonLd() {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": `${site.url}/#website`,
-        url: site.url,
-        name: site.name,
-        description: site.description,
-        inLanguage: "en",
-      },
       {
         "@type": "Person",
         "@id": `${site.url}/#person`,
