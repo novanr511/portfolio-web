@@ -1,10 +1,85 @@
 ---
 title: "Data Curation at Scale"
-description: "Reserved title for a future NOVANDRI article: Data Curation at Scale."
-date: 2026-11-17
+description: "Curation is ongoing work, not a one-time clean. Read the mechanism, a worked example, and why deduplication can remove useful data."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Data
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Data curation is often treated as a cleaning pass before training. The Wikipedia entry describes curation as ongoing management and quality control, and the data-modeling entry covers structure. At scale, the deciding factor is what the process removes as much as what it keeps.
+
+**Direct answer:** Curate with documented rules, measure what each rule removes, and keep a record that makes the final dataset reproducible. The sources define curation and structure; the measurement rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked pipeline review, separating documented definitions from the local decisions about thresholds.
+
+## The mechanism
+
+Three operations do most of the work:
+
+- **Deduplication.** Near-duplicate records can overweight a source. The curation entry treats quality control as an ongoing activity, not a single step.
+- **Filtering.** Quality heuristics remove low-value records. A threshold that is too aggressive can remove rare but legitimate cases.
+- **Provenance.** A record without a source cannot be audited later. The data-modeling entry describes structure, which supports consistent records.
+
+The sequence is: state the purpose of the dataset, define each rule, measure its effect, then record the result with a date. Choosing thresholds is judgement, so it is `inferred`; the existence of curation as a practice is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A team deduplicates a training corpus with an aggressive similarity threshold.
+
+Three checks decide. First, what did the rule remove, measured by a sample of removed records rather than by a count alone? Second, did the removal change the distribution of sources or languages in a way that matters? Third, can the exact dataset be reproduced from the documented rules and the source snapshot?
+
+The outcome is a threshold decision with a recorded trade-off. The numbers are hypothetical; the review method is the contribution.
+
+## Why rules need owners
+
+A curation rule is a decision expressed as code. It decides which records are legitimate, which sources are trusted, and which rare cases are collateral damage. Treating that decision as a configuration detail removes the possibility of challenging it later.
+
+An owner is useful for two reasons. First, they can explain why a threshold was chosen, which matters when the data changes and the rule no longer fits. Second, they can be asked to review the sample of removed records, which is the check most likely to catch a systematic error. Without an owner, the rule becomes a habit that nobody remembers choosing.
+
+Reproducibility is the other discipline. A dataset built from a source snapshot and a documented set of rules can be rebuilt. A dataset built by a sequence of manual edits cannot, and the difference becomes visible only when someone asks how a figure was produced. Recording the snapshot date and the rule versions is a small cost that makes the result auditable.
+
+## What changes at scale
+
+At small scale, a bad rule is visible because someone reads the data. At large scale, the same rule operates on millions of records and its errors are invisible unless they are measured. Sampling is the bridge: a small, deliberate sample of what was kept and what was removed provides evidence that a metric alone cannot.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Data curation is ongoing management and quality control | `source-reported` | Wikipedia, Data curation | 2026-11-18 | Definition revised |
+| Data models provide consistent structure | `source-reported` | Wikipedia, Data modeling | 2026-11-18 | Definition revised |
+| Measure what each rule removes | `inferred` | Derived from curation practice | 2026-11-18 | Dataset purpose changes |
+
+## Why removal needs measuring
+
+The effect of a curation rule is usually reported as a count of removed records. That number says nothing about whether the right records were removed. A sample of removals, read by someone who understands the domain, is a cheaper and more informative check than a larger automated metric.
+
+Distribution change is the second check. A rule that removes near-duplicates can systematically remove a minority source, because those records are more likely to resemble each other. Checking the composition before and after makes that effect visible.
+
+The choice of what to keep is ultimately a decision about the task the dataset will serve. A corpus suitable for one purpose can be wrong for another even when both are called high quality, which is why the purpose belongs in the record.
+
+## What it cannot do
+
+It cannot guarantee a high-quality dataset, because quality is defined by the task. It does not remove the need for provenance, which makes the result auditable. And it cannot be finished once, because sources change.
+
+The counterargument that a stricter filter is always better is fair for obvious noise and incomplete for rare cases.
+
+## A decision test
+
+1. State the dataset's purpose.
+2. Define each rule.
+3. Sample what was removed.
+4. Check distribution change.
+5. Record sources and dates.
+6. Reproduce the dataset from the rules.
+7. Record the decision and the recheck trigger.
+
+For the training context, see [Data Curation for LLM Pretraining](/articles/data-curation-for-llm-pretraining-deduplication-and-quality).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Data curation - Wikipedia](https://en.wikipedia.org/wiki/Data_curation) — Ongoing management and quality control of datasets.
+- Wikipedia contributors, 2026. [Data modeling - Wikipedia](https://en.wikipedia.org/wiki/Data_modeling) — The structure and purpose of data models.
