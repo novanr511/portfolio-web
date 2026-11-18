@@ -1,10 +1,73 @@
 ---
 title: "AI Risk Assessment Metrics that Matter"
-description: "Reserved title for a future NOVANDRI article: AI Risk Assessment Metrics that Matter."
-date: 2026-11-17
+description: "A risk assessment should change a decision. Read what to measure, a worked example, and why a list of risks is not an assessment."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Method
+  - Risk
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+An AI risk assessment is often produced as a document that lists possible harms, which does not by itself change any decision. The NIST AI RMF frames trustworthiness across governance, mapping, measurement, and management, and the OWASP LLM list identifies concrete risks for language-model applications. The measure of an assessment is whether it led to a different choice.
+
+**Direct answer:** Assess AI risk by mapping the system's use, measuring the hazards that matter, and recording which controls were adopted and which risks remain. The sources provide the frame; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked assessment, separating documented risk categories from the local judgement about which are material.
+
+## The mechanism
+
+The NIST RMF distinguishes governance from mapping and measurement, which is a useful separation. Governance is about who decides. Mapping is about what the system does and where it is used. Measurement is about how often the identified hazards occur. Management is about what was done and what remains. A document that contains only the first two has not completed the loop.
+
+The OWASP list gives concrete categories to consider, but a list is not a verdict. A risk that is plausible in one deployment may be irrelevant in another, and a category that is absent from a generic list may be the most important one in yours. The list is a starting point for mapping, not the assessment itself.
+
+The practical sequence is to define the system and its decision, identify the hazards that could change that decision, estimate likelihood and impact with whatever evidence exists, choose controls, and state the residual risk. Each step should name its uncertainty. An assessment that presents estimates as facts loses the main thing an assessment is for, which is making uncertainty visible to a decision maker.
+
+## A worked assessment
+
+*Illustrative.* A support assistant drafts replies and can call a refund tool.
+
+Three checks decide the assessment. First, what decisions does the system influence, and which of them are consequential enough to warrant control? Second, which hazards — a wrong policy citation, an unauthorised refund, or a missed escalation — have evidence behind them, and which are merely imagined? Third, which controls were adopted, who owns them, and what risk remains after they operate?
+
+The outcome is a short record with a residual risk statement. The scenario is hypothetical; the assessment method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| The RMF covers governance, mapping, measurement and management | `source-reported` | NIST AI RMF | 2026-11-18 | Framework updated |
+| LLM applications have identified risk categories | `source-reported` | OWASP LLM Top 10 | 2026-11-18 | New edition |
+| Measure material hazards and state residual risk | `inferred` | Derived from the framework | 2026-11-18 | Use changes |
+
+## Why a list is not an assessment
+
+A list of risks is cheap to produce and easy to file. It becomes an assessment only when each item is tied to evidence, a control, or a stated decision to accept it. Without that link, the document describes possibilities without helping anyone choose. The most useful question to ask of an assessment is what would have been different if it had not been written.
+
+An assessment is also a snapshot. A system that is reviewed once and then changed will carry a risk record that no longer describes it, which is why the recheck condition is part of the artefact rather than an optional addition. A short review after a material change is more useful than a long review that is never revisited.
+
+The choice of what to measure is itself a judgement that should be visible. A category that is excluded because it seems unlikely should be named as excluded, so a later reader can challenge that decision with new evidence. Silence about what was left out is the hardest part of an assessment to audit.
+
+The residual risk statement should name who accepts it, since an unowned risk is a risk nobody is tracking.
+
+## What it cannot do
+
+It cannot eliminate risk, because residual risk is always present. It does not prove that a control works, which requires testing. And it cannot guarantee that the identified hazards are complete.
+
+The counterargument that a comprehensive list is the goal is fair for coverage and incomplete for decision value.
+
+## A decision test
+
+1. Define the system and its decisions.
+2. Map material hazards.
+3. Estimate likelihood and impact with evidence.
+4. Choose controls with owners.
+5. State residual risk.
+6. Set a recheck condition.
+7. Record the assessment.
+
+For the framework, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
+
+## References & Further Reading
+
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.
+- OWASP Gen AI Security Project, 2025. [LLMRisks Archive - OWASP Gen AI Security Project](https://genai.owasp.org/llm-top-10/) — The OWASP Top 10 for LLM Applications 2025, where prompt injection is ranked LLM01:2025.

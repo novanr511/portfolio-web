@@ -1,10 +1,76 @@
 ---
 title: "Capacity Planning Checklist"
-description: "Reserved title for a future NOVANDRI article: Capacity Planning Checklist."
-date: 2026-11-17
+description: "Capacity planning is about matching resources to demand. Read the checklist, a worked plan, and why peak traffic is not the only number."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Operations
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Capacity planning is often reduced to buying enough servers for the biggest day, which ignores the shape of demand and the cost of idle capacity. The Wikipedia entry describes matching resources to expected demand, and the SRE material defines service objectives. The plan should connect both.
+
+**Direct answer:** Plan capacity from a measured demand profile, a stated service objective, and a headroom policy, then test the plan against a realistic peak. The sources describe the concepts; the checklist is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked plan, separating documented concepts from local choices about headroom.
+
+## The mechanism
+
+The first input is a demand profile rather than a single number. Average traffic hides peaks, and a peak that lasts minutes is different from one that lasts hours. The capacity entry describes matching resources to demand, which requires knowing the shape of that demand over time. A profile with percentiles is more useful than a maximum, because it shows how often the system is near its limit.
+
+The second input is a service objective. The SRE material defines what acceptable performance means, which determines what capacity is sufficient. A system that must respond quickly under load needs more headroom than one that can slow down gracefully. Without an objective, a capacity plan is a guess about what "enough" means.
+
+The third input is a headroom policy. Some spare capacity is needed for failures and surprises, but too much is expensive. The right amount depends on how quickly capacity can be added and how costly a shortfall is. That is a decision, not a calculation, and it should be written down with its reasoning.
+
+The sequence is: measure the profile, state the objective, choose headroom, then test against a realistic peak and a failure. Each step can be revisited as demand changes, which is why the plan needs a review condition rather than a permanent status.
+
+## A worked plan
+
+*Illustrative.* A service sees a steady load with brief daily peaks and must keep latency low.
+
+Three checks decide. First, what do the demand percentiles show, and how long does the peak last? Second, what latency is acceptable at the peak, using the service objective? Third, how much headroom is needed given how long it takes to add capacity?
+
+The outcome is a plan with a recorded assumption about growth. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Capacity planning matches resources to demand | `source-reported` | Wikipedia, Capacity planning | 2026-11-18 | Definition changes |
+| Service objectives define acceptable performance | `source-reported` | Google SRE | 2026-11-18 | Practice changes |
+| Plan from profile, objective and headroom | `inferred` | Derived from the concepts | 2026-11-18 | Demand changes |
+
+## Why the peak is not the only number
+
+A plan sized only for the maximum will be expensive most of the time. A plan sized for the average will fail during peaks. The useful plan is sized for a percentile that the organisation has chosen to serve well, with an explicit decision about what happens beyond it.
+
+A plan also depends on the reliability of the components behind it. More capacity cannot compensate for a dependency that fails often, and a plan that ignores this will buy resources that sit idle during an outage caused elsewhere. The failure scenario in the checklist exists to reveal this, and it deserves as much attention as the peak scenario.
+
+Growth assumptions deserve their own note. A plan built on a forecast will be wrong in some direction, and recording the assumption makes it possible to tell whether a shortfall was bad luck or a bad estimate. The distinction matters when the plan is revised, because the response is different for each.
+
+A plan without a review date becomes a snapshot of an older demand profile, which is easy to forget when traffic grows gradually.
+
+The objective itself should be revisited, because a target that no longer matches user expectations makes the whole plan irrelevant.
+
+## What it cannot do
+
+It cannot predict a sudden change in demand. It does not remove the need for monitoring. And it cannot guarantee that added capacity will be used efficiently.
+
+The counterargument that more capacity is always safer is fair for reliability and incomplete for cost.
+
+## A decision test
+
+1. Measure the demand profile.
+2. State the service objective.
+3. Choose a headroom policy.
+4. Test against a realistic peak.
+5. Test a failure scenario.
+6. Record the plan and recheck date.
+
+For the objective, see [SLOs: Metrics that Matter](/articles/slos-metrics-that-matter).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Capacity planning - Wikipedia](https://en.wikipedia.org/wiki/Capacity_planning) — Matching resources to expected demand.
+- Google, 2016. [Google SRE - Defining SLO: Service Level Objective Meaning](https://sre.google/sre-book/service-level-objectives/) — How to define SLIs and SLOs that are actually useful.

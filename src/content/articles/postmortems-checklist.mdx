@@ -1,10 +1,75 @@
 ---
 title: "Postmortems Checklist"
-description: "Reserved title for a future NOVANDRI article: Postmortems Checklist."
-date: 2026-11-17
+description: "A postmortem should produce completed actions, not a document. Read the checklist, a worked review, and why a blame-free process still needs owners."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+A postmortem checklist helps only if it produces actions that get finished. The SRE material treats postmortems as part of an incident culture, and NIST's handling guide includes review in the lifecycle. The checklist below is organised around completion rather than documentation.
+
+**Direct answer:** Reconstruct the timeline, name conditions rather than people, assign one owner per action, and verify completion on a recorded date. The sources describe the practice; the checklist is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked review, separating documented practice from the local judgement about what counts as a cause.
+
+## The mechanism
+
+The first item is a timeline built from evidence rather than memory. Events placed in order reveal which signal fired, what was done, and where the response waited. A review that begins with a conclusion will interpret the timeline to fit it, so the order of work matters.
+
+The second item is a distinction between trigger and condition. A trigger is the event that started the incident. A condition is what made the system unable to absorb it. Removing only the trigger leaves the condition in place, which is why the same class of incident can recur with a different immediate cause. Both belong in the record, with different actions attached.
+
+The third item is ownership. An action without an owner is a suggestion, and a list of suggestions is not an outcome. One person should be accountable for each action, and the review should set a date when completion will be checked. The date belongs in the document because a reminder that is never scheduled will not happen.
+
+The fourth item is a statement of what was unknown at the time. A decision that was reasonable with incomplete information is different from a careless decision, and the distinction is what makes a blame-free review honest. Recording the missing information also points to a control: if the same information will be needed next time, the system should provide it.
+
+## A worked review
+
+*Illustrative.* A deploy caused a long outage after a rollback was attempted and failed.
+
+Three checks decide. First, does the timeline show when the alert fired and when the rollback was attempted? Second, are the conditions named — a rollback that was never tested, an alert without an objective — rather than a person who made the decision? Third, does each action have one owner and a verification date?
+
+The outcome is a short document with two owned actions. The scenario is hypothetical; the checklist method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Postmortems belong to incident culture | `source-reported` | Google SRE book | 2026-11-18 | Practice changes |
+| Review is part of the incident lifecycle | `source-reported` | NIST SP 800-61 | 2026-11-18 | Guidance updated |
+| Verify completion with an owner and date | `inferred` | Derived from the practice | 2026-11-18 | Process changes |
+
+## Why completion is the measure
+
+A long review with no finished actions has changed nothing. A short one with two completed actions has improved the system. The checklist should therefore end with verification, not with publication. A document that is filed without a later check is a record of intention, and intention is not the purpose of the exercise.
+
+A checklist can also be followed without understanding it. A team can fill every field and still miss the condition that mattered, because the fields encourage completeness rather than insight. The value comes from the argument about what caused the incident, not from the completion of the form.
+
+The review should also say what will be different at the next incident. If the answer is nothing, the review has produced an account of the past without an effect on the future, which is a diagnostic of a process that has become a ceremony.
+
+An action that is waived should record when the waiver expires, so a temporary exception does not become permanent by silence.
+
+## What it cannot do
+
+It cannot guarantee that a failure will not recur. It does not replace monitoring. And it cannot fix a system designed without reversibility.
+
+The counterargument that a thorough review matters more than a short one is fair for complex incidents and incomplete when the extra detail never becomes an action.
+
+## A decision test
+
+1. Build a timeline from evidence.
+2. Separate trigger from condition.
+3. Name conditions, not people.
+4. Assign one owner per action.
+5. Set a verification date.
+6. Record what was unknown.
+7. Check completion.
+
+For the lifecycle, see [Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response).
+
+## References & Further Reading
+
+- Betsy Beyer et al., 2016. [Google SRE - Site Reliability Engineering book Google Index](https://sre.google/sre-book/table-of-contents/) — The book that defined SRE practice, including SLOs and error budgets.
+- Paul Cichonski, Thomas Millar, Tim Grance, Karen Scarfone (NIST), 2012. [SP 800-61 Rev. 2, Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final) — The incident-response capability lifecycle: preparation, detection and analysis, containment/eradication/recovery, and post-incident activity.
