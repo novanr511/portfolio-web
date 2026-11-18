@@ -88,6 +88,30 @@ If you cannot answer these questions, do not collect the data.
 
 For the related question of AI ethics, see [AI Ethics: Responsible Use of Artificial Intelligence](/articles/ai-ethics-responsible-use-of-artificial-intelligence) and why data quality matters, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
 
+## Fairness is not a single number
+
+The references at the end of this article make an uncomfortable point: fairness is not a single number a team can optimize and then declare done. Barocas, Hardt, and Narayanan show that several reasonable definitions of fairness are mathematically incompatible. A system can satisfy one formal criterion and necessarily violate another. An organization therefore cannot claim to have solved the ethical question by picking a metric and reporting a passing score.
+
+The choice of which criterion to apply is itself an ethical decision, not a technical one. Two teams examining the same data can reach different but internally consistent conclusions, depending on which definition they privileged. The ethical task is to make that choice explicit and defend it in terms of the customers affected, rather than burying it inside a dashboard.
+
+A passing metric is evidence that a specific constraint was met, not proof that the system treats people fairly. Responsible teams report which criteria they chose, which they did not, and why. They keep watching after launch, because an aggregate that looks acceptable can hide harm concentrated in a smaller group.
+
+## Documentation as an ethical habit
+
+The two reporting formats cited here, Datasheets for Datasets from Gebru and colleagues and Model Cards from Mitchell and colleagues, are often read as paperwork. They are better understood as ethical infrastructure. A datasheet records a dataset's provenance, composition, and limits so a reviewer can see what it was built to represent and where it falls short. A model card does the same for a trained system, stating intended use, evaluation, and limitations.
+
+Both formats turn claims that would otherwise be vague into claims that can be checked. 'We use representative data' becomes a statement with an answer: representative of whom, collected how, and missing which groups. That shift matters because ethical review is impossible when provenance and limits are unknown. A team cannot weigh the risk of a repurposed dataset if no record exists of the purpose it was originally collected for.
+
+Documentation also outlasts the people who made the decision. Employees leave, systems are inherited, and original intent is forgotten. A datasheet or model card preserves the reasoning so a later team can ask whether an old use is still justified. It is the practical counterpart to the accountability question in the framework above: it gives someone a way to answer for the system years after launch.
+
+## A worked example
+
+The following is hypothetical and illustrative. Consider a company that builds a model to prioritize which support tickets get the fastest response. The training data comes from historical tickets, and the team notices the model ranks some groups lower. A reviewer reaches for a single fairness score and finds one that looks acceptable in aggregate.
+
+The framework above and the sources behind it suggest a different sequence. First, the team consults the fairness criteria literature and recognizes that choosing a definition is a value judgment, so it documents which definition it picked and which it set aside. Second, it writes a datasheet for the ticket data, recording how labels were assigned and which customer segments are underrepresented. Third, it publishes a model card stating the intended use and the limits the team already knows about.
+
+None of this guarantees a fair outcome. What it does is make the decision reviewable: a customer, auditor, or future employee can see what was claimed, on what evidence, and with what acknowledged limits. When the company later considers reusing the same data for a different purpose, the documentation makes the surprise question concrete. The customer would likely be surprised, and the record exists to show why that answer matters.
+
 ## References & Further Reading
 
 - Solon Barocas, Moritz Hardt, and Arvind Narayanan, 2019. [Fairness and Machine Learning: Limitations and Opportunities](https://fairmlbook.org/) — The free textbook on fairness criteria and their incompatibility results.

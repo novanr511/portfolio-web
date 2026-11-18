@@ -43,6 +43,24 @@ Cloud makes infrastructure easier to obtain, but it does not make product-market
 
 For the related question of how unit economics interact with infrastructure costs, see [Understanding Unit Economics: CAC, LTV, Churn, and Contribution Margin](/articles/understanding-unit-economics-cac-ltv-churn-contribution-margin). For how technical choices affect operational cost, see [CDN Caching and Googlebot: Avoid Origin Overload](/articles/cdn-caching-and-googlebot-avoid-origin-overload).
 
+## A worked example
+
+The following is hypothetical and illustrative. Consider a small software business whose traffic arrives in unpredictable bursts. It starts with metered compute, pays for what it uses, and avoids the idle capacity that a purchased server would represent. That is the capex-to-opex trade in its simplest form: no large purchase before the first customer, and an abandoned experiment costs only the hours actually consumed.
+
+Now suppose the product becomes stable and heavily used. The same metered bill grows every month, and the team re-examines the crossover point. It reviews right-sizing and commitment models, the practices described in AWS's cost optimization guidance, and compares its workload against open, comparable performance measurements of the kind MLCommons publishes rather than vendor claims. Data transfer and managed-service premiums are checked separately, because they are easy to overlook in a per-instance comparison. If the workload is steady enough, owned hardware may win; if it remains spiky, the flexibility is worth the premium.
+
+## Where the reasoning breaks down
+
+The model breaks where usage and pricing refuse to stay still. A cloud bill is not a fixed monthly cost but a function of traffic, architecture, and provider terms. A price change can turn a previously sound decision into an expensive one, and the switching cost created by proprietary services can leave migration more costly than staying. The variable-cost trap is the sharpest version: if each new customer consumes more in cloud resources than they pay, growth accelerates losses rather than diluting them.
+
+Benchmarks help only when they are comparable; that is why open measurements matter more than a single vendor's numbers. Even then, they describe hardware and software performance, not the economics of a particular contract.
+
+## A decision test
+
+Treat infrastructure as a recurring decision. Ask whether the workload is spiky or steady, because that determines where the crossover point sits. Ask whether costs are measured per customer and connected to retained value, which is the discipline FinOps describes. Ask what leaving would cost: data transfer, rewrites around managed services, and the habits built around one provider.
+
+If the answers change from quarter to quarter, the right response is a scheduled review rather than a one-time architecture choice. Cloud lowered the cost of starting; it did not remove the obligation to keep deciding.
+
 ## References & Further Reading
 
 - Amazon Web Services, 2026. [Cost Optimization (AWS Well-Architected Framework)](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html) — Vendor primary documentation on right-sizing and commitment models.

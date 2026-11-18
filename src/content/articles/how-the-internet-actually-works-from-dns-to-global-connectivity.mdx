@@ -64,6 +64,24 @@ Understanding the internet as a network of networks changes how you diagnose pro
 
 For the related question of how DNS specifically affects site availability and crawling, see [DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works). For how servers and applications fit into the request path, see [Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin).
 
+## A worked example
+
+The following is hypothetical and illustrative. Suppose a browser in one country requests a page hosted on another continent. The resolver walks the hierarchy defined in RFC 1035, from the root through the top-level domain to the authoritative server, caches the answer, and returns an address. The device then opens a transport connection: RFC 9293 defines the TCP behaviour that establishes it, while RFC 9110 defines the HTTP request and response semantics carried inside. If the connection uses HTTP/3, RFC 9114 maps those same semantics onto QUIC instead.
+
+The packets cross several autonomous systems, perhaps meet at an internet exchange point, and travel undersea before reaching the destination network. Each hop adds latency, and each network along the way can read the packet headers even though TLS hides the encrypted contents. The response retraces a path that need not be the same as the request. Nothing in this sequence belongs to a single owner, which is the point the cloud metaphor conceals.
+
+## Where the reasoning breaks down
+
+The mental model fails in predictable ways. Because DNS resolves names before anything else happens, a resolution failure looks exactly like an internet failure even though the network is healthy. Because BGP is trust-based, a bad announcement can misdirect traffic or make a network unreachable, and the effects can be felt far from the mistake. Because answers are cached at every level, a DNS change appears to propagate slowly rather than take effect everywhere at once.
+
+None of these are software bugs in the ordinary sense. They are consequences of a system built from independently operated networks. The practical implication is that "the internet is down" is rarely a useful diagnosis; the useful question is which layer failed.
+
+## A decision test
+
+When a site is unreachable or slow, separate the layers. Ask whether the name resolves from more than one resolver. Ask whether the address is reachable from more than one network, since routing differs between providers. Ask whether latency or loss appears at a particular hop, which points toward congestion or a detour rather than the server. Ask whether the region's physical infrastructure - cables, exchange points, data centers - is the constraint.
+
+If the answer is yes at every layer, the fault is likely in the application rather than the network. The layered model is useful precisely because it turns one vague symptom into a sequence of checkable claims.
+
 ## References & Further Reading
 
 - M. Mockapetris, 1987. [Domain Names: Implementation and Specification (RFC 1035)](https://www.rfc-editor.org/rfc/rfc1035) — The DNS protocol specification.

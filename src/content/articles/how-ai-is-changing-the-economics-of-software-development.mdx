@@ -65,6 +65,30 @@ For teams, the implication is to use AI for acceleration within boundaries, not 
 
 For the related question of how AI models scale and where their limits are, see [Chinchilla and the Scaling Laws: Why "Just Make It Bigger" Stopped Being the Rule](/articles/chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule). For how to distinguish tool use from system understanding, see [The Difference Between Knowing a Tool and Understanding a System](/articles/the-difference-between-knowing-a-tool-and-understanding-a-system).
 
+## What the measurements actually show
+
+The METR study cited at the end of this article is valuable precisely because it measured rather than asked. Experienced open-source developers worked on tasks they knew well, some with AI tools and some without. The counter-intuitive result was that the developers were slower when using the tools, even though they believed the tools made them faster. That gap between perception and measurement is the most important economic fact in this debate.
+
+It fits the earlier sections. The tasks in that study were familiar codebases where the developers already understood the context, so the generation savings were small while review and verification costs remained. This is the review bottleneck in experimental form: time saved typing is spent checking output, and the checking is easy to underestimate because it feels like part of the work rather than a delay.
+
+Brynjolfsson, Li, and Raymond add the workforce-level view. Rapid adoption of generative AI does not by itself demonstrate a productivity payoff; adoption and measured gains can diverge. The same pattern appears at both scales: usage spreads quickly, while evidence of economic benefit accumulates more slowly and unevenly across tasks. Teams should therefore treat productivity claims as hypotheses to measure against their own outcomes, not as settled facts.
+
+## The cost that does not appear in the editor
+
+Software economics usually counts developer time, but the full cost of AI-assisted development has an infrastructure component. The IEA's analysis of data centres and electricity demand points to the physical layer beneath code generation: model inference consumes energy, and demand for it is growing. For a team adopting AI tools at scale, that cost is real even when it is hidden in a subscription price or a cloud bill.
+
+This does not overturn the earlier argument; it sharpens it. If generation becomes cheap at the margin, the scarce resources shift to the ones that remain expensive: engineer attention for review, the energy and hardware to run models, and the long-term maintenance of code that was produced quickly. A decision to generate more code is also a decision to consume more of each.
+
+The practical consequence is to measure the whole system. The closing advice to track features shipped, escaped bugs, and incident resolution time already points the right way. Adding the cost of the tooling and its infrastructure to that measurement prevents a local saving in typing time from being mistaken for a net gain. The economics change where the task is well-specified and disposable, as noted above, but only when the full bill is counted.
+
+## A worked example
+
+The following is hypothetical and illustrative. Consider a team maintaining a small internal tool that converts configuration files between two formats. The task is well-specified: the input and output shapes are known, and a mistake produces a failing test rather than a customer-facing outage. A developer asks an assistant to generate the conversion script and the accompanying test data. Generation that once took a morning takes minutes, and the economics argument above applies: the task is repetitive, the cost of error is low, and the codebase is disposable.
+
+Now consider the same assistant used on the billing service. The requirement is ambiguous because the finance team has not settled how proration should work, and a mistake could overcharge customers. Here the generation saving is small relative to the work of specifying the requirement, reviewing the output, and validating it against edge cases. The METR measurement discussed earlier is the relevant warning: in familiar codebases, the time saved typing was outweighed by verification time, and reviewers underestimated that cost.
+
+Three checks decide which case applies. First, is the task well-specified enough that a test can define correctness? Second, is the cost of an error low enough that review can be lightweight? Third, will the code need to evolve over years, with maintenance costs that compound? When all three answers are favourable, assistance changes the economics; when any answer is unfavourable, the local saving in typing time can hide a net loss. This is the same boundary the earlier sections draw, now applied to a concrete choice.
+
 ## References & Further Reading
 
 - METR, 2025. [Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) — A randomised measurement of AI tool impact on experienced developers, including the counter-intuitive result.
