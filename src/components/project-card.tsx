@@ -1,8 +1,9 @@
+import Link from "next/link";
 import type { Project } from "@/lib/projects";
 
 export function ProjectCard({ project }: { project: Project }) {
-  return (
-    <article className="flex h-full flex-col rounded-2xl border border-border bg-surface p-7">
+  const body = (
+    <article className="flex h-full flex-col rounded-2xl border border-border bg-surface p-7 transition-colors duration-300 group-hover:border-accent/40 group-hover:bg-tint/60">
       <div className="flex items-center justify-between">
         <span className="rounded-full bg-tint px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-accent">
           {project.year}
@@ -49,6 +50,29 @@ export function ProjectCard({ project }: { project: Project }) {
           </span>
         ))}
       </div>
+      {project.caseStudy && (
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent">
+          Baca case study
+          <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
+            →
+          </span>
+        </span>
+      )}
     </article>
   );
+
+  if (project.caseStudy) {
+    return (
+      <Link
+        href={`/projects/${project.slug}`}
+        transitionTypes={["nav-forward"]}
+        className="group block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        aria-label={`Baca case study: ${project.name}`}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return body;
 }

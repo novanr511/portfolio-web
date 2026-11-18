@@ -1,13 +1,80 @@
 ---
 title: "Rollback Strategies Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Rollback Strategies Trade-Offs."
-date: 2026-11-17
+description: "A rollback restores an earlier state, with its own risks. Read the trade-offs, a worked example, and why forward fixes sometimes win."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Reliability
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Rollback is often treated as the automatic response to a bad release, which ignores that reverting is itself a change. The GitHub Actions documentation describes automation for deployment, and NIST's incident-handling guide covers recovery. The trade-off is between returning to a known state and moving forward with a fix.
+
+**Direct answer:** Choose rollback when the change is reversible and the risk is immediate; choose a forward fix when reverting would create a worse state. The sources describe tooling and lifecycle; the decision rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented tooling from local judgements about reversibility.
+
+## The mechanism
+
+The first consideration is reversibility. The automation entry describes how a deployment can be repeated, but a change that includes a data migration cannot always be undone by redeploying old code. Knowing which parts of a release are reversible is the precondition for choosing rollback.
+
+The second consideration is time. A rollback returns to a previous state quickly, which is valuable when users are affected now. A forward fix may take longer but avoids the risk of reintroducing an older problem. The choice depends on the cost of waiting, which is a local judgement.
+
+The third consideration is testing. The incident guide treats recovery as a lifecycle, and a rollback that has never been rehearsed is a hypothesis. Testing it before it is needed is the difference between a plan and an intention.
+
+The sequence is: classify reversibility, estimate the cost of waiting, verify the rollback path, then decide. The decisions are local, so the conclusions are `inferred`; the context is `source-reported`.
+
+## A worked example
+
+*Illustrative.* A deploy causes errors and includes a schema change.
+
+Three checks decide. First, can the old code run against the new schema, or would reverting break the application? Second, how long would a forward fix take, and what is the cost of the errors in the meantime? Third, has the rollback path been tested with the current data?
+
+The outcome may be a forward fix chosen deliberately, which is a better result than a rollback assumed to work. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Deployment can be automated | `source-reported` | GitHub Actions docs | 2026-11-18 | Product changes |
+| Recovery is part of incident handling | `source-reported` | NIST SP 800-61 | 2026-11-18 | Guidance updated |
+| Decide from reversibility and cost of waiting | `inferred` | Derived from the lifecycle | 2026-11-18 | Architecture changes |
+
+## Why reverting is a change
+
+A rollback is not a cancellation; it is a new deployment of an older state. That state may be incompatible with data written since, and the incompatibility appears at the worst moment. Treating rollback as a special safe operation is the mistake the trade-off exists to correct.
+
+A final consideration is the signal that triggers the decision. A rollback based on a loose threshold can be triggered by normal variation, while one based on a strict threshold can arrive too late. The trigger should be tied to an objective defined before the release, which is the same discipline the alerting material recommends for production.
+
+The rollback also has to be monitored after it completes. A successful command is not evidence that the service recovered, and a system can be in a bad state for a different reason after reverting. Checking user-facing signals after the change closes the loop.
+
+None of this removes the need for a forward fix when the data has changed. Recognising that case early is the point of classifying reversibility before the release, not during the incident.
+
+The trigger should be agreed before the release, when the decision can be made calmly.
+
+A revert that has never been tested with current data is an assumption, not a recovery path.
+
+The decision should name what would make a forward fix preferable to a revert.
+
+A rollback is a deployment, and it deserves the same care as the original change.
+
+## What it cannot do
+
+It cannot undo an unplanned data change. It does not guarantee that the restored version is better. And it cannot replace testing.
+
+The counterargument that a fast rollback is always safer is fair for isolated code changes and incomplete when data is involved.
+
+## A decision test
+
+1. Classify reversibility.
+2. Estimate the cost of waiting.
+3. Verify the rollback path.
+4. Choose rollback or forward fix.
+5. Record the reason.
+6. Set a recheck condition.
+
+For the basis, see [Rollback Strategies](/articles/rollback-strategies-best-practices).
 
 ## References & Further Reading
 

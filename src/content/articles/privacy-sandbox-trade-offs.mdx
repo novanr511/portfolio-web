@@ -1,13 +1,77 @@
 ---
 title: "Privacy Sandbox Trade-Offs"
-description: "Reserved title for a future NOVANDRI article: Privacy Sandbox Trade-Offs."
-date: 2026-11-17
+description: "Privacy Sandbox changes how advertising is measured. Read the trade-offs, a worked example, and why a new mechanism is not a new guarantee."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Method
+  - Privacy
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Privacy Sandbox is often described as a replacement for third-party cookies, which hides that it is a set of mechanisms with different properties. The Wikipedia entry describes browser proposals to limit tracking while supporting advertising, and GDPR Article 6 sets conditions for processing. The trade-offs concern what each mechanism can and cannot do.
+
+**Direct answer:** Evaluate each mechanism against the specific measurement task and the privacy obligation, then verify what it actually reports. The sources describe the proposals and the law; the evaluation rule is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked example, separating documented mechanisms from local judgements about their fit.
+
+## The mechanism
+
+The first consideration is what is being protected. The Privacy Sandbox entry describes proposals to limit cross-site tracking, which is a specific goal. A mechanism that addresses that goal may still allow other forms of measurement, and a claim about privacy should say which one it refers to.
+
+The second consideration is what is being measured. Advertising depends on knowing whether an ad led to a result, and a mechanism that reports aggregated signals answers a different question from one that reports individual journeys. Choosing the mechanism without naming the decision it supports produces a tool that cannot answer the question.
+
+The third consideration is the legal obligation. GDPR Article 6 concerns the lawful basis for processing, which is independent of the technology used. A mechanism designed to reduce tracking does not by itself establish a lawful basis, and the two questions should be kept separate.
+
+The sequence is: define the measurement need, understand the mechanism, check the legal basis, then verify what is reported. The legal and technical facts are `source-reported`; the evaluation is `inferred`.
+
+## A worked example
+
+*Illustrative.* An advertiser wants to know whether a campaign reached people who later bought.
+
+Three checks decide. First, what decision needs the measurement — budget allocation or creative testing? Second, what does the chosen mechanism actually report, at what granularity and with what delay? Third, is there a documented lawful basis for the processing involved?
+
+The outcome is a fit assessment with a recorded limitation. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Privacy Sandbox proposes limits on tracking | `source-reported` | Wikipedia, Privacy Sandbox | 2026-11-18 | Proposals change |
+| Lawful bases are required for processing | `source-reported` | GDPR Article 6 | 2026-11-18 | Law changes |
+| Match the mechanism to the decision and obligation | `inferred` | Derived from both | 2026-11-18 | Measurement needs change |
+
+## Why a mechanism is not a guarantee
+
+A mechanism implements a design choice, which can be changed by the party that controls it. Evaluating it requires reading what it reports today, not assuming that a label implies a fixed behaviour. That is a practical reason to verify rather than trust a category name.
+
+A practical difficulty is that these mechanisms are still changing. A design that reports one set of signals today may report another after a browser update, and an evaluation built on the current behaviour will age. Recording the version and the date of the observation makes it possible to tell whether a later result reflects the campaign or a change in the mechanism.
+
+The trade-off also involves accuracy. A mechanism that limits tracking may report broader aggregates, which are useful for some decisions and too coarse for others. Choosing it without checking the granularity against the decision produces data that cannot answer the question, which is a cost disguised as a privacy win.
+
+None of this removes the advertiser's responsibility to have a lawful basis. The technology can reduce what is collected, but the obligation to justify what remains is a separate decision that belongs to the organisation.
+
+The mechanism's behaviour should be verified with a known case before its reports are trusted for a decision.
+
+A mechanism that changes its reporting rules invalidates past comparisons, which is why the version belongs in the record.
+
+The lawful basis should be documented independently of the technology chosen.
+
+## What it cannot do
+
+It cannot establish a lawful basis. It does not guarantee that all tracking stops. And it cannot replace a measurement design.
+
+The counterargument that a new mechanism solves measurement is fair for some tasks and incomplete where the report answers a different question.
+
+## A decision test
+
+1. Define the measurement need.
+2. Understand what the mechanism reports.
+3. Check the lawful basis.
+4. Verify with a known case.
+5. Record the limitation and recheck condition.
+
+For the legal frame, see [Privacy](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design).
 
 ## References & Further Reading
 
