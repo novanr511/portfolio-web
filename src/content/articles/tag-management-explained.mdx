@@ -1,10 +1,73 @@
 ---
 title: "Tag Management Explained"
-description: "Reserved title for a future NOVANDRI article: Tag Management Explained."
-date: 2026-11-17
+description: "Tag management separates measurement changes from site code. Read the governance decision, a worked example, and why a misconfigured tag corrupts data silently."
+date: 2026-11-18
 tags:
-  - Planned
   - Technology
+  - Explanation
+  - Tag Management
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams often treat tag management as a technical convenience, a way to avoid editing site code. The real problem is that measurement changes then move outside the normal release process, so the data feeding web analytics can change without anyone reviewing it. The result is a dashboard that looks stable while its meaning quietly drifts.
+
+**Direct answer:** A tag management system is a platform for adding and updating measurement tags through a web interface rather than by changing site code, and Google's documentation describes it in those terms. Wikipedia's web analytics entry defines the field that consumes those tags: the measurement, collection, analysis, and reporting of web data to understand and optimize usage. The boundary is that a tag manager delivers tags; it does not decide what is worth measuring.
+
+**Delta:** This article adds a governance decision beyond the sources: it maps the tag platform and the analytics definition to the choice of when a tag manager helps, with claim status explicit.
+
+## The mechanism
+
+Google's documentation describes a tag platform built around a container: a small snippet installed once on the site, with tags, triggers, and variables configured in a web interface. A tag is a snippet of code that sends information to a third party; a trigger decides when it fires; a variable carries a value such as a page name. The practical consequence is that adding or changing a tag no longer requires a code deployment. Iteration is faster, but the release path has moved to a separate configuration surface with its own interface and permissions.
+
+Wikipedia's web analytics entry describes the measurement, collection, analysis, and reporting of web data for understanding and optimizing web usage. That definition makes clear what tag management is for: it is plumbing that feeds an analytics system. The practical consequence is that analytics quality depends on which tags fire and with what parameters. A tag that fires on the wrong page, or carries a misnamed variable, does not crash the site; it corrupts the data quietly, and a corrupted report can be trusted precisely because the site still works.
+
+Combining the two sources exposes the central governance issue. Because tags are deployed from a platform separate from the site code, the people who own measurement are often not the people who own the site. That separation is the benefit and the risk. Change control, naming conventions, and documentation move into the tag platform, where they are easy to neglect because the platform looks like a settings panel rather than a production system. The practical consequence is that a tag inventory, an owner, and a test step become necessary even for a small site.
+
+The decision to adopt a tag manager therefore depends on two factors: how often measurement changes, and how much governance the team can sustain. A site with rare, simple measurement needs may get by with direct code and fewer moving parts. A site running frequent experiments across many pages gains from a platform that makes changes reversible. In both cases the mechanism is the same: the platform changes where measurement logic lives, and that relocation is what must be managed.
+
+## A worked example
+
+The following is hypothetical and illustrative. A marketing team wants to add an event that records downloads of a new guide across a site with several page templates. Rather than editing each template, the team configures the event in the tag platform. Three checks decide whether the change is safe. First, the trigger check: does the tag fire on exactly the pages where the guide is offered, and nowhere else? Second, the parameter check: does the variable carrying the guide name resolve correctly on every template, rather than returning an empty label? Third, the control check: is there a named owner and a published version that can be rolled back if the event is wrong? The outcome is that the event goes live without a site deploy, and the trigger test catches a template where the tag would have fired on the wrong page. The limitation is that a subtle variable error could still pass these checks and produce a plausible but misleading report.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Tag managers deploy and update tags through a web interface and container | `source-reported` | Google Tag Manager | 2026-11-18 | the container or interface model changes |
+| Web analytics measures, collects, analyses and reports web data | `source-reported` | Web analytics - Wikipedia | 2026-11-18 | the entry's definition is revised |
+| Separating tag deployment from site code shifts control to a platform that needs its own governance | `inferred` | Derived from the sources | 2026-11-18 | governance or consent requirements change |
+
+The first two rows report what the sources state directly and can be checked against them. The third is an inference: it follows from combining a separate configuration surface with a field that depends on correct inputs, but neither source calls it a governance rule. Recheck conditions point back to the sources or to changed obligations, keeping each row's status explicit.
+
+## What it cannot do
+
+A tag manager cannot decide what to measure. It is a delivery mechanism, and it will deploy a useless tag as readily as a useful one. The sources describe a platform and a field of practice; neither tells a team which events matter or how to interpret the resulting data. A team that treats the platform as a strategy will accumulate tags that fire faithfully and inform nothing.
+
+The hidden cost is that the platform becomes a second system to maintain. It has its own interface, permissions, versioning, and failure modes. Debugging shifts from reading code to inspecting configuration, which many engineers find less intuitive. Knowledge of how tags are wired tends to sit with one person, so the cost appears later as a single point of failure when that person is unavailable.
+
+The characteristic failure mode is silent data corruption. A tag with a wrong trigger or a mislabeled variable produces numbers that look normal, which is more dangerous than an obvious break because the report is trusted. Unlike a site outage, there is no error page to reveal the problem. Detection requires deliberate validation of tag firing and periodic comparison against an independent source of truth.
+
+The boundary of the sources matters here. They provide a platform description and a definition of web analytics, not a governance standard or a data-quality guarantee. Consent and privacy obligations, for example, sit outside the platform and must be enforced through its configuration. Claiming that adopting a tag manager improves data quality overstates what the sources support.
+
+Because tags accumulate, the setup needs scheduled review. Old tags reference page structures that no longer exist; owners leave; triggers that were once correct become broad. A practical cadence is a periodic audit that lists every tag, its owner, its trigger, and its last verification date, then removes what is no longer needed. Without that review the platform gradually becomes a source of noise.
+
+The counterargument that a tag manager adds unnecessary complexity is fair for a static site with rare measurement changes and incomplete for teams shipping frequent experiments across many pages, where changing measurement without a deploy pays for the extra layer.
+
+## A decision test
+
+1. List every tag the site needs and the decision each one supports.
+2. Name an owner for the tag platform and for each individual tag.
+3. Define the trigger and variables for each tag in writing.
+4. Test firing on every relevant page template before publishing.
+5. Record the published version and the rollback path.
+6. Check that consent and privacy rules are enforced in the configuration.
+7. Schedule a periodic audit and remove tags with no current owner.
+
+These steps turn a settings panel into a governed surface. The mapping from the platform's container model to a release decision is what makes the change reviewable. A passed test leaves an inventory, an owner, and a rollback path, not just a tag that happens to fire.
+
+For further reading, see [Marketing Dashboards Without the Hype](/articles/marketing-dashboards-without-the-hype).
+
+## References & Further Reading
+
+- Google, 2026. [About Google Tag Manager | Tag Platform | Google for Developers](https://developers.google.com/tag-manager?hl=en) — Primary documentation on tag management and server-side tagging options.
+- Wikipedia contributors, 2026. [Web analytics - Wikipedia](https://en.wikipedia.org/wiki/Web_analytics) — Collection and interpretation of website behaviour data.

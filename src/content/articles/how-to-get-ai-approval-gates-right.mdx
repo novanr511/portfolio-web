@@ -1,10 +1,75 @@
 ---
 title: "How to Get AI Approval Gates Right"
-description: "Reserved title for a future NOVANDRI article: How to Get AI Approval Gates Right."
-date: 2026-11-17
+description: "Place AI approval gates at high-risk decisions with evidence and an owner: a worked example, a claim-status table, and the limits of gating."
+date: 2026-11-18
 tags:
-  - Planned
   - AI
+  - Governance
+  - Approval Gates
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Teams add approval gates to AI systems as a reflex, then discover either a rubber stamp or a queue that slows every release. An approval is a formal agreement that confers authority, but a gate helps only when it sits at a decision that carries real risk. The practical problem is placement, not quantity.
+
+**Direct answer:** Put a gate where an AI system's output drives a high-impact or hard-to-reverse action, and give the approver evidence, authority, and a recorded decision. The NIST AI RMF frames risk management as continuous functions across the lifecycle, so a gate is one control, not a substitute for the rest.
+
+**Delta:** This article adds a claim-status table beyond the two sources: it maps where a gate sits to the decision it controls, with claim status explicit.
+
+## The mechanism
+
+Approval is the act of agreeing to a proposal, and in organizations it is the mechanism by which a decision receives authority. That definition carries two requirements that are easy to miss. The approver must be able to refuse, and the approver must have enough information to judge. A gate that always passes is not an approval; it is a delay with a signature attached. When a team adds a gate to reassure itself without changing who can say no, the ceremony consumes time while leaving the underlying risk untouched.
+
+The NIST AI Risk Management Framework organizes trustworthiness into continuous functions: govern, map, measure, and manage. It also describes characteristics such as validity, safety, security, accountability, transparency, explainability, privacy, and fairness. The important structural point is that risk management is iterative across the lifecycle rather than a single checkpoint. An approval gate is a control that belongs inside those functions, most naturally where mapped risks are measured and decisions are managed. It is not the program itself.
+
+Placement follows from that structure. A gate earns its position when three conditions meet: the action is high-impact, it is hard to reverse, or the system's output is uncertain enough that a person should decide. Sending a payment, changing a record, or publishing externally fit these conditions; drafting internal text often does not. Gating low-risk steps creates cost without reducing risk, and it trains approvers to click through, which degrades the gate where it is genuinely needed.
+
+The practical consequence is to define the decision before installing the control. State what the approver is deciding, what evidence they will see, who owns the outcome, and what event should trigger a review of the gate itself. Four answers are more valuable than a policy that says all outputs require approval, because each answer can be tested against a real scenario.
+
+## A worked example
+
+The following is hypothetical and illustrative. A support team deploys an assistant that drafts replies, searches a knowledge base, and can issue refunds within a policy limit; the team is deciding which actions require approval.
+
+Three checks decide placement. First, which actions are high-impact or hard to reverse, with the refund as the candidate and the draft as the contrast? Second, does the approver see evidence, specifically the policy citation and the refund details, rather than only a button to press? Third, can low-risk steps run without a gate, with escalation reserved for uncertain cases?
+
+The outcome is a single gate on refunds, with an owner, a recorded decision, and a review trigger tied to policy changes. Drafting and searching run ungated. The scenario is hypothetical; the placement method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Approval is agreement that confers authority | `source-reported` | Wikipedia Approval | 2026-11-18 | Definition changes |
+| AI risk management is continuous across the lifecycle | `source-reported` | NIST AI RMF | 2026-11-18 | Framework updated |
+| Gates belong at high-impact or hard-to-reverse actions | `inferred` | Derived from the sources | 2026-11-18 | Risk profile changes |
+
+The two source-reported rows describe a definition and a framework, not a placement rule. The inferred row is the article's synthesis: combining the meaning of approval with a lifecycle view of risk produces the conclusion that a gate should sit where authority and impact meet. It is a judgement to test, not a claim the sources make directly.
+
+## What it cannot do
+
+An approval gate cannot guarantee a correct decision. It records that a person agreed at a point in time, under the information available then. If the evidence was incomplete or the policy was wrong, the gate preserved the error rather than catching it. Treating a signed approval as proof of correctness confuses a process control with an outcome, and it makes later review harder because the signature looks like validation.
+
+It cannot remove the need for monitoring. A gate observes one decision at one moment; the behavior of an AI system changes as data, models, and policies change. Risk that appears after deployment will not be caught by a gate that was designed before it. The NIST framing treats management as ongoing for exactly this reason. A team that relies on the gate alone will discover drift through complaints rather than through its controls.
+
+There is a hidden cost in attention. Every gate consumes reviewer time, and reviewers have finite attention. When gates are placed indiscriminately, attention is spent on trivial cases and the important approval becomes another click. This is the rubber-stamp failure: the formal control exists, but the human judgment it depends on has been drained by volume. The cost is invisible in a policy document and visible only in how reviews are actually performed.
+
+The failure mode is automation bias in the other direction. When a reviewer sees a system recommendation followed by an approval prompt, the path of least resistance is to accept. A gate that presents only the recommendation, without the underlying evidence or a realistic option to refuse, does not create meaningful oversight. The design question is not whether a gate exists but what the reviewer can see and do at the gate.
+
+The boundary is ownership. A gate cannot fix a process with no accountable owner, because the person who signs is not necessarily the person who bears the consequence. If nobody owns the outcome, the approval is an empty record. The gate should therefore name an owner for the decision and a trigger for revisiting it when the system or its context changes. Without that, the control decays quietly.
+
+The counterargument that every output should be gated is fair for catastrophic actions and incomplete for routine ones, where delay and review fatigue raise their own risks.
+
+## A decision test
+
+1. Name the decision the gate is meant to control.
+2. Identify high-impact or hard-to-reverse actions.
+3. Show the approver the underlying evidence.
+4. Confirm the approver can refuse, not only accept.
+5. Assign an owner for the outcome.
+6. Record the decision and its basis.
+7. Set a review trigger tied to model or policy change.
+
+A gate is a control with a cost, so it should be placed where the cost buys something. If a gate cannot name the decision it controls, the evidence the reviewer needs, and the owner of the outcome, it is probably ceremony. Keep the number of gates small enough that each one receives real attention. For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Approval - Wikipedia](https://en.wikipedia.org/wiki/Approval) — Formal authorisation of a decision or action.
+- NIST, 2023. [AI Risk Management Framework | NIST](https://www.nist.gov/itl/ai-risk-management-framework) — The governance framework referenced in AI risk and compliance work.

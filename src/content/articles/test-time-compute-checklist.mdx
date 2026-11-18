@@ -1,10 +1,72 @@
 ---
 title: "Test-time Compute Checklist"
-description: "Reserved title for a future NOVANDRI article: Test-time Compute Checklist."
-date: 2026-11-17
+description: "A practical checklist for using test-time compute - extra sampling and chain-of-thought - to improve reasoning, with a cost-aware rule for when it beats scaling model parameters."
+date: 2026-11-18
 tags:
-  - Planned
-  - AI
+  - Applied AI
+  - Inference Optimization
+  - Test-time Compute
+  - Verified
 ---
+A common instinct when a language model fails is to reach for a larger model or another round of training. That instinct overlooks a cheaper lever: spending more computation at inference time. The hard part is knowing when extra test-time compute actually helps and when it simply burns budget.
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+**Direct answer:** Test-time compute means using additional calculation during inference, such as sampling multiple candidate answers or extended reasoning, to improve a response without changing model weights. Research shows it can beat scaling parameters on some reasoning tasks, but only when allocated well. The benefit depends on the task and on a reliable way to choose among candidates.
+
+**Delta:** This article adds a deployable checklist beyond the sources: it maps the two research findings to a concrete go or no-go decision for a workload, with claim status explicit.
+
+## The mechanism
+
+The 2024 study by Snell and colleagues, titled "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters," reports that adaptively allocating compute at inference can outperform simply increasing model size on certain reasoning benchmarks. The practical consequence is that there is a tradeoff between searching over many candidate answers and improving the reasoning within a single answer. More compute is not automatically better; how it is spent matters.
+
+One mechanism is generate-and-select. The model produces several candidates and a verifier or reward model scores them, so more samples raise the chance that at least one is correct. That gain saturates and depends heavily on verifier quality. If the verifier cannot tell a correct answer from a plausible wrong one, additional samples mostly multiply noise rather than signal.
+
+The 2022 chain-of-thought study by Wei and colleagues, "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models," shows that prompting a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. The practical consequence is that some test-time compute is elicited by prompt structure rather than purchased through extra sampling. A short instruction to reason step by step can unlock capability already present in the weights.
+
+The strongest gains tend to come from combining both ideas: eliciting reasoning and then selecting among reasoned candidates. For easy questions, extra compute is wasted; for hard ones, it helps until the base model lacks the underlying knowledge entirely. The checklist at the end translates this allocation problem into operational steps.
+
+## A worked example
+
+The following is hypothetical and illustrative. A hypothetical team runs a math-answering feature and considers doubling model size to fix errors. Three checks alter the plan. First, an accuracy breakdown shows errors cluster on multi-step problems, where chain-of-thought prompting already helps. Second, sampling eight candidates with a verifier lifts the pass rate on hard items but barely moves easy ones, confirming that compute should be targeted. Third, the extra token cost per query is estimated well below the larger model's inference bill. The outcome: the team keeps the smaller model, adds chain-of-thought prompts, and applies candidate sampling only to questions flagged as hard, reserving the larger model as a fallback for the residual failures.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Adaptive test-time compute can outperform parameter scaling on some reasoning tasks | `source-reported` | Snell et al. 2024 | 2026-11-18 | New benchmarks or model families appear |
+| Chain-of-thought prompting elicits reasoning that improves task accuracy | `source-reported` | Wei et al. 2022 | 2026-11-18 | Prompting methods are superseded |
+| Gains saturate and depend on verifier quality | `inferred` | Derived from the sources | 2026-11-18 | Stronger verifiers are published |
+
+The first two rows are the central reported findings of the two papers and are tied to specific benchmarks, so their status is source-reported rather than universal law. The third row is an inference drawn from how sampling and verification work. All three should be rechecked as new model families and better verifiers change the balance.
+
+## What it cannot do
+
+Test-time compute cannot add knowledge the model never learned. More sampling rearranges what is already in the weights; if a fact or a reasoning primitive is absent, no amount of inference will reliably produce it. This sets a hard ceiling on the technique. It is a way to extract more from a model, not a way to make a model know something it does not.
+
+There is a real hidden cost in latency and money. Sampling many candidates multiplies token generation, raising both bill and response time, and a verifier adds another model call on top. For user-facing products the delay may outweigh the accuracy gain. A configuration that wins on a benchmark can still be the wrong choice when a customer is waiting for an answer.
+
+A key failure mode is verifier misalignment. A verifier that rewards plausibility over correctness will confidently select wrong answers, and more candidates then make the system more sure of itself while being no more accurate. Longer reasoning chains can also drift or invent intermediate steps, creating a convincing appearance of rigor that does not survive checking.
+
+The method has a boundary around task type. It shines on problems with checkable intermediate steps, such as math or symbolic reasoning, and offers little for simple factual lookups or straightforward retrieval. Applying reasoning chains and candidate sampling indiscriminately spends budget where there is no accuracy headroom to capture.
+
+Finally, published gains are measured on specific suites that may not resemble a production workload. Domain data, answer formats, and difficulty distribution all matter. Any adoption should re-measure locally, and the plan should be revisited whenever the base model, the verifier, or the task mix changes.
+
+Counterargument: the view that bigger models make test-time tricks obsolete is fair for tasks where a single forward pass already succeeds and incomplete where compute budgets or latency caps make parameter scaling impractical.
+
+## A decision test
+
+1. Check whether errors are concentrated on reasoning-heavy items.
+2. Confirm the model already has the underlying knowledge needed.
+3. Add chain-of-thought prompting and measure the change on your data.
+4. Introduce candidate sampling with a verifier on hard items only.
+5. Verify that the verifier distinguishes correct answers from plausible ones.
+6. Compare total cost and latency against a larger-model baseline.
+7. Ship the smallest configuration that clears the accuracy target.
+
+Followed in sequence, these steps convert a research finding into a budget decision. They favor measurement over assumption, since the value of extra compute is workload-specific. Re-run the comparison whenever the model, verifier, or task distribution shifts, and keep the larger-model fallback available.
+
+For further reading, see [AI risk assessment: a pre-deployment checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Charlie Snell et al., 2024. [Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters](https://arxiv.org/abs/2408.03314) — Test-time compute can outperform parameter scaling on some tasks by searching or refining at inference.
+- Jason Wei et al., 2022. [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903) — The paper showing that generating intermediate reasoning steps improves performance on reasoning tasks.

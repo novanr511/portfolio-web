@@ -1,10 +1,72 @@
 ---
 title: "Retail Fraud Pitfalls"
-description: "Reserved title for a future NOVANDRI article: Retail Fraud Pitfalls."
-date: 2026-11-17
+description: "Understand retail shrinkage, how point-of-sale data feeds detection, and a three-check triage that separates theft from error before you spend on loss prevention."
+date: 2026-11-18
 tags:
-  - Planned
-  - Retail
+  - Operations
+  - Loss Prevention
+  - Retail Shrinkage
+  - Verified
 ---
+Retailers often treat missing inventory as a single problem with a single fix. In practice the gap between recorded and actual stock, known as shrinkage, has several distinct causes that demand different responses. Misdiagnosing the cause is why many loss-prevention programs spend money without reducing losses.
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+**Direct answer:** Shrinkage is the difference between recorded inventory and the inventory actually on hand, and it includes theft, damage, and administrative error. Point-of-sale systems generate much of the transaction data used to detect it, so weaknesses there corrupt the signal. Effective prevention separates employee theft, customer theft, and process error before choosing a countermeasure.
+
+**Delta:** This article adds a practical triage beyond the sources: it maps shrinkage categories to point-of-sale controls and a decision rule, with claim status explicit.
+
+## The mechanism
+
+The encyclopedia entry on shrinkage defines it as the loss of inventory between the point of manufacture or purchase and the point of sale, showing up as a difference between book and physical counts. Causes include theft, damage, and misplacement. The practical consequence is straightforward: shrinkage cannot be managed until it is measured, and measurement depends on reliable records.
+
+The categories matter because each has a different signature. Employee theft, customer shoplifting, vendor fraud, and administrative errors such as mis-scans or misplaced items do not leave the same trace. Administrative error often appears as discrepancies clustered around certain stock-keeping units or shifts, whereas theft may concentrate in high-value, easy-to-conceal goods. Treating all of them as one number destroys that diagnostic information.
+
+The entry on point-of-sale systems describes the hardware and software where transactions complete: registers, scanners, and payment terminals. POS data is the primary evidence trail for what was sold. If the system permits voids, overrides, or returns without controls, the data needed to detect fraud is compromised at its source, and no amount of later analysis can recover a clean signal.
+
+The mechanism is therefore a measurement chain: the POS captures the sale, records update inventory, and periodic physical counts reveal the shrinkage gap. Break any link and detection fails. This makes prevention partly a data-quality problem rather than purely a security problem, which is why controls over transaction records belong in any serious loss-prevention plan.
+
+## A worked example
+
+The following is hypothetical and illustrative. A hypothetical store sees shrinkage rise by two percentage points in a quarter. Three checks narrow the cause. First, splitting the gap by category shows most of it in high-value small items, pointing toward customer theft rather than error. Second, an audit of point-of-sale logs reveals a spike in voided transactions during one shift, suggesting a possible employee issue. Third, comparing physical counts with records for the flagged items confirms the discrepancy is real rather than a scanning mistake. The outcome: the store tightens display security on the vulnerable goods, requires manager approval for voids, and retrains staff on scanning, addressing three distinct causes instead of one assumed cause.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Shrinkage is the gap between recorded and physical inventory | `source-reported` | Shrinkage (Wikipedia) | 2026-11-18 | Accounting standards change |
+| POS systems are the main transaction record for sales | `source-reported` | Point of sale (Wikipedia) | 2026-11-18 | POS architecture shifts |
+| Administrative error can mimic theft in shrinkage data | `inferred` | Derived from the sources | 2026-11-18 | New audit evidence appears |
+
+The first two rows are definitions stated in the encyclopedia entries and are relatively stable, though accounting practice and POS design both evolve. The third row is an inference from the fact that several causes produce the same book-to-physical gap. It should be treated as a caution about diagnosis, not as a measured frequency.
+
+## What it cannot do
+
+Shrinkage figures are aggregated and cannot by themselves reveal a cause. A single percentage blends theft, damage, and error into one number, so acting on the total is essentially guessing. Two stores with identical shrinkage rates can have completely different underlying problems and need completely different responses.
+
+Aggressive controls also carry costs that are easy to overlook. More security staff, cameras, and approval steps slow operations and can damage employee morale or the customer experience. A control that costs more than the loss it prevents is a net negative, yet the cost side is frequently omitted from loss-prevention discussions.
+
+A common failure mode is overfitting to one signal. A spike in voided transactions might reflect a legitimate process change rather than fraud. Treating every anomaly as theft wastes investigation time and can lead to false accusations, which carry their own legal and human consequences. Anomalies are prompts to look closer, not verdicts.
+
+Point-of-sale data has a clear boundary. It records what was scanned, not what physically left the store, so return fraud and unscanned removal leave weak traces. Cash-heavy or offline operations have especially poor coverage. Any detection scheme built purely on POS records will be blind to losses that never generate a transaction.
+
+Finally, patterns drift over time. Product mixes, staff, store layouts, and supplier relationships all change, and with them the signature of each shrinkage category. Loss-prevention rules need periodic review against fresh physical counts rather than being set once and assumed valid.
+
+Counterargument: the claim that shrinkage is mostly a security problem is fair in high-theft environments and incomplete where administrative error drives a large share, since security controls cannot repair bad records.
+
+## A decision test
+
+1. Measure shrinkage as recorded inventory minus the physical count.
+2. Break the gap into theft, damage, and administrative-error categories.
+3. Check point-of-sale logs for voids, overrides, and unusual returns.
+4. Compare flagged items and shifts against fresh physical counts.
+5. Match each confirmed cause to a specific, proportionate control.
+6. Estimate each control's cost against the expected reduction in loss.
+7. Re-measure after one full cycle and adjust the plan.
+
+The value of this sequence is that it forces diagnosis before spending. Each step narrows the problem and adds evidence, so controls are chosen to fit a confirmed cause rather than a hunch. Re-running the triage each cycle keeps the response aligned with a problem that will not stay still.
+
+For further reading, see [Data quality in practice](/articles/data-quality-in-practice).
+
+## References & Further Reading
+
+- Wikipedia contributors, 2026. [Shrinkage (accounting) - Wikipedia](https://en.wikipedia.org/wiki/Retail_shrinkage) — Inventory loss and its causes in retail.
+- Wikipedia contributors, 2026. [Point of sale - Wikipedia](https://en.wikipedia.org/wiki/Point_of_sale) — Systems for recording transactions at the point of sale.
