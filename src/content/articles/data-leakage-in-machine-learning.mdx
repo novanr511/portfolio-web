@@ -1,0 +1,63 @@
+---
+title: "Data Leakage in Machine Learning: The Information You Were Not Allowed to Have"
+description: "Leakage is not a modelling bug — it is a question about what existed at prediction time. A practical taxonomy of target, temporal, preprocessing, and release-lag leakage, with checks that catch each one."
+date: 2026-11-18
+tags:
+  - Data Quality
+  - Machine Learning
+  - MLOps
+  - Analytics
+---
+
+A model can be fitted correctly, validated with the right metric, and still be wrong because it was allowed to see information that would not have existed when the prediction was made. That is data leakage, and it is the most common reason a promising result collapses in production.
+
+**Direct answer:** Leakage is a mismatch between the information set used to train a model and the information set available at decision time. The fix is not a different algorithm; it is a stricter definition of what each row is allowed to know, enforced at the point where features are built.
+
+## The definition that settles most arguments
+
+scikit-learn defines leakage as the use of information that would not be available at prediction time when building the model. Notice that the definition is about *availability*, not about fraud or intent. A feature can be perfectly legal to collect and still be illegal for a given forecast moment.
+
+This is why leakage arguments often go in circles. One person says "the data is real"; another says "the data is future". Both are talking past each other. The useful question is narrower: at the moment we would have made the decision, could we already have had this value?
+
+## Four ways information travels forward
+
+**Target leakage.** The label is encoded in a feature, directly or through an aggregate. A "churn risk score" computed after the churn event is a label wearing a feature's clothing. Target encoding computed over the full dataset has the same problem: every row contributes to its own encoding, so the model learns the answer from a smoothed copy of the answer.
+
+**Temporal leakage.** A random split on time-ordered data lets the model train on tomorrow to predict yesterday. For any series with autocorrelation, this produces a score that looks excellent and means nothing. scikit-learn's `TimeSeriesSplit` exists for this reason; it builds expanding folds that respect chronology, and its gap parameter handles labels that arrive late. A rolling-origin design — train on the first window, forecast the next, move the origin forward — mirrors the real task. See [Time Series Forecasting](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models) for the validation mechanics.
+
+**Preprocessing leakage.** A scaler, imputer, or selector fitted on all rows has already absorbed statistics from the validation fold. Placing these transformations inside a `Pipeline` keeps them attached to the fold, so the discipline survives refactors and busy weeks. This is a data-engineering control, not a modelling preference.
+
+**Release-lag leakage.** The value exists, but not yet. Economic series are the clearest case: a consumer price index for a month is published roughly two weeks after that month ends. If you use the index value to forecast something inside that month, you are reading the future. The remedy is *release dating* — shifting every series to the date it became publicly available. This is separate from the question of later revisions; for that, historical vintages are a different problem again.
+
+## Release dating is a data decision
+
+Release-lag leakage is easy to miss because the calendar looks harmless. A monthly macro release is naturally associated with its reference month, so a dataset keyed by month will happily join the final value to every day in that month. Nothing in the schema complains.
+
+The check is procedural. For each external series, write down the publication lag and shift the series by that lag. Then re-run the join and ask, for one concrete prediction date, whether every value in the row had been published by then. If the answer is unclear, assume leakage until proven otherwise.
+
+The same logic applies to hand-curated events, corporate filings, and any label that is finalised after the event. A dataset that records "final outcome" without a "known at" timestamp cannot support an honest backtest.
+
+## The pipeline is the control, not the checklist
+
+Checklists are useful once; pipelines are useful every time. Putting imputation, scaling, encoding, and selection inside the fitted object means a new train/test split cannot accidentally reuse a transformation from the previous experiment. The code enforces the rule even when the researcher is tired.
+
+For a broader treatment of how bad measurements enter a project, read [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity). For the specific case of rows disappearing during cleaning, see [Missing Data](/articles/missing-data-when-dropping-rows-changes-the-answer).
+
+## A pre-training audit
+
+Before the first model run, ask these in order:
+
+1. Write the prediction moment in one sentence, including the timezone and the cut-off time.
+2. For every feature, state when the value was first knowable.
+3. Check that the label was not finalised before the prediction moment.
+4. Verify that every fitted transformation lives inside the cross-validation fold.
+5. Check joins for row multiplication — a duplicated row is often a leaked row.
+6. Run a deliberately trivial model. If it scores near-perfectly, find out why before celebrating.
+
+Leakage is not a single bug to squash. It is a property of the whole data contract, and the only durable defence is to make the information set explicit in code.
+
+## References & Further Reading
+
+- scikit-learn developers, 2026. [Data leakage and cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html) — splitting before preprocessing, and the folds that respect time.
+- [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+- [Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models).

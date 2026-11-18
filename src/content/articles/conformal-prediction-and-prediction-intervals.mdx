@@ -1,0 +1,56 @@
+---
+title: "Conformal Prediction: Prediction Intervals That Keep Their Promise"
+description: "Quantile regression gives you a range; conformal calibration gives that range a coverage guarantee. How conformalized quantile regression works, why CRPS matters, and when a simple baseline still wins."
+date: 2026-11-18
+tags:
+  - Machine Learning
+  - Statistics
+  - Model Evaluation
+  - Analytics
+---
+
+A point forecast is almost never the thing a decision maker needs. They need a range: what is plausible, what is unlikely, and how confident they should be. The problem is that most machine learning models do not produce ranges — they produce a number and a hope.
+
+**Direct answer:** Conformal prediction turns a model's raw output into a prediction interval with a finite-sample coverage guarantee, under a much weaker assumption than "the errors are normal". It does not make the underlying model better, and it does not guarantee conditional correctness for every subgroup. It guarantees coverage on average over exchangeable data.
+
+## The gap between a point forecast and a promise
+
+A regression model minimises a loss. A forecaster needs a distribution. The usual workaround is to assume Gaussian errors and build a band from the mean and variance. That band can be badly wrong when errors are skewed, fat-tailed, or heteroskedastic — which is most interesting data.
+
+A quantile model closes the first half of the gap. Instead of predicting a single conditional mean, it predicts the 10th, 50th, and 90th percentiles directly. The result is an asymmetric interval that can widen when uncertainty rises. What it does not provide is a guarantee that the interval contains the outcome 80% of the time.
+
+## What conformal calibration actually guarantees
+
+Conformal prediction uses a calibration set that was not used to fit the model. For each calibration point, it measures how badly the interval missed, then expands or contracts the interval so that the desired coverage is achieved on that held-out sample. The guarantee is marginal: over future data drawn from the same process, the interval will contain the outcome at least the requested fraction of the time.
+
+Two caveats matter in practice. First, the guarantee relies on exchangeability — roughly, that calibration and future data come from the same distribution. Under distribution shift, coverage can degrade. Second, marginal coverage is not conditional coverage: the interval may be well-calibrated overall and poorly calibrated in a particular regime. Evaluating coverage by subgroup is therefore part of the work, not an optional extra.
+
+Conformalized quantile regression, introduced by Romano, Correa, and Candès, applies this idea to quantile models. It is a small change with a large practical benefit: the interval keeps the quantile model's shape while gaining a coverage guarantee.
+
+## CRPS: scoring a distribution, not a point
+
+If the output is a distribution, a point metric such as mean absolute error throws away most of the information. CRPS — the continuous ranked probability score — compares the predicted cumulative distribution with the observed outcome. Lower is better, and it rewards both sharpness and correct placement.
+
+CRPS is especially useful for the comparison that matters: does the learned distribution actually beat a simple baseline band? A model can produce beautifully shaped intervals and still score worse than a Gaussian band with the right width. That is a negative result worth publishing, because it tells you where the signal is not.
+
+## When the simple band wins
+
+In small-sample, noisy settings, a conformally calibrated Gaussian band is surprisingly hard to beat. It has few parameters, no training instability, and a coverage guarantee of its own. A gradient-boosted quantile model needs enough data to learn the shape of the conditional distribution; with a few hundred observations, it may mostly learn noise.
+
+The right protocol is to let both methods compete on the same chronological splits and report both CRPS and empirical coverage. If the learned model loses, ship the baseline. For the broader question of why a simpler model can be the right choice, see [Model Selection and the Cost of Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
+
+## A decision test
+
+Before using prediction intervals in a decision:
+
+- Was the calibration set excluded from model fitting?
+- Is the requested coverage reported alongside empirical coverage?
+- Did you check coverage in the regimes that matter, not just overall?
+- Did a simple baseline band compete on the same splits?
+- Is the score appropriate for a distribution (CRPS), or are you scoring a point?
+
+## References & Further Reading
+
+- Romano, Y., Correa, J. & Candès, E. J. (2019). *Conformalized quantile regression*. NeurIPS.
+- [Classification Metrics Beyond Accuracy](/articles/classification-metrics-beyond-accuracy) — the parallel problem on classification outputs.
+- [Time Series Forecasting: ARIMA, Prophet, and Deep Learning Models](/articles/time-series-forecasting-arima-prophet-and-deep-learning-models).

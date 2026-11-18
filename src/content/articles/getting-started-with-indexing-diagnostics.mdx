@@ -1,10 +1,86 @@
 ---
 title: "Getting Started with Indexing Diagnostics"
-description: "Reserved title for a future NOVANDRI article: Getting Started with Indexing Diagnostics."
-date: 2026-11-17
+description: "A page can be crawled and still not indexed. Read where to start, a worked diagnosis, and why the stages must be kept separate."
+date: 2026-11-18
 tags:
-  - Planned
-  - Technology
+  - SEO
+  - Method
+  - Technical
+  - Verified
 ---
 
-{/* PLANNED TITLE — reserved slug. Write the full article before publishing. */}
+Indexing problems are often described as ranking problems, which mixes stages that need different fixes. Google's SEO starter guide covers the basics of site quality, and the crawler documentation describes how Googlebot accesses pages. The diagnosis starts by separating discovery, crawling, rendering, and indexing.
+
+**Direct answer:** Diagnose indexing by checking each stage in order, with evidence at each one, before considering ranking. The sources describe the stages; the sequence is a synthesis.
+
+**Delta:** This article adds a claim-status table and a worked diagnosis, separating documented stages from local choices about which check comes first.
+
+## The mechanism
+
+The first stage is discovery. The starter guide describes how pages are found, often through links and sitemaps. A page that is not discovered cannot be considered, and the fix is different from a problem at a later stage.
+
+The second stage is crawling. The crawler documentation describes access, which can be blocked by rules, errors, or resource constraints. A 404 or a redirect changes what a crawler sees, and the status code is the evidence.
+
+The third stage is indexing. A page that was crawled may still be excluded, often because of its content or canonical signals. Rendering can also intervene, because a page that depends on JavaScript may present differently to a crawler.
+
+The sequence is: verify discovery, check crawling, check rendering, then check indexing. Each stage has its own evidence, and skipping one leads to a fix aimed at the wrong problem.
+
+## A worked diagnosis
+
+*Illustrative.* A product page is absent from search results.
+
+Three checks decide. First, is the page in the sitemap and linked from elsewhere, satisfying discovery? Second, does it return a clean status when requested, with no blocking rule? Third, does the rendered content contain the information the page is meant to show?
+
+The outcome is a stage-specific cause rather than a general SEO review. The scenario is hypothetical; the method is the contribution.
+
+## Evidence status
+
+| Claim | Status | Source | Verified | Recheck when |
+| --- | --- | --- | --- | --- |
+| Search basics cover discovery and quality | `source-reported` | Google SEO Starter Guide | 2026-11-18 | Guide updated |
+| Crawler docs describe access stages | `source-reported` | Google crawler docs | 2026-11-18 | Docs updated |
+| Diagnose stages in order | `inferred` | Derived from the stage model | 2026-11-18 | Site changes |
+
+## Why the stages matter
+
+A fix applied at the wrong stage cannot help. Adding internal links does not repair a server error, and fixing a server error does not resolve a canonical conflict. The order of checks is the method, and it saves more time than any single tool.
+
+A further consideration is that the stages interact. A rendering problem can look like an indexing problem, and a crawl error can be caused by a change that also affected content. Working through the stages in order does not remove the interaction, but it makes the evidence easier to interpret because each check narrows the possibilities.
+
+The diagnostic also needs a record. A finding noted in a message and then forgotten will be rediscovered in the next review, which is why the stage, the evidence, and the date belong in a document. That record also makes it possible to tell whether a fix worked when the page is checked again.
+
+None of this guarantees that a page will be indexed. The stages describe what must happen for indexing to be possible, which is a necessary condition rather than a sufficient one. Treating a clean diagnosis as a promise is the mistake to avoid.
+
+A clean diagnosis is a necessary condition for indexing, not a guarantee that it will happen.
+
+The stage should be recorded with its evidence, so the next review starts from what was observed.
+
+Rendering should be checked before concluding that a page's content is missing from the index.
+
+Fixing the wrong stage is the most common cause of a long and unsuccessful investigation.
+
+A stage check without a record has to be repeated the next time the question arises.
+
+A clean stage check is necessary, not sufficient, for indexing to follow.
+
+## What it cannot do
+
+It cannot guarantee indexing. It does not address ranking directly. And it cannot replace observing actual requests in logs.
+
+The counterargument that indexing is automatic is fair for simple sites and incomplete where a specific page is absent.
+
+## A decision test
+
+1. Verify discovery through links and sitemap.
+2. Check status and crawl rules.
+3. Check rendering.
+4. Check indexing signals.
+5. Record the stage and evidence.
+6. Set a recheck condition.
+
+For the workflow, see [Search Console for Technical SEO](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow).
+
+## References & Further Reading
+
+- Google, 2026. [SEO Starter Guide: The Basics](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=en) — The search engine's own description of what it needs from a site.
+- Google, 2026. [Google Crawler (User Agent) Overview](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers?hl=en) — How Google discovers, crawls, renders, and indexes pages.
