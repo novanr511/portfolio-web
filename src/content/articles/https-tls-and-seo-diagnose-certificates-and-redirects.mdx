@@ -183,10 +183,6 @@ Continue exploring web infrastructure layers:
 
 ## A worked example
 
-The following is hypothetical and illustrative. A crawler report shows a subset of pages failing over HTTPS and the team runs three checks. First, whether the certificate chain is complete and valid for the served hostname, since a broken chain fails the TLS handshake before any HTTP response is returned. Second, whether redirects preserve the scheme correctly, because a loop between HTTP and HTTPS produces no indexable response. Third, whether the failure is specific to the transport layer rather than the application, which the TCP and HTTP specifications let them separate. The outcome is bounded: when the chain and redirects are fixed, the pages become reachable to a crawler, but reachability is not indexing. The team still has to verify that the content is rendered and linked, and no timing guarantee follows from a correct certificate.
-
-## A worked example
-
 The following is hypothetical and illustrative. A crawler reports fetch failures on a domain that loads in one browser, and an engineer tests the TLS path. Three checks follow from the validation model. First, does `openssl s_client -connect example.com:443 -servername example.com -showcerts` show both the leaf and intermediate in the chain, ending in `Verify return code: 0 (ok)`, so no missing intermediate CA is rejected? Second, does the certificate cover the requested hostname in its SANs and remain inside its validity window, ruling out a bad-domain or expired-certificate abort rather than a browser cache? Third, do all four URL variants collapse to one canonical destination in a single 301, avoiding the chain that multiplies latency, with HSTS and no active mixed content to break rendering? If a browser caches the intermediate while the server omits it, the first check fails and automated crawlers stop at the handshake. If all three checks pass, the failure is localised to something outside the TLS and redirect path. The outcome is a bounded diagnosis: the RFCs cover TCP and HTTP semantics, and DevTools documents a panel, not a ranking or crawl-capacity effect.
 
 ## A counterargument
