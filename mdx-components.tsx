@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import Link from "next/link";
+import { Figure } from "@/components/figure";
 
 const components: MDXComponents = {
   a: ({ href = "", children, ...props }) => {
@@ -24,6 +25,11 @@ const components: MDXComponents = {
     <div className="table-scroll">
       <table {...props}>{children}</table>
     </div>
+  ),
+  // Inline figures: authors can place <Figure src=... alt=... caption=... />
+  // anywhere in an MDX article to support the surrounding paragraph.
+  Figure: ({ src, alt, caption }) => (
+    <Figure src={String(src ?? "")} alt={String(alt ?? "")} caption={caption ? String(caption) : undefined} />
   ),
 };
 
