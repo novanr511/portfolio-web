@@ -19,6 +19,8 @@ Model routing is often presented as a way to cut inference cost, which hides the
 
 The first trade is cost against quality. The routing paper describes selecting a model per request, which can save money when a smaller model suffices. The saving disappears when the smaller model fails and the request is retried on a larger one, so the measure is cost per successful answer rather than cost per call.
 
+<Figure src="/images/articles/inline/model-routing-trade-offs-1.png" alt="Two boxes compared: cost per call, which ignores retries, versus cost per successful answer, which includes escalations." caption="Conceptual: judge a route by cost per successful answer, not its sticker price per call." />
+
 The second trade is latency. A router that inspects a request before choosing adds time, and a cheap route that is slow may be worse than a fast expensive one for interactive use. The acceptable latency is a product decision, not a property of the model.
 
 The third trade is complexity. A learned router needs training data and evaluation, while a simple rule is easier to understand. The extra complexity should be justified by a measurable improvement, which is a comparison that belongs in the design.

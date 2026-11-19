@@ -19,6 +19,8 @@ Kubernetes scheduling is often treated as automatic, which hides the decisions t
 
 The first input is resource requests. The scheduler documentation describes how requests influence placement, which means a pod without them is placed on an assumption rather than a requirement. Setting requests from observed use is the first decision, and it affects both stability and cost.
 
+<Figure src="/images/articles/inline/kubernetes-scheduling-a-decision-framework-1.png" alt="A four-step flow: measure resource needs, choose QoS class, set a placement rule, verify placement." caption="Conceptual: requests, QoS, and placement rules are decided, then checked against reality." />
+
 The second input is guarantees. The QoS material describes how resource classes behave under pressure, which matters when a node is near its limit. A workload that cannot tolerate eviction needs a different treatment from a batch job that can be retried.
 
 The third input is placement rules. The scheduler can spread or pack workloads, and the right choice depends on the failure domain and the cost of idle capacity. A rule chosen without those factors produces a placement that is tidy and wrong.

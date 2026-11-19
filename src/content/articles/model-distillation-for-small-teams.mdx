@@ -15,7 +15,9 @@ A small team rarely has the budget to run a frontier model on every request. Dis
 
 ## The mechanism
 
-**A teacher produces soft targets.** Instead of a hard label, the teacher gives a distribution over answers, which carries information about how close the alternatives are, as the distillation paper explains. A weaker signal — just the top answer — throws that away, as the data-quality article warns about losing information at the source.
+**A teacher produces soft targets.** Instead of a hard label, the teacher gives a distribution over answers, which carries information about how close the alternatives are, as the distillation paper explains. A weaker signal - just the top answer - throws that away, as the data-quality article warns about losing information at the source.
+
+<Figure src="/images/articles/inline/model-distillation-for-small-teams-1.png" alt="A five-step flow: teacher soft targets, a student matching the distribution, filtering teacher errors, checking held-out cases, then deploying with a fallback." caption="Conceptual: a student learns a narrow distribution; filtering, evaluation and fallback bound the transfer." />
 
 **A student learns the distribution.** The student is trained to match the teacher's outputs, which the distillation-in-practice article describes for a specific task, as the training-recipes material advises on a stable loop. The task should be narrow, which the evaluation-rubric article requires for concrete criteria.
 

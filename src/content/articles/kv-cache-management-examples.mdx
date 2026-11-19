@@ -19,6 +19,8 @@ The KV cache stores attention keys and values so they need not be recomputed on 
 
 Three points do the work:
 
+<Figure src="/images/articles/inline/kv-cache-management-examples-1.png" alt="A comparison of adding cache capacity against evicting entries to free memory for concurrent requests." caption="Conceptual: capacity and eviction are competing levers; measure what actually repeats first." />
+
 - **Memory scales with context.** The PagedAttention paper describes how serving systems manage the cache. Longer contexts consume more memory per request.
 - **Repeated prefixes can be reused.** Anthropic's guide describes caching repeated context. A prefix that changes every request cannot be reused.
 - **Eviction is a policy.** When memory is limited, something must be removed. The choice affects latency and cost differently across workloads.

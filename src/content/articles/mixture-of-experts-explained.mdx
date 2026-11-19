@@ -23,6 +23,8 @@ Three components define an MoE layer:
 
 **Combination.** The selected experts' outputs are weighted by the router's scores and combined. The rest of the experts stay inactive for that token.
 
+<Figure src="/images/articles/inline/mixture-of-experts-explained-1.png" alt="A five-step flow: a token enters the layer, the router scores experts and selects the top-k, selected experts process the token, their outputs are weighted and combined, and the remaining experts stay inactive." caption="Conceptual: the router selects a sparse subset of experts for each token." />
+
 The Switch Transformer paper states the idea clearly: MoE "selects different parameters for each incoming example", producing "a sparsely-activated model — with outrageous numbers of parameters — but a constant computational cost". That is the core trade: total capacity grows while per-token compute stays roughly flat.
 
 ## Why the economics changed
