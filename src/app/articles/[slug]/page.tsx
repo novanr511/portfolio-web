@@ -168,11 +168,11 @@ export default async function ArticlePage({
             <p className="mt-4 text-[17px] leading-relaxed text-muted">
               {article.description}
             </p>
-            <div className="mt-6 flex items-center gap-3 border-t border-border pt-5 text-[13px] text-muted">
-              <Link href="/about" className="font-medium text-foreground underline-offset-4 hover:text-accent hover:underline">
+            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-5 text-[13px] text-muted">
+              <Link href="/about" className="whitespace-nowrap font-medium text-foreground underline-offset-4 hover:text-accent hover:underline">
                 {site.author.penName}
               </Link>
-              <time dateTime={article.date}>
+              <time dateTime={article.date} className="whitespace-nowrap">
                 {new Date(article.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
