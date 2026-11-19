@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
-import { ArticleCard } from "@/components/article-card";
+import { ArticleSearch } from "@/components/article-search";
 import { CategoryScroller } from "@/components/category-scroller";
 import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 import Link from "next/link";
 import { categorySlug } from "@/lib/articles";
+
+/** Full prerender at build; article inventory is read from the filesystem */
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "Articles",
@@ -118,12 +121,8 @@ export default async function ArticlesPage() {
           Written by <Link href="/about" className="font-medium text-accent underline-offset-4 hover:underline">me</Link>.
         </p>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedArticles.map((article, i) => (
-            <Reveal key={article.slug} delay={i * 80}>
-              <ArticleCard article={article} />
-            </Reveal>
-          ))}
+        <div className="mt-12">
+          <ArticleSearch articles={sortedArticles} />
         </div>
       </div>
     </ViewTransition>
