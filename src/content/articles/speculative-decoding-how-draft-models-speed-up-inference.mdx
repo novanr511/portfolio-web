@@ -17,6 +17,8 @@ A large language model generates one token at a time, and each step requires a f
 
 Three steps repeat:
 
+<Figure src="/images/articles/inline/speculative-decoding-how-draft-models-speed-up-inference-1.png" alt="A three-step flow: a small draft model proposes k tokens, the target verifies them in one pass, and matches are accepted until the first mismatch is corrected." caption="Conceptual: verification is parallel, so the cost per accepted token falls." />
+
 1. **Draft.** A smaller, faster model generates k candidate tokens autoregressively.
 2. **Verify.** The target model evaluates all k tokens in a single forward pass, using them as a proposed prefix.
 3. **Accept or correct.** Tokens that match the target's distribution are accepted. At the first mismatch, the target's own token is used and the rest are discarded.

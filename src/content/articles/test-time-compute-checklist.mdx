@@ -18,6 +18,8 @@ A common instinct when a language model fails is to reach for a larger model or 
 
 The 2024 study by Snell and colleagues, titled "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters," reports that adaptively allocating compute at inference can outperform simply increasing model size on certain reasoning benchmarks. The practical consequence is that there is a tradeoff between searching over many candidate answers and improving the reasoning within a single answer. More compute is not automatically better; how it is spent matters.
 
+<Figure src="/images/articles/inline/test-time-compute-checklist-1.png" alt="Two scaling strategies compared: a larger model with more parameters versus extra inference compute that samples and verifies candidates." caption="Conceptual: more inference can beat a larger model on hard items." />
+
 One mechanism is generate-and-select. The model produces several candidates and a verifier or reward model scores them, so more samples raise the chance that at least one is correct. That gain saturates and depends heavily on verifier quality. If the verifier cannot tell a correct answer from a plausible wrong one, additional samples mostly multiply noise rather than signal.
 
 The 2022 chain-of-thought study by Wei and colleagues, "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models," shows that prompting a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. The practical consequence is that some test-time compute is elicited by prompt structure rather than purchased through extra sampling. A short instruction to reason step by step can unlock capability already present in the weights.

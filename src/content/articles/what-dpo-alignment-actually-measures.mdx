@@ -19,6 +19,8 @@ Direct preference optimisation is often described as making a model safer, which
 
 The first point is that preferences are data. The DPO paper describes learning from pairs of preferred and dispreferred responses, which means the result reflects what the annotators chose. A dataset that rewards brevity will produce a brief model, whether or not brevity is what users need, and the cause is in the labels rather than the algorithm.
 
+<Figure src="/images/articles/inline/what-dpo-alignment-actually-measures-1.png" alt="A four-step flow: annotator choices set a preference win rate, which is tested on cases beyond the set against behaviour that matters." caption="Conceptual: a preference score measures agreement with the dataset's labels." />
+
 The second point is the gap between the dataset and the deployment. The NIST RMF treats measurement as a distinct function, which means a preference score is not the same as trustworthy behaviour in use. A model can score well on held-out pairs and still fail when a user asks something the annotators never considered.
 
 The third point is coverage. A preference dataset has boundaries, and a model optimised within them may behave worse outside them. Testing on cases drawn from real use, rather than from the same distribution as the labels, is the check that reveals the gap.
