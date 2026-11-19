@@ -29,6 +29,9 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
       return;
     }
 
+    // A tall element (e.g. a long section) can never reach a 0.1 visibility
+    // ratio on a short viewport, which would leave it permanently hidden.
+    // Reveal on any intersection instead, and unobserve immediately.
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -38,7 +41,7 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
           }
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0, rootMargin: "0px 0px -40px 0px" }
     );
 
     observer.observe(el);

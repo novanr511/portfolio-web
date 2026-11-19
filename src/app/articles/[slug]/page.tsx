@@ -189,32 +189,29 @@ export default async function ArticlePage({
 
         {/* Supporting figure (visual explainer) */}
         {article.image && (
-          <Reveal delay={90}>
-            <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-surface">
-              <Image
-                src={article.image}
-                alt={article.imageAlt ?? article.title}
-                width={1600}
-                height={900}
-                sizes="(max-width: 672px) 100vw, 672px"
-                className="h-auto w-full object-cover"
-                priority
-              />
-              {article.imageCaption && (
-                <figcaption className="border-t border-border px-4 py-3 text-[12.5px] leading-relaxed text-muted">
-                  {article.imageCaption}
-                </figcaption>
-              )}
-            </figure>
-          </Reveal>
+          <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-surface">
+            <Image
+              src={article.image}
+              alt={article.imageAlt ?? article.title}
+              width={1600}
+              height={900}
+              sizes="(max-width: 672px) 100vw, 672px"
+              className="h-auto w-full object-cover"
+              priority
+            />
+            {article.imageCaption && (
+              <figcaption className="border-t border-border px-4 py-3 text-[12.5px] leading-relaxed text-muted">
+                {article.imageCaption}
+              </figcaption>
+            )}
+          </figure>
         )}
 
-        {/* Body — Medium-style: narrower measure, larger type */}
-        <Reveal delay={120}>
-          <div className="prose prose-lg prose-article mt-12 max-w-none prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
-            <Post />
-          </div>
-        </Reveal>
+        {/* Body — rendered directly: long content must never be gated behind
+            an IntersectionObserver threshold it can never reach. */}
+        <div className="prose prose-lg prose-article mt-12 max-w-none prose-p:leading-[1.8] prose-headings:tracking-[-0.01em]">
+          <Post />
+        </div>
 
         {/* Prev / next — stacked, Medium-style */}
         <Reveal>
