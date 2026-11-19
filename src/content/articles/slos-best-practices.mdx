@@ -18,6 +18,8 @@ Service level objectives are often adopted as a number without a decision attach
 
 The SRE material distinguishes the service level indicator, the measured signal, from the service level objective, the target on that signal, and the service level agreement, the external promise. Keeping these separate prevents a team from confusing an internal goal with a contractual commitment. The practical consequence is that internal objectives should be published stricter than any external agreement so there is room to recover before a promise is broken.
 
+<Figure src="/images/articles/inline/slos-best-practices-1.png" alt="A flow from user-facing indicator to internal target, published error budget, and release policy." caption="Conceptual: pick a user signal, publish the budget, agree the exhaustion policy." />
+
 Google SRE recommends choosing indicators based on what users care about, such as request latency, error rate, or availability measured at the user-facing edge. Internal utilization metrics are easier to collect but can look healthy while users suffer. The practical consequence is to start with the user question, then find the measurable signal, rather than starting with whichever telemetry happens to be available and declaring it an indicator.
 
 The error budget is the complement of the objective, so a 99.9 percent target leaves a small allowance of failed requests. The guidance treats this budget as a resource that can be spent by releasing changes, with a policy that pauses releases when the budget is exhausted. The practical consequence is that reliability becomes a currency balancing feature velocity against stability, and the trade-off becomes visible to the whole team instead of staying inside an engineering argument.

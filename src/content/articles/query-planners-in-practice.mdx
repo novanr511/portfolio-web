@@ -19,6 +19,8 @@ A query planner chooses an execution strategy from the options available. The Wi
 
 Three points matter:
 
+<Figure src="/images/articles/inline/query-planners-in-practice-1.png" alt="A four-step flow: inspect the execution plan, check the estimates, match the index to the predicate, then verify on the same query." caption="Conceptual: a plan is a snapshot, so verification and rechecking are continuous." />
+
 - **The planner uses estimates.** The optimization entry describes choosing among strategies. Bad estimates produce bad plans.
 - **Indexes are inputs.** The PostgreSQL documentation describes how indexes support access. An index that does not match the query cannot help.
 - **Plans change with data.** A plan that was good last month can be wrong after the data distribution shifts. Verification is continuing work.
