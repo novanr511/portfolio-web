@@ -82,6 +82,10 @@ The counterargument — that position encoding is a low-level detail practitione
 
 For the mechanism it supports, see [Attention Is All You Need](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers); for the practical limit, see [Long Context Windows](/articles/long-context-windows-what-they-buy).
 
+## A worked example
+
+The following is hypothetical and illustrative. Consider a hypothetical model released with a claimed 100,000-token window but trained at 4,000, and a team deciding whether to trust the claim for a document-QA task. Three checks follow the decision test. First, separate position from meaning: assume an order-related failure where two swapped clauses score nearly identically; recall that RoPE, from the RoFormer paper, encodes distance, not semantics, so the encoding alone cannot explain the error. Second, check the scheme and the lengths: the rotation is periodic and multi-scale, so a model that saw 4,000 positions in training may behave oddly near 100,000; treat training length and inference length as different facts rather than assuming extrapolation is magic. Third, test position sensitivity directly: move the relevant fact to the front, middle, and end of the input and measure, the empirical check the long-context discussion recommends and the one the Lost in the Middle finding warns is necessary. The bounded outcome: accuracy is reported per position band, the window claim is accepted only where those measurements hold, and no capability is inferred from the encoding alone. No real model is implied.
+
 ## References & Further Reading
 
 - Jianlin Su et al., 2021. [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864) — Rotary position embedding, which encodes relative position by rotating queries and keys.

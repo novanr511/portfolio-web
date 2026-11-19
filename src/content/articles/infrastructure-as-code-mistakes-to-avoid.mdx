@@ -72,6 +72,10 @@ The counterargument that a passing plan proves safety is fair for syntax and inc
 
 For the common questions, see [Infrastructure as Code](/articles/infrastructure-as-code-common-questions).
 
+## A worked example
+
+The following is hypothetical and illustrative. A team adopts a declarative definition for a staging environment and hits three failure modes described in the article. First, drift: someone changes a setting directly in the console, so the next apply reconciles it and produces an unexpected diff; the remedy is to read live state before writing. Second, an unreviewed plan: the operator applies a proposed change set without reading it, which is equivalent to approving an unread patch. Third, state that is not stored or locked, so two people applying at once produce conflicting results. The outcome is bounded: reading plans and treating out-of-band changes as incidents reduces surprises, but it does not remove the need to understand the system being described. The definition is a record of intent, not a substitute for knowing what the infrastructure does.
+
 ## References & Further Reading
 
 - Wikipedia contributors, 2026. [Infrastructure as code - Wikipedia](https://en.wikipedia.org/wiki/Infrastructure_as_code) — Managing infrastructure through definitions rather than manual steps.

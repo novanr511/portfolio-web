@@ -141,6 +141,10 @@ The move from chains to graphs mirrors a story every web developer already knows
 
 Start with the minimal tool-calling loop above, add a checkpointer the day you need multi-turn memory, add interrupts the day your agent touches anything irreversible. Build up exactly as fast as your failure modes demand, and no faster.
 
+## A worked example
+
+The following is hypothetical and illustrative. Consider an agent that processes support refunds: it retrieves an order, checks policy, and may issue a credit. Three checks map the failure modes to graph features. First, the workflow is built as a ReAct-style loop with typed state and a conditional edge, so an empty retrieval routes back to a clarifying question rather than crashing the run. Second, a Postgres checkpointer is attached under a thread ID, so a failure partway through a long batch resumes from the last superstep instead of restarting. Third, the credit-issuing node sits behind an interrupt, pausing for human approval before any irreversible action. In this imagined case a transient API error costs one step rather than the whole run, the approval gate survives a new tool being added, and the loop is bounded by a recursion limit so it cannot become a bill generator. The move to a graph is justified by those failure modes, not by fashion.
+
 ## A counterargument
 
 Reasonable critics could argue the piece sets up a straw version of chains. Its later sections concede that a one-call agent is fine as a chain and that LangChain components compose into RAG pipelines, while ReAct - the cited work by Yao and colleagues on interleaved reasoning and tool use - is a loop that need not require a graph. The four failure modes are real, but they are features of a naive linear chain, not of chains as a category; the article notes people nest chains to fake loops. Checkpointing and interrupts are conveniences, yet the claim that architecture alone enforces human gates understates what a code-review convention can do. The move to graphs is one of degree, not the clean break the opening suggests.
