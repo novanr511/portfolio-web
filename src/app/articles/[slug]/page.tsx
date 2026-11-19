@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
@@ -86,6 +87,15 @@ export default async function ArticlePage({
         },
         mainEntityOfPage: `${site.url}/articles/${article.slug}`,
         keywords: article.tags.join(", "),
+        ...(article.image
+          ? {
+              image: {
+                "@type": "ImageObject",
+                url: `${site.url}${article.image}`,
+                ...(article.imageAlt ? { caption: article.imageAlt } : {}),
+              },
+            }
+          : {}),
       },
       {
         "@type": "BreadcrumbList",
@@ -176,6 +186,28 @@ export default async function ArticlePage({
             </div>
           </header>
         </Reveal>
+
+        {/* Supporting figure (visual explainer) */}
+        {article.image && (
+          <Reveal delay={90}>
+            <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-surface">
+              <Image
+                src={article.image}
+                alt={article.imageAlt ?? article.title}
+                width={1600}
+                height={900}
+                sizes="(max-width: 672px) 100vw, 672px"
+                className="h-auto w-full object-cover"
+                priority
+              />
+              {article.imageCaption && (
+                <figcaption className="border-t border-border px-4 py-3 text-[12.5px] leading-relaxed text-muted">
+                  {article.imageCaption}
+                </figcaption>
+              )}
+            </figure>
+          </Reveal>
+        )}
 
         {/* Body — Medium-style: narrower measure, larger type */}
         <Reveal delay={120}>

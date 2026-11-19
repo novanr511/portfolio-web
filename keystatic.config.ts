@@ -62,6 +62,19 @@ export default config({
           label: "Tags",
           itemLabel: (props) => props.value || "tag",
         }),
+        image: fields.text({
+          label: "Supporting image path",
+          description:
+            "Optional. Path under /public, e.g. /images/articles/<slug>.png. Leave blank for no figure.",
+        }),
+        imageAlt: fields.text({
+          label: "Image alt text",
+          description: "Describe what the figure shows, for accessibility and search.",
+        }),
+        imageCaption: fields.text({
+          label: "Image caption",
+          description: "Optional short line under the figure (source or what it measures).",
+        }),
         content: fields.mdx({
           label: "Content",
         }),

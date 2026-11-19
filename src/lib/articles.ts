@@ -14,6 +14,12 @@ export type Article = {
   tags: string[];
   /** Human-readable, e.g. "12 min read" — computed from the content */
   readingTime: string;
+  /** Optional supporting image path, relative to /public (e.g. /images/articles/<slug>.png) */
+  image?: string;
+  /** Alt text describing what the image shows */
+  imageAlt?: string;
+  /** Optional short caption, e.g. source or what the chart measures */
+  imageCaption?: string;
 };
 
 const articlesDir = path.join(process.cwd(), "src", "content", "articles");
@@ -84,6 +90,10 @@ async function loadArticles(): Promise<Article[]> {
           : undefined,
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         readingTime: `${minutes} min read`,
+        image: typeof data.image === "string" ? data.image : undefined,
+        imageAlt: typeof data.imageAlt === "string" ? data.imageAlt : undefined,
+        imageCaption:
+          typeof data.imageCaption === "string" ? data.imageCaption : undefined,
       };
     })
   );
