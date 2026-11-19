@@ -19,6 +19,8 @@ A model that performs well at launch can degrade quietly as the world it learned
 
 Concept drift describes a change in the statistical relationship a model learned, such as when the distribution of inputs shifts or the mapping from input to outcome changes. The source distinguishes gradual, sudden, and recurring forms. The practical consequence is that a single training snapshot cannot be assumed to stay valid; what was true at training time may stop being true in production.
 
+<Figure src="/images/articles/inline/continuous-learning-best-practices-1.png" alt="A cycle from monitoring inputs and outcomes, comparing to a baseline and detecting sustained drift, through versioned retraining and rollback back to monitoring." caption="Conceptual: a drift signal becomes a versioned, reviewable retraining decision." />
+
 MLOps brings versioning, automated testing, and monitoring to the machine learning lifecycle. It treats a model as a system that moves through stages, not a file that is handed over once. Continuous training and continuous monitoring are part of that lifecycle, so a retraining event is a controlled release with a record, not an ad hoc notebook run.
 
 Putting the two together produces a loop: monitor the input and outcome distributions, compare them to a documented baseline, and treat a sustained deviation as a trigger to retrain. The trigger matters because a drift alert on its own has no operational meaning. It must be tied to a decision someone is authorized to make.
