@@ -9,7 +9,7 @@ tags:
   - Engineering
 ---
 
-Security headers are response headers that tell a browser how to behave — whether to allow a page in a frame, which sources of scripts are permitted, whether to use HTTPS exclusively. They are cheap to set and easy to misconfigure, which is why a copied set can give a false sense of protection, as the OWASP ASVS material treats controls as something to verify, as the threat-modeling article argues for a defined boundary.
+Security headers are response headers that tell a browser how to behave — whether to allow a page in a frame, which sources of scripts are permitted, whether to use HTTPS exclusively. They are cheap to set and easy to misconfigure, which is why a copied set can give a false sense of protection, as the OWASP ASVS material treats controls as something to verify, as [Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response) argues for a defined boundary.
 
 **Direct answer:** Use security headers to enforce behaviour the browser can control — HTTPS upgrade, MIME handling, framing, and content policy — with a deployment that tests for breakage. MDN documents HSTS, and OWASP ASVS provides the verification standard. The boundary: headers cannot fix server-side vulnerabilities, which the security fundamentals article treats as a separate domain, and a strict content policy can break a site if deployed without testing, as the rollout guidance in the incident article recommends for staged changes.
 
@@ -41,11 +41,11 @@ The counterargument that a framework sets them automatically is fair and incompl
 
 ## A decision test
 
-1. Identify the browser behaviours you want to enforce, as the threat-modeling article advises.
+1. Identify the browser behaviours you want to enforce, as [Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response) advises.
 2. Check HTTPS readiness before HSTS, as MDN's reference requires.
 3. Deploy CSP in report-only mode first, as the rollout guidance recommends.
 4. Verify the headers in an actual response, as the diagnostics article advises.
-5. Test embedded and upload flows for breakage, as the threat article treats these as boundaries.
+5. Test embedded and upload flows for breakage, as [Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response) treats these as boundaries.
 6. Review after an application change, as the monitoring article advises.
 7. Record the config, as the decision-memo article requires.
 

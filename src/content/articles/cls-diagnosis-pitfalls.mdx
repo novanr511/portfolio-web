@@ -17,19 +17,19 @@ Cumulative layout shift is a measure of how much visible content moves during a 
 
 **Looking at a screenshot.** A static screenshot cannot show movement, which is why the diagnosis needs a recording or a trace, as the tracing article recommends for observing a system over time. The moment of the shift is the evidence.
 
-**Blaming CSS first.** Layout changes are often caused by late-arriving resources — images, fonts, or ads — rather than by the stylesheet, as the image and font articles explain for reserved dimensions and display strategies, as the web-performance article advises for finding the slow layer.
+**Blaming CSS first.** Layout changes are often caused by late-arriving resources — images, fonts, or ads — rather than by the stylesheet, as the image and font articles explain for reserved dimensions and display strategies, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises for finding the slow layer.
 
 **Testing on a fast connection.** Resources that arrive instantly on a developer machine may arrive late for users, which the web-performance article requires you to account for, as the mobile-first article explains for device constraints.
 
 **Optimising the aggregate score.** A single score hides where the shift happened, which the evaluation-rubric article warns about for metrics without dimensions, as the dashboard article argues for signals tied to a decision.
 
-Three consequences follow. The diagnosis should identify the element and the trigger, which the tracing method supports. It should be performed on a realistic connection, as the performance article advises. And the fix should be measured again, as the monitoring article treats as a review of any maintained change.
+Three consequences follow. The diagnosis should identify the element and the trigger, which the tracing method supports. It should be performed on a realistic connection, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises. And the fix should be measured again, as the monitoring article treats as a review of any maintained change.
 
 ## A worked diagnosis
 
 The following is hypothetical and illustrative. A page shows a high layout-shift score when a hero image loads and a banner ad appears.
 
-Three checks decide the fix. First, does the image have reserved dimensions, which MDN's image guidance requires for stability, as the image-optimization article advises? Second, does the font swap late, which the font-loading article covers as a source of shift? Third, does the ad slot have a fixed size before content arrives, which the layout-stability guidance recommends, as the performance article advises for resource timing?
+Three checks decide the fix. First, does the image have reserved dimensions, which MDN's image guidance requires for stability, as the image-optimization article advises? Second, does the font swap late, which the font-loading article covers as a source of shift? Third, does the ad slot have a fixed size before content arrives, which the layout-stability guidance recommends, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises for resource timing?
 
 Three conclusions follow. The largest shift came from the image, which the trace revealed and a screenshot would not. The ad slot was a second contributor, as the diagnosis shows. And the result should be re-measured, as the monitoring article requires for a maintained change, as the decision-memo article requires for a recorded judgement.
 
@@ -45,7 +45,7 @@ The counterargument that a single number is enough ignores the diagnosis problem
 2. Identify the element that moved and the resource that triggered it.
 3. Check reserved dimensions for images, as MDN's guidance requires.
 4. Check font swap behaviour, as the font-loading article advises.
-5. Test on a realistic connection, as the web-performance article requires.
+5. Test on a realistic connection, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) requires.
 6. Re-measure after the fix, as the monitoring article advises.
 7. Record the decision, as the decision-memo article requires.
 

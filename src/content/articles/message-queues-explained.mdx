@@ -19,13 +19,13 @@ Queues differ in what they promise about a message after it is accepted. At-most
 
 This is why idempotency at the consumer is the practical defence, as the tool-calling article explains for retried actions. A consumer that can recognise a repeated message and return the original result makes at-least-once delivery safe, which is why most systems choose it and invest in deduplication. A queue that promises more than the consumer can honour is a configuration that transfers risk back to the application, as the saga pattern in the microservices article shows for compensating actions.
 
-Monitoring should follow the guarantee. A queue that grows without a bound is a visible symptom, as the observability article argues for alerts on meaningful signals, but so is a high rate of redelivery, which indicates that consumers are failing after accepting work. Both need owners, as the governance checklist requires for any maintained control.
+Monitoring should follow the guarantee. A queue that grows without a bound is a visible symptom, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) argues for alerts on meaningful signals, but so is a high rate of redelivery, which indicates that consumers are failing after accepting work. Both need owners, as the governance checklist requires for any maintained control.
 
 ## What the queue changes
 
 **Decoupling in time.** A producer can continue accepting work while a consumer is slow or temporarily unavailable, which the microservices article treats as a reason to use event-driven communication. The queue absorbs the difference in rate, up to its capacity.
 
-**Backpressure.** When consumers cannot keep up, the queue grows, which is a visible signal of overload, as the observability article recommends for alerts on queue depth rather than resource utilisation.
+**Backpressure.** When consumers cannot keep up, the queue grows, which is a visible signal of overload, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) recommends for alerts on queue depth rather than resource utilisation.
 
 **Failure isolation.** A failing consumer does not stop the producer, which the site-reliability article treats as containment. The work remains in the queue and can be retried, as the saga pattern handles compensating actions.
 
@@ -49,7 +49,7 @@ The counterargument that synchronous calls are simpler is fair for small systems
 
 1. Identify what work can be decoupled from the request path.
 2. Define delivery semantics and duplicate handling at the consumer, as the tool-calling article requires.
-3. Monitor queue depth and age of oldest message, as the observability article advises.
+3. Monitor queue depth and age of oldest message, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) advises.
 4. Check capacity and retention against peak load.
 5. Diagnose the consumer's bottleneck before adding consumers.
 6. Tell users honestly what a queued state means, as the SLO article requires.

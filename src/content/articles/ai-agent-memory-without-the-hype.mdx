@@ -9,7 +9,7 @@ tags:
   - Memory
 ---
 
-Agent memory is often described as a long-term store that makes an assistant remember everything. That is the wrong goal. An unbounded store retrieved on every turn adds noise and cost, and a memory that surfaces the wrong item can change a decision more than no memory would, as the context-engineering article argues for designing what the model sees, as the retrieval article explains for why selection matters.
+Agent memory is often described as a long-term store that makes an assistant remember everything. That is the wrong goal. An unbounded store retrieved on every turn adds noise and cost, and a memory that surfaces the wrong item can change a decision more than no memory would, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) argues for designing what the model sees, as the retrieval article explains for why selection matters.
 
 **Direct answer:** Agent memory should be divided into working state, semantic facts, and episodic records, with deliberate rules about what is stored and retrieved. The Generative Agents work describes observation, reflection, and retrieval in agents, and the context-engineering article explains why context is scarce. The boundary: memory is a model of past interactions, not truth, which the data-governance article requires you to source and date, as the hallucination article warns about confident wrong detail.
 
@@ -19,7 +19,7 @@ Agent memory is often described as a long-term store that makes an assistant rem
 
 **Semantic facts.** Durable information such as a customer's plan or preferences, which should have a source and a date, as the data-governance article requires for any relied-upon record, as the first-party-data article treats consent and purpose as constraints.
 
-**Episodic records.** Summaries of specific past events, with dates and outcomes, which the Generative Agents work treats as material for reflection, as the agent-memory article describes for the design, as the monitoring article warns about stale records.
+**Episodic records.** Summaries of specific past events, with dates and outcomes, which the Generative Agents work treats as material for reflection, as [Agent Memory Architectures: Short-Term, Long-Term, and Episodic](/articles/agent-memory-architectures-short-term-long-term-and-episodic) describes for the design, as the monitoring article warns about stale records.
 
 Three consequences follow. Retrieval should use more than similarity, which the reranking article explains for precision, as the embedding-selection article advises for own-data evaluation. Storage should be selective, as the data-curation article argues for quality over volume, as the model-collapse article warns about uncontrolled corpora. And the memory should be reviewable, as the model-explainability article argues for traces, as the governance checklist requires an owner.
 
@@ -29,7 +29,7 @@ The following is hypothetical and illustrative. A support agent needs to remembe
 
 Three checks decide the design. First, what is stored, as the data-governance article requires provenance? The plan comes from the billing system with a date; the tickets come from the support system with outcomes. Second, what is retrieved, as the reranking article advises? On a new ticket, retrieve the current plan and only the two most recent relevant tickets, which the context-engineering article recommends for a bounded context. Third, what is expired, as the monitoring article advises? A plan older than a billing cycle triggers a fresh lookup, which the first-party-data article treats as a quality rule.
 
-Three conclusions follow. The memory is a cache of authoritative systems, not a replacement for them, as the data-governance article argues for provenance. A small, relevant set is more useful than a large one, as the context-engineering article explains. And the design should be reviewed after a change in systems, as the monitoring article advises.
+Three conclusions follow. The memory is a cache of authoritative systems, not a replacement for them, as the data-governance article argues for provenance. A small, relevant set is more useful than a large one, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) explains. And the design should be reviewed after a change in systems, as the monitoring article advises.
 
 ## What agent memory cannot do
 
@@ -41,7 +41,7 @@ The counterargument that a bigger memory is better is wrong in direction, which 
 
 1. Separate working state, semantic facts, and episodic records.
 2. Attach a source and date to each stored item, as the governance article requires.
-3. Retrieve a small, relevant set, as the context article advises.
+3. Retrieve a small, relevant set, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) advises.
 4. Treat authoritative systems as the source, as the data-governance article requires.
 5. Expire stale records, as the monitoring article advises.
 6. Test retrieval quality on real cases, as the evaluation article requires.

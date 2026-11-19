@@ -9,13 +9,13 @@ tags:
   - AI
 ---
 
-A long context window lets a system hold more material, which makes it tempting to skip retrieval altogether. The decision has a hidden risk: a model can accept a long prompt and still fail to use the passage that matters, especially when it sits in the middle. The Lost in the Middle paper reports exactly that effect, which the long-context article covers for the practical consequence, as the retrieval article explains for why selection still matters.
+A long context window lets a system hold more material, which makes it tempting to skip retrieval altogether. The decision has a hidden risk: a model can accept a long prompt and still fail to use the passage that matters, especially when it sits in the middle. The Lost in the Middle paper reports exactly that effect, which the long-context article covers for the practical consequence, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains for why selection still matters.
 
 **Direct answer:** Evaluate long-context retrieval by testing whether the right passage is used across positions, with a fixed question set and a comparison against a shorter retrieved context. The Lost in the Middle paper is the primary source, and the Sentence-BERT paper explains the bi-encoder retrieval that a shorter pipeline uses. The boundary: position behaviour is model-specific, which the benchmarks article warns about applying a result broadly, and the gain must be weighed against token cost, as the cost estimator article requires.
 
 ## What to test
 
-**Position sensitivity.** Place the relevant passage at the beginning, middle, and end of otherwise identical prompts and score the answer, as the long-context article recommends. A model that fails only in the middle has a position problem, which a better retriever can avoid by shortening the context, as the reranking article explains.
+**Position sensitivity.** Place the relevant passage at the beginning, middle, and end of otherwise identical prompts and score the answer, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) recommends. A model that fails only in the middle has a position problem, which a better retriever can avoid by shortening the context, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains.
 
 **Distractors.** Real contexts contain similar-looking passages with conflicting details, which the hallucination article treats as a grounding problem. A test with only the correct passage flatters the system, as the evaluation-rubric article warns about easy cases.
 
@@ -29,7 +29,7 @@ Three consequences follow. The question set should be fixed, as AAPOR's standard
 
 The following is hypothetical and illustrative. A team considers sending an entire 200,000-token manual with each question instead of retrieving five passages.
 
-Three checks decide. First, accuracy across positions on 100 questions, as the long-context article advises. If the model scores 92% when the passage is at the edges and 70% in the middle, the long context is unreliable. Second, cost: at the published input price, each full-manual request costs substantially more than a retrieved one, which the cost estimator calculates. Third, distractor behaviour: adding a conflicting passage reveals whether the model can distinguish sources, as the legal-research article treats citations as the control.
+Three checks decide. First, accuracy across positions on 100 questions, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) advises. If the model scores 92% when the passage is at the edges and 70% in the middle, the long context is unreliable. Second, cost: at the published input price, each full-manual request costs substantially more than a retrieved one, which the cost estimator calculates. Third, distractor behaviour: adding a conflicting passage reveals whether the model can distinguish sources, as the legal-research article treats citations as the control.
 
 Three conclusions follow. The retrieved pipeline may win on both reliability and cost, which the reranking article supports, as the evaluation article requires for a decision. A hybrid is possible — retrieve for most questions, use long context for cross-document ones — which the routing article describes. And the result should be recorded, as the decision-memo article requires.
 
@@ -37,12 +37,12 @@ Three conclusions follow. The retrieved pipeline may win on both reliability and
 
 It cannot generalise beyond the tested model and question set, which the benchmarks article warns about, as the embedding-selection article advises for own-data evaluation. It does not remove the need for good retrieval, which the RAG article treats as the upstream stage. And it cannot guarantee a future result after a model update, as the monitoring article advises for change triggers.
 
-The counterargument that larger windows make testing unnecessary is wrong in direction, which the lost-middle finding demonstrates: capacity is not use, as the long-context article explains.
+The counterargument that larger windows make testing unnecessary is wrong in direction, which the lost-middle finding demonstrates: capacity is not use, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) explains.
 
 ## A decision test
 
 1. Fix a question set with known answers, as AAPOR's wording standards advise.
-2. Move the relevant passage across positions, as the long-context article recommends.
+2. Move the relevant passage across positions, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) recommends.
 3. Add distractors with conflicting details, as the hallucination article advises.
 4. Check citation correctness, as the legal-research article requires.
 5. Compare with a retrieved baseline, as the embedding-selection article recommends.

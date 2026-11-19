@@ -11,13 +11,13 @@ tags:
 
 A 5xx response tells a client that the server failed to complete a valid request. The status is useful because it is unambiguous about where the failure sits, and unhelpful because it does not say why, as RFC 9110 defines the class, as the HTTP-status article advises for diagnosis, as the SRE alerting workbook treats a surge of errors as a signal tied to an objective.
 
-**Direct answer:** Treat 5xx errors as a symptom to diagnose from logs, traces, and recent changes, with alerting tied to a service objective. RFC 9110 defines the status class, and the SRE alerting workbook covers detection. The boundary: a correct diagnostic process does not guarantee a fix or a ranking, which the publication standard states for SEO, as the incident article treats recovery as a process with residual risk, as the uptime article warns about the cost of repeated errors.
+**Direct answer:** Treat 5xx errors as a symptom to diagnose from logs, traces, and recent changes, with alerting tied to a service objective. RFC 9110 defines the status class, and the SRE alerting workbook covers detection. The boundary: a correct diagnostic process does not guarantee a fix or a ranking, which the publication standard states for SEO, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) treats recovery as a process with residual risk, as the uptime article warns about the cost of repeated errors.
 
 ## Common questions
 
-**What does a 5xx mean?** The server failed to fulfil a valid request, which RFC 9110 defines for the 5xx class, as the status article explains for diagnosis. It is not a client error, as the 4xx class covers those, as the 404 article treats a missing resource as a different case.
+**What does a 5xx mean?** The server failed to fulfil a valid request, which RFC 9110 defines for the 5xx class, as [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) explains for diagnosis. It is not a client error, as the 4xx class covers those, as [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) treats a missing resource as a different case.
 
-**Is one 5xx a problem?** A single failure is usually noise; a sustained rate is a signal, which the SRE alerting workbook treats as alerting over a window, as the error-budget article explains, as the uptime article treats crawling reliability over time.
+**Is one 5xx a problem?** A single failure is usually noise; a sustained rate is a signal, which the SRE alerting workbook treats as alerting over a window, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains, as the uptime article treats crawling reliability over time.
 
 **What causes them?** Application faults, overloaded dependencies, timeouts, and bad deploys, which the incident article treats as a response problem, as the incident-response-at-scale article advises for containment, as the tracing article recommends for observing a system over time.
 
@@ -29,7 +29,7 @@ Three consequences follow. The rate should be read against an objective, as the 
 
 The following is hypothetical and illustrative. A site reports a spike in 503 responses after a deploy.
 
-Three checks decide the response. First, what does the status class mean, as RFC 9110 defines — a server-side failure, not a crawler fault, as the status article advises? Second, is the rate above the objective and sustained, as the SRE alerting workbook requires, with evidence from logs, as the server-logs article describes? Third, did a deploy or dependency change precede the spike, as the monitoring article treats as a trigger, as the rollback article advises on reverting a bad change?
+Three checks decide the response. First, what does the status class mean, as RFC 9110 defines — a server-side failure, not a crawler fault, as [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) advises? Second, is the rate above the objective and sustained, as the SRE alerting workbook requires, with evidence from logs, as the server-logs article describes? Third, did a deploy or dependency change precede the spike, as the monitoring article treats as a trigger, as the rollback article advises on reverting a bad change?
 
 Three conclusions follow. The spike is a symptom, which the status class makes clear, as the diagnostic article advises. The cause is in the recent change or dependency, which the logs and traces reveal, as the tracing method recommends. And the response should be recorded with the evidence, as the decision-memo article requires.
 
@@ -37,15 +37,15 @@ Three conclusions follow. The spike is a symptom, which the status class makes c
 
 It cannot guarantee a fix, which the incident article treats as a process, as the publication standard forbids guaranteed outcomes. It does not guarantee a ranking, which the status article treats a correct response as necessary but not sufficient, as the SEO standard states. And it cannot replace monitoring, which the SRE workbook treats as the signal, as the observability article advises for evidence from a system.
 
-The counterargument that a 5xx is a search-engine problem is wrong about where the failure sits, which RFC 9110 defines, as the status article advises for diagnosis, as the worked diagnosis shows.
+The counterargument that a 5xx is a search-engine problem is wrong about where the failure sits, which RFC 9110 defines, as [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) advises for diagnosis, as the worked diagnosis shows.
 
 ## A decision test
 
-1. Confirm the status class from RFC 9110, as the status article advises.
+1. Confirm the status class from RFC 9110, as [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) advises.
 2. Check the rate against an objective, as the SRE alerting workbook requires.
 3. Inspect logs and traces, as the logs and tracing articles recommend.
 4. Check recent deploys and dependency changes, as the monitoring article advises.
-5. Contain the incident, as the incident article requires.
+5. Contain the incident, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires.
 6. Verify recovery from signals, as the observability article advises.
 7. Record the decision and evidence, as the decision-memo article requires.
 

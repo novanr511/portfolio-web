@@ -23,13 +23,13 @@ Finally, the gain should be reported honestly. A throughput improvement at a fix
 
 ## What it changes
 
-**Memory traffic.** The algorithm tiles attention so the full score matrix is never written to high-bandwidth memory, which the paper describes as IO awareness. For long sequences this is the difference between a matrix that fits and one that does not, as the attention-variants article explains for the memory problem.
+**Memory traffic.** The algorithm tiles attention so the full score matrix is never written to high-bandwidth memory, which the paper describes as IO awareness. For long sequences this is the difference between a matrix that fits and one that does not, as [FlashAttention and Attention Variants: What They Actually Optimize](/articles/flashattention-and-attention-variants-what-they-actually-optimize) explains for the memory problem.
 
 **Speed.** Fewer memory round trips can speed up attention even though the arithmetic is unchanged, as the paper reports. The gain is workload-specific, which the benchmarks article warns about applying a result from one setup to another.
 
-**No output change.** It computes the same function up to numerical differences, which is why it belongs in the serving layer, as the serving-frameworks article describes. A team should not expect a quality improvement from enabling it, which the evaluation article treats as a separate measurement.
+**No output change.** It computes the same function up to numerical differences, which is why it belongs in the serving layer, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) describes. A team should not expect a quality improvement from enabling it, which the evaluation article treats as a separate measurement.
 
-Three consequences follow. The practical choice is a framework that supports IO-aware attention, as the serving article recommends. The workload should have sequences long enough for the gain to matter, which the long-context article treats as a trade-off. And memory planning must still account for the KV cache, as the KV-cache article explains for generation.
+Three consequences follow. The practical choice is a framework that supports IO-aware attention, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) recommends. The workload should have sequences long enough for the gain to matter, which the long-context article treats as a trade-off. And memory planning must still account for the KV cache, as the KV-cache article explains for generation.
 
 ## A worked example
 
@@ -47,7 +47,7 @@ The counterargument that a small team should ignore low-level attention entirely
 
 ## A decision test
 
-1. Identify whether you self-host and which framework you use, as the serving-frameworks article advises.
+1. Identify whether you self-host and which framework you use, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) advises.
 2. Check that the stack supports IO-aware attention.
 3. Confirm the workload's sequence length makes the gain relevant.
 4. Distinguish memory from compute as the bottleneck, as the GPU article requires.

@@ -9,7 +9,7 @@ tags:
   - Infrastructure
 ---
 
-Teams budget inference by multiplying tokens by a published price, which misses the operational factors that decide the bill: batching, memory, repeated prefixes, and idle capacity. The PagedAttention paper explains how memory management changes serving efficiency, as the AWS cost framework treats waste as a design problem, as the cost-estimator article requires an honest total, as the serving-frameworks article treats batching as a lever.
+Teams budget inference by multiplying tokens by a published price, which misses the operational factors that decide the bill: batching, memory, repeated prefixes, and idle capacity. The PagedAttention paper explains how memory management changes serving efficiency, as the AWS cost framework treats waste as a design problem, as [LLM Cost Estimator: How to Predict Your Monthly Bill](/articles/llm-cost-estimator-how-to-predict-your-monthly-bill) requires an honest total, as the serving-frameworks article treats batching as a lever.
 
 **Direct answer:** Control inference cost by measuring tokens per request, reusing cached prefixes, batching where possible, and counting idle capacity — not by looking at a single token price. PagedAttention is the primary source on serving memory, and the AWS cost framework covers waste. The boundary: this is educational orientation, not a guarantee — prices and workloads change, as the benchmarks article warns about broad results, as the publication standard forbids guaranteed savings.
 
@@ -29,7 +29,7 @@ Three consequences follow. The measurement should be cost per successful task, a
 
 The following is hypothetical and illustrative. A service sends a 2,000-token system prompt with every request and runs an always-on GPU.
 
-Three checks decide. First, can the repeated prefix be cached, as the prompt-caching article advises, with the saving measured, as the cost estimator requires? Second, is the GPU utilised enough to justify the reservation, as the AWS cost framework and cloud-cost article ask, with capacity reviewed, as the capacity-planning article advises? Third, what is the cost per successful answer, as the cost estimator and routing article require, with a concrete criterion, as the rubric article requires?
+Three checks decide. First, can the repeated prefix be cached, as [Prompt Caching: Reducing Cost on Repeated Context](/articles/prompt-caching-reducing-cost-on-repeated-context) advises, with the saving measured, as the cost estimator requires? Second, is the GPU utilised enough to justify the reservation, as the AWS cost framework and cloud-cost article ask, with capacity reviewed, as the capacity-planning article advises? Third, what is the cost per successful answer, as the cost estimator and routing article require, with a concrete criterion, as the rubric article requires?
 
 Three conclusions follow. The repeated prefix is a direct saving, which the cache check reveals. Idle capacity is a real cost, as the AWS framework advises. And the decision should be recorded with the metric, as the decision-memo article requires, as the monitoring article advises for review.
 
@@ -42,7 +42,7 @@ The counterargument that token price is the whole cost is fair as a starting num
 ## A decision test
 
 1. Measure tokens per request, as the cost estimator requires.
-2. Reuse cached prefixes, as the prompt-caching article advises.
+2. Reuse cached prefixes, as [Prompt Caching: Reducing Cost on Repeated Context](/articles/prompt-caching-reducing-cost-on-repeated-context) advises.
 3. Check batching behaviour, as the serving-frameworks article describes.
 4. Review capacity against traffic, as the AWS cost framework advises.
 5. Count idle cost, as the cloud-cost article advises.

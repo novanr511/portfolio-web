@@ -11,7 +11,7 @@ tags:
 
 A web font that loads late can leave a page blank, then swap text and shift the layout. The choice of loading strategy is therefore a decision about how a page behaves under imperfect network conditions, not only a styling preference. The right answer depends on the font's role and what the page does while it waits.
 
-**Direct answer:** Use the `font-display` descriptor and preloading deliberately, based on whether the font is critical to reading, and measure the effect on text rendering and layout stability. MDN's font-display reference defines the options, and the Core Web Vitals article covers the stability metric. The boundary: no setting guarantees a fast page, which the publication standard states for performance claims, and a strategy that improves one metric can worsen the reading experience, as the web-performance article explains for trade-offs.
+**Direct answer:** Use the `font-display` descriptor and preloading deliberately, based on whether the font is critical to reading, and measure the effect on text rendering and layout stability. MDN's font-display reference defines the options, and the Core Web Vitals article covers the stability metric. The boundary: no setting guarantees a fast page, which the publication standard states for performance claims, and a strategy that improves one metric can worsen the reading experience, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) explains for trade-offs.
 
 ## The choices
 
@@ -31,13 +31,13 @@ The following is hypothetical and illustrative. A site uses a custom body font a
 
 The team applies `swap` to both and preloads both files. Text renders early, but the heading font arrives late and shifts the hero section on slower connections. Three checks decide the fix. First, is the heading font critical to the page's meaning, which the brand-identity article asks for typography's role? If not, `optional` avoids the late swap, as MDN describes. Second, is the body font preloaded and the file subset to the characters used, which the font guidance recommends for performance? Third, does the layout remain stable under a throttled connection, which the Core Web Vitals article measures?
 
-Three conclusions follow. Different fonts can justify different settings, which the decision framework above implies. Preloading both fonts was a cost without a clear benefit, as the web-performance article warns about contention. And the result should be measured, not assumed, which the performance article requires for any optimisation claim.
+Three conclusions follow. Different fonts can justify different settings, which the decision framework above implies. Preloading both fonts was a cost without a clear benefit, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) warns about contention. And the result should be measured, not assumed, which the performance article requires for any optimisation claim.
 
 ## What font loading cannot do
 
 It cannot make a large font file small, which the font guidance treats as a separate step. It cannot fix a page with excessive resources, which the web-performance article explains for finding the slow layer. And it does not guarantee a metric, which the publication standard states for performance claims.
 
-The counterargument that system fonts avoid the problem is fair for many sites and misses the role of typography in identity, which the brand-guidelines article treats as a maintained asset. The decision is a trade, as the web-performance article argues for measuring the cost of a choice.
+The counterargument that system fonts avoid the problem is fair for many sites and misses the role of typography in identity, which the brand-guidelines article treats as a maintained asset. The decision is a trade, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) argues for measuring the cost of a choice.
 
 ## A decision test
 
@@ -45,7 +45,7 @@ The counterargument that system fonts avoid the problem is fair for many sites a
 2. Choose `font-display` to match that role, using MDN's options.
 3. Preload only fonts known to be needed, as the font guidance recommends.
 4. Subset files where possible, as the guidance advises.
-5. Test on a throttled connection, as the web-performance article requires.
+5. Test on a throttled connection, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) requires.
 6. Measure layout stability, as the Core Web Vitals article specifies.
 7. Review after a font or template change, as the monitoring article advises.
 
