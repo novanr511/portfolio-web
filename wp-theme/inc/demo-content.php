@@ -13,9 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once ABSPATH . 'wp-admin/includes/image.php';
-require_once ABSPATH . 'wp-admin/includes/file.php';
-require_once ABSPATH . 'wp-admin/includes/media.php';
+foreach ( array( 'image.php', 'file.php', 'media.php' ) as $novan_admin_file ) {
+	$novan_admin_path = ABSPATH . 'wp-admin/includes/' . $novan_admin_file;
+	if ( file_exists( $novan_admin_path ) ) {
+		require_once $novan_admin_path;
+	}
+}
 
 $novan_asset_base = 'https://raw.githubusercontent.com/novanr511/portfolio-web/main/wp-theme/assets/images/';
 
