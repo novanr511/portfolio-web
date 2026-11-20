@@ -265,6 +265,51 @@ body {
   font-weight: 550;
 }
 
+/* Sourced figures as rows, not cards: the value carries visual weight and
+   the source sits directly beneath it so evidence stays attached (R-17). */
+.prose-article :where(.article-figures) {
+  margin: 1.75rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.prose-article :where(.article-figure-row) {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.85rem 0;
+}
+
+.prose-article :where(.article-figure-row + .article-figure-row) {
+  border-top: 1px solid var(--border);
+}
+
+.prose-article :where(.article-figure-value) {
+  flex: 0 0 5.5rem;
+  font-size: 1.7em;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose-article :where(.article-figure-body) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.prose-article :where(.article-figure-label) {
+  font-size: 0.95em;
+  color: var(--foreground);
+}
+
+.prose-article :where(.article-figure-source) {
+  font-size: 0.8em;
+  color: var(--muted);
+}
+
 @media (max-width: 640px) {
   .prose-article :where(.article-key-point) {
     margin-left: 0;
@@ -272,6 +317,13 @@ body {
   }
   .prose-article :where(.article-pull-quote) {
     font-size: 1.25em;
+  }
+  .prose-article :where(.article-figure-row) {
+    gap: 0.5rem;
+  }
+  .prose-article :where(.article-figure-value) {
+    flex-basis: 4.5rem;
+    font-size: 1.4em;
   }
 }
 

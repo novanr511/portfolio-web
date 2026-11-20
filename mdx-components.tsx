@@ -7,6 +7,7 @@ import {
   PullQuote,
   Trap,
   Mark,
+  KeyFigures,
 } from "@/components/article-emphasis";
 
 const components: MDXComponents = {
@@ -43,6 +44,7 @@ const components: MDXComponents = {
   PullQuote,
   Trap,
   Mark,
+  KeyFigures,
 };
 
 export function useMDXComponents(): MDXComponents {

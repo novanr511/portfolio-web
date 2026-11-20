@@ -48,3 +48,27 @@ export function Trap({ children }: Props) {
 export function Mark({ children }: Props) {
   return <mark className="article-mark">{children}</mark>;
 }
+
+type Figure = { value: string; label: string; source: string };
+
+/**
+ * A short list of sourced figures. Reason (R-31): a number carrying real
+ * evidence deserves its own visual weight so a scanning reader sees it, and
+ * keeping the source attached to the value preserves accountability (R-17).
+ * Rendered as rows, not a card grid, so it does not imply equal importance.
+ */
+export function KeyFigures({ items }: { items: Figure[] }) {
+  return (
+    <div className="article-figures" role="list" aria-label="Key figures with sources">
+      {items.map((item, i) => (
+        <div className="article-figure-row" role="listitem" key={i}>
+          <span className="article-figure-value">{item.value}</span>
+          <span className="article-figure-body">
+            <span className="article-figure-label">{item.label}</span>
+            <span className="article-figure-source">{item.source}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
