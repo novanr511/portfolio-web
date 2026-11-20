@@ -9,19 +9,25 @@ tags:
   - Operations
 ---
 
+<Lead>
 ETL orchestration is often treated as scheduling, which ignores the harder parts: dependencies, retries, and what a successful run actually means. The ETL entry describes extract, transform, and load stages, as the Airflow entry covers orchestration of task dependencies, as the data-governance article requires provenance, as the observability article treats signals as evidence, as the risk article requires residual risk.
+</Lead>
 
-**Direct answer:** Orchestrate pipelines with explicit dependencies, idempotent tasks, measured quality, and a clear failure path. Wikipedia's ETL entry provides the stages, and Airflow covers orchestration. The boundary: a completed run does not guarantee correct data, which the data-quality article warns, as the risk article requires residual risk, as the publication standard forbids guaranteed outcomes.
+**Direct answer:** Orchestrate pipelines with <Mark>explicit dependencies, idempotent tasks, measured quality, and a clear failure path</Mark>. Wikipedia's ETL entry provides the stages, and Airflow covers orchestration. The boundary: a completed run does not guarantee correct data, which the data-quality article warns, as the risk article requires residual risk, as the publication standard forbids guaranteed outcomes.
 
 ## The mistakes
 
 **Confusing completion with correctness.** A job that finishes may have loaded wrong data, which the data-quality article warns, as the data-governance article requires provenance, as the evaluation-rubric article requires criteria, as the observability article treats signals, as the dashboard article argues, as the risk article requires residual risk, as the decision-memo article requires for a record.
 
-**Implicit dependencies.** A task that assumes another finished is a hidden coupling, which the Airflow entry treats, as the ETL entry describes stages, as the technical-debt article warns about complexity, as the data-modeling entry advises, as the monitoring article advises for review, as the decision-memo article requires a record, as the risk article requires residual risk.
+**Implicit dependencies.** A task that assumes another finished is <Mark>a hidden coupling</Mark>, which the Airflow entry treats, as the ETL entry describes stages, as the technical-debt article warns about complexity, as the data-modeling entry advises, as the monitoring article advises for review, as the decision-memo article requires a record, as the risk article requires residual risk.
 
-**Unsafe retries.** A retry that duplicates rows corrupts the result, which the ETL entry implies, as the data-quality article warns, as the data-governance article requires provenance, as the rollback article treats reversibility, as the incident article requires containment, as the monitoring article advises for review, as the risk article requires residual risk.
+**Unsafe retries.**
 
-**Missing lineage.** If a figure cannot be traced to its source, which the data-governance article requires, as the ETL entry describes stages, as the observability article treats signals, as the dashboard article argues, as the analytics article recommends, as the risk article requires residual risk, as the decision-memo article requires for a record.
+<Trap>
+A retry that duplicates rows corrupts the result, which the ETL entry implies, as the data-quality article warns, as the data-governance article requires provenance, as the rollback article treats reversibility, as the incident article requires containment, as the monitoring article advises for review, as the risk article requires residual risk.
+</Trap>
+
+**Missing lineage.** If a figure cannot be <Mark>traced to its source</Mark>, which the data-governance article requires, as the ETL entry describes stages, as the observability article treats signals, as the dashboard article argues, as the analytics article recommends, as the risk article requires residual risk, as the decision-memo article requires for a record.
 
 Three consequences follow. The stages should be explicit, as the ETL entry and Airflow entry advise, as the technical-debt article warns, as the data-modeling entry advises, as the monitoring article advises, as the decision-memo article requires, as the risk article requires residual risk, as the data-quality article warns, as the data-governance article requires provenance, as the evaluation-rubric article requires criteria, as the observability article treats signals, as the dashboard article argues, as the rollback and incident articles advise, as the analytics article recommends, as the decision-memo article requires for a record.
 
@@ -31,13 +37,21 @@ The following is hypothetical and illustrative. A nightly pipeline completes but
 
 Three checks decide. First, is the task idempotent, as the ETL entry and data-quality article advise, with a safe retry, as the rollback article advises? Second, are dependencies explicit, as the Airflow entry advises, with a trace, as the observability article recommends? Third, can the figure be traced to its source, as the data-governance article requires, with a recorded decision, as the decision-memo article requires, as the risk article requires residual risk?
 
-Three conclusions follow. Completion is not correctness, which the checks reveal. Idempotence matters, as the rollback and data-quality articles advise. And the decision should be recorded, as the decision-memo article requires.
+Three conclusions follow.
+
+<KeyPoint>
+Completion is not correctness, which the checks reveal.
+</KeyPoint>
+
+Idempotence matters, as the rollback and data-quality articles advise. And the decision should be recorded, as the decision-memo article requires.
 
 ## What orchestration cannot do
 
 It cannot create data quality, which the data-quality article treats as upstream, as the publication standard forbids guaranteed outcomes, as the risk article requires residual risk. It does not replace monitoring, which the observability and monitoring articles require, as the dashboard article argues, as the rubric article requires criteria, as the incident article requires containment. And it cannot fix an unclear model, which the data-modeling entry treats, as the technical-debt article warns, as the decision-memo article requires a record, as the risk article requires residual risk.
 
+<PullQuote>
 The counterargument that a scheduler solves reliability is fair for timing and incomplete for correctness, which the worked example shows, as the data-quality and data-governance articles advise, as the observability article treats signals, as the risk article requires residual risk.
+</PullQuote>
 
 ## A decision test
 

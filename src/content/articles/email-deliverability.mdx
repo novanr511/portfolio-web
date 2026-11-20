@@ -9,9 +9,11 @@ tags:
   - Standards
 ---
 
+<Lead>
 A sender can pass every authentication check and still land in spam. The checks answer "are you who you claim to be?"; the mailbox provider then asks a different question — "do recipients want this?" Confusing the two produces teams that configure DKIM correctly, see no improvement, and conclude that deliverability is a mystery.
+</Lead>
 
-**Direct answer:** SPF, DKIM and DMARC are the three authentication standards — SPF authorises sending hosts for a domain, DKIM signs messages cryptographically, and DMARC ties both to the visible From address and publishes a handling policy. Gmail's sender guidelines add the reputation layer: authentication is required, but recipient engagement and list quality affect placement. The boundary: authentication is necessary and verifiable; reputation is probabilistic and controlled by the receiving provider.
+**Direct answer:** SPF, DKIM and DMARC are the three authentication standards — SPF authorises sending hosts for a domain, DKIM signs messages cryptographically, and DMARC ties both to the visible From address and publishes a handling policy. Gmail's sender guidelines add the reputation layer: authentication is required, but <Mark>recipient engagement and list quality affect placement</Mark>. The boundary: authentication is necessary and verifiable; reputation is probabilistic and controlled by the receiving provider.
 
 ## The three standards do different jobs
 
@@ -25,7 +27,11 @@ Three properties follow:
 
 - **SPF and DKIM can both pass while DMARC fails** if the authenticated domains do not align with the visible From domain. This is the most common configuration surprise.
 - **DMARC is a policy, not a delivery guarantee.** A `p=none` record requests reports without asking receivers to reject anything; moving to `quarantine` or `reject` changes handling, and should follow a period of reading the reports.
-- **Authentication identifies, it does not persuade.** Passing all three says the message is genuine, not that it is wanted.
+- **Authentication identifies, it does not persuade.**
+
+<KeyPoint>
+Passing all three says the message is genuine, not that it is wanted.
+</KeyPoint>
 
 ## The reputation layer
 
@@ -33,7 +39,7 @@ Gmail's sender guidelines illustrate what providers ask beyond authentication: s
 
 Three practical implications:
 
-1. **List hygiene is a deliverability control.** Sending to addresses that no longer exist or that never opted in generates bounces and complaints, which damage reputation. A smaller, engaged list outperforms a large stale one.
+1. **List hygiene is a deliverability control.** Sending to addresses that no longer exist or that never opted in generates bounces and complaints, which damage reputation. <Mark>A smaller, engaged list outperforms a large stale one</Mark>.
 2. **Engagement is feedback.** Opens and clicks are signals providers can observe. A message nobody interacts with teaches the provider that the sender's mail is not wanted.
 3. **Complaints are expensive.** A single spam complaint from a recipient can outweigh many successful deliveries, which is why unsubscribe friction is counterproductive.
 
@@ -67,7 +73,11 @@ A deliverability project changes DNS records that affect every message the domai
 
 **Fix the sources the reports reveal.** Align the authenticated domains with the visible From address, and move or retire unauthorised senders. At this stage, a spike in failures is a success — it means the report is doing its job.
 
-**Tighten policy gradually.** Move to `quarantine`, watch complaint and bounce rates, then move to `reject` when alignment is stable. A sudden jump to `reject` can silently drop legitimate mail.
+**Tighten policy gradually.** Move to `quarantine`, watch complaint and bounce rates, then move to `reject` when alignment is stable.
+
+<Trap>
+A sudden jump to `reject` can silently drop legitimate mail.
+</Trap>
 
 **Keep subdomain policy in mind.** DMARC allows a separate policy for subdomains. A domain that is protected while its subdomains are not leaves an obvious path for impersonation.
 
@@ -75,13 +85,17 @@ This sequence is unglamorous, and it is the difference between a project that im
 
 ## Metrics that mislead
 
-**Open rates are noisy.** Privacy features in mail clients pre-fetch images, which can register as opens without a human reading. Treat open rate as a directional signal, not a measurement.
+**Open rates are noisy.** <Mark>Privacy features in mail clients pre-fetch images</Mark>, which can register as opens without a human reading. Treat open rate as a directional signal, not a measurement.
 
 **Delivery is not inbox placement.** "Delivered" typically means the receiving server accepted the message; it may have been filed in spam or promotions. The distinction matters when diagnosing a deliverability drop.
 
 **A single seed test is weak.** Checking whether a test message reached your own inbox tells you about one recipient with one history. Use seed lists across providers and monitor complaint and bounce rates over time.
 
-The counterargument — that deliverability is opaque because providers do not publish their rules — is partly fair. The standards and published guidelines are public, and they remove the failures a sender can control. What remains is a reputation system you influence through list quality and recipient behaviour rather than configure directly.
+The counterargument — that deliverability is opaque because providers do not publish their rules — is partly fair. The standards and published guidelines are public, and they remove the failures a sender can control.
+
+<PullQuote>
+What remains is a reputation system you influence through list quality and recipient behaviour rather than configure directly.
+</PullQuote>
 
 ## A decision test
 

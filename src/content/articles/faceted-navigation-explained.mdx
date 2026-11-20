@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A product search that returns thousands of results is only useful if a shopper can narrow it. Faceted navigation is the common answer, but the real problem is deciding which facets to expose: too few and shoppers cannot refine, too many and the catalog fragments into near-duplicate paths. Web analytics is the evidence needed to make that decision.
+</Lead>
 
 **Direct answer:** Faceted search is a technique that lets a user narrow results by applying filters built from attributes or categories, such as brand, size, or price. Wikipedia's faceted search entry describes the approach, and its web analytics entry defines the measurement of site usage that can show which facets people actually use. The boundary: facets are a navigation structure; analytics reports behavior, not what the structure should be.
 
@@ -17,15 +19,19 @@ A product search that returns thousands of results is only useful if a shopper c
 
 ## The mechanism
 
-Wikipedia's faceted search entry describes a retrieval technique in which results are narrowed by applying one or more filters, called facets, that correspond to attributes or categories of the items. A shopper might combine a brand with a size and a price range, and each facet typically presents the values available within the current result set. The practical consequence is that navigation becomes a process of progressive refinement rather than a single query. The design of the facets determines which refinements are possible at all, so the structure is not neutral.
+Wikipedia's faceted search entry describes a retrieval technique in which results are narrowed by applying one or more filters, called facets, that correspond to attributes or categories of the items. A shopper might combine a brand with a size and a price range, and each facet typically presents the values available within the current result set. The practical consequence is that navigation becomes a process of <Mark>progressive refinement</Mark> rather than a single query. The design of the facets determines which refinements are possible at all, so the structure is not neutral.
 
 <Figure src="/images/articles/inline/faceted-navigation-explained-1.png" alt="A flow from consistent catalog attributes, to facet filters and progressive refinement, to analytics usage data, to a keep-or-remove decision for each facet." caption="Conceptual: navigation refines results, but usage data decides which facets stay." />
 
 That design is a taxonomy decision. Facets only work when the underlying attributes are consistent: a color facet is useful if products carry a clean color value, and useless if the field is filled inconsistently. The practical consequence is that the quality of faceted navigation is bounded by the quality of the catalog data behind it. A team can add facets freely, but it cannot add attributes that the product data does not reliably contain.
 
-Wikipedia's web analytics entry defines the measurement, collection, analysis, and reporting of web data to understand and optimize web usage. That definition matters here because faceted navigation generates many combinations, and only usage data can show which combinations shoppers actually take. The practical consequence is that the facet set should be reviewed against behavior: a facet nobody uses still adds interface clutter and URL combinations, while a facet used heavily deserves prominence. Analytics turns an opinion about the interface into an observed pattern.
+Wikipedia's web analytics entry defines the measurement, collection, analysis, and reporting of web data to understand and optimize web usage. That definition matters here because faceted navigation generates many combinations, and only usage data can show which combinations shoppers actually take. The practical consequence is that the facet set should be <Mark>reviewed against behavior</Mark>: a facet nobody uses still adds interface clutter and URL combinations, while a facet used heavily deserves prominence. Analytics turns an opinion about the interface into an observed pattern.
 
-The output of combining the two sources is a decision rule, not a specification. The sources describe a technique and a measurement field; they do not prescribe a particular facet set, layout, or URL scheme. The useful move is to treat each facet as a hypothesis about how people refine, then check it against analytics. That mapping from observed behavior to a navigation choice is a local decision built on the two described concepts, not a rule either source states.
+<KeyPoint>
+The output of combining the two sources is a decision rule, not a specification.
+</KeyPoint>
+
+The sources describe a technique and a measurement field; they do not prescribe a particular facet set, layout, or URL scheme. The useful move is to treat each facet as <Mark>a hypothesis about how people refine</Mark>, then check it against analytics. That mapping from observed behavior to a navigation choice is a local decision built on the two described concepts, not a rule either source states.
 
 ## A worked example
 
@@ -43,7 +49,13 @@ The first two rows report definitions stated directly by the sources and can be 
 
 ## What it cannot do
 
-Faceted navigation cannot define the taxonomy it presents. It is a way of exposing attributes, not a source of those attributes. The sources describe the technique; they do not tell a team which attributes matter for its products or customers. A facet set built without domain input will look complete while reflecting the wrong distinctions. The structure can only be as good as the categories fed into it, and no amount of interface polish repairs a poorly chosen attribute.
+Faceted navigation cannot define the taxonomy it presents. It is a way of exposing attributes, not a source of those attributes. The sources describe the technique; they do not tell a team which attributes matter for its products or customers.
+
+<Trap>
+A facet set built without domain input will look complete while reflecting the wrong distinctions.
+</Trap>
+
+The structure can only be as good as the categories fed into it, and no amount of interface polish repairs a poorly chosen attribute.
 
 It cannot guarantee findability when the underlying data is inconsistent. If a product field is missing or mislabeled, the facet built on it will mislead. A shopper who filters by a value that is present on only some relevant products gets an incomplete result set and no obvious reason why. The failure is silent, because the interface works exactly as designed; the data behind it is the problem. That is why the data check precedes the interface decision in any review.
 
@@ -53,7 +65,9 @@ There is a boundary around what the sources support. They provide a definition o
 
 Because catalogs and behavior change, the facet set needs scheduled review. Attributes drift, products are added with new values, and shopper habits move. A practical cadence is a periodic check of which facets are used, which produce empty results, and which still map to clean data. Each facet should carry an owner and a review condition. Without that, an interface that once fit the catalog gradually stops doing so, and nobody is responsible for noticing the drift.
 
+<PullQuote>
 The counterargument that more facets give shoppers more control is fair for a small, clean catalog and incomplete when combinations create empty results, duplicate paths, and a harder interface.
+</PullQuote>
 
 ## A decision test
 

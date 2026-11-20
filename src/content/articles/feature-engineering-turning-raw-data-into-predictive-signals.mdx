@@ -9,7 +9,9 @@ tags:
   - Data Preprocessing
 ---
 
+<Lead>
 Feature engineering is usually described as a creative step — the place where a practitioner's intuition turns raw columns into useful signals. That is true, and it is also the source of most silent failures, because a feature is a claim about the world that has to be true at prediction time, not just in the training notebook.
+</Lead>
 
 **Direct answer:** Feature engineering is "adjusting and reworking the predictors to enable models to better uncover predictor-response relationships" — the phrase comes from Kuhn and Johnson's open reference on the subject. It works when the transformation encodes real domain structure and when the entire transformation is fitted inside the training fold. It fails when a feature uses information that will not be available at prediction time, or when preprocessing was applied before the split, which makes the validation score look excellent and the deployed model look random.
 
@@ -41,17 +43,23 @@ scikit-learn states the rule without ambiguity: "This situation is called overfi
 
 Feature engineering creates three specific leak risks:
 
-**Computing a statistic on the full dataset.** A target-encoded category built on all rows includes the validation labels. The fix is to compute it inside the training fold, using out-of-fold encoding for the training rows themselves.
+**Computing a statistic on the full dataset.** A target-encoded category built on all rows includes the validation labels. The fix is to compute it inside the training fold, using <Mark>out-of-fold encoding</Mark> for the training rows themselves.
 
-**Using future values in a rolling window.** A 30-day average ending after the prediction date is a lookahead, even if it is only by one day. scikit-learn's `TimeSeriesSplit` supports a `gap` parameter precisely for the related case where recent data is not yet usable.
+**Using future values in a rolling window.** A 30-day average ending after the prediction date is <Mark>a lookahead</Mark>, even if it is only by one day. scikit-learn's `TimeSeriesSplit` supports a `gap` parameter precisely for the related case where recent data is not yet usable.
 
 **Creating a feature from an outcome that arrives late.** A "customer lifetime value to date" feature that includes events after the prediction moment is unavailable in production by definition. If an event cannot be observed at the moment of prediction, it cannot be a feature.
 
+<KeyPoint>
 The discipline is simple: every feature needs a stated answer to the question "at prediction time, could I have computed this exactly as I did in training?"
+</KeyPoint>
 
 ## Time makes the problem harder
 
-Random splits are wrong for time-ordered data, and they are especially wrong for engineered features, because many of them are derived from neighbouring rows. A rolling statistic computed across a random split can see values from the future fold.
+<Trap>
+Random splits are wrong for time-ordered data, and they are especially wrong for engineered features, because many of them are derived from neighbouring rows.
+</Trap>
+
+A rolling statistic computed across a random split can see values from the future fold.
 
 Expanding-window validation — training on earlier periods and testing on later ones — matches the deployment. scikit-learn's `TimeSeriesSplit` does this with documented folds in which the training set grows: an early fold trains on indices 0–5 and tests on 6–7, a later fold trains on 0–7 and tests on 8–9. Adding a gap inserts a period between training and test, which matters when labels take time to arrive.
 
@@ -59,7 +67,7 @@ The practical consequence for feature work is that the feature computation has t
 
 ## When to stop
 
-Feature engineering has diminishing and then negative returns. More features increase the chance of finding a spurious relationship, complicate the pipeline, and create more places for a leak to hide.
+Feature engineering has <Mark>diminishing and then negative returns</Mark>. More features increase the chance of finding a spurious relationship, complicate the pipeline, and create more places for a leak to hide.
 
 A reasonable stopping rule is to add a feature only when you can state the mechanism in one sentence and test its contribution in a clean validation. If you cannot say why it should matter, it is a candidate for noise, and if you cannot measure its contribution, you do not know whether it helped.
 
@@ -73,7 +81,13 @@ For an application that ablates feature blocks under a leakage-controlled walk-f
 
 ## A counterargument
 
-A reasonable critic can object that the article's stopping rule - add a feature only when its mechanism fits one sentence - is stricter than its sources support. Kuhn and Johnson present tools for re-representing predictors and for selection, and scikit-learn documents leakage and validation mechanics, but neither establishes that a useful feature must have a one-sentence human explanation. The article's own list includes text and image features from pretrained models, whose value often lies in representations no one can narrate simply. The objection is not that unexplained features are safer; it is that the rule converts a heuristic for avoiding noise into a test of legitimacy the references do not provide. Under conditions where a feature improves out-of-fold performance but resists a crisp story, the framework would discard a real signal in the name of interpretability.
+A reasonable critic can object that the article's stopping rule - add a feature only when its mechanism fits one sentence - is stricter than its sources support. Kuhn and Johnson present tools for re-representing predictors and for selection, and scikit-learn documents leakage and validation mechanics, but neither establishes that a useful feature must have a one-sentence human explanation. The article's own list includes text and image features from pretrained models, whose value often lies in representations no one can narrate simply.
+
+<PullQuote>
+The objection is not that unexplained features are safer; it is that the rule converts a heuristic for avoiding noise into a test of legitimacy the references do not provide.
+</PullQuote>
+
+Under conditions where a feature improves out-of-fold performance but resists a crisp story, the framework would discard a real signal in the name of interpretability.
 
 ## References & Further Reading
 

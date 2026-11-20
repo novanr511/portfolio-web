@@ -9,17 +9,27 @@ tags:
   - MLOps
 ---
 
-An LLM application that works on ten examples you wrote yourself is not evaluated. It is demonstrated. The difference matters because the failures that reach production are usually the cases nobody thought to try — a different phrasing, an edge case, a document in a format the demo never saw. A harness is the mechanism that turns a demo into evidence.
+<Lead>
+An LLM application that works on ten examples you wrote yourself is not evaluated. It is demonstrated. The difference matters because the failures that reach production are usually the cases nobody thought to try — a different phrasing, an edge case, a document in a format the demo never saw. A harness is the mechanism that <Mark>turns a demo into evidence</Mark>.
+</Lead>
 
 **Direct answer:** Evaluation means measuring a system on a representative set of cases with explicit metrics, then re-running the same measurement after every change. The HELM study argues for a multi-metric approach, measuring "7 metrics (accuracy, calibration, robustness, fairness, bias, toxicity, and efficiency)" across many scenarios because "metrics beyond accuracy don't fall to the wayside". OpenAI documents evals as the way to test applications built on its models. The boundary: a harness tells you whether the system improved on your test set; it does not prove the test set represents the world.
 
+<KeyFigures items={[
+  { value: "17.9%", label: "average share of core HELM scenarios covered before HELM", source: "Percy Liang et al., 2022 (HELM)" },
+]} />
+
 ## Why a single score fails
 
-**Benchmarks measure a different distribution.** HELM found that before its work, models "on average were evaluated on just 17.9% of the core HELM scenarios", with some prominent models sharing no scenario in common. A rank derived from different tests is not a comparison. HELM raised that coverage to 96.0% under standardised conditions — the point being that shared scenarios and explicit metrics make comparison possible.
+**Benchmarks measure a different distribution.** HELM found that before its work, models "on average were evaluated on just 17.9% of the core HELM scenarios", with some prominent models sharing no scenario in common. A rank derived from different tests is not a comparison. HELM raised that coverage to 96.0% under standardised conditions — the point being that <Mark>shared scenarios and explicit metrics make comparison possible</Mark>.
 
 **Accuracy is not the only desideratum.** A model can be accurate and poorly calibrated, biased, or expensive. HELM's inclusion of calibration, robustness, fairness, bias, toxicity and efficiency exists because those properties trade off against accuracy and are invisible if you measure only correctness.
 
-**Your application has its own distribution.** A public benchmark asks generic questions. Your support bot sees your customers' phrasing, your product's names, and your knowledge base's quirks. A labelled set from your own traffic is the only evaluation that answers your question.
+**Your application has its own distribution.** A public benchmark asks generic questions. Your support bot sees your customers' phrasing, your product's names, and your knowledge base's quirks.
+
+<KeyPoint>
+A labelled set from your own traffic is the only evaluation that answers your question.
+</KeyPoint>
 
 ## What a minimal harness contains
 
@@ -60,17 +70,27 @@ The set has a limitation: 200 cases cannot detect a rare failure that occurs onc
 
 **Validate the judge.** If an LLM scores the answers, have humans score a sample and compare. A judge with a bias toward long answers will reward verbosity.
 
-**Keep the test set honest.** Once a set is used to tune prompts, it stops being a clean measure. Reserve a held-out portion that is only scored at milestones.
+**Keep the test set honest.**
+
+<Trap>
+Once a set is used to tune prompts, it stops being a clean measure.
+</Trap>
+
+Reserve a held-out portion that is only scored at milestones.
 
 ## What an evaluation cannot prove
 
-**Representativeness is an assumption.** A test set drawn from last quarter's traffic will not contain next quarter's product launch or a new form of attack. Evaluation is evidence about the past, used cautiously for the future.
+**Representativeness is an assumption.** A test set drawn from last quarter's traffic will not contain next quarter's product launch or a new form of attack. Evaluation is <Mark>evidence about the past, used cautiously for the future</Mark>.
 
 **Rubrics encode values.** Deciding that a refusal is "calibrated" is a judgement about what the system should do. Make the rubric explicit so a reviewer can disagree with it.
 
 **Scores can be gamed.** Optimising directly against a fixed metric produces systems that score well on the metric. The held-out set and human review are the defence.
 
-The counterargument — that a lightweight team cannot afford a harness — is backwards. A small set of real examples with a fixed scoring script is cheap; what is expensive is discovering a regression from customer complaints.
+<PullQuote>
+The counterargument — that a lightweight team cannot afford a harness — is backwards.
+</PullQuote>
+
+A small set of real examples with a fixed scoring script is cheap; what is expensive is discovering a regression from customer complaints.
 
 ## A decision test
 

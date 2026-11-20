@@ -9,15 +9,21 @@ tags:
   - Prompt Engineering
 ---
 
+<Lead>
 Three techniques get conflated because they all look like "making the model better at your task". They are not interchangeable, they cost very different amounts, and they fail in different ways. Pretraining creates the model's capability. Prompting steers it without changing its weights. Fine-tuning changes its weights — and, unless you need it for a specific reason, it is usually the most expensive answer to a problem that a better prompt would have solved.
+</Lead>
 
-**Direct answer:** Pretraining produces a general model from raw text. Prompting specifies the task in the input and requires no training at all. Fine-tuning trains on examples so the behaviour generalises to unseen inputs of the same kind. Choose prompting first, because it is free and instant; fine-tune when the behaviour must be reliable across a large volume of inputs, the task is narrow enough to be learnable from examples, or the model's default behaviour is unacceptable for your domain; and expect a caveat that cuts across all three — a bigger model is not automatically a more obedient one.
+**Direct answer:** Pretraining produces a general model from raw text. Prompting specifies the task in the input and requires no training at all. Fine-tuning trains on examples so the behaviour generalises to unseen inputs of the same kind.
+
+<KeyPoint>
+Choose prompting first, because it is free and instant; fine-tune when the behaviour must be reliable across a large volume of inputs, the task is narrow enough to be learnable from examples, or the model's default behaviour is unacceptable for your domain; and expect a caveat that cuts across all three — a bigger model is not automatically a more obedient one.
+</KeyPoint>
 
 ## Pretraining: what the model becomes
 
 The base model is built by predicting text. That sounds trivial, and the scale of what it produces is the first surprise.
 
-Brown et al. trained GPT-3, "an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model". Their finding is not that the model was large, but that scale changed what the model could do without being trained for it: scaling "greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-state-of-the-art fine-tuning approaches".
+Brown et al. trained GPT-3, "an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model". Their finding is not that the model was large, but that <Mark>scale changed what the model could do without being trained for it</Mark>: scaling "greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-state-of-the-art fine-tuning approaches".
 
 The comparison in their abstract is the one to hold onto. The dominant method before this was pretraining on a large corpus followed by fine-tuning on a specific task, and that method "still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples". A few-shot model, by contrast, performs "a new language task from only a few examples or from simple instructions — something which current NLP systems still largely struggle to do".
 
@@ -27,7 +33,7 @@ So pretraining's contribution is a shift in the cost structure of adaptation. Th
 
 Prompting specifies the task inside the input. It costs nothing to change, takes effect immediately, and requires no labels.
 
-That makes it the first thing to try, and the correct default in most cases. But the failure mode is specific and worth naming: a prompt steers the model; it does not change what the model is likely to do by default. Where the base model's prior behaviour conflicts with what you need — a specific output format it does not naturally produce, a domain vocabulary it has not seen, a behaviour that must be consistent across thousands of calls — a prompt can sometimes be coaxed into it and sometimes cannot.
+That makes it the first thing to try, and the correct default in most cases. But the failure mode is specific and worth naming: <Mark>a prompt steers the model; it does not change what the model is likely to do by default</Mark>. Where the base model's prior behaviour conflicts with what you need — a specific output format it does not naturally produce, a domain vocabulary it has not seen, a behaviour that must be consistent across thousands of calls — a prompt can sometimes be coaxed into it and sometimes cannot.
 
 The diagnostic question is whether the inconsistency is random or systematic. If outputs vary run to run for the same input, the fix is usually the prompt's instruction, the output format, or a temperature change. If the failure is consistent — it always truncates, always ignores the schema, always answers the wrong question — that is a capability or alignment gap, and prompting alone will not close it.
 
@@ -39,7 +45,11 @@ Their method, InstructGPT, is worth describing because the sequence is what most
 
 Note the ordering. Demonstrations first, then rankings, then reinforcement learning. The supervised stage teaches the *shape* of the desired behaviour and is cheap to produce; the ranking stage teaches the *preference* between outputs, and needs comparison rather than absolute judgement, which is a much cheaper thing to ask of a human. The result is that a 1.3B-parameter InstructGPT model was preferred by human raters over the 175B GPT-3, which is the clearest evidence in the literature that size and usefulness are separate axes.
 
-This is also why "just use a bigger model" fails as a strategy for a specific application. A bigger base model can be harder to steer, needs more alignment work, and costs more per call.
+<Trap>
+This is also why "just use a bigger model" fails as a strategy for a specific application.
+</Trap>
+
+A bigger base model can be harder to steer, needs more alignment work, and costs more per call.
 
 ## Fine-tuning: when it is the right answer
 
@@ -47,7 +57,12 @@ Fine-tuning trains the model's weights on your examples. Hu et al. frame the pro
 
 Their method, LoRA, "freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks". The measured result is large: "Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times", while "performs on-par or better than fine-tuning in model quality on RoBERTa" datasets.
 
-That last clause matters more than the parameter count. Parameter-efficient fine-tuning is not a compromise on quality; it is a different allocation of the same budget, and in the reported comparisons it is at least as good. The practical benefit is operational: adapters are small enough to version, swap, and serve per customer, where a full checkpoint per customer is not.
+<KeyFigures items={[
+  { value: "175 billion", label: "parameters in GPT-3", source: "Brown et al., 2020" },
+  { value: "10,000 times", label: "fewer trainable parameters with LoRA than full fine-tuning on GPT-3 175B", source: "Hu et al., 2021" },
+]} />
+
+That last clause matters more than the parameter count. <Mark>Parameter-efficient fine-tuning is not a compromise on quality</Mark>; it is a different allocation of the same budget, and in the reported comparisons it is at least as good. The practical benefit is operational: adapters are small enough to version, swap, and serve per customer, where a full checkpoint per customer is not.
 
 The cost that does not disappear is the training data. Fine-tuning requires examples, and their quality determines the result. A thousand examples of the behaviour you want, in the format you want, is the real input.
 
@@ -68,7 +83,11 @@ The following is hypothetical and illustrative. A team wants generated records t
 
 ## A counterargument
 
-A reasonable critic could argue that the article's "start with prompting" default understates what reliability actually costs. Prompt iteration is free per call but not free in engineering time, and the article itself concedes that when a failure is systematic - always ignoring the schema, always truncating - prompting alone will not close it. The clean split between prompting and fine-tuning also blurs on inspection: the alignment the article says is separate from scale comes from Ouyang et al.'s supervised and preference-based fine-tuning, so reliable behaviour often requires the very training the decision order defers. A critic could add that LoRA's "on-par or better" result is reported on RoBERTa and GPT-3 comparisons, which may not transfer to a team's narrow task.
+A reasonable critic could argue that the article's "start with prompting" default understates what reliability actually costs. Prompt iteration is free per call but not free in engineering time, and the article itself concedes that when a failure is systematic - always ignoring the schema, always truncating - prompting alone will not close it. The clean split between prompting and fine-tuning also blurs on inspection: the alignment the article says is separate from scale comes from Ouyang et al.'s supervised and preference-based fine-tuning, so reliable behaviour often requires the very training the decision order defers.
+
+<PullQuote>
+A critic could add that LoRA's "on-par or better" result is reported on RoBERTa and GPT-3 comparisons, which may not transfer to a team's narrow task.
+</PullQuote>
 
 ## References & Further Reading
 

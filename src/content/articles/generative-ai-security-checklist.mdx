@@ -9,9 +9,21 @@ tags:
   - Governance
 ---
 
-A security review of a generative AI system that focuses only on prompt injection will miss the larger attack surface. The model is one component; the tools it can call, the data it can read, and the actions it can trigger are where impact lives. OWASP's Top 10 for LLM Applications places prompt injection first, but lists nine other risks alongside it.
+<Lead>
+A security review of a generative AI system that focuses only on prompt injection will miss the larger attack surface. The model is one component; <Mark>the tools it can call, the data it can read, and the actions it can trigger are where impact lives</Mark>. OWASP's Top 10 for LLM Applications places prompt injection first, but lists nine other risks alongside it.
+</Lead>
 
-**Direct answer:** A practical checklist covers six areas: untrusted inputs, tool permissions, data exposure, output handling, dependency and supply chain, and monitoring. OWASP's LLM Top 10 and NIST's adversarial-ML taxonomy provide the reference structure. The boundary: a checklist reduces known risks; it does not make a system secure against an adaptive attacker, which is why the controls must be enforced outside the model.
+**Direct answer:**
+
+<KeyPoint>
+A practical checklist covers six areas: untrusted inputs, tool permissions, data exposure, output handling, dependency and supply chain, and monitoring.
+</KeyPoint>
+
+OWASP's LLM Top 10 and NIST's adversarial-ML taxonomy provide the reference structure. The boundary: a checklist reduces known risks; it does not make a system secure against an adaptive attacker, which is why the controls must be enforced outside the model.
+
+<KeyFigures items={[
+  { value: "nine", label: "other risks listed alongside prompt injection in the OWASP Top 10 for LLM Applications", source: "OWASP Gen AI Security Project, 2025" },
+]} />
 
 ## Six areas
 
@@ -25,7 +37,7 @@ A security review of a generative AI system that focuses only on prompt injectio
 
 **5. Dependencies and supply chain.** Models, embeddings, and prompt templates come from somewhere. Their provenance and update behaviour matter, as the build-versus-integrate article discusses.
 
-**6. Monitoring.** Log inputs, tool calls, and decisions with enough detail to reconstruct an incident. An alert with no owner is not a control.
+**6. Monitoring.** Log inputs, tool calls, and decisions with enough detail to reconstruct an incident. <Mark>An alert with no owner is not a control.</Mark>
 
 ## A worked example of a tool boundary
 
@@ -53,7 +65,11 @@ Three lessons follow:
 
 **List every tool** with its permissions, limits, and the evidence it requires before acting.
 
-**Test indirect injection explicitly** by planting instructions in documents the system retrieves. A single direct prompt test misses the main vector.
+**Test indirect injection explicitly** by planting instructions in documents the system retrieves.
+
+<Trap>
+A single direct prompt test misses the main vector.
+</Trap>
 
 **Define the stop condition** and the owner who can pause the system, as the governance checklist describes.
 
@@ -65,9 +81,13 @@ Three lessons follow:
 
 **Filters are not controls.** Blocking known phrases does not address a model that can be influenced by paraphrase. OWASP's ranking treats prompt injection as a design problem, not a string problem.
 
-**Compliance is not security.** A system can pass a checklist and still be compromised. The purpose of the checklist is to ensure the obvious boundaries exist, not to certify safety.
+**Compliance is not security.** <Mark>A system can pass a checklist and still be compromised.</Mark> The purpose of the checklist is to ensure the obvious boundaries exist, not to certify safety.
 
-The counterargument — that a small team cannot implement all six areas — is fair. The response is to prioritise the tool boundary and logging first, because those contain damage when the model is wrong. The other areas can be added incrementally.
+<PullQuote>
+The counterargument — that a small team cannot implement all six areas — is fair.
+</PullQuote>
+
+The response is to prioritise the tool boundary and logging first, because those contain damage when the model is wrong. The other areas can be added incrementally.
 
 ## A decision test
 

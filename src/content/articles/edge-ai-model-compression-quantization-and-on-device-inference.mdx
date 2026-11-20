@@ -9,9 +9,21 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 A model that runs well in a data centre is often unusable on a phone, a camera, or a microcontroller. The obstacle is not a single limitation but a combination — memory, compute, bandwidth, heat, and battery — and the techniques that make a model fit are not interchangeable. Each one spends a different resource and introduces a different failure mode.
+</Lead>
 
-**Direct answer:** Edge AI makes models small and cheap enough to run locally. Han et al.'s deep-compression pipeline — "pruning, trained quantization and Huffman coding" — reduced storage requirements "by 35x to 49x without affecting their accuracy", with pruning cutting connections "by 9x to 13x" and quantisation reducing the bits per connection "from 32 to 5". Integer-only quantisation goes further by making inference executable on hardware without floating-point support. The constraint behind all of these is that compression is not free: it changes the numerical behaviour of the model, and the only honest evaluation is on the target hardware under the target power budget.
+**Direct answer:** Edge AI makes models small and cheap enough to run locally. Han et al.'s deep-compression pipeline — "pruning, trained quantization and Huffman coding" — reduced storage requirements "by 35x to 49x without affecting their accuracy", with pruning cutting connections "by 9x to 13x" and quantisation reducing the bits per connection "from 32 to 5". Integer-only quantisation goes further by making inference executable on hardware without floating-point support.
+
+<KeyPoint>
+The constraint behind all of these is that compression is not free: it changes the numerical behaviour of the model, and the only honest evaluation is on the target hardware under the target power budget.
+</KeyPoint>
+
+<KeyFigures items={[
+  { value: "35x to 49x", label: "Reduction in storage requirements, deep-compression pipeline", source: "Song Han et al., 2015" },
+  { value: "9x to 13x", label: "Reduction in connections from pruning", source: "Song Han et al., 2015" },
+  { value: "32 to 5", label: "Bits per connection after quantisation", source: "Song Han et al., 2015" },
+]} />
 
 ## Why the data centre model does not fit
 
@@ -31,7 +43,7 @@ Han et al.'s pipeline is the clearest map of the available levers:
 
 **Huffman coding** exploits the distribution of the quantised values. It is a lossless compression step on top of the others, so it reduces storage without further changing the model's behaviour.
 
-The combined result — 35–49× less storage without affecting accuracy — is the headline, and the qualification "without affecting accuracy" is the part to scrutinise. It applies to the tasks and models the authors evaluated, which is why a team must reproduce the measurement on its own workload.
+The combined result — 35–49× less storage without affecting accuracy — is the headline, and <Mark>the qualification "without affecting accuracy" is the part to scrutinise</Mark>. It applies to the tasks and models the authors evaluated, which is why a team must reproduce the measurement on its own workload.
 
 ## Integer-only inference
 
@@ -68,13 +80,17 @@ Three failure modes are specific enough to plan for:
 
 **Sparsity that is not exploited.** A pruned model is smaller on disk, but most hardware performs dense arithmetic. Unless the runtime and the chip can skip the zeroed connections, the inference cost is unchanged and the pruning has bought only storage.
 
-**Thermal throttling.** A device can meet its latency target for the first minute and fall well short after ten, because sustained inference raises temperature and the system reduces clock speed. A benchmark that runs once is a best case, not an operating point.
+**Thermal throttling.** A device can meet its latency target for the first minute and fall well short after ten, because sustained inference raises temperature and the system reduces clock speed. A benchmark that runs once is <Mark>a best case, not an operating point</Mark>.
 
-Each of these is a reason to treat compression as a measurement problem rather than a transformation applied once at the end of training.
+Each of these is a reason to treat <Mark>compression as a measurement problem rather than a transformation applied once at the end of training</Mark>.
 
 ## What to measure on the target
 
-The error that teams make is evaluating compression on the training machine. A model that is four times smaller on disk may run no faster if the runtime cannot exploit sparsity, and a quantised model that matches accuracy on one dataset may fail on a subgroup that was underrepresented in the calibration set.
+<Trap>
+The error that teams make is evaluating compression on the training machine.
+</Trap>
+
+A model that is four times smaller on disk may run no faster if the runtime cannot exploit sparsity, and a quantised model that matches accuracy on one dataset may fail on a subgroup that was underrepresented in the calibration set.
 
 A practical evaluation needs:
 
@@ -98,7 +114,11 @@ For the deployment context, see [MLOps](/articles/mlops-from-experiment-to-produ
 
 ## A counterargument
 
-A reasonable critic can argue that the article gives post-hoc compression more authority than its own sources warrant. The headline ratios come from Han et al. and Jacob et al., evaluated on the authors' own tasks, and the article concedes that 'without affecting accuracy' is bounded to those workloads. Tan and Le's EfficientNet paper, cited here, argues that compound scaling of depth, width, and resolution yields better accuracy-efficiency than ad hoc adjustment, which suggests that choosing an efficient architecture - the article's own step two - may matter more than compressing an arbitrary model afterwards. The objection is not that compression fails; it is that the framing treats it as the primary lever when a cited source points to design. Under conditions where a suitable efficient architecture exists, a team that compresses a general model may accept accuracy loss that a purpose-built model would avoid.
+A reasonable critic can argue that the article gives post-hoc compression more authority than its own sources warrant. The headline ratios come from Han et al. and Jacob et al., evaluated on the authors' own tasks, and the article concedes that 'without affecting accuracy' is bounded to those workloads. Tan and Le's EfficientNet paper, cited here, argues that compound scaling of depth, width, and resolution yields better accuracy-efficiency than ad hoc adjustment, which suggests that choosing an efficient architecture - the article's own step two - may matter more than compressing an arbitrary model afterwards. Under conditions where a suitable efficient architecture exists, a team that compresses a general model may accept accuracy loss that a purpose-built model would avoid.
+
+<PullQuote>
+The objection is not that compression fails; it is that the framing treats it as the primary lever when a cited source points to design.
+</PullQuote>
 
 ## References & Further Reading
 

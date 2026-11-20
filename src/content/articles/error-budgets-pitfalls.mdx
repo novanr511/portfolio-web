@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Error budgets are often treated as a number to aim for, which inverts their purpose. The SRE material defines an error budget in relation to a service objective, and the alerting workbook ties signals to objectives. The value is in the decision the budget triggers.
+</Lead>
 
 **Direct answer:** Define the objective, derive the budget, and attach a consequence when it is exhausted. The sources describe the mechanism; the decision rule is a synthesis.
 
@@ -21,8 +23,8 @@ Three points matter:
 
 <Figure src="/images/articles/inline/error-budgets-pitfalls-1.png" alt="A flow from a service objective to a derived budget, monitoring spend, and a pre-agreed consequence." caption="Conceptual: a budget becomes a decision rule only when exhaustion has a consequence." />
 
-- **The objective comes first.** The SRE material defines an error budget from a service objective. A budget without an objective is an arbitrary threshold.
-- **The budget is a resource.** It represents how much failure users will tolerate over a period. Spending it is a decision, not a failure.
+- **The objective comes first.** The SRE material defines an error budget from a service objective. A budget without an objective is <Mark>an arbitrary threshold</Mark>.
+- **The budget is a resource.** It represents how much failure users will tolerate over a period. Spending it is <Mark>a decision, not a failure</Mark>.
 - **Exhaustion needs a consequence.** The alerting workbook relates signals to objectives. If nothing changes when the budget is gone, the budget has no effect.
 
 The sequence is: set the objective, derive the budget, monitor it, then apply the consequence. The consequence is a local policy, so it is `inferred`; the mechanism is `source-reported`.
@@ -55,7 +57,11 @@ A review of a budget should ask whether the objective still matches user expecta
 
 A budget that is monitored but never acted on is a metric. The consequence is what converts it into a decision rule, and it must be agreed before the budget is spent, when nobody is under pressure.
 
-A budget also cannot measure user experience directly. A service can stay within its error budget while users have a poor time, because the metric captures only one dimension. Treating the budget as a complete picture of reliability is the limit that the SRE material itself warns against when it distinguishes signals from objectives.
+A budget also cannot measure user experience directly. A service can stay within its error budget while users have a poor time, because the metric captures only one dimension.
+
+<Trap>
+Treating the budget as a complete picture of reliability is the limit that the SRE material itself warns against when it distinguishes signals from objectives.
+</Trap>
 
 None of this removes the need for judgment when the consequence is applied. A budget that triggers a freeze during a period of urgent work creates its own trade-off, and the team must decide whether to honour it or record an explicit exception. The exception belongs in the record, because repeated exceptions reveal that the objective was wrong.
 
@@ -63,19 +69,23 @@ The review should record whether the consequence was applied or waived, since a 
 
 An exception should state when it expires, so a temporary waiver does not become a permanent change to the objective by default.
 
+<KeyPoint>
 A budget is a tool for deciding whether to ship, and it works only when the decision it informs is made explicitly and recorded.
+</KeyPoint>
 
 The objective and its budget should be reviewed together, because changing one without the other breaks the rule they form.
 
 A waiver that is never recorded cannot be distinguished from a rule that was quietly abandoned.
 
-A budget works only when the team believes the consequence will actually follow, which makes consistency more important than precision.
+A budget works only when the team believes the consequence will actually follow, which makes <Mark>consistency more important than precision</Mark>.
 
 ## What it cannot do
 
 It cannot make a system reliable by itself. It does not replace monitoring. And it cannot guarantee that the objective was well chosen.
 
+<PullQuote>
 The counterargument that a budget is just a metric is fair for tracking and incomplete for governance.
+</PullQuote>
 
 ## A decision test
 

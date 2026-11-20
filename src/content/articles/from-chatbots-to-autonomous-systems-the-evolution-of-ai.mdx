@@ -9,15 +9,25 @@ tags:
   - Reinforcement Learning
 ---
 
+<Lead>
 The story of AI "becoming autonomous" is usually told as a straight line with a destination: chatbots answered questions, then models could use tools, then agents could plan, and eventually systems will run themselves. Read as a sequence of papers, the line is messier and more interesting, because each step added a specific capability and left a specific gap that the next step happened to address.
+</Lead>
 
-**Direct answer:** Three documented steps take you from a model that answers to a system that acts. Learned control policies gave the ability to act on raw sensory input without a hand-written policy. Self-supervised tool use gave the ability to delegate a capability the model is bad at to a program that is good at it. Runtime planning gave the ability to revise a course when reality does not match the expectation. Each step is a change in *what the system decides at runtime*, not in how clever the model is. The gaps left over are exactly where the next step had to come from.
+**Direct answer:** Three documented steps take you from a model that answers to a system that acts. Learned control policies gave the ability to act on raw sensory input without a hand-written policy. Self-supervised tool use gave the ability to delegate a capability the model is bad at to a program that is good at it. Runtime planning gave the ability to revise a course when reality does not match the expectation. The gaps left over are exactly where the next step had to come from.
+
+<KeyPoint>
+Each step is a change in *what the system decides at runtime*, not in how clever the model is.
+</KeyPoint>
 
 ## Step one: learning to act from raw input
 
 The first step is not about language at all, and it is the foundation for everything that follows.
 
 Mnih et al. present "the first deep learning model to successfully learn control policies directly from high-dimensional sensory input using reinforcement learning". The architecture is deliberately plain: "a convolutional neural network, trained with a variant of Q-learning, whose input is raw pixels and whose output is a value function estimating future rewards". They applied it to seven Atari 2600 games "with no adjustment of the architecture or learning algorithm", and found it "outperforms all previous approaches on six of the games and surpasses a human expert on three of them".
+
+<KeyFigures items={[
+  { value: "3 of 7", label: "Atari games on which the learned policy surpassed a human expert", source: "Mnih et al., 2015" },
+]} />
 
 Two details in that sentence set the pattern for everything after. First, the same network learned seven different games without modification — the capability came from the learning procedure, not from per-task engineering. Second, the output was a *value function*, not a plan: the system estimated future reward, and the behaviour followed from the estimate rather than from a written rule.
 
@@ -31,7 +41,11 @@ The word "paradoxically" is doing real work: the same scale that makes a model g
 
 The tool set they used is worth studying because it is deliberately unglamorous: "a calculator, a Q&A system, two different search engines, a translation system, and a calendar". Every one is a capability a language model is measurably worse at than a dedicated implementation. The reported result is "substantially improved zero-shot performance across a variety of downstream tasks, often competitive with much larger models, without sacrificing its core language modeling abilities."
 
-What this step added: the ability to reach outside the weights. What it left open: the sequence of calls. A model that can call a calculator can still call it five times when once would do, or search for something it could have reasoned out.
+What this step added: <Mark>the ability to reach outside the weights</Mark>. What it left open: the sequence of calls.
+
+<Trap>
+A model that can call a calculator can still call it five times when once would do, or search for something it could have reasoned out.
+</Trap>
 
 ## Step three: planning at runtime
 
@@ -41,7 +55,7 @@ Yao et al. generate "both reasoning traces and task-specific actions in an inter
 
 The measurable difference appears where the previous steps fail hardest. On question answering and fact verification, Yao et al. report that ReAct "overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API". The mechanism is specific: a reasoning-only chain compounds its own errors, because each step is conditioned on the previous wrong step. An interleaved action returns ground truth from outside, which breaks the compounding.
 
-So the progression is coherent. Learned policies could act but could not consult. Tool use could consult but could not revise. Interleaved reasoning and acting can both, because the reasoning trace is an inspectable representation of the plan that the model can rewrite mid-run.
+So the progression is coherent. Learned policies could act but could not consult. Tool use could consult but could not revise. Interleaved reasoning and acting can both, because the reasoning trace is <Mark>an inspectable representation of the plan</Mark> that the model can rewrite mid-run.
 
 ## What the sequence does not tell you
 
@@ -63,7 +77,7 @@ The useful way to use this history is as a checklist for your own system. Each s
 4. **Is its plan observable?** Reasoning traces are text, so they can be logged and reviewed. That is a debugging asset, not a presentation detail.
 5. **Who answers for it?** Not optional at any of these steps, and least optional at the last one.
 
-None of this requires the newest architecture. It requires knowing which of the three capabilities your workflow actually needs — and buying the narrowest one that does the job.
+None of this requires the newest architecture. It requires knowing which of the three capabilities your workflow actually needs — and <Mark>buying the narrowest one that does the job</Mark>.
 
 ## A worked example
 
@@ -71,7 +85,11 @@ The following is hypothetical and illustrative. A support assistant is asked to 
 
 ## A counterargument
 
-A reasonable critic could object that the article's three-step arc is a retrospective construction rather than a documented progression. The Atari, Toolformer, and ReAct papers were not written as chapters of one plan, and the claim that each step "left a gap that the next step happened to address" reads a direction into work the authors did not claim, even though the article itself warns the steps are not a ladder of generality. A critic could also press on the evidence: the reported gains are bounded - surpassing a human expert on three of seven games and "substantially improved" performance on author-chosen tasks - and the article admits capability is not reliability. The sequence is a useful reading aid; calling it an evolution risks making a curated set of papers look like an inevitable trajectory.
+A reasonable critic could object that the article's three-step arc is a retrospective construction rather than a documented progression. The Atari, Toolformer, and ReAct papers were not written as chapters of one plan, and the claim that each step "left a gap that the next step happened to address" reads a direction into work the authors did not claim, even though the article itself warns the steps are not a ladder of generality. A critic could also press on the evidence: the reported gains are bounded - surpassing a human expert on three of seven games and "substantially improved" performance on author-chosen tasks - and the article admits capability is not reliability.
+
+<PullQuote>
+The sequence is a useful reading aid; calling it an evolution risks making a curated set of papers look like an inevitable trajectory.
+</PullQuote>
 
 ## References & Further Reading
 

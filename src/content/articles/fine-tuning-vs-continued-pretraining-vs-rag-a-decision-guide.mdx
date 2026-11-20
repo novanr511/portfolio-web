@@ -9,7 +9,9 @@ tags:
   - Decision Guide
 ---
 
+<Lead>
 Teams often ask which adaptation method is best, as if the three were competing products. They solve different problems: retrieval gives the model information, fine-tuning teaches it a behaviour or format, and continued pretraining teaches it a domain. Choosing the wrong one produces an expensive system that still fails.
+</Lead>
 
 **Direct answer:** Use RAG when the answer depends on information that can be retrieved and changes; use fine-tuning when the task is stable but the model's behaviour or output format needs teaching; use continued pretraining when the domain's language and concepts are unfamiliar. The RAG article, the LoRA article, and the domain-adaptation article cover the mechanisms. The boundary: many real systems need more than one — retrieval for facts, fine-tuning for behaviour — and the choice is about the dominant failure, not a single label.
 
@@ -39,26 +41,36 @@ A legal team wants an assistant that answers questions about their contracts and
 
 Three conclusions follow:
 
-- **The three failures need three different responses.** A single method would fix one and leave the others.
+- **The three failures need three different responses.**
 - **RAG is first** because the most serious failure — wrong version — is an information problem, and retrieval is where provenance lives, as the data-governance article explains.
 - **Fine-tuning is second** for the format, because that behaviour is stable and teachable by example.
+
+<KeyPoint>
+A single method would fix one and leave the others.
+</KeyPoint>
 
 ## A decision sequence
 
 1. **Classify the failure** — information, behaviour, or domain knowledge.
-2. **Try prompting and retrieval first**, because they are cheapest and most reversible, as the prompt-engineering article argues.
+2. **Try prompting and retrieval first**, because they are <Mark>cheapest and most reversible</Mark>, as the prompt-engineering article argues.
 3. **Add fine-tuning** when behaviour must be consistent across many cases and examples exist.
 4. **Consider continued pretraining** only when language itself is the barrier and a substantial corpus exists.
 5. **Evaluate the full system** after each addition, since methods interact, as the LLM evaluation article explains.
 6. **Record why the method was chosen**, so a future team can revisit the decision, which the decision-memo article covers.
 
-The counterargument — that one method should solve everything — is a preference for simplicity, not a description of the problem. A well-designed system often combines retrieval for facts with a small behavioural adaptation.
+<Trap>
+The counterargument — that one method should solve everything — is a preference for simplicity, not a description of the problem.
+</Trap>
+
+<PullQuote>
+A well-designed system often combines retrieval for facts with a small behavioural adaptation.
+</PullQuote>
 
 ## Combining methods deliberately
 
-Once the dominant failure is identified, combinations follow a pattern:
+Once <Mark>the dominant failure</Mark> is identified, combinations follow a pattern:
 
-**Retrieval plus prompting** is the default starting point for most knowledge tasks. It is reversible, updatable, and makes provenance visible, as the retrieval article explains. Many teams never need more.
+**Retrieval plus prompting** is the default starting point for most knowledge tasks. It is reversible, updatable, and <Mark>makes provenance visible</Mark>, as the retrieval article explains. Many teams never need more.
 
 **Retrieval plus fine-tuning** is common when the answer depends on changing information and the output must follow a stable format. The retrieval supplies facts; the fine-tuning teaches the format, which the structured-output article covers.
 

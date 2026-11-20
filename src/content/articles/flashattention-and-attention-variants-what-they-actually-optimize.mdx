@@ -9,9 +9,11 @@ tags:
   - Architecture
 ---
 
-Attention is often described by its quadratic cost in sequence length. That is true of the arithmetic, and it is only half the story. On modern hardware, moving data between memory levels is often more expensive than the multiplication itself, which is why an algorithm that changes *where* data is read can be faster without changing the mathematics.
+<Lead>
+Attention is often described by its quadratic cost in sequence length. That is true of the arithmetic, and it is only half the story. On modern hardware, <Mark>moving data between memory levels is often more expensive than the multiplication itself</Mark>, which is why an algorithm that changes *where* data is read can be faster without changing the mathematics.
+</Lead>
 
-**Direct answer:** FlashAttention is an IO-aware attention algorithm that computes exact attention while avoiding the materialisation of the full attention matrix in high-bandwidth memory. The paper reports speedups and memory savings on standard benchmarks. The boundary: it changes the implementation, not the function — attention still has quadratic arithmetic in sequence length, and the KV cache still exists for generation.
+**Direct answer:** FlashAttention is an IO-aware attention algorithm that computes exact attention while avoiding the materialisation of the full attention matrix in high-bandwidth memory. The paper reports speedups and memory savings on standard benchmarks. The boundary: <Mark>it changes the implementation, not the function</Mark> — attention still has quadratic arithmetic in sequence length, and the KV cache still exists for generation.
 
 ## The memory problem
 
@@ -23,7 +25,11 @@ Three consequences follow:
 
 **Memory capacity limits sequence length.** If the matrix does not fit, the implementation fails or must use slower strategies.
 
-**The result is exact.** None of this is about approximating attention; it is about computing the same function with fewer memory round trips.
+**The result is exact.**
+
+<KeyPoint>
+None of this is about approximating attention; it is about computing the same function with fewer memory round trips.
+</KeyPoint>
 
 ## What FlashAttention changes
 
@@ -37,7 +43,7 @@ Three properties follow:
 
 **Lower peak memory.** No n × n matrix is materialised, which allows longer sequences on the same hardware.
 
-The original paper and its successors are implementation advances, not new model architectures. They make existing attention cheaper to run.
+The original paper and its successors are <Mark>implementation advances, not new model architectures</Mark>. They make existing attention cheaper to run.
 
 ## A worked example of the memory difference
 
@@ -78,7 +84,13 @@ Three lessons follow:
 
 **Implementation quality varies.** A reported speedup depends on hardware, precision, and the baseline implementation. Treat benchmark numbers as evidence for the tested setup.
 
-The counterargument — that hardware improvements make IO-aware algorithms unnecessary — is wrong in direction. Faster compute makes memory bandwidth relatively more important, which is why these algorithms persist.
+<Trap>
+The counterargument — that hardware improvements make IO-aware algorithms unnecessary — is wrong in direction.
+</Trap>
+
+<PullQuote>
+Faster compute makes memory bandwidth relatively more important, which is why these algorithms persist.
+</PullQuote>
 
 ## A decision test
 

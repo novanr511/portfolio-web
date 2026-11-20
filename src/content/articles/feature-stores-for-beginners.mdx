@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A feature store is often presented as infrastructure that necessarily improves a machine-learning system. The Wikipedia entry describes centralised feature definitions, and the data-modeling entry covers structure. The benefit depends on whether the same features are genuinely reused.
+</Lead>
 
 **Direct answer:** Use a feature store when several models need the same features computed consistently, then verify that training and serving use the same definitions. The sources describe the concept; the decision rule is a synthesis.
 
@@ -31,7 +33,7 @@ The sequence is: identify shared features, define them once, check consistency a
 
 *Illustrative.* Two models use a customer lifetime-value feature computed in different notebooks.
 
-Three checks decide. First, are the two definitions actually the same in calculation and time window? Second, can both models read a single shared definition? Third, is the stored value fresh enough for the decision each model makes?
+Three checks decide. First, are the two definitions actually the same in calculation and time window? Second, can both models read <Mark>a single shared definition</Mark>? Third, is the stored value fresh enough for the decision each model makes?
 
 The outcome is a decision about whether a store solves a real duplication problem. The scenario is hypothetical; the method is the contribution.
 
@@ -53,25 +55,33 @@ A feature can be defined correctly and still be stale. The acceptable age depend
 
 ## Why a store cannot fix a bad feature
 
-Centralising a poorly defined feature makes the error consistent, not correct. The definition has to be justified by the task before it is shared. That ordering is the difference between infrastructure that helps and infrastructure that scales a mistake.
+<Trap>
+Centralising a poorly defined feature makes the error consistent, not correct.
+</Trap>
+
+The definition has to be justified by the task before it is shared. That ordering is the difference between infrastructure that helps and infrastructure that scales a mistake.
 
 A store cannot decide which features are useful. It makes definitions consistent, but a feature that does not predict the outcome remains unhelpful no matter how well it is served.
 
 The store also has an operating cost. A team must maintain it, which is only justified when enough models share features to repay that cost. Counting the models that actually use it is the honest test.
 
-A store also introduces a deployment dependency. When a feature definition changes, every model that uses it may be affected, sometimes without the model owners knowing. That is the same benefit of centralisation seen from the other side, and it requires a review process that a shared notebook did not need. The process is part of the cost of reuse.
+A store also introduces <Mark>a deployment dependency</Mark>. When a feature definition changes, every model that uses it may be affected, sometimes without the model owners knowing. That is the same benefit of centralisation seen from the other side, and it requires a review process that a shared notebook did not need. The process is part of the cost of reuse.
 
 The concept also assumes that features can be computed the same way in training and serving, which is not always true. A feature that depends on an event stream may be reconstructed historically in one system and computed live in another, and the two can diverge even with identical definitions. The store can expose that divergence, but it cannot eliminate it.
 
-For a beginner, the most useful question is therefore not whether a feature store is good practice, but whether the duplication problem it solves exists yet. A single model with a handful of features often does not need one, and adding infrastructure early creates maintenance without a counterpart in value. Waiting until reuse is real is a defensible choice.
+For a beginner, the most useful question is therefore not whether a feature store is good practice, but whether <Mark>the duplication problem</Mark> it solves exists yet. A single model with a handful of features often does not need one, and adding infrastructure early creates maintenance without a counterpart in value. Waiting until reuse is real is a defensible choice.
 
+<KeyPoint>
 The store should be adopted when the same definition is genuinely needed in several places, not simply because the idea is sound.
+</KeyPoint>
 
 ## What it cannot do
 
 It cannot create useful features. It does not guarantee consistency if teams bypass it. And it cannot remove the need for monitoring.
 
+<PullQuote>
 The counterargument that every team needs a feature store is fair for reuse at scale and incomplete for a single model.
+</PullQuote>
 
 ## A decision test
 

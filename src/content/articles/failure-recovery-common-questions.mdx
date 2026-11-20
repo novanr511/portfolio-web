@@ -9,7 +9,9 @@ tags:
   - Risk
 ---
 
+<Lead>
 Recovery is often treated as what happens after a failure, which is too late to make it cheap. The NIST incident-handling guide treats preparation as part of the lifecycle, as the SRE alerting workbook ties detection to service objectives, as the rollback article treats reversibility as a design choice, as [Disaster Recovery: a Decision Framework](/articles/disaster-recovery-a-decision-framework) argues for decisions made in advance.
+</Lead>
 
 **Direct answer:** Recover by containing first, restoring service with a tested path, then finding and fixing the cause, with a record and a review. NIST SP 800-61 covers the lifecycle, and the SRE alerting workbook covers detection. The boundary: no process guarantees recovery, which the publication standard forbids claiming, as the risk-assessment article requires residual risk, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) treats recovery as a process with uncertainty.
 
@@ -19,11 +21,15 @@ Recovery is often treated as what happens after a failure, which is too late to 
 
 **How do I know it happened?** From a signal tied to an objective, which the SRE alerting workbook requires, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains, as the observability article advises for logging, metrics, and tracing, as the 5xx article treats a status as a symptom.
 
-**Is restoring service enough?** No. A restore without a cause leaves the system exposed to the same failure, which the root-cause article treats as distinct from the symptom, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires for a post-incident review, as the decision-memo article requires for a recorded judgement.
+**Is restoring service enough?** No.
 
-**What about data?** A restore must consider data integrity, which the backup discussion in the disaster-recovery article treats, as the data-governance article requires provenance, as the risk article requires residual risk to be stated.
+<Trap>
+A restore without a cause leaves the system exposed to the same failure, which the root-cause article treats as distinct from the symptom, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires for a post-incident review, as the decision-memo article requires for a recorded judgement.
+</Trap>
 
-Three consequences follow. Preparation should include a tested restore path, as [Disaster Recovery: a Decision Framework](/articles/disaster-recovery-a-decision-framework) argues, as the rollback article advises on rehearsal, as the crisis-planning article argues for rehearsed response. Detection should be tied to objectives, as the SRE workbook requires. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises for follow-up.
+**What about data?** A restore must consider <Mark>data integrity</Mark>, which the backup discussion in the disaster-recovery article treats, as the data-governance article requires provenance, as the risk article requires residual risk to be stated.
+
+Three consequences follow. Preparation should include <Mark>a tested restore path</Mark>, as [Disaster Recovery: a Decision Framework](/articles/disaster-recovery-a-decision-framework) argues, as the rollback article advises on rehearsal, as the crisis-planning article argues for rehearsed response. Detection should be tied to objectives, as the SRE workbook requires. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises for follow-up.
 
 ## A worked example
 
@@ -31,13 +37,21 @@ The following is hypothetical and illustrative. A deploy causes a spike in faile
 
 Three checks decide the response. First, is there a signal tied to an objective, as the SRE alerting workbook requires, with evidence from logs, as the observability article advises? Second, can service be restored with a tested path, as the rollback and disaster-recovery articles require, considering data integrity, as the data-governance article requires? Third, was the cause identified and recorded, as the root-cause and incident articles require, with a review, as the decision-memo article requires?
 
-Three conclusions follow. Containment comes before a fix, which the NIST guide advises. A restore without data checks is incomplete, as the disaster-recovery and data-governance articles advise. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises.
+Three conclusions follow.
+
+<KeyPoint>
+Containment comes before a fix, which the NIST guide advises.
+</KeyPoint>
+
+A restore without data checks is incomplete, as the disaster-recovery and data-governance articles advise. And the review should be recorded, as the decision-memo article requires, as the monitoring article advises.
 
 ## What failure recovery cannot do
 
-It cannot guarantee no future failure, which the publication standard forbids claiming, as the risk article requires residual risk, as the chaos-engineering literature treats failure as ongoing, as the red-teaming article treats testing as partial. It does not remove the need for monitoring, which the observability article treats as evidence, as the SRE workbook requires. And it cannot fix a system designed without reversibility, which the rollback article treats as a structural limit, as [Disaster Recovery: a Decision Framework](/articles/disaster-recovery-a-decision-framework) advises for design.
+It cannot guarantee no future failure, which the publication standard forbids claiming, as the risk article requires <Mark>residual risk</Mark>, as the chaos-engineering literature treats failure as ongoing, as the red-teaming article treats testing as partial. It does not remove the need for monitoring, which the observability article treats as evidence, as the SRE workbook requires. And it cannot fix a system designed without reversibility, which the rollback article treats as a structural limit, as [Disaster Recovery: a Decision Framework](/articles/disaster-recovery-a-decision-framework) advises for design.
 
+<PullQuote>
 The counterargument that recovery is only about speed is fair for the immediate impact and incomplete for cause and data integrity, which the worked example shows, as the incident and data-governance articles advise.
+</PullQuote>
 
 ## A decision test
 

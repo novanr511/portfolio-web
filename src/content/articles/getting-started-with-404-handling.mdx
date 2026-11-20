@@ -9,23 +9,29 @@ tags:
   - Verified
 ---
 
+<Lead>
 A 404 is the most common signal that a requested resource is missing, yet many teams treat it as a template problem rather than a protocol decision. The real problem is that a not-found response can be reported with the wrong status, leaving clients and crawlers to guess whether content is gone, moved, or merely mislabeled. That ambiguity turns a simple status code into a recovery decision nobody owns.
+</Lead>
 
-**Direct answer:** RFC 9110 defines 404 as the origin server not finding a current representation for the target resource, or being unwilling to disclose one. Wikipedia notes that servers typically return a custom message, but the status line is the signal that machines trust. The bounded claim: recovery depends on whether the absence is a move, a temporary gap, or a permanent removal.
+**Direct answer:** RFC 9110 defines 404 as the origin server not finding a current representation for the target resource, or being unwilling to disclose one. Wikipedia notes that servers typically return a custom message, but the status line is the signal that machines trust.
 
 **Delta:** This article adds a status-to-recovery mapping beyond the sources: it maps each class of absence to a status and a client action, with claim status explicit.
 
 ## The mechanism
 
-RFC 9110 defines the 404 status code as the origin server not having found a current representation for the target resource, or not being willing to disclose that one exists. Status codes are semantic signals about the outcome of a request, carried on the status line and separate from the response body. The practical consequence is that a 404 says the resource is absent at the origin; it does not say the request was malformed, which is a 400 concern, or that the server failed, which is a 5xx concern. A custom error page is an application-level nicety layered on a protocol-level fact, and the two should not be confused.
+<KeyPoint>
+The bounded claim: recovery depends on whether the absence is a move, a temporary gap, or a permanent removal.
+</KeyPoint>
+
+RFC 9110 defines the 404 status code as the origin server not having found a current representation for the target resource, or not being willing to disclose that one exists. Status codes are semantic signals about the outcome of a request, carried on the status line and separate from the response body. The practical consequence is that a 404 says the resource is absent at the origin; it does not say the request was malformed, which is a 400 concern, or that the server failed, which is a 5xx concern. A custom error page is <Mark>an application-level nicety layered on a protocol-level fact</Mark>, and the two should not be confused.
 
 <Figure src="/images/articles/inline/getting-started-with-404-handling-1.png" alt="A flow from reading the status line, to classifying an absence as moved, gone, or missing, to choosing a 3xx, 410, or 404 status and matching the body." caption="Conceptual: each class of absence gets its own status and recovery action." />
 
-Wikipedia notes that a 404 is commonly encountered when a URL is mistyped or a page has been moved or deleted, and that web servers usually return a customized message, sometimes with a search box or a site map. This is where the distinction between a real 404 and a soft 404 matters. A soft 404 returns a success status while carrying a not-found message in the body. Because machines act on the status line, a soft 404 advertises success while the content says missing, creating ambiguity for crawlers and analytics. The practical consequence is that teams should measure the status returned, not the text rendered.
+Wikipedia notes that a 404 is commonly encountered when a URL is mistyped or a page has been moved or deleted, and that web servers usually return a customized message, sometimes with a search box or a site map. This is where the distinction between a real 404 and a soft 404 matters. A soft 404 returns a success status while carrying a not-found message in the body. Because machines act on the status line, a soft 404 advertises success while the content says missing, creating ambiguity for crawlers and analytics. The practical consequence is that <Mark>teams should measure the status returned, not the text rendered</Mark>.
 
 The 404 sits among nearby alternatives, each with a different meaning. A 410 Gone signals that the resource was intentionally removed and is not expected to return. A 3xx redirect signals that the resource has moved and a new location is available. Choosing among them is a decision about the intent behind the absence, not about template design. Neither source tells a team which URL deserves which status; that judgment depends on a local content inventory and must be marked as inferred. Treating every absence as a 404 throws away the information those alternatives carry.
 
-The useful output is a handling policy that maps each class of URL to a status and an action: recover a moved resource with a redirect, mark an intentionally retired one as gone, or serve a 404 with a body that helps a visitor recover. That policy, rather than a single generic error template, is the decision instrument. It shows where reuse of a status is appropriate and where a different signal is warranted. It also makes the rationale reviewable, because the status and the reason for choosing it are recorded together. A team that writes the mapping down can later explain why an old path redirects while another returns gone, instead of guessing from template code.
+The useful output is a handling policy that maps each class of URL to a status and an action: recover a moved resource with a redirect, mark an intentionally retired one as gone, or serve a 404 with a body that helps a visitor recover. That policy, rather than a single generic error template, is the decision instrument. It shows where reuse of a status is appropriate and where a different signal is warranted. It also makes the rationale reviewable, because <Mark>the status and the reason for choosing it are recorded together</Mark>. A team that writes the mapping down can later explain why an old path redirects while another returns gone, instead of guessing from template code.
 
 ## A worked example
 
@@ -47,7 +53,11 @@ Handling 404 responses correctly does not recover lost content. The status repor
 
 The hidden cost is that correct handling takes more effort than a default template. Auditing URLs, deciding per class whether a path should redirect, return gone, or return not found, maintaining a redirect map, and distinguishing soft from hard responses all require work that a single catch-all page avoids. That asymmetry is why soft 404s persist long after they are noticed. The cost is paid in inventory maintenance and in the discipline to update the map whenever URLs are added, moved, or retired. Making the mapping a prerequisite for site changes keeps that work from being skipped under deadline pressure.
 
-The main failure mode is letting a template stand in for a decision. A success status carrying an error message wastes crawl budget and pollutes analytics with pages that appear healthy. A blanket redirect sends visitors to irrelevant destinations and conceals the fact that content is genuinely gone. A generic 404 with no recovery path leaves a visitor at a dead end. None of these is a server bug; all are choices about how to signal absence that were never made explicitly. The question worth asking is what the absence means and what a client should do next. A defensible setup states that answer alongside the status it chooses.
+<Trap>
+The main failure mode is letting a template stand in for a decision.
+</Trap>
+
+A success status carrying an error message wastes crawl budget and pollutes analytics with pages that appear healthy. A blanket redirect sends visitors to irrelevant destinations and conceals the fact that content is genuinely gone. A generic 404 with no recovery path leaves a visitor at a dead end. None of these is a server bug; all are choices about how to signal absence that were never made explicitly. The question worth asking is what the absence means and what a client should do next. A defensible setup states that answer alongside the status it chooses.
 
 There is a boundary around the method. It covers the semantics of not-found responses and the nearby alternatives, not search ranking, not information architecture, and not the editorial quality of a custom page. It cannot tell a team which URLs matter to its audience or which retired content should be restored. It can only show whether the chosen status is consistent with the intent behind the absence. That is a narrower contribution than the way 404 handling is often discussed, where a status code is asked to carry the weight of a whole content strategy.
 
@@ -67,7 +77,11 @@ A 404 practice is useful only when the status and the recovery action are both r
 
 ## A counterargument
 
-A reasonable critic could object that the article promotes a status-to-recovery mapping as "the decision instrument" while conceding that neither RFC 9110 nor the Wikipedia entry assigns a status to any specific URL. The mapping is marked `inferred` in the article's own evidence table, so the central practical output rests on local judgment the sources do not supply. A critic could also argue that treating the status line as the only signal machines trust is too sharp: the same Wikipedia entry notes that servers typically return a custom message with a search box or site map, implying that body content plays a role alongside the status. The article is right that machines act on the status line, but it understates how much of 404 handling is an editorial and inventory decision that the protocol cannot settle.
+A reasonable critic could object that the article promotes a status-to-recovery mapping as "the decision instrument" while conceding that neither RFC 9110 nor the Wikipedia entry assigns a status to any specific URL. The mapping is marked `inferred` in the article's own evidence table, so the central practical output rests on local judgment the sources do not supply. A critic could also argue that treating the status line as the only signal machines trust is too sharp: the same Wikipedia entry notes that servers typically return a custom message with a search box or site map, implying that body content plays a role alongside the status.
+
+<PullQuote>
+The article is right that machines act on the status line, but it understates how much of 404 handling is an editorial and inventory decision that the protocol cannot settle.
+</PullQuote>
 
 ## References & Further Reading
 

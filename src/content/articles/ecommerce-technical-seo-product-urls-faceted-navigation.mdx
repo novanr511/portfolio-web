@@ -9,11 +9,19 @@ tags:
   - URL Architecture
 ---
 
+<Lead>
 An online store can expose a URL for every combination of size, color, brand, price range, and sort order. A small catalog can therefore generate a very large URL space, much of which represents the same products in a different order or filtered view.
+</Lead>
 
 The engineering challenge is not to block every filter. Some filtered pages satisfy distinct shopping needs and deserve stable landing pages; other combinations add little value, create duplicate or near-duplicate pages, and consume crawl resources.
 
-**Direct answer:** Start by classifying each URL family by user purpose and unique content. Keep stable, useful category or curated-filter landing pages crawlable and potentially indexable; avoid creating crawlable links to arbitrary combinations that do not deserve search landing pages. Use consistent internal links, canonical URLs, robots directives, and sitemap inclusion rules—but remember that `robots.txt` blocks crawling, not indexing, and a canonical is a hint rather than a command. Verify the resulting behavior through rendered links, server logs, and Search Console rather than applying one global rule to all parameters.
+**Direct answer:**
+
+<KeyPoint>
+Start by classifying each URL family by user purpose and unique content.
+</KeyPoint>
+
+Keep stable, useful category or curated-filter landing pages crawlable and potentially indexable; avoid creating crawlable links to arbitrary combinations that do not deserve search landing pages. Use consistent internal links, canonical URLs, robots directives, and sitemap inclusion rules—but remember that `robots.txt` <Mark>blocks crawling, not indexing</Mark>, and <Mark>a canonical is a hint rather than a command</Mark>. Verify the resulting behavior through rendered links, server logs, and Search Console rather than applying one global rule to all parameters.
 
 ## 1. How facets create a URL space
 
@@ -63,7 +71,11 @@ Different controls solve different problems:
 * **Use `noindex` when a crawled page should not be indexed:** The crawler must be able to fetch the page to see a page-level `noindex` directive. Blocking that same URL in `robots.txt` can prevent the directive from being read.
 * **Use `robots.txt` to manage crawling carefully:** A disallow may reduce fetches for known URL patterns, but it does not guarantee that a URL disappears from search results. It can also prevent a crawler from seeing page directives or links.
 
-Avoid contradictory combinations—for example, blocking a URL in `robots.txt` while expecting Google to read its `noindex` or canonical. More on the distinction in [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap).
+<Trap>
+Avoid contradictory combinations—for example, blocking a URL in `robots.txt` while expecting Google to read its `noindex` or canonical.
+</Trap>
+
+More on the distinction in [Robots.txt vs Noindex vs Sitemap: What Each One Does](/articles/robots-txt-vs-noindex-vs-sitemap).
 
 ## 4. A reproducible audit for facet URL behavior
 
@@ -95,13 +107,17 @@ This shows response headers, not the HTML canonical or rendered link graph. Fetc
 
 ## Summary
 
-Treat faceted navigation as a URL architecture and product-discovery problem. Decide which filtered states merit stable search landing pages, prevent unnecessary combinations from becoming crawlable paths, and align canonicals, directives, internal links, and sitemaps. Then check actual requests and indexing reports; no single parameter rule guarantees a particular crawl or index outcome.
+Treat faceted navigation as a URL architecture and product-discovery problem. Decide which filtered states merit stable search landing pages, prevent unnecessary combinations from becoming crawlable paths, and align canonicals, directives, internal links, and sitemaps. Then check actual requests and indexing reports; <Mark>no single parameter rule guarantees a particular crawl or index outcome</Mark>.
 
 Continue with [Crawl Budget: When It Matters and How to Diagnose It](/articles/crawl-budget-when-it-matters-and-how-to-diagnose-it) and [Canonical Tags and Duplicate URLs: Signals, Not Commands](/articles/canonical-tags-and-duplicate-urls-signals-not-commands).
 
 ## A counterargument
 
-A reasonable critic can argue that the article's premise - that limiting crawlable facet URLs improves search outcomes - is assumed rather than shown by its sources. Google's canonical documentation describes a hint rather than a command, and the sitemap guides explain format and usage; none establishes that pruning URL combinations changes ranking or visibility. The article itself concedes that no single rule guarantees a crawl or index outcome, yet its summary recommends preventing combinations from becoming crawlable paths with more confidence than that concession allows. The objection is not that URL hygiene is pointless; it is that the causal payoff is unverified. Under conditions where crawl demand is not a constraint, the framework's central activity may be effort without measurable benefit, and the cited documents offer no criterion for deciding when the constraint actually binds.
+A reasonable critic can argue that the article's premise - that limiting crawlable facet URLs improves search outcomes - is assumed rather than shown by its sources. Google's canonical documentation describes a hint rather than a command, and the sitemap guides explain format and usage; none establishes that pruning URL combinations changes ranking or visibility. The article itself concedes that no single rule guarantees a crawl or index outcome, yet its summary recommends preventing combinations from becoming crawlable paths with more confidence than that concession allows. Under conditions where crawl demand is not a constraint, the framework's central activity may be effort without measurable benefit, and the cited documents offer no criterion for deciding when the constraint actually binds.
+
+<PullQuote>
+The objection is not that URL hygiene is pointless; it is that the causal payoff is unverified.
+</PullQuote>
 
 ## References & Further Reading
 

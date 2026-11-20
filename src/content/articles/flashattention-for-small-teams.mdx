@@ -9,25 +9,35 @@ tags:
   - Engineering
 ---
 
+<Lead>
 Small teams rarely implement FlashAttention themselves, which is a good thing. It is a low-level attention algorithm that matters through the serving framework a team chooses, and the practical decision is whether the stack includes it and whether the workload benefits. Treating it as a project to hand-write is a mistake, as the build-versus-buy article argues for software capabilities generally.
+</Lead>
 
-**Direct answer:** FlashAttention computes exact attention with fewer memory reads and lower peak memory, which matters for long sequences and prefill. The paper is the primary source, and the serving-frameworks article explains how IO-aware techniques reach an application through infrastructure. The boundary: it does not change model capability, does not remove the KV cache, and its benefit depends on sequence length and hardware, as the KV-cache article explains for the separate memory consumer.
+**Direct answer:** FlashAttention computes exact attention with fewer memory reads and lower peak memory, which matters for long sequences and prefill. The paper is the primary source, and the serving-frameworks article explains how IO-aware techniques reach an application through infrastructure. The boundary: <Mark>it does not change model capability</Mark>, does not remove the KV cache, and its benefit depends on sequence length and hardware, as the KV-cache article explains for the separate memory consumer.
 
 ## The framework decision in practice
 
-For most teams, the choice is not whether to use FlashAttention but which serving stack to adopt. A framework that includes IO-aware attention and continuous batching gives the benefit without a custom kernel, which the serving-frameworks article explains for how infrastructure techniques reach an application. The evaluation should therefore compare frameworks on the team's workload, as the benchmarks article advises for results that transfer to a specific setup.
+<KeyPoint>
+For most teams, the choice is not whether to use FlashAttention but which serving stack to adopt.
+</KeyPoint>
+
+A framework that includes IO-aware attention and continuous batching gives the benefit without a custom kernel, which the serving-frameworks article explains for how infrastructure techniques reach an application. The evaluation should therefore compare frameworks on the team's workload, as the benchmarks article advises for results that transfer to a specific setup.
 
 The comparison should include the parts that do not change. Model weights and the KV cache still determine whether a model fits in memory, as the KV-cache article explains for generation, and prompt caching addresses a different cost, as the prompt-caching article describes. A framework that speeds attention but leaves the team unable to serve the desired concurrency is not a solution, which the GPU article treats as a capacity question.
 
-Finally, the gain should be reported honestly. A throughput improvement at a fixed latency target is a measurable result, which the batching-economics article specifies, while a benchmark from another hardware setup is a claim, as the benchmarks article warns about context. The distinction is the same one the publication standard requires for all performance statements.
+Finally, the gain should be reported honestly. <Mark>A throughput improvement at a fixed latency target is a measurable result</Mark>, which the batching-economics article specifies, while a benchmark from another hardware setup is a claim, as the benchmarks article warns about context. The distinction is the same one the publication standard requires for all performance statements.
 
 ## What it changes
 
 **Memory traffic.** The algorithm tiles attention so the full score matrix is never written to high-bandwidth memory, which the paper describes as IO awareness. For long sequences this is the difference between a matrix that fits and one that does not, as [FlashAttention and Attention Variants: What They Actually Optimize](/articles/flashattention-and-attention-variants-what-they-actually-optimize) explains for the memory problem.
 
-**Speed.** Fewer memory round trips can speed up attention even though the arithmetic is unchanged, as the paper reports. The gain is workload-specific, which the benchmarks article warns about applying a result from one setup to another.
+**Speed.** Fewer memory round trips can speed up attention even though the arithmetic is unchanged, as the paper reports.
 
-**No output change.** It computes the same function up to numerical differences, which is why it belongs in the serving layer, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) describes. A team should not expect a quality improvement from enabling it, which the evaluation article treats as a separate measurement.
+<Trap>
+The gain is workload-specific, which the benchmarks article warns about applying a result from one setup to another.
+</Trap>
+
+**No output change.** It computes the same function up to numerical differences, which is why it belongs in the serving layer, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) describes. <Mark>A team should not expect a quality improvement from enabling it</Mark>, which the evaluation article treats as a separate measurement.
 
 Three consequences follow. The practical choice is a framework that supports IO-aware attention, as [Serving Frameworks: What vLLM-Style Batching Changes](/articles/serving-frameworks-what-vllm-style-batching-changes) recommends. The workload should have sequences long enough for the gain to matter, which the long-context article treats as a trade-off. And memory planning must still account for the KV cache, as the KV-cache article explains for generation.
 
@@ -43,7 +53,9 @@ Three conclusions follow. The gain comes from the framework, which the serving a
 
 It cannot make a model fit if the weights and KV cache exceed memory, which the GPU article treats as a capacity problem. It does not shorten context or reduce the cost of long prompts, as the prompt-caching article explains for a different mechanism. And it does not guarantee a speedup on short sequences, which the paper's scope makes clear, as the benchmarks article warns about generalising results.
 
+<PullQuote>
 The counterargument that a small team should ignore low-level attention entirely is fair for most applications and wrong about the choice of serving framework, which the serving article treats as a decision with real throughput consequences.
+</PullQuote>
 
 ## A decision test
 
