@@ -9,7 +9,9 @@ tags:
   - AI
 ---
 
-Reinforcement learning is usually introduced with games, and the examples are memorable, but they obscure the method's actual shape. An RL agent is not given the right answer; it is given a measure of how well it is doing and must discover behaviour that improves that measure. That makes the central problem different from supervised learning: the data depends on the actions the agent chooses, so the agent has to decide what to try as well as what to learn.
+<Lead>
+Reinforcement learning is usually introduced with games, and the examples are memorable, but they obscure the method's actual shape. An RL agent is not given the right answer; it is given a measure of how well it is doing and must discover behaviour that improves that measure. That makes the central problem different from supervised learning: <Mark>the data depends on the actions the agent chooses</Mark>, so the agent has to decide what to try as well as what to learn.
+</Lead>
 
 **Direct answer:** The field divides broadly into value-based methods, which learn how good it is to take an action in a state, and policy-gradient methods, which learn a parameterised behaviour directly. Deep Q-learning established that control policies can be learned from raw sensory input; PPO made policy gradients practical by allowing multiple updates per batch of experience; and human-preference methods showed that the reward signal can come from comparisons rather than a hand-written function. The binding constraint across all of them is sample efficiency — how much interaction is needed to learn something useful — which is why most real-world applications are in simulation or in domains where mistakes are cheap.
 
@@ -33,7 +35,11 @@ The engineering significance is that PPO made policy gradients usable in practic
 
 ## When the reward cannot be written down
 
-Many real tasks are easy to recognise and hard to specify. "Write a helpful assistant" or "drive comfortably" are not reward functions, and a hand-written approximation is usually gamed by the optimiser.
+Many real tasks are easy to recognise and hard to specify.
+
+<Trap>
+"Write a helpful assistant" or "drive comfortably" are not reward functions, and a hand-written approximation is usually gamed by the optimiser.
+</Trap>
 
 Christiano et al. show that goals can be defined by "(non-expert) human preferences between pairs of trajectory segments", and that the approach can solve complex RL tasks "without access to the reward function", including Atari games and simulated robot locomotion. The decisive number is the cost of oversight: feedback on "less than one percent of our agent's interactions with the environment", enough to make the approach "practically applied to state-of-the-art RL systems". They also report training "complex novel behaviors with about an hour of human time".
 
@@ -41,9 +47,19 @@ That result reframes human involvement. In supervised learning, humans label the
 
 Bai et al. push the idea further in Constitutional AI: "the only human oversight is provided through a list of rules or principles". The method has a supervised phase of self-critique and revision and a reinforcement phase using "RL from AI Feedback" (RLAIF), producing an assistant that is "harmless but non-evasive" and "engages with harmful queries by explaining its objections to them". The governance consequence is that the principles become the artefact to review — a subject this publication covers in [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale).
 
+<KeyFigures items={[
+  { value: "seven", label: "Atari 2600 games handled by one learning procedure", source: "Mnih et al." },
+  { value: "less than one percent", label: "of the agent's interactions needing human feedback", source: "Christiano et al." },
+  { value: "about an hour", label: "of human time to train complex behaviours", source: "Christiano et al." },
+]} />
+
 ## Why sample efficiency dominates everything
 
-In a simulated game, an agent can take millions of actions. In a real factory, a hospital, or a trading system, each action has a cost and some are irreversible. That gap is why RL's most visible successes are in simulation, and why a model that learns well in simulation can fail when transferred.
+In a simulated game, an agent can take millions of actions. In a real factory, a hospital, or a trading system, <Mark>each action has a cost and some are irreversible</Mark>.
+
+<KeyPoint>
+That gap is why RL's most visible successes are in simulation, and why a model that learns well in simulation can fail when transferred.
+</KeyPoint>
 
 Three properties determine whether RL is feasible in a given domain:
 
@@ -61,7 +77,7 @@ Three properties determine whether RL is feasible in a given domain:
 4. **Choose the family deliberately** — value-based for discrete action spaces and simpler settings, policy gradients for continuous control and stochastic policies.
 5. **Start with the simplest baseline**, including a non-learning heuristic. RL should beat it, not merely run.
 6. **Evaluate on held-out episodes and on the real system separately.** Simulation performance is a design signal, not a deployment result.
-7. **Instrument the reward itself.** An optimiser will find any loophole in the objective, and the first sign is usually a metric that improves while the task does not.
+7. **Instrument the reward itself.** An optimiser will find any loophole in the objective, and the first sign is usually <Mark>a metric that improves while the task does not</Mark>.
 
 For the training mechanics behind these systems, see [How AI Models Are Trained](/articles/how-ai-models-are-trained-from-data-to-deployment); for the governance of reward design, see [AI Safety](/articles/ai-safety-alignment-robustness-and-governance).
 
@@ -71,7 +87,13 @@ The following is hypothetical and illustrative. Consider a hypothetical team wei
 
 ## A counterargument
 
-A fair objection is that the article treats sample efficiency as a fixed property of a domain when its own sources show the cost of interaction being engineered down. Christiano et al. report usable reward models from feedback on less than one percent of interactions and complex behaviours from about an hour of human time, and Bai et al. reduce oversight to a list of principles revised through self-critique and RLAIF. On that evidence, the feasibility test is less about how many actions a domain permits and more about whether human feedback can be made cheap enough to fit the budget. The framing also leans on results that are entirely simulated - Atari and robot locomotion - so extending them to factories and hospitals is an extrapolation the sources do not themselves make.
+A fair objection is that the article treats sample efficiency as a fixed property of a domain when its own sources show the cost of interaction being engineered down. Christiano et al. report usable reward models from feedback on less than one percent of interactions and complex behaviours from about an hour of human time, and Bai et al. reduce oversight to a list of principles revised through self-critique and RLAIF.
+
+<PullQuote>
+On that evidence, the feasibility test is less about how many actions a domain permits and more about whether human feedback can be made cheap enough to fit the budget.
+</PullQuote>
+
+The framing also leans on results that are entirely simulated - Atari and robot locomotion - so extending them to factories and hospitals is an extrapolation the sources do not themselves make.
 
 ## References & Further Reading
 

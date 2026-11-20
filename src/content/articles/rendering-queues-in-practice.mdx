@@ -9,15 +9,23 @@ tags:
   - Verified
 ---
 
+<Lead>
 Rendering work rarely arrives at the pace a system can complete it. A burst of requests for on-demand pages or images can overwhelm a renderer, and without a buffer the result is dropped work or a slow response for everyone. The practical problem is choosing where to put the buffer and what to measure once it is there.
+</Lead>
 
-**Direct answer:** A rendering queue is a buffer that accepts jobs from producers and holds them until a renderer is free, which decouples arrival from completion. The message-queue concept describes this producer-consumer separation; a content delivery network describes the distributed edge layer that often sits downstream. The boundary: a queue manages work, not correctness, so it cannot tell you whether the rendered output is right.
+**Direct answer:**
+
+<KeyPoint>
+A rendering queue is a buffer that accepts jobs from producers and holds them until a renderer is free, which decouples arrival from completion.
+</KeyPoint>
+
+The message-queue concept describes this producer-consumer separation; a content delivery network describes the distributed edge layer that often sits downstream. The boundary: a queue manages work, not correctness, so it cannot tell you whether the rendered output is right.
 
 **Delta:** This article adds a decision map beyond the two sources: it maps queue depth and edge caching to a capacity decision, with claim status explicit.
 
 ## The mechanism
 
-The message-queue concept describes a model in which producers place messages into a queue and consumers retrieve them, so the two sides need not run at the same speed. In a rendering pipeline, the producer is a request handler and the consumer is a renderer. The practical consequence is that a burst can be absorbed: the queue grows while renderers work at a steady rate, and shrinks when demand falls. That absorption is the core value, but it converts an overload problem into a latency problem, because a job waiting in a queue is a job not yet done.
+The message-queue concept describes a model in which producers place messages into a queue and consumers retrieve them, so the two sides need not run at the same speed. In a rendering pipeline, the producer is a request handler and the consumer is a renderer. The practical consequence is that a burst can be absorbed: the queue grows while renderers work at a steady rate, and shrinks when demand falls. That absorption is the core value, but it converts <Mark>an overload problem into a latency problem</Mark>, because a job waiting in a queue is a job not yet done.
 
 <Figure src="/images/articles/inline/rendering-queues-in-practice-1.png" alt="A four-step pipeline: a request handler produces jobs into a rendering queue, a renderer consumes them, and the output is cached at the edge." caption="Conceptual: the queue hides timing differences; watch depth and oldest-job age." />
 
@@ -25,7 +33,7 @@ Queues also carry ordering and delivery assumptions. A queue may be first-in-fir
 
 The content delivery network concept places cached content on distributed edge servers so repeated requests are served near the user. In a rendering pipeline, the queue feeds renderers whose output is then cached at the edge. The consequence is that queue load depends on cache effectiveness: a low hit rate sends more unique work into the queue. A team that watches only queue depth will miss that the real lever often sits upstream in cache policy.
 
-The useful measures are arrival rate, service rate, queue depth, and the age of the oldest job. Depth is a stock; arrival minus service is the flow that changes it. A queue that grows without bound is a signal that service capacity sits below demand, and no configuration of the queue changes that arithmetic. The practical consequence is that a queue is a shock absorber with a limit, not a capacity plan.
+The useful measures are arrival rate, service rate, queue depth, and the age of the oldest job. Depth is a stock; arrival minus service is the flow that changes it. A queue that grows without bound is a signal that service capacity sits below demand, and no configuration of the queue changes that arithmetic. The practical consequence is that a queue is <Mark>a shock absorber with a limit, not a capacity plan</Mark>.
 
 ## A worked example
 
@@ -45,15 +53,21 @@ The table separates what the sources state from what this article infers. The tw
 
 A queue cannot create capacity. It can only reorder time, moving work from a moment of high demand to a later moment when a renderer is free. If demand stays above service rate indefinitely, the queue grows without bound and the delay becomes unbounded too. Teams sometimes treat a growing queue as evidence that the system is handling load, when it is actually accumulating debt. The limit is arithmetic: arrival rate minus service rate determines whether depth trends up or down, and no tuning of the queue changes that difference.
 
-The hidden cost of a queue is latency that is hard to see. A dropped request fails loudly; a queued request succeeds slowly. Monitoring that counts completions will look healthy while the oldest job ages. There is also a cost to stale work: a job that sits in a queue may render data already outdated by the time it runs, so the output is technically complete but practically wrong. Teams pay for this with version checks, expiry rules, and the engineering time to maintain them, none of which appear in the queue's own metrics.
+The hidden cost of a queue is latency that is hard to see. <Mark>A dropped request fails loudly; a queued request succeeds slowly.</Mark> Monitoring that counts completions will look healthy while the oldest job ages. There is also a cost to stale work: a job that sits in a queue may render data already outdated by the time it runs, so the output is technically complete but practically wrong. Teams pay for this with version checks, expiry rules, and the engineering time to maintain them, none of which appear in the queue's own metrics.
 
-A common failure mode is the silent backlog. Producers keep accepting jobs because the queue has room, consumers keep completing jobs, and nothing errors, yet the age of the oldest job climbs past a user's patience. Another failure mode is retry amplification: if a renderer fails after consuming a job and the job is requeued without care, the same expensive work runs repeatedly and deepens the backlog. Both failures are invisible to a simple jobs-completed counter.
+<Trap>
+A common failure mode is the silent backlog.
+</Trap>
+
+Producers keep accepting jobs because the queue has room, consumers keep completing jobs, and nothing errors, yet the age of the oldest job climbs past a user's patience. Another failure mode is retry amplification: if a renderer fails after consuming a job and the job is requeued without care, the same expensive work runs repeatedly and deepens the backlog. Both failures are invisible to a simple jobs-completed counter.
 
 The boundary of this approach is correctness. A queue orders and holds work; it does not validate the rendered result, enforce that the right cache key was used, or guarantee that the edge layer has the newest content. Those belong to the renderer and the cache policy. A team that expects the queue to catch content errors will be disappointed, because the queue's contract is delivery, not accuracy. The two systems must be reviewed separately.
 
 None of this is static. Workloads shift, cache hit rates move, and renderer code changes, so the queue that was right last quarter can be wrong today. The decision to add capacity, change retry behavior, or drop superseded jobs needs a review tied to measured rates and ages, not to a one-time design choice. A brief scheduled check of arrival rate, service rate, depth, and oldest-job age is enough to catch drift before it becomes an incident. The point is not to babysit the queue but to know which signal would tell you the design no longer fits.
 
+<PullQuote>
 Counterargument: "The counterargument that a queue is simple infrastructure is fair for a low-volume internal tool and incomplete for a user-facing renderer where stale output and silent backlogs directly affect what people see."
+</PullQuote>
 
 ## A decision test
 

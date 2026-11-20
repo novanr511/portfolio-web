@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A query planner chooses an execution strategy from the options available. The Wikipedia entry describes query optimization, and the PostgreSQL index documentation covers one of the main tools a planner uses. The practice is about giving the planner good information rather than forcing a plan.
+</Lead>
 
 **Direct answer:** Work with the planner by keeping statistics current, indexing from real access patterns, and verifying changes with execution plans. The sources describe the mechanism; the workflow is a synthesis.
 
@@ -21,7 +23,7 @@ Three points matter:
 
 <Figure src="/images/articles/inline/query-planners-in-practice-1.png" alt="A four-step flow: inspect the execution plan, check the estimates, match the index to the predicate, then verify on the same query." caption="Conceptual: a plan is a snapshot, so verification and rechecking are continuous." />
 
-- **The planner uses estimates.** The optimization entry describes choosing among strategies. Bad estimates produce bad plans.
+- **The planner uses estimates.** The optimization entry describes choosing among strategies. <Mark>Bad estimates produce bad plans</Mark>.
 - **Indexes are inputs.** The PostgreSQL documentation describes how indexes support access. An index that does not match the query cannot help.
 - **Plans change with data.** A plan that was good last month can be wrong after the data distribution shifts. Verification is continuing work.
 
@@ -41,7 +43,7 @@ A planner chooses based on estimates of row counts and selectivity. When those e
 
 ## Why the plan should be observed
 
-A query can return the correct result through an expensive path, and an index can exist without being used. Reading the execution plan is the only way to see which happened. It turns an optimisation discussion from an argument about preferences into a comparison of observed behaviour.
+A query can return the correct result through an expensive path, and an index can exist without being used. Reading the execution plan is the only way to see which happened. It turns an optimisation discussion from an argument about preferences into <Mark>a comparison of observed behaviour</Mark>.
 
 ## Evidence status
 
@@ -53,11 +55,19 @@ A query can return the correct result through an expensive path, and an index ca
 
 ## Why a hint is not a fix
 
-A hint forces a plan that may be right today and wrong after the data changes. Fixing the information available to the planner — statistics and indexes — is usually more durable because it lets the planner adapt.
+A hint forces a plan that may be right today and wrong after the data changes.
 
-A plan that is optimal on one data distribution can be poor on another, which is why a recorded plan is a snapshot rather than a guarantee. Revisiting the plan after significant growth or a change in query patterns is part of maintenance. A system that never revisits it will slowly degrade without an obvious cause.
+<KeyPoint>
+Fixing the information available to the planner — statistics and indexes — is usually more durable because it lets the planner adapt.
+</KeyPoint>
 
-The practice also has a limit when the schema itself is wrong. No planner can rescue a query that asks for far more data than the application needs, and adding indexes to such a query often moves the cost rather than removing it. Reading the query is the first step, not the plan.
+A plan that is optimal on one data distribution can be poor on another, which is why a recorded plan is a snapshot rather than a guarantee. Revisiting the plan after significant growth or a change in query patterns is part of maintenance.
+
+<Trap>
+A system that never revisits it will slowly degrade without an obvious cause.
+</Trap>
+
+The practice also has a limit when the schema itself is wrong. <Mark>No planner can rescue a query that asks for far more data than the application needs</Mark>, and adding indexes to such a query often moves the cost rather than removing it. Reading the query is the first step, not the plan.
 
 The measurement should record the query and the data size together, since a plan cannot be judged without knowing the conditions it was chosen under.
 
@@ -73,7 +83,9 @@ The planner's estimates should be checked before the query is rewritten to compe
 
 It cannot make a poorly designed query efficient. It does not guarantee the same plan under different data. And it cannot remove the need to monitor performance.
 
+<PullQuote>
 The counterargument that forcing a known-good plan is safest is fair for a stable workload and incomplete when the data changes.
+</PullQuote>
 
 ## A decision test
 

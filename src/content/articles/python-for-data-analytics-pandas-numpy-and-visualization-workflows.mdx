@@ -9,9 +9,15 @@ tags:
   - Reproducibility
 ---
 
+<Lead>
 Most Python analytics tutorials teach the API: how to call `groupby`, how to reshape a frame, how to draw a chart. The harder part is the workflow around the code — what gets computed from what, which transformations are fitted on which rows, and how a reader could reproduce the result. A clean analysis is mostly a set of decisions about order and provenance.
+</Lead>
 
-**Direct answer:** NumPy provides fast array operations, Pandas provides labelled tabular data structures, and a plotting library turns the results into something a human can inspect. The stack is powerful because the operations compose, and dangerous for the same reason: a transformation fitted on the full dataset can quietly leak information from the future or the test set into the model. The defence is a pipeline that splits data before fitting anything and applies each transform to the correct subset.
+**Direct answer:** NumPy provides fast array operations, Pandas provides labelled tabular data structures, and a plotting library turns the results into something a human can inspect. The stack is powerful because the operations compose, and dangerous for the same reason: a transformation fitted on the full dataset can quietly leak information from the future or the test set into the model.
+
+<KeyPoint>
+The defence is a pipeline that splits data before fitting anything and applies each transform to the correct subset.
+</KeyPoint>
 
 ## What each tool actually contributes
 
@@ -19,7 +25,7 @@ Most Python analytics tutorials teach the API: how to call `groupby`, how to res
 
 **Pandas** adds labels — row indices and column names — and heterogenous types. Its core structures, the Series and DataFrame, make operations like grouping, joining, and handling missing values expressible in a few lines. The convenience comes with a cost: the same operation can be written several ways with subtly different behaviour around missing data and index alignment.
 
-**Visualization** is not decoration. A plot is a diagnostic: it reveals outliers, seasonality, and distribution shapes that a summary statistic hides. The choice of chart should follow the question — distribution, relationship over time, or comparison across groups — not the other way around.
+**Visualization** is not decoration. <Mark>A plot is a diagnostic</Mark>: it reveals outliers, seasonality, and distribution shapes that a summary statistic hides. The choice of chart should follow the question — distribution, relationship over time, or comparison across groups — not the other way around.
 
 The three form a workflow: load and clean in Pandas, compute numeric operations with NumPy underneath, inspect the result with a plot, then formalise the check in a model or a test.
 
@@ -46,9 +52,17 @@ scikit-learn's definition applies directly: a value not available at prediction 
 1. **Move the split before the transforms**, and fit imputation and scaling on training folds only. A `Pipeline` with `ColumnTransformer` enforces this mechanically.
 2. **Redefine the feature** using only information available at the prediction date — for example, login frequency in the 30 days preceding the cutoff, not the last login ever.
 
-The 0.88 AUC was not measuring predictive skill. It was measuring how well the model could read a consequence of the outcome. This is why a surprisingly good result is a reason to audit the pipeline, not to celebrate.
+The 0.88 AUC was not measuring predictive skill. It was measuring how well the model could read a consequence of the outcome.
 
-For time-ordered data the same rule applies with a sharper edge: use an expanding-window split such as `TimeSeriesSplit`, and respect the `gap` parameter when labels arrive late. A random split lets the model learn from the future.
+<PullQuote>
+This is why a surprisingly good result is a reason to audit the pipeline, not to celebrate.
+</PullQuote>
+
+For time-ordered data the same rule applies with a sharper edge: use an expanding-window split such as `TimeSeriesSplit`, and respect the `gap` parameter when labels arrive late.
+
+<Trap>
+A random split lets the model learn from the future.
+</Trap>
 
 ## Visualization as a check, not a conclusion
 
@@ -64,9 +78,9 @@ The discipline is to make the plot, state what it shows, and then decide whether
 
 Two cautions keep the toolkit in perspective.
 
-**Convenience hides assumptions.** Pandas will silently align on index labels when you combine two series, which is helpful until two frames share an index by coincidence. Many analysis bugs are not exceptions; they are operations that succeeded on the wrong rows.
+**Convenience hides assumptions.** Pandas will silently align on index labels when you combine two series, which is helpful until two frames share an index by coincidence. Many analysis bugs are not exceptions; they are <Mark>operations that succeeded on the wrong rows</Mark>.
 
-**The library is not the method.** Knowing the API does not tell you whether a cross-validation scheme matches the deployment question, whether a feature is available at prediction time, or whether an aggregate metric hides a subgroup failure. Those are decisions about the problem, and they matter more than syntax.
+**The library is not the method.** Knowing the API does not tell you whether a cross-validation scheme matches the deployment question, <Mark>whether a feature is available at prediction time</Mark>, or whether an aggregate metric hides a subgroup failure. Those are decisions about the problem, and they matter more than syntax.
 
 The relevant counterargument to "just use a pipeline" is that real exploration is messy and you often do not know the right transforms in advance. That is true. The answer is not to avoid pipelines but to treat exploratory analysis as hypothesis generation and then rebuild the result in a clean, ordered pipeline before reporting it.
 

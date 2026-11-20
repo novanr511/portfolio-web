@@ -9,9 +9,15 @@ tags:
   - Engineering
 ---
 
-A vector index is fast because it approximates similarity, which also means its top results can be wrong. A reranker is a second stage that scores a small set of candidates more carefully, using the query and the document together. The combination — broad recall first, precise ordering second — is one of the most reliable improvements available in a retrieval pipeline.
+<Lead>
+A vector index is fast because it approximates similarity, which also means its top results can be wrong. A reranker is a second stage that scores a small set of candidates more carefully, using the query and the document together. The combination — <Mark>broad recall first, precise ordering second</Mark> — is one of the most reliable improvements available in a retrieval pipeline.
+</Lead>
 
-**Direct answer:** Reranking takes the top k documents from a first-stage retriever and rescoring them with a more expensive model that considers the query-document pair jointly. Cohere's reranking documentation describes the two-stage pattern, and the MTEB benchmark covers the first-stage models. The boundary: reranking cannot recover a document the first stage failed to retrieve, so it only pays when recall@k is already high and precision at the top is the problem.
+**Direct answer:** Reranking takes the top k documents from a first-stage retriever and rescoring them with a more expensive model that considers the query-document pair jointly. Cohere's reranking documentation describes the two-stage pattern, and the MTEB benchmark covers the first-stage models.
+
+<KeyPoint>
+The boundary: reranking cannot recover a document the first stage failed to retrieve, so it only pays when recall@k is already high and precision at the top is the problem.
+</KeyPoint>
 
 ## Why two stages
 
@@ -21,7 +27,7 @@ A vector index is fast because it approximates similarity, which also means its 
 
 Three consequences follow:
 
-- **Recall comes from stage one.** If the right document is not in the top k, the reranker never sees it.
+- **Recall comes from stage one.** <Mark>If the right document is not in the top k, the reranker never sees it.</Mark>
 - **Precision comes from stage two.** The reranker reorders candidates so the best one appears first.
 - **The costs add.** Reranking is an extra inference step per query, which matters at high volume.
 
@@ -37,7 +43,7 @@ A retrieval system returns 20 candidate documents. Evaluation on 300 queries sho
 A reranker rescores the 20 candidates and lifts top-5 accuracy to 78%. Three readings follow:
 
 1. **The gain came from ordering, not discovery.** The document was already in the candidate set 94% of the time. The reranker moved it up.
-2. **The ceiling is recall@20.** Even a perfect reranker could not exceed 94%. If the ultimate goal is 95% top-5 accuracy, the first stage needs work instead.
+2. **The ceiling is recall@20.** <Mark>Even a perfect reranker could not exceed 94%.</Mark> If the ultimate goal is 95% top-5 accuracy, the first stage needs work instead.
 3. **The cost is 20 extra scoring operations per query.** At 10,000 queries a day, that is 200,000 pairwise scores. The improvement must justify the bill, as the cost estimator shows.
 
 Three decisions follow:
@@ -62,7 +68,11 @@ Three decisions follow:
 
 **Simple queries with one obvious answer.** The reranker's ordering adds little.
 
-The counterargument — that a better embedding model makes reranking unnecessary — is partly true and misses the structural point. A better first stage raises recall, which makes the reranker more valuable, not less.
+<PullQuote>
+The counterargument — that a better embedding model makes reranking unnecessary — is partly true and misses the structural point.
+</PullQuote>
+
+A better first stage raises recall, which makes the reranker more valuable, not less.
 
 ## Choosing a reranker
 
@@ -72,7 +82,13 @@ Three properties matter when evaluating a reranking model:
 
 **Latency at k.** Reranking cost scales with the number of candidates. Measure it at the k you actually plan to use, not at a default from the documentation.
 
-**Failure behaviour.** A reranker that confidently promotes an irrelevant passage is worse than one that leaves the ordering unchanged, because the generator will trust the top result. Inspect mistakes by category, not only the aggregate score.
+**Failure behaviour.**
+
+<Trap>
+A reranker that confidently promotes an irrelevant passage is worse than one that leaves the ordering unchanged, because the generator will trust the top result.
+</Trap>
+
+Inspect mistakes by category, not only the aggregate score.
 
 These criteria favour a model that is good enough on your data and fast enough for your volume, rather than the highest-scoring model on a public leaderboard.
 

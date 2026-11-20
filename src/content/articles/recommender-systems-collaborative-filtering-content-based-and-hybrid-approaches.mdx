@@ -9,7 +9,9 @@ tags:
   - Search
 ---
 
-Recommender systems are usually introduced as two approaches — collaborative filtering and content-based filtering — and then a hybrid is mentioned to cover the cases where neither works. That framing is tidy and slightly wrong, because it describes how the features are computed rather than what the system is trying to learn, and it hides the fact that the hard part is rarely the model.
+<Lead>
+Recommender systems are usually introduced as two approaches — collaborative filtering and content-based filtering — and then a hybrid is mentioned to cover the cases where neither works. That framing is tidy and slightly wrong, because it describes how the features are computed rather than what the system is trying to learn, and it hides the fact that <Mark>the hard part is rarely the model</Mark>.
+</Lead>
 
 **Direct answer:** Recommenders learn a relationship between a user and an item, and they differ in where that relationship comes from. Collaborative methods learn it from what users did with each other; content-based methods learn it from the attributes of the items; hybrid methods combine both. The published work on modern recommenders is largely about encoding the interaction structure explicitly and about feature interactions in ranking models. The hard part in practice is not the architecture — it is that offline metrics and online outcomes disagree, and that most of the apparent accuracy comes from the split you chose.
 
@@ -41,19 +43,31 @@ The two problems get conflated, and they have different failure modes.
 
 The second is where modern models operate, and it is where the business metric lives. Click-through rate is the objective, and the modelling problem in CTR prediction is the interaction between features: a user's history, the item's attributes, the context, and the combinations of all three.
 
-The two-level architecture has a consequence worth stating plainly. Retrieval and ranking optimise different objectives, and the properties of the final list are decided by both. A system with excellent ranking and mediocre retrieval shows excellent numbers in an offline CTR test and disappointing results in production, because the ranked items are the wrong items.
+The two-level architecture has a consequence worth stating plainly. Retrieval and ranking optimise different objectives, and the properties of the final list are decided by both. A system with excellent ranking and mediocre retrieval shows excellent numbers in an offline CTR test and disappointing results in production, because <Mark>the ranked items are the wrong items</Mark>.
 
 ## Where the evaluation breaks
 
 Offline evaluation for recommenders is notoriously fragile, and the reason is worth being precise about: the metrics are computed over a split you chose, and the metrics are not the business objective.
 
-The most common mistake is a random split. If your data has a time dimension — and it does, because users accumulate interactions — a random split lets the model learn from the future. scikit-learn's `TimeSeriesSplit` exists for exactly this reason, and its documented behaviour shows why the ordering matters: the default folds are expanding, with fold 0 training on index `[0 1 2 3 4 5]` and testing on `[6 7]`, fold 1 training on `[0 1 2 3 4 5 6 7]` and testing on `[8 9]`. Every training fold is strictly in the past relative to its test fold.
+<Trap>
+The most common mistake is a random split.
+</Trap>
 
-The `gap` parameter is the detail most teams skip. It inserts a period between the end of the training window and the start of the test window, and the documented example "add[s] a 2 period gap". Without a gap, you are evaluating on a test period that starts immediately after training, which flatters any model that benefits from recency in a way that will not survive deployment.
+If your data has a time dimension — and it does, because users accumulate interactions — a random split lets the model learn from the future. scikit-learn's `TimeSeriesSplit` exists for exactly this reason, and its documented behaviour shows why the ordering matters: the default folds are expanding, with fold 0 training on index `[0 1 2 3 4 5]` and testing on `[6 7]`, fold 1 training on `[0 1 2 3 4 5 6 7]` and testing on `[8 9]`. Every training fold is strictly in the past relative to its test fold.
+
+The `gap` parameter is <Mark>the detail most teams skip</Mark>. It inserts a period between the end of the training window and the start of the test window, and the documented example "add[s] a 2 period gap". Without a gap, you are evaluating on a test period that starts immediately after training, which flatters any model that benefits from recency in a way that will not survive deployment.
+
+<KeyFigures items={[
+  { value: "2", label: "period gap in the documented TimeSeriesSplit example", source: "scikit-learn" },
+]} />
 
 Beyond the split, three habits produce misleading evaluations. Splitting by user rather than by time measures generalisation to new users while your production system mostly serves existing ones — a mismatch in the wrong direction. Reporting a single aggregate metric hides the segment where the model is actually failing. And evaluating on the items the production retrieval stage already selected measures the ranker, not the system.
 
-None of this is fixable by a better model. It is fixed by an evaluation design that matches the deployment, which is why the evaluation step usually deserves more attention than the architecture step.
+None of this is fixable by a better model.
+
+<KeyPoint>
+It is fixed by an evaluation design that matches the deployment, which is why the evaluation step usually deserves more attention than the architecture step.
+</KeyPoint>
 
 ## Cold start is a standing constraint
 
@@ -77,7 +91,11 @@ The following is hypothetical and illustrative. Consider a hypothetical catalogu
 
 ## A counterargument
 
-A reasonable critic would note that the article blames offline evaluation for the gap to online outcomes, while its cited scikit-learn source describes only cross-validation mechanics, not evidence that a correct split predicts production behaviour. A time-ordered split with a gap can be executed flawlessly and still miss the feedback loop the article itself implies: recommendations change the interactions that train the next model, and neither the feature-interaction nor the graph-embedding sources address that. By saying most apparent accuracy comes from the split chosen, the article risks implying that a clean split closes the disagreement, when its own framing treats offline and online as different problems. The evaluation advice is sound; its status as the usual bottleneck is asserted rather than shown.
+A reasonable critic would note that the article blames offline evaluation for the gap to online outcomes, while its cited scikit-learn source describes only cross-validation mechanics, not evidence that a correct split predicts production behaviour. A time-ordered split with a gap can be executed flawlessly and still miss the feedback loop the article itself implies: recommendations change the interactions that train the next model, and neither the feature-interaction nor the graph-embedding sources address that. By saying most apparent accuracy comes from the split chosen, the article risks implying that a clean split closes the disagreement, when its own framing treats offline and online as different problems.
+
+<PullQuote>
+The evaluation advice is sound; its status as the usual bottleneck is asserted rather than shown.
+</PullQuote>
 
 ## References & Further Reading
 

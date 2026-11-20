@@ -9,15 +9,23 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often treat a prioritization score as the decision itself, then wonder why the ranked list does not match what gets shipped. The prioritization entry describes ordering items by relative importance, and the decision-making entry describes choosing among alternatives. The real problem is that a ranking is an input to a choice, not a substitute for one.
+</Lead>
 
-**Direct answer:** Prioritization arranges competing items by criteria such as importance and urgency so a team can see its trade-offs. Decision-making is the act of choosing among alternatives using that ordering. A score is useful only when it changes what the team decides to do.
+**Direct answer:**
+
+<KeyPoint>
+Prioritization arranges competing items by criteria such as importance and urgency so a team can see its trade-offs.
+</KeyPoint>
+
+Decision-making is the act of choosing among alternatives using that ordering. A score is useful only when it changes what the team decides to do.
 
 **Delta:** This article adds a claim-status table and a metric-to-decision mapping beyond the sources: it maps a prioritization score to a commitment of limited capacity, with claim status explicit.
 
 ## The mechanism
 
-The prioritization entry describes arranging items in order of relative importance, a step used when demand for attention exceeds the capacity to act. Applied to a product backlog, the items are candidate work and the criterion is whatever the team decides matters: value, urgency, risk, or effort. The source frames prioritization as assigning priority rather than as discovering a single correct order, which matters because the criterion is chosen by people. A team that changes the criterion changes the ranking without changing any underlying fact.
+The prioritization entry describes arranging items in order of relative importance, a step used when demand for attention exceeds the capacity to act. Applied to a product backlog, the items are candidate work and the criterion is whatever the team decides matters: value, urgency, risk, or effort. The source frames prioritization as assigning priority rather than as discovering a single correct order, which matters because the criterion is chosen by people. A team that changes the criterion <Mark>changes the ranking without changing any underlying fact</Mark>.
 
 <Figure src="/images/articles/inline/prioritization-metrics-that-matter-1.png" alt="A flow from picking a scoring criterion, to scoring items on one scale, to ranking the backlog, to deciding what capacity allows." caption="Conceptual: record the weights and the capacity constraint the ranking serves." />
 
@@ -25,7 +33,7 @@ The decision-making entry describes the selection of a course of action from amo
 
 The practical consequence is that a prioritization metric is only as defensible as the criterion behind it. A score that weights urgency heavily will surface short-term work; a score that weights value will surface different items. Because the sources do not prescribe weights, choosing them is an inference. That choice should be recorded, because two teams using the same data but different weights can produce different lists and both claim to be data-driven.
 
-A further consequence is that a ranking assumes the items are comparable. Prioritization works best when items share a unit, such as effort or expected value, and breaks down when unlike things are forced onto one scale. A score also tends to hide the assumptions it encodes: a single number can look objective while resting on several debatable judgements. The mechanism is therefore a chain: pick a criterion, score items, rank them, then decide. Every link is a decision that should be visible to anyone who has to defend the result.
+A further consequence is that a ranking assumes the items are comparable. Prioritization works best when items share a unit, such as effort or expected value, and breaks down when unlike things are forced onto one scale. A score also tends to hide the assumptions it encodes: <Mark>a single number can look objective while resting on several debatable judgements</Mark>. The mechanism is therefore a chain: pick a criterion, score items, rank them, then decide. Every link is a decision that should be visible to anyone who has to defend the result.
 
 ## A worked example
 
@@ -43,17 +51,23 @@ The first two rows describe the concepts as the source entries present them and 
 
 ## What it cannot do
 
-A prioritization metric cannot decide what to build. It orders items under a chosen criterion, but the sources describe ordering and choosing, not the judgement about which criterion is right. A top-ranked item can still be the wrong one if the criterion ignores a constraint that matters, such as regulatory risk or customer trust. The score narrows the field; it does not resolve the choice. A team that treats the number as final will ship the highest scorer and call the outcome data-driven, when the data only reflected the weights someone selected.
+A prioritization metric cannot decide what to build. It orders items under a chosen criterion, but the sources describe ordering and choosing, not the judgement about which criterion is right. <Mark>A top-ranked item can still be the wrong one if the criterion ignores a constraint that matters</Mark>, such as regulatory risk or customer trust. The score narrows the field; it does not resolve the choice. A team that treats the number as final will ship the highest scorer and call the outcome data-driven, when the data only reflected the weights someone selected.
 
 The hidden cost is the maintenance the ranking demands. Criteria that were sensible last quarter can stop reflecting reality when capacity, goals, or the competitive context shift. Scores must be recomputed, weights revisited, and the comparison set refreshed, or the list quietly goes stale. There is also a cost to precision: elaborate weighting can consume more effort than the decision is worth, producing a number that looks rigorous while adding little. Neither source addresses this cost, so it is an inference from the gap between producing a ranking and acting on it.
 
-The main failure mode is comparing unlike items on one scale. When small improvements and large initiatives share a single score, the scale either rewards the loudest estimate or punishes anything hard to quantify. A related failure is weighting by what is easy to measure rather than what matters, since visible metrics get counted and important but vague factors get dropped. The sources describe prioritization and decision-making without guaranteeing either problem away, so the team must supply the guardrail.
+<Trap>
+The main failure mode is comparing unlike items on one scale.
+</Trap>
+
+When small improvements and large initiatives share a single score, the scale either rewards the loudest estimate or punishes anything hard to quantify. A related failure is weighting by what is easy to measure rather than what matters, since visible metrics get counted and important but vague factors get dropped. The sources describe prioritization and decision-making without guaranteeing either problem away, so the team must supply the guardrail.
 
 There is a boundary around what these methods cover. Prioritization assumes a set of items already exists; it does not generate better options or tell you which requests deserve to be in the set. Decision-making describes choosing among alternatives, not evaluating whether the alternatives were framed well. A ranking built from a poor candidate list inherits that limitation. It also cannot substitute for a decision about capacity: a ranked list longer than the team can execute is a wish list, not a plan.
 
 Because criteria and capacity shift, the ranking needs periodic review. Weights should be revisited when goals change, and the comparison set should be checked against the requests actually in flight. Each cycle should record the criterion used, the date, and the decision the ranking informed, so a result can be challenged rather than inherited. Without that record, a score from an old context keeps driving current commitments.
 
+<PullQuote>
 The counterargument that a single score is fair because it applies one rule to every item is reasonable for consistency and incomplete for comparison, since unlike work rarely fits one scale and the rule can hide the judgement behind its weights.
+</PullQuote>
 
 ## A decision test
 

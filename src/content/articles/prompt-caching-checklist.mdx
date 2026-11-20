@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
-Teams send the same large context, such as system instructions, reference documents, and examples, on every model call and pay for it each time. Enabling prompt caching seems like a simple fix, yet many teams see no saving because a changing prefix silently prevents reuse. The two sources frame the mechanics: Anthropic documents explicit cache boundaries and OpenAI documents automatic caching of repeated prefixes.
+<Lead>
+Teams send the same large context, such as system instructions, reference documents, and examples, on every model call and pay for it each time. Enabling prompt caching seems like a simple fix, yet many teams see no saving because <Mark>a changing prefix silently prevents reuse</Mark>. The two sources frame the mechanics: Anthropic documents explicit cache boundaries and OpenAI documents automatic caching of repeated prefixes.
+</Lead>
 
-**Direct answer:** Cache only context that is repeated, long enough to qualify, and byte-identical across calls. Place volatile fields after the cache boundary, then verify a real cache hit and measure net cost, since a write premium must be repaid by enough discounted reads.
+**Direct answer:** Cache only context that is repeated, long enough to qualify, and byte-identical across calls. Place volatile fields after the cache boundary, then <Mark>verify a real cache hit</Mark> and measure net cost, since a write premium must be repaid by enough discounted reads.
 
 **Delta:** This article adds a claim-status table beyond the sources: it maps caching mechanics to a deployment checklist decision, with claim status explicit.
 
@@ -21,9 +23,15 @@ Prompt caching reuses the result of processing a repeated prefix across calls, s
 
 <Figure src="/images/articles/inline/prompt-caching-checklist-1.png" alt="A five-step flow: identify repeated context, make it a stable leading prefix, set the cache boundary or confirm eligibility, verify a cache hit, then measure net cost." caption="Conceptual: caching pays only when the same prefix is read often enough." />
 
-The unit of reuse is the prefix. Only content that is byte-identical and positioned before the cache boundary is reused; a changed token early in the prefix invalidates everything after it. That is why stable, large content such as system instructions and reference documents belongs at the front, and why volatile fields belong after the boundary. A timestamp, a request identifier, or a reordering of retrieved passages placed too early can erase the benefit for the whole prompt.
+The unit of reuse is the prefix. <Mark>Only content that is byte-identical and positioned before the cache boundary is reused</Mark>; a changed token early in the prefix invalidates everything after it. That is why stable, large content such as system instructions and reference documents belongs at the front, and why volatile fields belong after the boundary. A timestamp, a request identifier, or a reordering of retrieved passages placed too early can erase the benefit for the whole prompt.
 
-The economics are asymmetric. Writing to the cache carries a premium over an ordinary token, while reading from it is discounted. A team only breaks even when the same prefix is read often enough within the storage window to repay the write premium. The practical consequence is that caching a short or rarely repeated prompt can increase total spend. The decision is a volume question as much as a technical one, and it should be tested against real request patterns rather than assumed.
+The economics are asymmetric. Writing to the cache carries a premium over an ordinary token, while reading from it is discounted.
+
+<KeyPoint>
+A team only breaks even when the same prefix is read often enough within the storage window to repay the write premium.
+</KeyPoint>
+
+The practical consequence is that caching a short or rarely repeated prompt can increase total spend. The decision is a volume question as much as a technical one, and it should be tested against real request patterns rather than assumed.
 
 The two providers differ in approach: one relies on cache boundaries the developer places in the prompt, while the other applies caching automatically to sufficiently long prompts. The sequence for a team is: identify the repeated context, make it a stable leading prefix, set the boundary or confirm automatic eligibility, verify a cache hit on real traffic, and measure net cost. The mechanics are `source-reported`; the verification checklist is `inferred`.
 
@@ -47,13 +55,19 @@ Prompt caching reduces the cost and latency of repeated context; it does not mak
 
 The hidden cost is the break-even created by the write premium and the storage window. A short prefix, a low request volume, or traffic spread so thinly that the cache expires between calls can produce a net increase in spend. Engineering effort spent restructuring prompts and monitoring hit rates is a genuine cost too, and it is easy to overlook when a feature is described as a simple switch. Before committing, a team should estimate how often a stable prefix will actually be reused inside the window and compare that with the premium paid to store it.
 
-The most common failure mode is silent invalidation. A non-deterministic field, a changing ordering of items, a different serialization, or an identifier injected into the prefix changes the bytes and produces cache misses without any error message. The team believes caching is active while paying full price, and the lack of a failure signal makes the problem hard to spot. Diagnosing it requires checking cache-hit behavior on real traffic, not reading the code and assuming the prefix is stable. This is why verification is a step in the checklist rather than an afterthought.
+<Trap>
+The most common failure mode is silent invalidation.
+</Trap>
+
+A non-deterministic field, a changing ordering of items, a different serialization, or an identifier injected into the prefix changes the bytes and produces cache misses without any error message. The team believes caching is active while paying full price, and the lack of a failure signal makes the problem hard to spot. Diagnosing it requires checking cache-hit behavior on real traffic, not reading the code and assuming the prefix is stable. This is why verification is a step in the checklist rather than an afterthought.
 
 There are boundaries to how far the mechanism applies. Caches are provider-side and are generally scoped to an account or project, so they should not be assumed to carry across regions, endpoints, or the moment of expiry. Sensitive content placed in a cached prefix also raises data-handling questions that a cost document does not resolve, and those questions belong with the team's privacy review. Caching does not alter what the model knows or guarantee that a cached result is reused in every circumstance; it is a cost optimization, not a correctness or capability feature.
 
 Finally, the details need ongoing review. Minimum lengths, storage windows, boundary syntax, and token pricing differ between providers and change over time. A configuration that is correct today can quietly stop saving money after a model or pricing change. The team should watch hit rates and net cost on representative traffic and recheck the setup whenever prompts, models, or provider terms change, rather than treating caching as a one-time configuration.
 
+<PullQuote>
 The counterargument that caching is fair for high-volume, stable prefixes and incomplete for low-volume or highly variable ones is sound: the write premium can exceed the saving when repetition is rare.
+</PullQuote>
 
 ## A decision test
 

@@ -9,7 +9,9 @@ tags:
   - Infrastructure
 ---
 
+<Lead>
 QUIC is usually associated with reliable streams: bytes arrive in order, and lost data is recovered. The QUIC DATAGRAM extension adds a different option for applications that can tolerate loss and prefer not to wait for retransmission. It is not “faster QUIC” in general, and it does not turn a QUIC connection into an unrestricted UDP tunnel.
+</Lead>
 
 **Direct answer:** RFC 9221 defines QUIC DATAGRAM frames for unreliable application data carried within a QUIC connection. DATAGRAM frames are not retransmitted by QUIC and are not subject to stream-level ordering, while they still benefit from QUIC packet protection and congestion control. An application must negotiate support, respect the connection’s datagram size limit, and decide what to do when data is lost. The extension is useful only when the application’s semantics can handle that loss.
 
@@ -19,19 +21,23 @@ QUIC streams provide reliable, ordered byte delivery. That is appropriate for HT
 
 RFC 9221 adds DATAGRAM frames that carry application data without the retransmission and ordering guarantees of streams. If a packet carrying a DATAGRAM is lost, QUIC does not retransmit that DATAGRAM frame. The application may send a later update, tolerate the gap, or use its own recovery strategy.
 
-“Unreliable” here does not mean unencrypted or outside QUIC. DATAGRAM frames are carried in QUIC packets, which retain QUIC’s packet protection and congestion-control behavior. The extension changes the delivery semantics of the frame, not the security model of the connection.
+“Unreliable” here does not mean unencrypted or outside QUIC. DATAGRAM frames are carried in QUIC packets, which retain QUIC’s packet protection and congestion-control behavior.
+
+<KeyPoint>
+The extension changes the delivery semantics of the frame, not the security model of the connection.
+</KeyPoint>
 
 ## Negotiation and size limits
 
 Support is negotiated using the `max_datagram_frame_size` transport parameter. A peer that does not send this parameter does not enable the extension for that connection. Applications need to check negotiated support rather than assuming every QUIC endpoint can send DATAGRAM frames.
 
-The parameter also communicates a limit related to the maximum DATAGRAM frame size the endpoint is willing to receive. It is not a promise that every packet of that size will fit on every network path. Packet overhead, path characteristics, and other frames in a packet matter. If the application’s message is too large for the available datagram size, it needs an application-level strategy—such as reducing the message, splitting data with its own reassembly rules, or choosing a stream. RFC 9221 does not provide a general fragmentation-and-reassembly service for application messages.
+The parameter also communicates a limit related to the maximum DATAGRAM frame size the endpoint is willing to receive. It is not a promise that every packet of that size will fit on every network path. Packet overhead, path characteristics, and other frames in a packet matter. If the application’s message is too large for the available datagram size, it needs an application-level strategy—such as reducing the message, splitting data with its own reassembly rules, or choosing a stream. <Mark>RFC 9221 does not provide a general fragmentation-and-reassembly service</Mark> for application messages.
 
 ## Where loss can be acceptable
 
 The right question is not “Are datagrams faster?” but “What is the cost of losing this particular update?” Examples may include time-sensitive state updates where a newer value supersedes an older one, or real-time media components designed to conceal or recover from loss. Those are design examples, not guarantees that every media or interactive protocol should use this extension.
 
-DATAGRAMs are a poor fit when every byte must eventually arrive and the application has no independent recovery mechanism. For such data, a QUIC stream’s reliability is usually the relevant property. Applications can also use both modes: reliable streams for setup, control, or durable state, and DATAGRAM frames for specific loss-tolerant updates, provided their protocol clearly defines the distinction.
+DATAGRAMs are <Mark>a poor fit when every byte must eventually arrive</Mark> and the application has no independent recovery mechanism. For such data, a QUIC stream’s reliability is usually the relevant property. Applications can also use both modes: reliable streams for setup, control, or durable state, and DATAGRAM frames for specific loss-tolerant updates, provided their protocol clearly defines the distinction.
 
 ## Congestion control still applies
 
@@ -56,11 +62,19 @@ For the reliable-stream transport that QUIC DATAGRAMs complement, see [HTTP/3: W
 
 ## A worked example
 
-The following is hypothetical and illustrative. A multiplayer game client sends frequent position updates over a single QUIC connection and is considering QUIC DATAGRAM frames for the most time-sensitive ones. It runs three checks from the deployment checklist before switching. First, it defines what loss means: a missed position update is superseded by the next one within a fraction of a second, while the authoritative world state stays on a reliable stream, so the data fits the extension's loss-tolerant semantics rather than RFC 9221 being treated as faster QUIC. Second, it confirms support was negotiated, checking that the peer actually sent the `max_datagram_frame_size` transport parameter before relying on the frame. Third, it sizes the payload against the negotiated limit and path overhead, keeping messages small with no assumption of fragmentation, and keeps congestion behaviour and a stream fallback in view as RFC 9000 requires. The bounded outcome is smoother motion on lossy links for the updates that tolerate it, with setup and durable state unaffected. A naive switch of every message would have put data that must arrive onto an unreliable path.
+The following is hypothetical and illustrative. A multiplayer game client sends frequent position updates over a single QUIC connection and is considering QUIC DATAGRAM frames for the most time-sensitive ones. It runs three checks from the deployment checklist before switching. First, it defines what loss means: a missed position update is superseded by the next one within a fraction of a second, while the authoritative world state stays on a reliable stream, so the data fits the extension's loss-tolerant semantics rather than RFC 9221 being treated as faster QUIC. Second, it confirms support was negotiated, checking that the peer actually sent the `max_datagram_frame_size` transport parameter before relying on the frame. Third, it sizes the payload against the negotiated limit and path overhead, keeping messages small with no assumption of fragmentation, and keeps congestion behaviour and a stream fallback in view as RFC 9000 requires. The bounded outcome is smoother motion on lossy links for the updates that tolerate it, with setup and durable state unaffected.
+
+<Trap>
+A naive switch of every message would have put data that must arrive onto an unreliable path.
+</Trap>
 
 ## A counterargument
 
-A reasonable critic would push back that the article presents the extension's usefulness as more settled than its sources warrant. RFC 9221 and RFC 9000 define a mechanism: frames that are not retransmitted, negotiated by a transport parameter, still carried inside a congestion-controlled connection. Neither sets an application-level latency or delivery guarantee, so the time-sensitive use cases the article names remain conditional on how the rest of the connection behaves. In particular, shared congestion state means stream traffic can still affect datagram timing, a factor the deployment checklist mentions only obliquely. The article is right that loss tolerance is a prerequisite; it understates how much of the outcome depends on conditions the RFCs do not specify.
+A reasonable critic would push back that the article presents the extension's usefulness as more settled than its sources warrant. RFC 9221 and RFC 9000 define a mechanism: frames that are not retransmitted, negotiated by a transport parameter, still carried inside a congestion-controlled connection. Neither sets an application-level latency or delivery guarantee, so the time-sensitive use cases the article names remain conditional on how the rest of the connection behaves. In particular, <Mark>shared congestion state means stream traffic can still affect datagram timing</Mark>, a factor the deployment checklist mentions only obliquely.
+
+<PullQuote>
+The article is right that loss tolerance is a prerequisite; it understates how much of the outcome depends on conditions the RFCs do not specify.
+</PullQuote>
 
 ## References & Further Reading
 

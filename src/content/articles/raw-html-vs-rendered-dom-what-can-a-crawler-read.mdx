@@ -9,7 +9,9 @@ tags:
   - Rendering
 ---
 
+<Lead>
 When auditing a modern web page, opening Google Chrome DevTools and right-clicking "Inspect" does not show you what arrived over the network. It shows you the **Rendered Document Object Model (DOM)**—a dynamic, in-memory tree that has already been executed, modified, and hydrated by your client-side JavaScript.
+</Lead>
 
 For search engine crawlers, the difference between the **Raw HTML byte stream** and the **Rendered DOM** is the difference between instant Wave 1 indexation and deferred, high-risk Wave 2 rendering.
 
@@ -67,7 +69,7 @@ Google's documentation explicitly defines what constitutes a **crawlable link**:
 2. **Pseudo-Protocols (`javascript:...`):** Search engines do not execute inline JavaScript pseudo-protocols as navigational links.
 3. **Event Listeners:** Headless crawlers do not simulate mouse clicks, hover events, or focus changes to discover URLs hidden behind JavaScript event listeners.
 
-**Engineering Rule:** Always use semantic `<a href="/valid-path">` elements for internal navigation. You can enhance the link with client-side framework routers (`next/link`, `react-router`), but the underlying serialized HTML must contain a valid anchor tag.
+**Engineering Rule:** Always use semantic `<a href="/valid-path">` elements for internal navigation. You can enhance the link with client-side framework routers (`next/link`, `react-router`), but <Mark>the underlying serialized HTML must contain a valid anchor tag</Mark>.
 
 ---
 
@@ -85,7 +87,11 @@ A severe rendering failure occurs when there is a **Hydration Mismatch**:
 5. Rendered DOM clears text: <div class="price"></div> (Blank!)
 ```
 
-If client-side hydration fails or throws an unhandled runtime error, the framework may wipe the server-rendered DOM and replace it with a blank white screen. If Googlebot’s Web Rendering Service captures the DOM after a failed hydration pass, it will index an empty page despite the server having delivered complete HTML in Wave 1.
+<Trap>
+If client-side hydration fails or throws an unhandled runtime error, the framework may wipe the server-rendered DOM and replace it with a blank white screen.
+</Trap>
+
+If Googlebot's Web Rendering Service captures the DOM after a failed hydration pass, <Mark>it will index an empty page</Mark> despite the server having delivered complete HTML in Wave 1.
 
 ---
 
@@ -166,7 +172,11 @@ Before releasing dynamic frontend features, verify:
 
 ## Summary & Next Steps
 
-Search engines have evolved to render modern JavaScript, but the Raw HTML stream remains the most reliable, cost-effective path to search indexation. By ensuring that primary text, metadata, and navigational links are present in the raw byte stream before hydration, developers eliminate indexing lag and insulate their sites against client-side script failures.
+Search engines have evolved to render modern JavaScript, but the Raw HTML stream remains the most reliable, cost-effective path to search indexation.
+
+<KeyPoint>
+By ensuring that primary text, metadata, and navigational links are present in the raw byte stream before hydration, developers eliminate indexing lag and insulate their sites against client-side script failures.
+</KeyPoint>
 
 Continue exploring URL architecture and crawl discovery:
 * **[SEO URL Structure: Normalize Hostnames, Paths, and Parameters](/articles/seo-url-structure-normalize-hostnames-paths-parameters)** — Designing clean, deterministic URLs for crawler discovery.
@@ -179,7 +189,11 @@ The following is hypothetical and illustrative. An online retailer ships a produ
 
 ## A counterargument
 
-A reasonable critic would note that the cited Google JavaScript SEO documentation treats rendering as a normal, supported stage of crawling, not the high-risk fallback the article implies. Its diagnostic labels links found only in the rendered DOM "invisible to Wave 1", but invisibility to a first pass is not exclusion from the index, and none of the cited sources establishes that stronger claim. The article also slides from "cheaper to crawl" to "necessary to index": the checklist asks teams to duplicate text, anchors, and metadata into raw HTML, something the HTML Living Standard permits but does not require. The byte-stream-versus-DOM distinction is sound; the verdict that rendered-only content is broadly at risk is the article's judgment, not a sourced finding.
+A reasonable critic would note that the cited Google JavaScript SEO documentation treats rendering as a normal, supported stage of crawling, not the high-risk fallback the article implies. Its diagnostic labels links found only in the rendered DOM "invisible to Wave 1", but <Mark>invisibility to a first pass is not exclusion from the index</Mark>, and none of the cited sources establishes that stronger claim. The article also slides from "cheaper to crawl" to "necessary to index": the checklist asks teams to duplicate text, anchors, and metadata into raw HTML, something the HTML Living Standard permits but does not require.
+
+<PullQuote>
+The byte-stream-versus-DOM distinction is sound; the verdict that rendered-only content is broadly at risk is the article's judgment, not a sourced finding.
+</PullQuote>
 
 ## References & Further Reading
 

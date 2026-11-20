@@ -9,7 +9,9 @@ tags:
   - Productivity
 ---
 
+<Lead>
 Prompt advice is often given as rules without examples, which is why it fails to transfer. A pattern becomes useful when you can see it applied to a task you actually have. Anthropic's prompt-engineering overview frames the work around success criteria and empirical tests; OpenAI's GPT-4.1 prompting guide offers concrete patterns. Below are six patterns tied to everyday tasks, with the failure each one prevents.
+</Lead>
 
 **Direct answer:** The most reusable prompt patterns are: specify the output shape, give an example of a good answer, assign the model a checking role, ask for reasoning before a conclusion, constrain the knowledge source, and separate extraction from judgement. The boundary: a pattern is a starting structure, not a guarantee — every one needs a test set drawn from your own work before you rely on it.
 
@@ -19,7 +21,7 @@ Prompt advice is often given as rules without examples, which is why it fails to
 
 > Extract action items from the transcript between `<transcript>` tags. Return a JSON array of objects with exactly these keys: `owner`, `action`, `due_date`. Use `null` when a value is not stated. Do not infer due dates. Return JSON only.
 
-**Failure prevented:** prose that looks useful but cannot be parsed. Asking for a specific structure turns the output into data a downstream system can use. The instruction "do not infer due dates" is the important part — without it the model fills gaps confidently.
+**Failure prevented:** prose that looks useful but cannot be parsed. Asking for a specific structure turns the output into data a downstream system can use. The instruction "<Mark>do not infer due dates</Mark>" is the important part — without it the model fills gaps confidently.
 
 ## Pattern 2 — Show a good answer
 
@@ -73,7 +75,13 @@ Anthropic's prompting guides treat extended thinking and structured reasoning as
 
 ## A worked example of combining patterns
 
-Suppose a product team wants a weekly feedback digest. A single prompt that asks for "a useful summary" will produce different formats every week. A composed prompt uses three patterns:
+Suppose a product team wants a weekly feedback digest.
+
+<Trap>
+A single prompt that asks for "a useful summary" will produce different formats every week.
+</Trap>
+
+A composed prompt uses three patterns:
 
 1. **Constrain the source** — only the feedback exported this week.
 2. **Specify the shape** — a JSON object with `themes`, `counts`, and `example_quotes`.
@@ -83,7 +91,7 @@ The output is now comparable across weeks. A team can measure whether a theme is
 
 Three checks make the composed prompt safe:
 
-- **No invented quotes.** Require each quote to be copied verbatim from the source.
+- **No invented quotes.** Require each quote to be <Mark>copied verbatim from the source</Mark>.
 - **Counts have a denominator.** "12 mentions" should mean 12 of the exported records, not 12 of a sample the model chose.
 - **A held-out sample.** Have a human classify ten records and compare with the model, as the prompt-engineering prerequisite suggests.
 
@@ -91,11 +99,21 @@ Three checks make the composed prompt safe:
 
 **No pattern fixes missing information.** If the source does not contain the answer, every pattern should lead to an honest "not found" — which is why the refusal wording matters.
 
-**No pattern removes the need for evaluation.** A prompt that works on one example is a demo. The success criteria and empirical test that Anthropic puts before prompt engineering are the actual work.
+**No pattern removes the need for evaluation.** A prompt that works on one example is a demo. The <Mark>success criteria and empirical test</Mark> that Anthropic puts before prompt engineering are the actual work.
 
-**Longer prompts are not automatically better.** Each instruction should correspond to a failure you have observed. Instructions without a failure to prevent add ambiguity about priority.
+**Longer prompts are not automatically better.**
 
-The counterargument — that these patterns are obvious — is fair. Their value is consistency: a team using the same six structures can compare outputs across tasks and reviewers, which is not possible with ad hoc prompting.
+<KeyPoint>
+Each instruction should correspond to a failure you have observed.
+</KeyPoint>
+
+Instructions without a failure to prevent add ambiguity about priority.
+
+The counterargument — that these patterns are obvious — is fair.
+
+<PullQuote>
+Their value is consistency: a team using the same six structures can compare outputs across tasks and reviewers, which is not possible with ad hoc prompting.
+</PullQuote>
 
 ## A decision test
 

@@ -9,13 +9,21 @@ tags:
   - Governance
 ---
 
+<Lead>
 "Responsible AI" is a phrase broad enough to mean anything, which is why it is often used to mean nothing. The subject becomes tractable when it is split into three questions that have different answers and different owners: what the system does to different groups, what the law in a given place requires, and what evidence the organisation can produce when asked.
+</Lead>
 
-**Direct answer:** The three questions are distinct and none substitutes for the others. Fairness criteria can conflict, so a team must choose which one its system satisfies and say why. Compliance is jurisdiction-specific and dated, so "we are compliant" is a claim about a place and a time. And documentation — model cards, datasheets, risk records — is the artefact that makes either claim reviewable. The NIST AI Risk Management Framework is described as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems": a framework for producing evidence, not a certificate.
+**Direct answer:**
+
+<KeyPoint>
+The three questions are distinct and none substitutes for the others.
+</KeyPoint>
+
+Fairness criteria can conflict, so a team must choose which one its system satisfies and say why. <Mark>Compliance is jurisdiction-specific and dated</Mark>, so "we are compliant" is a claim about a place and a time. And documentation — model cards, datasheets, risk records — is the artefact that makes either claim reviewable. The NIST AI Risk Management Framework is described as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems": a framework for producing evidence, not a certificate.
 
 ## Fairness is a choice among incompatible criteria
 
-The central technical fact is uncomfortable: the main mathematical definitions of fairness cannot all be satisfied at once when base rates differ between groups.
+The central technical fact is uncomfortable: <Mark>the main mathematical definitions of fairness cannot all be satisfied at once when base rates differ between groups</Mark>.
 
 Barocas, Hardt and Narayanan's *Fairness and Machine Learning* is the standard reference for the trade-offs, and its accompanying material discusses anti-discrimination law as something that "navigates tradeoffs" and has "limits". That framing is the right one. A team choosing a fairness criterion is not selecting the correct definition from a menu; it is making a decision about which kind of error it considers most harmful and for whom.
 
@@ -27,7 +35,11 @@ Three criteria are commonly confused:
 
 When the underlying base rates differ, these cannot generally hold together. A system that satisfies demographic parity will usually fail calibration; one that is calibrated will usually show different positive rates. The choice has to be made in the context of the application — a lending decision and a job shortlist have different harms and different legal constraints — and the reasoning has to be recorded.
 
-The practical error is treating a single aggregate accuracy figure as evidence of fairness. It is not. Mitchell et al.'s model cards exist precisely because aggregate evaluation hides group-level behaviour: they call for "benchmarked evaluation in a variety of conditions, such as across different cultural, demographic, or phenotypic groups... and intersectional groups" relevant to the intended application, along with disclosure of "the context in which models are intended to be used".
+<Trap>
+The practical error is treating a single aggregate accuracy figure as evidence of fairness.
+</Trap>
+
+It is not. Mitchell et al.'s model cards exist precisely because aggregate evaluation hides group-level behaviour: they call for "benchmarked evaluation in a variety of conditions, such as across different cultural, demographic, or phenotypic groups... and intersectional groups" relevant to the intended application, along with disclosure of "the context in which models are intended to be used".
 
 ## A worked example of the conflict
 
@@ -75,7 +87,7 @@ The NIST RMF's structure — governance, mapping, measurement, management — is
 
 Most difficult cases are not failures of data or law; they are disagreements about values. What level of error is acceptable in a medical triage system? Should a model optimise for the average or the worst-served group? Who gets to decide?
 
-There is no technical answer to these questions, and pretending otherwise is how "ethics" becomes a marketing function. The right response is procedural: make the decision explicit, name the person or body accountable for it, record the reasoning and the alternatives rejected, and revisit it when the system or the evidence changes.
+<Mark>There is no technical answer to these questions</Mark>, and pretending otherwise is how "ethics" becomes a marketing function. The right response is procedural: make the decision explicit, name the person or body accountable for it, record the reasoning and the alternatives rejected, and revisit it when the system or the evidence changes.
 
 This is the same argument that applies to Constitutional AI, where Bai et al. note that "the only human oversight is provided through a list of rules or principles". A principles list does not remove the human decision; it relocates it into an artefact that can be reviewed and versioned.
 
@@ -94,7 +106,13 @@ For the framework detail, see [AI Governance](/articles/ai-governance-managing-a
 
 ## A counterargument
 
-The procedural answer has a limit the article does not press. Naming who owns a value decision and recording the alternatives rejected, as the closing sections recommend, can make a choice reviewable without making it fair to the people who bear it; the incompatibility results in Barocas, Hardt and Narayanan describe a distribution of harm that procedure alone does not settle. There is also a tension in treating documentation as a neutral audit trail: model cards and datasheets are written by the teams whose decisions they describe, and Mitchell et al. and Gebru et al. specify what they should contain rather than how they would be independently verified. A critic would argue the three questions are less separable than the framing suggests, since the evidence an organisation can produce is itself shaped by what the law in a jurisdiction requires.
+The procedural answer has a limit the article does not press.
+
+<PullQuote>
+Naming who owns a value decision and recording the alternatives rejected, as the closing sections recommend, can make a choice reviewable without making it fair to the people who bear it; the incompatibility results in Barocas, Hardt and Narayanan describe a distribution of harm that procedure alone does not settle.
+</PullQuote>
+
+There is also a tension in treating documentation as a neutral audit trail: model cards and datasheets are written by the teams whose decisions they describe, and Mitchell et al. and Gebru et al. specify what they should contain rather than how they would be independently verified. A critic would argue the three questions are less separable than the framing suggests, since the evidence an organisation can produce is itself shaped by what the law in a jurisdiction requires.
 
 ## References & Further Reading
 

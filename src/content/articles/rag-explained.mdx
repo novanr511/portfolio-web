@@ -10,7 +10,9 @@ tags:
   - Vector Databases
 ---
 
+<Lead>
 Most RAG tutorials stop at "split your documents, embed them, ask the model." That recipe produces an impressive demo on Friday and an unusable system on Monday. The gap between those two states lives entirely in the details of the retrieval pipeline — so this article goes deep on the whole thing: how the pieces fit, where the standard recipe breaks, and the decisions that matter in production.
+</Lead>
 
 **Direct answer:** RAG grounds an LLM's answers in documents retrieved at query time, updating knowledge through the index rather than retraining the model. A production system depends on the retrieval pipeline: chunking, embeddings, hybrid search, reranking, and evaluation decide whether the right evidence reaches the generator. The real design choice is what to trade off at each stage, not whether to use retrieval at all.
 
@@ -24,7 +26,11 @@ This buys you three things at once:
 2. **Attribution** — answers can cite sources, which turns "the AI said so" into "the policy on page 12 says so." This matters enormously for trust and for audit.
 3. **Scope** — the model answers from your corpus, which reduces hallucination dramatically. Not eliminates — reduces. More on that later.
 
-The inverse is worth stating plainly: RAG is *not* a hallucination cure-all. If retrieval fetches the wrong document, the model will happily fabricate an answer that sounds authoritative about the wrong content. Retrieval quality is the ceiling on answer quality.
+The inverse is worth stating plainly: RAG is *not* a hallucination cure-all. If retrieval fetches the wrong document, the model will happily fabricate an answer that sounds authoritative about the wrong content.
+
+<KeyPoint>
+Retrieval quality is the ceiling on answer quality.
+</KeyPoint>
 
 ## The pipeline, piece by piece
 
@@ -32,7 +38,7 @@ A production RAG system has two phases. Ingestion happens offline, once per docu
 
 ### Ingestion: chunking is the highest-leverage decision
 
-Documents get split into *chunks* which are embedded and stored. The chunk is your atomic unit of retrieval forever after, so getting this wrong poisons everything downstream.
+Documents get split into *chunks* which are embedded and stored. The chunk is your atomic unit of retrieval forever after, so getting this wrong <Mark>poisons everything downstream</Mark>.
 
 The naive rule — "chunk every 512 tokens" — is exactly the kind of advice that quietly ruins systems. Chunks need to be **semantically coherent**: a chunk should contain a complete thought, not a paragraph sliced mid-sentence or a heading divorced from its body. Practical guidance:
 
@@ -51,7 +57,11 @@ Choosing an embedding model, in order of importance:
 2. **Match the retrieval mode.** Some embedding models are trained for symmetric similarity (comparing two similar texts, like deduplication); others are asymmetric (matching a short query against a long document). Using the wrong mode silently degrades retrieval.
 3. **Mind the dimensions and cost.** Higher dimensions aren't automatically better, and embedding API costs add up when you re-index regularly. Local models (e.g. via sentence-transformers) trade a little quality for zero per-token cost and full privacy.
 
-One rule is absolute: **the same model must embed queries and documents.** Mixing embedding models breaks retrieval completely, and it's a surprisingly common deploy-day bug.
+One rule is absolute: **the same model must embed queries and documents.**
+
+<Trap>
+Mixing embedding models breaks retrieval completely, and it's a surprisingly common deploy-day bug.
+</Trap>
 
 ### Storage: you don't need a database dressed up as a vector database
 
@@ -65,7 +75,7 @@ For your first build, options in ascending complexity:
 | < 1M chunks, single app | SQLite + sqlite-vec, or pgvector on your existing Postgres |
 | Multi-tenant, high QPS, filtering-heavy | A dedicated engine (Qdrant, Weaviate, Pinecone, Vespa) |
 
-The database matters far less than people assume. What matters is **metadata filtering** — the ability to say "search only these documents, from this tenant, updated after this date" *inside* the ANN search rather than after it. Post-filtering a vector search result set is a classic bug farm.
+The database matters far less than people assume. What matters is **metadata filtering** — the ability to say "search only these documents, from this tenant, updated after this date" *inside* the ANN search rather than after it. Post-filtering a vector search result set is <Mark>a classic bug farm</Mark>.
 
 ### Retrieval: hybrid search, because embeddings have blind spots
 
@@ -105,7 +115,7 @@ The final assembly is a prompt with the query and the retrieved chunks. Three ru
 
 ## The part tutorials skip: evaluation
 
-A RAG system without evaluation is a vibes machine. The good news: a meaningful harness costs an afternoon.
+A RAG system without evaluation is <Mark>a vibes machine</Mark>. The good news: a meaningful harness costs an afternoon.
 
 1. **Build a question set.** 30–50 real questions with the source document/section that should be retrieved. Mine them from actual support tickets or search logs, not from your imagination.
 2. **Measure retrieval first, separately.** Hit-rate@k (is the right chunk in the top k?) and MRR (how high does it rank?). If retrieval is broken, no prompt will save you — and these metrics pinpoint *where* it's broken: if the right document is retrieved but ranked below the cutoff, that's a reranking problem; if it's never retrieved at all, that's chunking or embedding.
@@ -138,7 +148,11 @@ For a deployed example where a retrieval agent answers questions over a project'
 
 ## A counterargument
 
-A reasonable critic would object that the article places the whole demo-to-production gap in the retrieval pipeline, when its own references put ceilings at both ends. Sentence-BERT compresses text into a fixed vector, and FAISS and HNSW trade recall for speed; the exact codes and error strings the article says become "semantic mush" are lost in the representation and index, not recovered by reranking. The generator is a transformer whose context behaviour produces the "lost in the middle" effect described here, and that limit sits outside the retriever. The pipeline work is real, but locating the discipline chiefly in the middle overstates how much a practitioner controls.
+A reasonable critic would object that the article places the whole demo-to-production gap in the retrieval pipeline, when its own references put ceilings at both ends. Sentence-BERT compresses text into a fixed vector, and FAISS and HNSW trade recall for speed; the exact codes and error strings the article says become "semantic mush" are lost in the representation and index, not recovered by reranking. The generator is a transformer whose context behaviour produces the "lost in the middle" effect described here, and that limit sits outside the retriever.
+
+<PullQuote>
+The pipeline work is real, but locating the discipline chiefly in the middle overstates how much a practitioner controls.
+</PullQuote>
 
 ## References & Further Reading
 

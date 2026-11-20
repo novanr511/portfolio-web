@@ -9,15 +9,27 @@ tags:
   - Data Modelling
 ---
 
-Most Power BI tutorials teach the interface, and the interface is the least consequential part of the tool. Two teams can build visually identical dashboards from the same data, and one of them will be trusted by finance and the other will not, because one of them modelled the business and the other modelled the query.
+<Lead>
+Most Power BI tutorials teach the interface, and the interface is the least consequential part of the tool. Two teams can build visually identical dashboards from the same data, and one of them will be trusted by finance and the other will not, because <Mark>one of them modelled the business and the other modelled the query</Mark>.
+</Lead>
 
-**Direct answer:** Power BI's own documentation describes the product as covering "cloud capabilities in Microsoft Fabric, standalone desktop and on-premises applications, and guidance tailored to your role—whether you create reports, model data, or consume insights". That last clause is the design brief: the reporting layer is one of three roles, and the modelling layer is where the value is decided. The order that works is model first, measure second, visualise third — and the reason is that a measure computed correctly once can be reused everywhere, while a number typed into a visual has to be re-derived and re-checked every time someone adds a page.
+**Direct answer:** Power BI's own documentation describes the product as covering "cloud capabilities in Microsoft Fabric, standalone desktop and on-premises applications, and guidance tailored to your role—whether you create reports, model data, or consume insights".
+
+<KeyPoint>
+That last clause is the design brief: the reporting layer is one of three roles, and the modelling layer is where the value is decided.
+</KeyPoint>
+
+The order that works is model first, measure second, visualise third — and the reason is that a measure computed correctly once can be reused everywhere, while a number typed into a visual has to be re-derived and re-checked every time someone adds a page.
+
+<KeyFigures items={[
+  { value: "over 250", label: "functions in the DAX function reference", source: "Microsoft Learn, 2026" },
+]} />
 
 ## Why the semantic model is the product
 
 A semantic model is a description of your business expressed as entities, relationships, and measures. It is not a query result and it is not a table; it is a layer between the source data and every question anyone will ask.
 
-The benefit is that it makes disagreement about definitions impossible to hide. If "active customer" appears in three dashboards with three definitions, the problem is not the dashboards — it is that the definition lives in each dashboard instead of in the model. Putting it in the model means it exists once, and every report inherits it.
+The benefit is that <Mark>it makes disagreement about definitions impossible to hide</Mark>. If "active customer" appears in three dashboards with three definitions, the problem is not the dashboards — it is that the definition lives in each dashboard instead of in the model. Putting it in the model means it exists once, and every report inherits it.
 
 This also changes what a new report costs. With a modelled source, adding a metric is a measure and a visual. Without one, it is a new query, a new column, and a fresh round of validation — and it is the second path that usually gets taken, because the first path requires someone to understand the model.
 
@@ -31,7 +43,11 @@ DAX comes in two families, and mixing them up is the most common source of confu
 
 **Calculated columns** are computed at refresh time, row by row, and then stored. They are a transformation, not a question. They are also expensive: a calculated column over a large fact table is processed on every refresh, it is materialised into the model, and it cannot respond to slicers the way a measure can.
 
-The practical rule that follows is simple and worth internalising: if the value depends on the context the user is currently viewing, it is a measure. If it depends only on the row, it is a calculated column. Most badly performing Power BI reports are reports with measures written as calculated columns, because someone wanted the number to appear in a table and reached for the tool that makes it appear without thinking about how it will behave when the user filters.
+The practical rule that follows is simple and worth internalising: if the value depends on the context the user is currently viewing, it is a measure. If it depends only on the row, it is a calculated column.
+
+<Trap>
+Most badly performing Power BI reports are reports with measures written as calculated columns, because someone wanted the number to appear in a table and reached for the tool that makes it appear without thinking about how it will behave when the user filters.
+</Trap>
 
 ## The modelling choices that decide everything
 
@@ -39,7 +55,7 @@ Three decisions account for most of the difference between a model that performs
 
 **The grain of the fact table.** A fact table has one row per event at a stated grain. Most bad models contain a fact table at two grains, which forces the tool to invent a relationship that is not true and produces numbers that are subtly wrong in ways that are hard to spot.
 
-**The direction of the relationships and the cardinality.** Dimensions filter facts; facts do not filter dimensions in a well-formed model. When you find yourself writing a measure that has to "unpivot" something, the model is fighting you, and the fix is in the model rather than in the measure.
+**The direction of the relationships and the cardinality.** Dimensions filter facts; facts do not filter dimensions in a well-formed model. When you find yourself writing a measure that has to "unpivot" something, <Mark>the model is fighting you</Mark>, and the fix is in the model rather than in the measure.
 
 **Star schema over snowflake.** A flat dimension set around a fact table is simple to reason about and fast to query. A fully normalised dimension hierarchy is elegant on paper and expensive in practice, and the denormalisation cost is usually less than the modelling and query cost of the alternative.
 
@@ -47,7 +63,11 @@ Three decisions account for most of the difference between a model that performs
 
 When a report is slow, the instinct is to look for a setting to change. Usually the cause is structural: a calculated column on a wide fact table, a relationship that prevents filter propagation, a measure that iterates rows rather than sets, or a source that has not been pushed into the right form before it enters the model.
 
-Each of those is fixable in the model, and fixing it there fixes every report built on top. Tuning the query engine is treating the symptom.
+Each of those is fixable in the model, and fixing it there fixes every report built on top.
+
+<PullQuote>
+Tuning the query engine is treating the symptom.
+</PullQuote>
 
 There is one external factor that is genuinely worth checking before blaming the model: the source. A dashboard reading a live transactional table will be slow regardless of how well it is modelled, because the problem is the access pattern, not the expression engine.
 

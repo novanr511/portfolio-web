@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A trained neural network usually stores weights and activations as floating-point numbers, which are expensive to move and compute. Quantization maps those values to lower-precision integers so inference can run faster and with a smaller memory footprint. The beginner's problem is knowing which method applies and what accuracy you might give up.
+</Lead>
 
 **Direct answer:** Quantization reduces the numerical precision of a model's weights and activations, with the Jacob et al. method training for integer-arithmetic-only inference and the Han et al. method combining pruning, trained quantization and coding. The boundary: smaller and faster does not mean free, because reduced precision can change outputs and must be validated on the target task.
 
@@ -21,11 +23,19 @@ The Jacob et al. work shows that a neural network can be trained so that inferen
 
 <Figure src="/images/articles/inline/quantization-in-practice-for-beginners-1.png" alt="A comparison of integer-only inference from quantization-aware training with the Deep Compression pipeline of pruning, quantization and Huffman coding." caption="Conceptual: fast inference and compact storage are different deployment goals." />
 
-The word trained in that method is important. Quantization is not just a post-hoc rounding of weights; the source describes training with quantization in the loop so the network adapts to reduced precision. The consequence is that accuracy loss can be much smaller than a naive conversion suggests, but it requires access to training data and a training pipeline. A beginner who applies rounding without retraining may see a sharp drop that the published method avoids.
+The word trained in that method is important. Quantization is not just <Mark>a post-hoc rounding of weights</Mark>; the source describes training with quantization in the loop so the network adapts to reduced precision. The consequence is that accuracy loss can be much smaller than a naive conversion suggests, but it requires access to training data and a training pipeline.
+
+<Trap>
+A beginner who applies rounding without retraining may see a sharp drop that the published method avoids.
+</Trap>
 
 The Han et al. work addresses compression more broadly. Deep Compression combines three steps: pruning connections that contribute little, quantizing the remaining weights so fewer bits represent them, and encoding the result with Huffman coding. The consequence is a much smaller model, often far below the original storage size. The method is distinct from integer-only inference: it targets size and storage, and its quantized weights may still be decoded before use.
 
-Choosing between approaches depends on the deployment constraint. If the goal is fast inference on modest hardware, integer-arithmetic-only inference from the first method is the direct fit. If the goal is fitting a large model into limited storage or bandwidth, the compression pipeline is the relevant one. Both trade precision for efficiency, and both require measuring the effect on the actual task rather than assuming that a smaller model is a harmless one.
+Choosing between approaches depends on the deployment constraint. If the goal is fast inference on modest hardware, integer-arithmetic-only inference from the first method is the direct fit. If the goal is fitting a large model into limited storage or bandwidth, the compression pipeline is the relevant one.
+
+<KeyPoint>
+Both trade precision for efficiency, and both require measuring the effect on the actual task rather than assuming that a smaller model is a harmless one.
+</KeyPoint>
 
 ## A worked example
 
@@ -43,13 +53,17 @@ The table marks the two method descriptions as reported from their papers and th
 
 ## What it cannot do
 
-Quantization cannot preserve a model's behavior exactly. It reduces the number of bits available to represent a value, and that reduction introduces error. For many tasks the error is small enough to be harmless, but the method offers no guarantee that a given model will tolerate it. Sensitive outputs, such as those near a decision threshold, can flip when precision falls. A beginner should treat accuracy retention as something to measure, not something the method promises.
+Quantization cannot preserve a model's behavior exactly. It reduces the number of bits available to represent a value, and that reduction introduces error. For many tasks the error is small enough to be harmless, but the method offers no guarantee that a given model will tolerate it. Sensitive outputs, such as those near a decision threshold, can flip when precision falls.
 
-The hidden cost is the work around the model, not the arithmetic. Quantization-aware training needs training data, a modified training loop, and validation, which can be more expensive than the inference savings in a small project. Compression adds pruning schedules and an encoding step, each with parameters to tune. The modest integer model may also require a runtime that supports the chosen format, which is a dependency that appears only at deployment time.
+<PullQuote>
+A beginner should treat accuracy retention as something to measure, not something the method promises.
+</PullQuote>
+
+The hidden cost is <Mark>the work around the model, not the arithmetic</Mark>. Quantization-aware training needs training data, a modified training loop, and validation, which can be more expensive than the inference savings in a small project. Compression adds pruning schedules and an encoding step, each with parameters to tune. The modest integer model may also require a runtime that supports the chosen format, which is a dependency that appears only at deployment time.
 
 A common failure mode is quantizing the wrong parts of a network. Some layers are more sensitive than others, and applying a uniform scheme can damage accuracy even when the average looks fine. Another failure is a mismatch between the quantization format used in training and the one supported by the deployment runtime, which can force a fallback to slower code. A third is validating on the training distribution rather than the distribution the model will actually see, which hides the very errors that matter.
 
-The boundary is the task, not the model. A quantized network may score well on a benchmark and still be unacceptable for a specific use, because the benchmark does not weight the errors that matter to that use. The two source methods describe techniques for efficiency; neither defines what accuracy is good enough. That decision belongs to the deployment context, which must set a tolerance and test against it.
+The boundary is <Mark>the task, not the model</Mark>. A quantized network may score well on a benchmark and still be unacceptable for a specific use, because the benchmark does not weight the errors that matter to that use. The two source methods describe techniques for efficiency; neither defines what accuracy is good enough. That decision belongs to the deployment context, which must set a tolerance and test against it.
 
 Hardware changes the answer. A new accelerator with better integer support can make one method worthwhile where another was not, and a change in model architecture can shift which layers are sensitive. Teams that quantize once and ship indefinitely should recheck accuracy whenever the model, the runtime, or the target device changes. Keeping a small held-out set and a recorded tolerance makes that recheck cheap and turns quantization from a one-off trick into a maintained decision.
 

@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 Retrieval systems often stop at the first list of candidates, which leaves the ordering to a similarity score. The Cohere reranking material describes a second stage that reorders candidates, and web analytics covers measurement of what users actually use. The examples show what the extra stage can and cannot do.
+</Lead>
 
-**Direct answer:** Add a reranker when the first-stage results are mostly relevant but poorly ordered, then evaluate the final answer rather than the intermediate list. The sources describe the mechanism; the decision rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Add a reranker when the first-stage results are mostly relevant but poorly ordered, then evaluate the final answer rather than the intermediate list.
+</KeyPoint>
+
+The sources describe the mechanism; the decision rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked evaluation, separating documented retrieval behaviour from local judgements about usefulness.
 
@@ -21,7 +29,7 @@ The first point is division of labour. The reranking material describes a second
 
 <Figure src="/images/articles/inline/reranking-examples-1.png" alt="A three-step flow: a first stage retrieves candidates broadly, a reranker orders them precisely, and the final outcome is evaluated." caption="Conceptual: check recall before ordering, then judge the answer rather than the list." />
 
-The second point is measurement. The web-analytics entry describes collection and interpretation as separate, which applies here. A better ordering is not the same as a better outcome, and the useful measure is whether the system's answer or the user's decision improved.
+The second point is measurement. The web-analytics entry describes collection and interpretation as separate, which applies here. <Mark>A better ordering is not the same as a better outcome</Mark>, and the useful measure is whether the system's answer or the user's decision improved.
 
 The third point is cost. A reranker adds latency and expense to every query, and that cost should be compared with the value of the improvement. A system that is already good enough may not benefit enough to justify it.
 
@@ -51,9 +59,13 @@ A document can be relevant to a query and still not help the user decide. Useful
 
 A further consideration is that a reranker adds latency to every query, and the benefit must be weighed against that cost on the queries that matter. A system that is already good enough may not need the extra stage, and measuring the gap before adding it avoids work that does not pay.
 
-The first stage also has to be measured on its own. A reranker cannot recover a document that was never retrieved, and a low recall will limit any improvement. Checking recall before ordering is the sequence that makes the evaluation interpretable.
+The first stage also has to be measured on its own. <Mark>A reranker cannot recover a document that was never retrieved</Mark>, and a low recall will limit any improvement. Checking recall before ordering is the sequence that makes the evaluation interpretable.
 
-Finally, a relevance score is a proxy. A document can score highly and still not answer the question, which is why the final answer or decision deserves its own measure. Optimising the proxy alone produces a system that looks good on a benchmark and disappoints in use.
+Finally, a relevance score is a proxy. A document can score highly and still not answer the question, which is why the <Mark>final answer or decision deserves its own measure</Mark>.
+
+<Trap>
+Optimising the proxy alone produces a system that looks good on a benchmark and disappoints in use.
+</Trap>
 
 The decision to add a stage should be revisited when traffic changes, since a cost that was acceptable at one volume may not be at another.
 
@@ -61,7 +73,9 @@ The decision to add a stage should be revisited when traffic changes, since a co
 
 It cannot retrieve a document the first stage missed. It does not fix a bad answer from a good document. And it cannot guarantee that users notice the change.
 
+<PullQuote>
 The counterargument that a better score is always better is fair for ranking and incomplete for outcomes.
+</PullQuote>
 
 ## A decision test
 

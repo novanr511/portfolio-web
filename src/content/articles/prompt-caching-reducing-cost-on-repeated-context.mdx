@@ -9,9 +9,11 @@ tags:
   - Engineering
 ---
 
+<Lead>
 Most production LLM applications send the same material at the start of every request — system instructions, tool definitions, a knowledge base, or a long document. Without caching, that prefix is reprocessed and re-billed each time. Prompt caching lets a provider reuse the already-computed representation of a stable prefix.
+</Lead>
 
-**Direct answer:** Prompt caching stores the computed representation of a repeated prompt prefix so subsequent requests with the same prefix can skip recomputation, typically at a lower billed rate. OpenAI and Anthropic both document the mechanism and its conditions. The boundary: caching only helps when the prefix is genuinely stable — a changed token early in the prefix invalidates everything after it.
+**Direct answer:** Prompt caching stores the computed representation of a repeated prompt prefix so subsequent requests with the same prefix can skip recomputation, typically at a lower billed rate. OpenAI and Anthropic both document the mechanism and its conditions. The boundary: caching only helps when the prefix is genuinely stable — <Mark>a changed token early in the prefix invalidates everything after it</Mark>.
 
 ## How caching works
 
@@ -51,7 +53,7 @@ Providers report cache behaviour, and a few fields matter more than the headline
 
 **Time-to-live and eviction.** A cache may expire after inactivity or be evicted under pressure. A high write-to-read ratio usually means the prefix is changing too often or traffic is too sparse.
 
-**Prefix stability.** Track whether the first few hundred tokens of requests are identical. A single dynamic field at the front — a timestamp, a session ID, a rotating example — can invalidate an otherwise perfect cache.
+**Prefix stability.** Track whether the first few hundred tokens of requests are identical. <Mark>A single dynamic field at the front</Mark> — a timestamp, a session ID, a rotating example — can invalidate an otherwise perfect cache.
 
 These fields turn caching from a feature you enable into a system you operate. A team that watches only total input cost may miss that a recent prompt change quietly halved the hit rate.
 
@@ -63,24 +65,36 @@ These fields turn caching from a feature you enable into a system you operate. A
 
 **High-volume support applications** with a stable policy document and varied user questions.
 
+<KeyPoint>
 In each case the pattern is the same: a large stable prefix and a small variable suffix.
+</KeyPoint>
 
 ## What caching cannot do
 
 **It does not reduce output cost.** Generated tokens are still billed at the normal rate, as the cost estimator shows.
 
-**It does not survive arbitrary edits.** Reordering a few early tokens invalidates the prefix. Versioning the knowledge base deliberately is better than letting it drift.
+**It does not survive arbitrary edits.**
+
+<Trap>
+Reordering a few early tokens invalidates the prefix.
+</Trap>
+
+Versioning the knowledge base deliberately is better than letting it drift.
 
 **It is not a guarantee.** A cache miss due to expiry or routing means a full-price request. Measure the hit rate, which the observability article explains how to instrument.
 
-The counterargument — that cached input is cheap enough to ignore — is true at low volume and false at scale. A 100,000-token prefix sent 10,000 times is a billion tokens of input, and the difference between full and cached rates is material.
+The counterargument — that cached input is cheap enough to ignore — is true at low volume and false at scale.
+
+<PullQuote>
+A 100,000-token prefix sent 10,000 times is a billion tokens of input, and the difference between full and cached rates is material.
+</PullQuote>
 
 ## A decision test
 
 1. **Identify the stable prefix** in your requests.
 2. **Place variable content at the end** of the prompt.
 3. **Mark cache breakpoints** where the API requires them.
-4. **Measure the cache hit rate** and the effective cost per request.
+4. **Measure the cache hit rate** and <Mark>the effective cost per request</Mark>.
 5. **Version the prefix deliberately** so changes are controlled.
 6. **Account for expiry** in the cost model.
 7. **Re-check rates** when the provider updates pricing.

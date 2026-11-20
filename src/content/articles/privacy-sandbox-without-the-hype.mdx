@@ -12,21 +12,29 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams evaluating Privacy Sandbox often treat it as a like-for-like replacement for third-party cookies. The Privacy Sandbox entry describes browser-mediated alternatives for advertising, while the GDPR legal text sets obligations for personal data. The real problem is that a tracking mechanism and a legal basis are different things, and conflating them leads to faulty compliance claims.
+</Lead>
 
-**Direct answer:** Privacy Sandbox is a set of browser technologies for measuring and targeting ads without third-party cookies; GDPR is a regulation governing how personal data may be processed. The first changes what signals are available, and the second sets the lawful basis for using them. Neither substitutes for the other.
+**Direct answer:**
+
+<KeyPoint>
+Privacy Sandbox is a set of browser technologies for measuring and targeting ads without third-party cookies; GDPR is a regulation governing how personal data may be processed.
+</KeyPoint>
+
+The first changes what signals are available, and the second sets the lawful basis for using them. Neither substitutes for the other.
 
 **Delta:** This article adds a signal-to-obligation map beyond the sources: it maps each advertising signal to the compliance decision it triggers, with claim status explicit.
 
 ## The mechanism
 
-Privacy Sandbox is a collection of browser technologies intended to support advertising while reducing reliance on third-party cookies. The entry describes mechanisms that let a browser hold information about user interests or attribute conversions without handing a static identifier to every site. The practical consequence is that the location of the data shifts: signals that once lived in a shared cookie now live inside the browser and are exposed through controlled interfaces. A team that previously read a cookie directly must now reason about what the browser chooses to reveal and to whom. That shift changes the engineering question from where to store an identifier to which interface the design is allowed to call.
+Privacy Sandbox is a collection of browser technologies intended to support advertising while reducing reliance on third-party cookies. The entry describes mechanisms that let a browser hold information about user interests or attribute conversions without handing a static identifier to every site. The practical consequence is that <Mark>the location of the data shifts</Mark>: signals that once lived in a shared cookie now live inside the browser and are exposed through controlled interfaces. A team that previously read a cookie directly must now reason about what the browser chooses to reveal and to whom. That shift changes the engineering question from where to store an identifier to which interface the design is allowed to call.
 
 <Figure src="/images/articles/inline/privacy-sandbox-without-the-hype-1.png" alt="Two panels compared: a technology gate for what the browser interface reveals, and a GDPR obligation gate for the lawful basis and purpose of the signal." caption="Conceptual: a privacy-preserving API is not a compliance certificate." />
 
-GDPR operates at a different layer. The legal text sets principles for processing personal data, including lawfulness, fairness, transparency, purpose limitation, data minimisation, accuracy, storage limitation, integrity, confidentiality, and accountability. It also defines lawful bases for processing and rights for data subjects. The practical consequence is that a technical design does not settle legality: an ad signal collected through a privacy-preserving interface can still be personal data, and processing it still needs a lawful basis and a stated purpose. The regulation asks why and on what authority, questions a browser API cannot answer.
+GDPR operates at a different layer. The legal text sets principles for processing personal data, including lawfulness, fairness, transparency, purpose limitation, data minimisation, accuracy, storage limitation, integrity, confidentiality, and accountability. It also defines lawful bases for processing and rights for data subjects. The practical consequence is that a technical design does not settle legality: an ad signal collected through a privacy-preserving interface can still be personal data, and processing it still needs a lawful basis and a stated purpose. <Mark>The regulation asks why and on what authority, questions a browser API cannot answer.</Mark>
 
-The two sources meet at a boundary neither draws explicitly. Privacy Sandbox constrains how a signal is obtained; GDPR constrains whether and on what basis that signal may be used. A privacy-preserving delivery mechanism can reduce exposure, but it does not by itself supply a lawful basis, and a lawful basis does not make a particular tracking design acceptable to a browser. Treating either as a substitute for the other is the source of most hype. The defensible position is to handle them as two separate gates that a design must pass, each with its own evidence and its own reviewer.
+The two sources meet at a boundary neither draws explicitly. Privacy Sandbox constrains how a signal is obtained; GDPR constrains whether and on what basis that signal may be used. A privacy-preserving delivery mechanism can reduce exposure, but it does not by itself supply a lawful basis, and a lawful basis does not make a particular tracking design acceptable to a browser. Treating either as a substitute for the other is the source of most hype. The defensible position is to handle them as <Mark>two separate gates that a design must pass</Mark>, each with its own evidence and its own reviewer.
 
 The output is a mapping from each advertising signal to the interface that supplies it, the purpose it serves, and the lawful basis relied on. That mapping is the decision instrument: it shows where a design is blocked by technology and where it is blocked by obligation, and it keeps the two reasons distinct for later review.
 
@@ -50,13 +58,19 @@ A privacy-sandbox evaluation does not certify compliance. It describes what brow
 
 The hidden cost is the loss of direct measurement. Browser-mediated signals are coarser and controlled by a party the business does not own, so experiments take longer to design and results are harder to compare with historical cookie-based data. There is also a maintenance cost: the interfaces and their rules change, and each change can invalidate an earlier evaluation. Teams that budget only for a one-time migration tend to discover the recurring cost later, when a metric drifts and the cause is an interface change rather than a campaign decision.
 
-The main failure mode is treating privacy-preserving as synonymous with compliant, or the reverse, treating a lawful basis as permission to track by any means. Both moves collapse two independent gates into one. A signal can be collected through an approved interface and still lack a documented purpose; a purpose can be legitimate and still be implemented in a way a browser blocks. Because the two sources do not share a vocabulary for this boundary, the failure is easy to miss in a review: each team checks its own gate and assumes the other passed.
+<Trap>
+The main failure mode is treating privacy-preserving as synonymous with compliant, or the reverse, treating a lawful basis as permission to track by any means.
+</Trap>
+
+Both moves collapse two independent gates into one. A signal can be collected through an approved interface and still lack a documented purpose; a purpose can be legitimate and still be implemented in a way a browser blocks. Because the two sources do not share a vocabulary for this boundary, the failure is easy to miss in a review: each team checks its own gate and assumes the other passed.
 
 The scope is also bounded. The Privacy Sandbox entry concerns advertising technologies, not general web tracking or first-party analytics. The GDPR text is a regulation, not implementation guidance for a particular API. Nothing here resolves jurisdiction questions, consent mechanics, or the rights of specific individuals, and none of it constitutes legal advice. The method only organises a decision: which signal, which interface, which purpose, which basis. A question outside that frame needs a different source.
 
 Because both sources change, the mapping needs a refresh condition on every row. An interface deprecation changes the technology column; an amendment or new guidance changes the obligation column. A reviewer should be able to see when a decision was made and which version of each source it relied on. Without that record, a future audit cannot distinguish a deliberate choice from a default that was never revisited. The decision remains valid only for the version of the world in which it was made.
 
+<PullQuote>
 The counterargument that browser-mediated signals are fair for reducing third-party tracking is incomplete when teams treat the mechanism as a compliance certificate rather than one input to a separate legal decision.
+</PullQuote>
 
 ## A decision test
 
