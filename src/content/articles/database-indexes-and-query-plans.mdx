@@ -9,7 +9,9 @@ tags:
   - Query Optimization
 ---
 
-A query that used to return in milliseconds suddenly takes seconds, and the obvious response is to add an index. Sometimes that fixes it. Often the index already existed and the planner chose not to use it — because the table grew, the statistics went stale, or the query started returning a large fraction of the rows. The index is an input to a decision, not a guarantee.
+<Lead>
+A query that used to return in milliseconds suddenly takes seconds, and the obvious response is to add an index. Sometimes that fixes it. Often the index already existed and the planner chose not to use it — because the table grew, the statistics went stale, or the query started returning a large fraction of the rows. The index is <Mark>an input to a decision, not a guarantee</Mark>.
+</Lead>
 
 **Direct answer:** An index lets the database find rows without scanning the whole table, but the query planner chooses between an index scan and a sequential scan based on estimated cost. PostgreSQL's documentation states that the planner "will use the index in queries when it thinks doing so would be more efficient than a sequential table scan" — and that you "might have to run the ANALYZE command regularly to update statistics to allow the query planner to make educated decisions". The boundary: indexes add overhead to writes, and an index that matches the wrong column order or predicate can be ignored entirely.
 
@@ -21,9 +23,19 @@ Two consequences follow from that framing:
 
 **Selectivity drives the choice.** A query returning a tiny fraction of rows benefits from an index. A query returning most of the table often does not — reading the index and then fetching rows can cost more than a sequential scan, which reads blocks in order. There is no fixed row count at which an index becomes worthwhile; it depends on the table, the storage, and the query.
 
-**The planner decides, not you.** "Once an index is created, no further intervention is required: the system will update the index when the table is modified, and it will use the index in queries when it thinks doing so would be more efficient." Adding an index does not force its use. If the planner estimates that a sequential scan is cheaper, it will ignore the index.
+**The planner decides, not you.** "Once an index is created, no further intervention is required: the system will update the index when the table is modified, and it will use the index in queries when it thinks doing so would be more efficient."
 
-This is why "we have an index" and "the query uses an index" are different claims. The second requires looking at the plan.
+<KeyPoint>
+Adding an index does not force its use.
+</KeyPoint>
+
+If the planner estimates that a sequential scan is cheaper, it will ignore the index.
+
+<Trap>
+This is why "we have an index" and "the query uses an index" are different claims.
+</Trap>
+
+The second requires <Mark>looking at the plan</Mark>.
 
 ## Reading the plan
 
@@ -34,7 +46,7 @@ The output is a tree of nodes. The documentation notes that "the very first line
 Three practical rules:
 
 1. **Compare estimates to actuals with `EXPLAIN ANALYZE`.** The plain `EXPLAIN` shows what the planner *thinks*. `EXPLAIN ANALYZE` runs the query and reports what actually happened. A large gap between estimated and actual rows is the most common sign of stale statistics.
-2. **Treat costs as relative, not absolute.** The docs warn that estimated costs "might vary slightly because ANALYZE's statistics are random samples rather than exact, and because costs are inherently somewhat platform-dependent". Compare two plans on the same system, not a number against a universal threshold.
+2. **Treat costs as relative, not absolute.** The docs warn that estimated costs "might vary slightly because ANALYZE's statistics are random samples rather than exact, and because costs are inherently somewhat platform-dependent". <Mark>Compare two plans on the same system</Mark>, not a number against a universal threshold.
 3. **Look for the expensive node, not the first node.** A plan's top line is a summary; the bottleneck is usually a specific scan, join, or sort deeper in the tree.
 
 ## A worked example of a planner decision
@@ -89,7 +101,11 @@ For the operational side, see [Observability](/articles/observability-logging-me
 
 ## A counterargument
 
-The article tells readers that once an index exists "no further intervention is required," quoting the PostgreSQL introduction, and then advises auditing and removing indexes the planner never uses - exactly the intervention that sentence says is unnecessary. A reasonable critic would say the planner-centric framing is doing two jobs at once: it usefully warns that an index does not force its own use, but it also discourages the schema-level reasoning the article later relies on when it recommends multicolumn indexes and column-order checks. The selectivity heuristics ("a large result set often does not") are themselves rules of thumb, and the EXPLAIN documentation warns that costs are "inherently somewhat platform-dependent," which cuts against generalising any threshold. Trusting the plan is sound advice; presenting the planner as self-sufficient while recommending continuous index audits is not quite consistent.
+The article tells readers that once an index exists "no further intervention is required," quoting the PostgreSQL introduction, and then advises auditing and removing indexes the planner never uses - exactly the intervention that sentence says is unnecessary. A reasonable critic would say the planner-centric framing is doing two jobs at once: it usefully warns that an index does not force its own use, but it also discourages the schema-level reasoning the article later relies on when it recommends multicolumn indexes and column-order checks. The selectivity heuristics ("a large result set often does not") are themselves rules of thumb, and the EXPLAIN documentation warns that costs are "inherently somewhat platform-dependent," which cuts against generalising any threshold.
+
+<PullQuote>
+Trusting the plan is sound advice; presenting the planner as self-sufficient while recommending continuous index audits is not quite consistent.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,7 +9,9 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 Matrix factorisation was the dominant recommender approach for years: represent users and items as vectors, and score a pair with a dot product. Its simplicity is its strength and its ceiling. Deep learning for recommender systems begins with the question of what happens when you replace that fixed dot product with a learned function.
+</Lead>
 
 **Direct answer:** Neural collaborative filtering replaces the fixed inner product with a neural network that learns how user and item embeddings should interact, which can capture structure a dot product cannot. The gain comes with costs — more parameters, more data, less interpretability, and harder serving. It helps when there is enough interaction data to learn the structure and when the ranking problem is complex; on sparse data, a well-tuned simpler model usually wins. The same trade-off appears in modern ranking models: DeepFM was built to learn "both low- and high-order feature interactions" end to end, which is a more powerful objective and a larger data requirement.
 
@@ -17,17 +19,19 @@ Matrix factorisation was the dominant recommender approach for years: represent 
 
 In matrix factorisation, a user's score for an item is the dot product of their two vectors. That is a multiplicative interaction with a fixed form, and it imposes a geometry on the problem: similarity means proximity in a shared latent space.
 
-A learned interaction function removes that constraint. The network can discover that different dimensions matter differently for different users, that interactions are non-linear, or that the user's vector and the item's vector should be combined in a more complex way. This is a genuine increase in expressive power.
+A learned interaction function removes that constraint. The network can discover that different dimensions matter differently for different users, that interactions are non-linear, or that the user's vector and the item's vector should be combined in a more complex way. This is <Mark>a genuine increase in expressive power</Mark>.
 
 Wang et al. supply the more important argument in their work on Neural Graph Collaborative Filtering: existing approaches — "ranging from early matrix factorization to recently emerged deep learning based methods" — typically obtain a user's embedding "by mapping from pre-existing features that describe the user (or the item), such as ID and attributes". The consequence is that "the collaborative signal, which is latent in user-item interactions, is not encoded in the embedding process", and the embedding "may not be sufficient to capture the collaborative filtering effect". Their answer is to integrate the interaction graph into the embedding itself.
 
+<KeyPoint>
 That is the real distinction between the deep and the classical line: not that the network is bigger, but that structure which used to appear only in the loss can be made part of the representation.
+</KeyPoint>
 
 ## Embeddings are the interface
 
 A deep recommender still needs representations of users and items, and those representations can come from several places:
 
-**ID embeddings** are learned from the interactions themselves. They work well for frequently seen entities and badly for rare ones, which is the cold-start problem in another form.
+**ID embeddings** are learned from the interactions themselves. They work well for frequently seen entities and badly for rare ones, which is <Mark>the cold-start problem in another form</Mark>.
 
 **Content embeddings** come from attributes, text, or images. Sentence-BERT derives "semantically meaningful sentence embeddings that can be compared using cosine-similarity", which is the basis for representing an item by its description. Word2vec embeddings do the same for shorter text. These help new items participate before they have interactions.
 
@@ -37,9 +41,15 @@ A practical system usually combines them. The choice matters because each source
 
 ## Ranking is where most of the value is
 
-Recommenders produce candidates; rankers order them, and the ranking objective is where most commercial value sits. DeepFM's approach is to model low- and high-order feature interactions end to end, and their evaluation covers "both benchmark data and commercial data" — the right instinct for a field where offline gains often fail to transfer.
+Recommenders produce candidates; rankers order them, and <Mark>the ranking objective is where most commercial value sits</Mark>. DeepFM's approach is to model low- and high-order feature interactions end to end, and their evaluation covers "both benchmark data and commercial data" — the right instinct for a field where offline gains often fail to transfer.
 
-The transfer problem is worth stating plainly: a ranking model optimises the metric it was trained on, usually click-through rate, which is not the business objective. A more expressive model can be better at optimising the wrong thing. The system therefore needs a second measure — retention, repeat purchase, total value — that the model was not trained against, and an experiment that tests whether the offline gain appears online.
+The transfer problem is worth stating plainly: a ranking model optimises the metric it was trained on, usually click-through rate, which is not the business objective.
+
+<Trap>
+A more expressive model can be better at optimising the wrong thing.
+</Trap>
+
+The system therefore needs a second measure — retention, repeat purchase, total value — that the model was not trained against, and an experiment that tests whether the offline gain appears online.
 
 ## The costs that come with the gain
 
@@ -63,7 +73,11 @@ The following is hypothetical and illustrative. Suppose a media service with a m
 
 ## A counterargument
 
-The article presents the learned interaction as the substantive advance, but that framing is largely the one the cited papers use to motivate themselves. NGCF is quoted saying earlier methods fail to encode the collaborative signal in the embedding; DeepFM reports evaluation on "both benchmark data and commercial data"; neither establishes on its own that the extra expressiveness is worth the serving cost in a deployed system. The article concedes the point when it says offline gains often fail to transfer and that the honest test is a controlled comparison on your own data, which makes the central claim empirical rather than architectural. A reasonable critic would also note that part of the reported gain may come from content embeddings such as Sentence-BERT and Word2vec, which bring item semantics from elsewhere rather than from the learned user-item interaction the title foregrounds. The costs list is fair, but it reads as a caveat attached to a conclusion the sources do not fully support.
+The article presents the learned interaction as the substantive advance, but that framing is largely the one the cited papers use to motivate themselves. NGCF is quoted saying earlier methods fail to encode the collaborative signal in the embedding; DeepFM reports evaluation on "both benchmark data and commercial data"; neither establishes on its own that the extra expressiveness is worth the serving cost in a deployed system. The article concedes the point when it says offline gains often fail to transfer and that the honest test is a controlled comparison on your own data, which makes the central claim empirical rather than architectural. A reasonable critic would also note that part of the reported gain may come from content embeddings such as Sentence-BERT and Word2vec, which bring item semantics from elsewhere rather than from the learned user-item interaction the title foregrounds.
+
+<PullQuote>
+The costs list is fair, but it reads as a caveat attached to a conclusion the sources do not fully support.
+</PullQuote>
 
 ## References & Further Reading
 

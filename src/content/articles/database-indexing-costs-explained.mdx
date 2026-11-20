@@ -9,21 +9,27 @@ tags:
   - Verified
 ---
 
-Indexes are often added as a reflex whenever a query feels slow, without asking what the database must give up in exchange. The database index entry describes a structure that speeds retrieval at a cost, and the query optimization entry describes how a database chooses among plans. The real problem is deciding when an index earns its keep rather than simply adding one.
+<Lead>
+Indexes are often added as a reflex whenever a query feels slow, without asking what the database must give up in exchange. The database index entry describes a structure that speeds retrieval at a cost, and the query optimization entry describes how a database chooses among plans. The real problem is deciding <Mark>when an index earns its keep rather than simply adding one</Mark>.
+</Lead>
 
-**Direct answer:** A database index is a structure that improves the speed of data retrieval, usually by maintaining an ordered or hashed access path, at the cost of extra storage and slower writes. A query optimizer decides whether to use available indexes when it plans a query. An index pays off only when the read benefit exceeds its write and storage cost.
+**Direct answer:** A database index is a structure that improves the speed of data retrieval, usually by maintaining an ordered or hashed access path, at the cost of extra storage and slower writes. A query optimizer decides whether to use available indexes when it plans a query.
+
+<KeyPoint>
+An index pays off only when the read benefit exceeds its write and storage cost.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and an index-to-workload mapping beyond the sources: it maps an index structure to a read-write trade-off decision, with claim status explicit.
 
 ## The mechanism
 
-The database index entry describes a data structure that improves the speed of data retrieval operations on a table, typically at the cost of additional writes and storage. In practice, an index keeps a copy of selected columns in a form that can be searched quickly, so the engine can find matching rows without scanning the whole table. The source presents the index as a trade-off, not a free improvement. That framing is the key: every index is paid for on every write, whether or not any query ever uses it.
+The database index entry describes a data structure that improves the speed of data retrieval operations on a table, typically at the cost of additional writes and storage. In practice, an index keeps a copy of selected columns in a form that can be searched quickly, so the engine can find matching rows without scanning the whole table. The source presents the index as a trade-off, not a free improvement. That framing is the key: <Mark>every index is paid for on every write</Mark>, whether or not any query ever uses it.
 
 <Figure src="/images/articles/inline/database-indexing-costs-explained-1.png" alt="A four-step flow: understand the query shape, choose an index structure, pay the write and storage cost, then verify the optimizer uses it." caption="Conceptual: an index pays only when reads outweigh writes." />
 
 The query optimization entry describes how a database examines possible execution plans and selects one it estimates to be efficient. Indexes are inputs to that choice. An optimizer may use an index for a selective lookup and ignore it for a query that returns most of a table, because a full scan can be cheaper than many index lookups. The sources treat these as separate topics: one describes the structure, the other the decision to use it. Useful evaluation requires both.
 
-The practical consequence is that indexing is a workload decision. A read-heavy table with selective filters can benefit from indexes; a write-heavy table may suffer because each insert and update must maintain every index. Because the sources describe mechanisms rather than workloads, deciding which columns to index is an inference. That decision should be recorded with the queries it was meant to serve, because an index added for one access pattern can become dead weight when that pattern disappears.
+The practical consequence is that <Mark>indexing is a workload decision</Mark>. A read-heavy table with selective filters can benefit from indexes; a write-heavy table may suffer because each insert and update must maintain every index. Because the sources describe mechanisms rather than workloads, deciding which columns to index is an inference. That decision should be recorded with the queries it was meant to serve, because an index added for one access pattern can become dead weight when that pattern disappears.
 
 A further consequence is that an index is not a guarantee of speed. It helps only when the optimizer chooses it and when the query shape suits its structure. A function applied to an indexed column, a mismatched data type, or a broad filter can make the index irrelevant. The mechanism is therefore a chain: understand the queries, choose an index structure, pay the write and storage cost, then verify the optimizer uses it. Every link is a decision that should be visible when performance is reviewed.
 
@@ -47,13 +53,19 @@ An index cannot make every query faster. It helps specific access patterns, chie
 
 The hidden cost is ongoing rather than one-time. Each index consumes storage and must be updated on every relevant write, so a write-heavy workload pays repeatedly for a structure that may be used rarely or never. There is also a maintenance cost: indexes accumulate as applications change, and unused ones are seldom removed because nobody owns them. The result is a table that grows slower to write over time, with no clear culprit. Neither source addresses this operational cost, so it is an inference from the gap between adding an index and living with it.
 
-The main failure mode is indexing without checking the plan. An index can exist and still be unused because the query does not match its structure, a function wraps the indexed column, or the optimizer judges a scan cheaper. A related failure is assuming the optimizer is always right: it chooses from available indexes and estimates, so a missing index or stale statistics can produce a poor plan. The sources describe the mechanism without guaranteeing correct choices, so verification remains the team's responsibility.
+<Trap>
+The main failure mode is indexing without checking the plan.
+</Trap>
+
+An index can exist and still be unused because the query does not match its structure, a function wraps the indexed column, or the optimizer judges a scan cheaper. A related failure is assuming the optimizer is always right: it chooses from available indexes and estimates, so a missing index or stale statistics can produce a poor plan. The sources describe the mechanism without guaranteeing correct choices, so verification remains the team's responsibility.
 
 There is a boundary around what these topics cover. The database index entry describes access structures; it does not cover schema design, normalization, or the cost of joins. Query optimization describes plan selection; it does not tune the application queries that feed the planner. An indexing decision can improve one query while leaving a deeper design problem in place. It also cannot substitute for measurement, because the benefit depends on real data distribution and real load, which no definition supplies.
 
 Because workloads change, indexing needs periodic review. Query plans should be rechecked when access patterns shift, and index usage should be examined before assuming an old index still earns its cost. Each index should be recorded with the query it was added for and a date, so it can be challenged when that query disappears. Without that record, indexes persist as invisible write overhead long after their purpose has passed.
 
+<PullQuote>
 The counterargument that adding more indexes is fair because it covers more query shapes is reasonable for read flexibility and incomplete for writes, since every extra structure is maintained on every change whether or not it is used.
+</PullQuote>
 
 ## A decision test
 

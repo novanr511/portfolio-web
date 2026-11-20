@@ -9,9 +9,11 @@ tags:
   - Quality
 ---
 
+<Lead>
 Pretraining data is often treated as a volume problem — collect more text and train longer. The composition of that text matters as much as its size. A corpus full of near-duplicates trains a model to memorise common passages; one with systematic gaps produces blind spots no amount of compute fills.
+</Lead>
 
-**Direct answer:** Data curation for pretraining means removing duplicates, filtering low-quality content, and balancing the sources before training. The paper *Deduplicating Training Data Makes Language Models Better* reports that both exact and near-duplicate removal improve model quality and reduce memorisation. The boundary: curation choices are judgements about what counts as quality, and they encode values — a filtered corpus is not a neutral one, as the datasheets article explains.
+**Direct answer:** Data curation for pretraining means removing duplicates, filtering low-quality content, and balancing the sources before training. The paper *Deduplicating Training Data Makes Language Models Better* reports that both exact and near-duplicate removal improve model quality and reduce memorisation. The boundary: curation choices are judgements about what counts as quality, and they encode values — <Mark>a filtered corpus is not a neutral one</Mark>, as the datasheets article explains.
 
 ## Why deduplication matters
 
@@ -19,7 +21,11 @@ Three effects follow from repeated content:
 
 **Memorisation.** A passage seen many times in training is more likely to be reproduced verbatim at inference, which raises privacy and copyright concerns.
 
-**Distorted frequencies.** If one source appears a hundred times, the model overweights its phrasing and facts. A corpus is a sample, and duplicates bias the sample.
+**Distorted frequencies.** If one source appears a hundred times, the model overweights its phrasing and facts.
+
+<KeyPoint>
+A corpus is a sample, and duplicates bias the sample.
+</KeyPoint>
 
 **Wasted compute.** Tokens spent re-reading the same material are tokens not spent on new information, which matters at training scale.
 
@@ -49,12 +55,12 @@ Three checks decide:
 
 1. **Measure duplicate prevalence.** If 20% of the corpus is duplicated, curation frees significant capacity. If it is 1%, the effort may not pay.
 2. **Check what the filter removes.** Sample the discarded documents. If a near-duplicate filter is removing legitimate variation — different reviews of the same product, for example — the threshold is too aggressive.
-3. **Evaluate on a held-out real corpus.** A model trained on curated data should be assessed on human-written text it did not see, not on a test set drawn from the same filtered distribution.
+3. **Evaluate on <Mark>a held-out real corpus</Mark>.** A model trained on curated data should be assessed on human-written text it did not see, not on a test set drawn from the same filtered distribution.
 
 Three conclusions follow:
 
 - **Curation has a measurable cost and a measurable benefit**; decide with both in view.
-- **Filters encode values**, so record what was removed and why.
+- **<Mark>Filters encode values</Mark>**, so record what was removed and why.
 - **A held-out human corpus is the anchor**, since a filtered test set flatters the filtered training set.
 
 ## The operational side of curation
@@ -67,7 +73,11 @@ Curation is a pipeline, not a one-time cleanup. Three practices keep it from dri
 
 **Keep a small gold set.** A human-reviewed sample of the corpus, labelled as high or low quality, gives a stable reference for evaluating a filter change. Without it, a filter update is judged by the model's downstream behaviour, which is slow and confounded.
 
-These habits are unglamorous and decisive. Most curation failures are not a wrong algorithm but a filter nobody re-examined after the data changed.
+These habits are unglamorous and decisive.
+
+<Trap>
+Most curation failures are not a wrong algorithm but a filter nobody re-examined after the data changed.
+</Trap>
 
 ## What curation cannot do
 
@@ -77,7 +87,11 @@ These habits are unglamorous and decisive. Most curation failures are not a wron
 
 **It cannot fix a bad objective.** A well-curated corpus trained with the wrong objective still produces a model that optimises the wrong thing.
 
-The counterargument — that more data always helps — is true only under a fixed quality distribution. When composition changes, the relationship breaks, which is why model cards and datasheets exist as documentation of the data behind a system.
+<PullQuote>
+The counterargument — that more data always helps — is true only under a fixed quality distribution.
+</PullQuote>
+
+When composition changes, the relationship breaks, which is why model cards and datasheets exist as documentation of the data behind a system.
 
 ## A decision test
 

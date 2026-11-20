@@ -9,7 +9,9 @@ tags:
   - DevOps
 ---
 
+<Lead>
 A data pipeline is rarely difficult because of any single transformation. It becomes difficult when dozens of transformations depend on one another, run on different schedules, and fail in partial ways that leave downstream tables quietly wrong. Orchestration is the discipline of making those dependencies explicit and the failures visible.
+</Lead>
 
 **Direct answer:** Workflow orchestration tools — Apache Airflow and Prefect are the two named here — manage task dependencies, scheduling, retries, and observability for data workflows. CloudEvents provides "a specification for describing event data in a common way", which matters when pipelines react to events rather than clocks. GitHub Actions automates "software development workflows" and can run CI/CD, which overlaps with orchestration but is optimised for code, not data dependencies. The boundary: an orchestrator does not make a pipeline correct; it makes the order and state of execution explicit.
 
@@ -21,7 +23,7 @@ Four capabilities distinguish orchestration from a collection of cron jobs.
 
 **Retry and failure semantics.** A transient failure should be retried; a deterministic one should not. A good orchestrator lets you declare retries, backoff, and the conditions under which a task is considered failed.
 
-**State and history.** You should be able to answer "did yesterday's load succeed?" and "which run produced this table?" without reading logs. That history is the basis of trust in a data warehouse.
+**State and history.** You should be able to answer "did yesterday's load succeed?" and "which run produced this table?" without reading logs. That history is <Mark>the basis of trust in a data warehouse</Mark>.
 
 **Backfills.** When a transformation changes, you need to recompute past periods in the correct order. A tool that cannot backfill reliably forces manual work and creates silent inconsistencies.
 
@@ -45,7 +47,7 @@ Suppose a daily revenue table must be ready by 07:00, and three jobs feed it:
 | Extract refunds | 10 min | — |
 | Join and aggregate | 15 min | both extracts |
 
-Run sequentially, the total is 45 minutes, so a 06:15 start meets the 07:00 SLA with 15 minutes of slack. Run the two extracts in parallel, the critical path is 20 + 15 = 35 minutes, giving 25 minutes of slack.
+Run sequentially, the total is 45 minutes, so a 06:15 start meets the 07:00 SLA with 15 minutes of slack. Run the two extracts in parallel, <Mark>the critical path</Mark> is 20 + 15 = 35 minutes, giving 25 minutes of slack.
 
 Now add a retry. If the orders extract has a 10% chance of failing once and taking 20 minutes again, the expected duration is 20 + 0.1 × 20 = 22 minutes, and the 10% tail is 42 minutes on the critical path. With a 06:15 start, a single retry still finishes around 06:57 — just inside the SLA. Two retries would breach it.
 
@@ -55,7 +57,9 @@ This arithmetic explains three design choices:
 2. **Set retry limits from the SLA**, not from a default of three.
 3. **Alert on predicted breach**, not only on failure — a delayed input at 06:30 is already a problem even if nothing has failed yet.
 
+<KeyPoint>
 The numbers are hypothetical, but the method is the point: an SLA is a budget of time, and retries, dependencies, and delays spend it.
+</KeyPoint>
 
 ## Where CI/CD overlaps and where it does not
 
@@ -67,7 +71,7 @@ Use both, with clear boundaries: CI/CD to build and deploy the transformation co
 
 ## Idempotency is the safety property
 
-A pipeline will be retried. A task will run twice after a worker loses its connection at the moment it was writing. The question is whether a second execution produces the same result as the first — the property called idempotency.
+A pipeline will be retried. A task will run twice after a worker loses its connection at the moment it was writing. The question is whether a second execution produces the same result as the first — the property called <Mark>idempotency</Mark>.
 
 Three patterns make it achievable:
 
@@ -85,7 +89,11 @@ Three limits matter.
 
 **A green task is not a correct table.** An orchestrator confirms that a job exited successfully. It does not know whether the row count is plausible, whether a join silently dropped records, or whether a source changed its schema. Data-quality checks are a separate concern and should be part of the pipeline.
 
-**Dependencies must be declared.** The orchestrator cannot infer that table B needs table A if nobody encoded it. An undocumented dependency is a hidden failure waiting for a change in timing.
+**Dependencies must be declared.** The orchestrator cannot infer that table B needs table A if nobody encoded it.
+
+<Trap>
+An undocumented dependency is a hidden failure waiting for a change in timing.
+</Trap>
 
 **The graph rots.** Pipelines accumulate tasks that nobody remembers the purpose of. Keep a Changelog's discipline — "all notable changes to this project will be documented in this file", with categories such as Added, Changed, and Removed — applies to pipeline definitions: record why a task was added and when it was retired.
 
@@ -103,7 +111,11 @@ For the operational side, see [MLOps](/articles/mlops-from-experiment-to-product
 
 ## A counterargument
 
-The article draws a firm boundary between an orchestrator and a CI/CD tool, then claims the orchestrator makes scheduled and event-driven work "visible in one place." A reasonable critic would say that boundary is a convention rather than a property established by the sources. CloudEvents and AMQP, as cited, specify an event envelope and a messaging protocol; neither supplies dependency graphs, run history, or backfills, so the "one place" is something the orchestrator adds rather than something the standards guarantee. GitHub Actions is described as automating "software development workflows," but the cited documentation does not say it cannot run a scheduled, retried data job - the claim that it "will not tell you that a partition is stale" is a feature gap, not an inherent limit. The distinction is useful, yet the article presents a tool boundary as a principle.
+The article draws a firm boundary between an orchestrator and a CI/CD tool, then claims the orchestrator makes scheduled and event-driven work "visible in one place." A reasonable critic would say that boundary is a convention rather than a property established by the sources. CloudEvents and AMQP, as cited, specify an event envelope and a messaging protocol; neither supplies dependency graphs, run history, or backfills, so the "one place" is something the orchestrator adds rather than something the standards guarantee. GitHub Actions is described as automating "software development workflows," but the cited documentation does not say it cannot run a scheduled, retried data job - the claim that it "will not tell you that a partition is stale" is a feature gap, not an inherent limit.
+
+<PullQuote>
+The distinction is useful, yet the article presents a tool boundary as a principle.
+</PullQuote>
 
 ## References & Further Reading
 

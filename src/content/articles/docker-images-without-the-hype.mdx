@@ -9,9 +9,13 @@ tags:
   - Infrastructure
 ---
 
+<Lead>
 A Docker image is often described as a lightweight virtual machine, which is misleading. The Docker entry describes the image and its layers, as the Open Container Initiative defines the specifications behind the format, as the kubernetes-cost article treats the resource implications, as the rollback article treats deployment as a change with risk, as the security-headers article treats browser boundaries, as the threat-modeling article treats the build as a boundary.
+</Lead>
 
-**Direct answer:** Treat an image as a layered artefact with a defined base, a build recipe, and a runtime contract. Wikipedia's Docker entry provides the mechanism, and the OCI specifications define the format. The boundary: a smaller image does not guarantee a safer or faster system, which the benchmarks article warns about broad claims, as the risk article requires residual risk, as the publication standard forbids guaranteed outcomes.
+**Direct answer:** Treat an image as a layered artefact with a defined base, a build recipe, and a runtime contract.
+
+Wikipedia's Docker entry provides the mechanism, and the OCI specifications define the format. The boundary: a smaller image does not guarantee a safer or faster system, which the benchmarks article warns about broad claims, as the risk article requires residual risk, as the publication standard forbids guaranteed outcomes.
 
 ## What the layers mean
 
@@ -21,9 +25,9 @@ A Docker image is often described as a lightweight virtual machine, which is mis
 
 **Runtime contract.** Ports, environment, and entrypoint define how the image runs, which the OCI specification covers, as the tool-calling article treats explicit contracts, as the configuration article treats drift, as the observability article treats signals as evidence, as the rubric article requires concrete criteria.
 
-**Size and trust.** A smaller image has fewer components, which the Docker entry implies, as the SBOM article treats inventory, as the security-checklist article treats per-component controls, as the data-curation article advises on keeping only what is needed, as the cost estimator requires for storage, as the risk article requires residual risk.
+**Size and trust.** <Mark>A smaller image has fewer components</Mark>, which the Docker entry implies, as the SBOM article treats inventory, as the security-checklist article treats per-component controls, as the data-curation article advises on keeping only what is needed, as the cost estimator requires for storage, as the risk article requires residual risk.
 
-Three consequences follow. The base should be chosen deliberately, as the supply-chain and SBOM articles advise, as the data-governance article requires provenance, as the risk article requires residual risk, as the decision-memo article requires for a record, as the monitoring article advises for review, as the benchmarks article warns about broad claims, as the observability article treats signals as evidence, as the rubric article requires concrete criteria.
+Three consequences follow. <Mark>The base should be chosen deliberately</Mark>, as the supply-chain and SBOM articles advise, as the data-governance article requires provenance, as the risk article requires residual risk, as the decision-memo article requires for a record, as the monitoring article advises for review, as the benchmarks article warns about broad claims, as the observability article treats signals as evidence, as the rubric article requires concrete criteria.
 
 ## A worked example
 
@@ -31,13 +35,25 @@ The following is hypothetical and illustrative. A team builds an image from a ge
 
 Three checks decide. First, what is actually in the image, as the Docker entry and SBOM article advise, with provenance, as data governance requires? Second, is the build recipe reproducible, as the build-pipeline article advises, with a fixed base, as the change-management article requires, as the monitoring article advises for review? Third, does a smaller base change runtime behaviour, as the OCI specification and benchmarks article advise, with a test, as the rubric article requires, as the rollback article advises on a recovery path, as the risk article requires residual risk?
 
-Three conclusions follow. A general base carries more than the app needs, which the inventory check reveals. Reproducibility matters more than size, as the build-pipeline article advises. And the decision should be recorded, as the decision-memo article requires.
+Three conclusions follow.
+
+<KeyPoint>
+A general base carries more than the app needs, which the inventory check reveals.
+</KeyPoint>
+
+<PullQuote>
+Reproducibility matters more than size, as the build-pipeline article advises.
+</PullQuote>
+
+And the decision should be recorded, as the decision-memo article requires.
 
 ## What images cannot do
 
-They cannot guarantee a secure runtime, which the publication standard forbids claiming, as the risk article requires residual risk, as the security-checklist article treats per-component controls, as the threat-modeling article treats boundaries, as the red-teaming article treats testing as partial. They do not remove the need for scanning, which the SBOM and security articles advise, as the observability article treats signals, as the monitoring article advises for review. And they cannot guarantee portability across runtimes, which the OCI specification defines as a goal, as the benchmarks article warns about conditions, as the decision-memo article requires for a record.
+<Mark>They cannot guarantee a secure runtime</Mark>, which the publication standard forbids claiming, as the risk article requires residual risk, as the security-checklist article treats per-component controls, as the threat-modeling article treats boundaries, as the red-teaming article treats testing as partial. They do not remove the need for scanning, which the SBOM and security articles advise, as the observability article treats signals, as the monitoring article advises for review. And they cannot guarantee portability across runtimes, which the OCI specification defines as a goal, as the benchmarks article warns about conditions, as the decision-memo article requires for a record.
 
+<Trap>
 The counterargument that the smallest image is always best is fair for storage and surface area and incomplete when the base lacks what the runtime needs, which the worked example shows, as the OCI specification and benchmarks article advise, as the rollback article recommends a recovery path, as the risk article requires residual risk.
+</Trap>
 
 ## A decision test
 

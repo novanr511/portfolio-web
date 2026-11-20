@@ -9,7 +9,9 @@ tags:
   - Reliability
 ---
 
-DevOps is often introduced with a diagram of a loop between development and operations, and the diagram is correct. What it leaves out is the mechanism: the loop is made of specific artefacts — version control, automated tests, deployment pipelines, shared metrics, and blameless review — and a team that adopts the word without those artefacts has renamed a boundary rather than removed it.
+<Lead>
+DevOps is often introduced with a diagram of a loop between development and operations, and the diagram is correct. What it leaves out is the mechanism: the loop is made of specific artefacts — version control, automated tests, deployment pipelines, shared metrics, and blameless review — and a team that adopts the word without those artefacts has <Mark>renamed a boundary rather than removed it</Mark>.
+</Lead>
 
 **Direct answer:** DevOps works when the feedback from production reaches the people who write the code, quickly and without a translation layer, and when the path from a commit to production is automated enough that deployment is routine. The practical instruments are continuous integration, automated deployment, shared service objectives, and incident review that produces changes to the system rather than conclusions about individuals. The test is simple: how long does it take a developer to learn that their change caused a problem, and can they fix it without asking another team for permission?
 
@@ -31,13 +33,21 @@ Continuous delivery extends that to deployment. The important property is not fr
 
 Git hooks and CI configuration are the enforcement layer, and Git's own documentation describes hooks as scripts that run automatically on events such as commit and push. They are useful for cheap checks — formatting, a fast test, a secret scan — and the heavier checks belong in CI, where they run in a consistent environment rather than on a developer's laptop.
 
-The failure mode of automation is a pipeline nobody trusts: tests that fail intermittently, a build that takes an hour, a deployment that cannot be rolled back. A slow, unreliable pipeline is worse than a manual process, because it adds ceremony without adding confidence.
+<Trap>
+The failure mode of automation is a pipeline nobody trusts: tests that fail intermittently, a build that takes an hour, a deployment that cannot be rolled back.
+</Trap>
+
+A slow, unreliable pipeline is worse than a manual process, because it adds ceremony without adding confidence.
 
 ## Shared objectives are the cultural part
 
 The reason "throw it over the wall" fails is not a lack of friendliness. It is that the two groups are measured on different things. If developers are rewarded for feature velocity and operations for uptime, the boundary is rational and the loop cannot form.
 
-Shared service level objectives change the incentives. When both groups own the same availability target and the same error budget, a decision to ship becomes a joint judgement about risk rather than a negotiation between competing goals. This is the practical meaning of "bridging" — a common measure, not a common Slack channel.
+Shared service level objectives change the incentives. When both groups own the same availability target and the same error budget, a decision to ship becomes a joint judgement about risk rather than a negotiation between competing goals.
+
+<KeyPoint>
+This is the practical meaning of "bridging" — a common measure, not a common Slack channel.
+</KeyPoint>
 
 Blameless incident review is the companion practice. The purpose is to find the conditions that allowed a human action to cause an outage — a missing guard, an ambiguous interface, an unclear rollout — because those are the things that can be changed. A review that ends with "be more careful next time" has not produced a learning artefact.
 
@@ -45,7 +55,7 @@ Blameless incident review is the companion practice. The purpose is to find the 
 
 The useful measures are about the loops: lead time from commit to production, deployment frequency, change failure rate, and time to restore service. These four together are more informative than any single one — optimising deployment frequency alone can produce a system that fails more often and recovers slowly.
 
-The measures to distrust are activity metrics: number of pipelines, number of tickets closed, number of deploys in a week without a failure-rate denominator. A team can improve all of those while the system becomes less reliable.
+The measures to distrust are <Mark>activity metrics</Mark>: number of pipelines, number of tickets closed, number of deploys in a week without a failure-rate denominator. A team can improve all of those while the system becomes less reliable.
 
 ## A starting sequence
 
@@ -65,7 +75,13 @@ The following is hypothetical and illustrative. Suppose a team ships a release t
 
 ## A counterargument
 
-A reasonable critic can push back that the causal story is stronger than the sources support. The Google SRE texts describe SLOs, error budgets, and blameless review as recommended practice, and the GitHub and Git documents describe what the tools do; none of them establishes that shortening these loops causes higher reliability. The article presents the four loop metrics as diagnostic, but the same sources offer no threshold at which a long lead time becomes harmful, so a team could improve every metric and still fail in ways the framework does not capture. The objection is not that the loops are meaningless; it is that treating a prescriptive framework as a measured law invites false confidence. The framing is incomplete wherever the mechanism is asserted rather than demonstrated on the system at hand.
+A reasonable critic can push back that the causal story is stronger than the sources support. The Google SRE texts describe SLOs, error budgets, and blameless review as recommended practice, and the GitHub and Git documents describe what the tools do; none of them establishes that shortening these loops causes higher reliability. The article presents the four loop metrics as diagnostic, but the same sources offer no threshold at which a long lead time becomes harmful, so a team could improve every metric and still fail in ways the framework does not capture.
+
+<PullQuote>
+The objection is not that the loops are meaningless; it is that treating a prescriptive framework as a measured law invites false confidence.
+</PullQuote>
+
+The framing is incomplete wherever the mechanism is asserted rather than demonstrated on the system at hand.
 
 ## References & Further Reading
 

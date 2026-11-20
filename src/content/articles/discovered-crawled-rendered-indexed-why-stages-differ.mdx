@@ -9,7 +9,9 @@ tags:
   - Google Search Console
 ---
 
+<Lead>
 One of the most persistent sources of confusion in technical SEO is treating search engine visibility as a binary state: a page is either known or unknown. In reality, a URL must pass through five distinct operational stages before it can ever appear in search results. When a page fails to rank, it has almost always stalled at one specific boundary inside this ingestion pipeline.
+</Lead>
 
 **Direct Answer:** Discovery means a crawler knows a URL exists. Crawling (fetching) means the crawler downloaded the initial response bytes. Rendering means the Web Rendering Service executed client-side JavaScript to construct the DOM. Indexing means the document was parsed, clustered for duplicates, assigned canonical equity, and committed to the searchable database. A URL stuck in *Discovered — currently not indexed* indicates a crawl capacity or demand bottleneck, whereas *Crawled — currently not indexed* indicates a content quality, thinness, or duplicate clustering issue.
 
@@ -32,13 +34,13 @@ Not Indexed         Indexed          or Blocked JS        Not Selected          
 To diagnose indexing issues, engineers must isolate exactly where a document stalls along the ingestion path.
 
 ### Stage 1: Discovery (The URL Frontier)
-Googlebot identifies that a URL exists. Discovery occurs via internal hyperlinks (`<a href>`), XML sitemaps, HTTP redirect destinations, or external backlinks. At this point, **the server has not been contacted**. The URL is merely a string queued in the crawl frontier database.
+Googlebot identifies that a URL exists. Discovery occurs via internal hyperlinks (`<a href>`), XML sitemaps, HTTP redirect destinations, or external backlinks. At this point, **the server has not been contacted**. The URL is merely a string queued in the <Mark>crawl frontier database</Mark>.
 
 ### Stage 2: Crawling / Fetching (Network Transmission)
 The crawler scheduler allocates host capacity and dispatches an HTTP GET request. The web server returns response headers and the initial HTML stream. If the server responds with `200 OK`, the byte stream is stored for processing. If it responds with `404`, `301`, `429`, or `5xx`, the URL exits the indexing pipeline immediately (as detailed in [HTTP Status Codes for SEO](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx)).
 
 ### Stage 3: Rendering (Web Rendering Service)
-If the page relies on client-side JavaScript to render text, navigation, or metadata, it enters the Web Rendering Service (WRS) queue. Headless Chromium executes the code to produce the rendered DOM. If script execution times out or critical assets are blocked by `robots.txt`, the document is evaluated in a degraded state.
+If the page relies on client-side JavaScript to render text, navigation, or metadata, it enters the <Mark>Web Rendering Service</Mark> (WRS) queue. Headless Chromium executes the code to produce the rendered DOM. If script execution times out or critical assets are blocked by `robots.txt`, the document is evaluated in a degraded state.
 
 ### Stage 4: Canonical Selection & Deduplication
 Search engines cluster similar documents across your site and the wider web. Algorithms evaluate canonical tags (`rel="canonical"`), redirect targets, URL structure, and internal link equity to select a single representative URL (the "Canonical URL"). Non-canonical duplicates are omitted from the index.
@@ -78,7 +80,9 @@ Discovery Event (Sitemap / Internal Link)
 
 *Crawled — currently not indexed* is fundamentally different: **Googlebot successfully fetched the page, rendered it, and actively chose not to include it in the search index.**
 
+<Trap>
 This is not a network or crawling failure; it is an indexation and evaluation judgment.
+</Trap>
 
 ### Root Causes of Crawled But Excluded URLs:
 * **Duplicate or Near-Duplicate Content:** The content is substantially identical to another page on the same domain or an external site, and search engine heuristics decided not to index multiple versions.
@@ -148,7 +152,13 @@ Run GSC URL Inspection (Inspect URL)
 
 ## Summary & Next Steps
 
-Search indexing is an incremental funnel. A URL cannot be indexed until it is crawled; it cannot be crawled until it is discovered; and it will not be served unless it passes canonical consolidation and uniqueness thresholds. By separating *Discovered* bottlenecks (capacity and crawl demand) from *Crawled* bottlenecks (content quality and duplicate signals), developers can apply precise infrastructure and architectural fixes.
+Search indexing is an <Mark>incremental funnel</Mark>.
+
+<KeyPoint>
+A URL cannot be indexed until it is crawled; it cannot be crawled until it is discovered; and it will not be served unless it passes canonical consolidation and uniqueness thresholds.
+</KeyPoint>
+
+By separating *Discovered* bottlenecks (capacity and crawl demand) from *Crawled* bottlenecks (content quality and duplicate signals), developers can apply precise infrastructure and architectural fixes.
 
 Continue through the Technical SEO series to master platform implementations and discovery controls:
 * **[How Googlebot Discovers and Crawls Pages](/articles/how-googlebot-discovers-and-crawls-pages)** — Managing the crawl frontier and crawl capacity limits.
@@ -161,7 +171,13 @@ The following is hypothetical and illustrative. Suppose an e-commerce engineer s
 
 ## A counterargument
 
-A reasonable critic can object that the stage model is cleaner than the sources actually support. Google's crawler overview and SEO Starter Guide describe discovery, crawling, and rendering as best-effort processes and explicitly decline to guarantee that any given URL will be crawled or indexed, yet the article presents a deterministic funnel in which each status maps to one cause and one fix. The same Search Console status, however, can have several causes, and the sources do not establish the one-to-one diagnostic mapping the tree relies on. The objection is not that the stages are a useless abstraction; it is that a tidy boundary diagram can overstate how precisely a specific URL's fate can be inferred. Under conditions where crawl demand, rendering, and quality interact, isolating one stage may be a heuristic rather than a diagnosis.
+A reasonable critic can object that the stage model is cleaner than the sources actually support. Google's crawler overview and SEO Starter Guide describe discovery, crawling, and rendering as best-effort processes and explicitly decline to guarantee that any given URL will be crawled or indexed, yet the article presents a deterministic funnel in which each status maps to one cause and one fix. The same Search Console status, however, can have several causes, and the sources do not establish the one-to-one diagnostic mapping the tree relies on.
+
+<PullQuote>
+The objection is not that the stages are a useless abstraction; it is that a tidy boundary diagram can overstate how precisely a specific URL's fate can be inferred.
+</PullQuote>
+
+Under conditions where crawl demand, rendering, and quality interact, isolating one stage may be a heuristic rather than a diagnosis.
 
 ## References & Further Reading
 

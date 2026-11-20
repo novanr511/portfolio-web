@@ -9,23 +9,33 @@ tags:
   - Analytics
 ---
 
+<Lead>
 Customer lifetime value is the metric most acquisition decisions are supposed to be governed by, and it is routinely used in a way that cannot survive contact with an accountant. The problem is not that people calculate it. The problem is that they treat one half of the ratio as a fact and the other half as an estimate, and then act as if the estimate were the fact.
+</Lead>
 
 **Direct answer:** CAC is what you spent; LTV is a forecast built from assumptions about retention, margin, and discount rate. Treating a measurement and a model as equals is how companies end up buying customers at losses they cannot see. The defensible version of the metric is not the ratio but the pair: lifetime value, gross-margin-adjusted, against CAC, compared over a payback window that your cash position can actually tolerate.
 
 ## The asymmetry that decides everything
 
-CAC is knowable. You can read it off the spend and the new-customer count, reconcile it against the ledger, and the only judgement is the attribution window. LTV is not knowable. It requires three things you must forecast: how long the customer stays, what they buy while they are there, and what that revenue is worth in present money.
+CAC is knowable. You can read it off the spend and the new-customer count, reconcile it against the ledger, and <Mark>the only judgement is the attribution window</Mark>. LTV is not knowable. It requires three things you must forecast: how long the customer stays, what they buy while they are there, and what that revenue is worth in present money.
 
 That asymmetry propagates through every decision built on the ratio. If a team can measure CAC precisely and LTV loosely, the natural drift is to defend the measurement and discount the model — which is exactly backwards, because the model is where the uncertainty that matters lives.
 
-It also explains a common pattern: LTV improves in the model the moment growth gets hard. When CAC rises, teams refine the retention assumption, and the ratio appears to recover while the business is getting worse. A metric that improves when reality worsens is not a metric.
+It also explains a common pattern: LTV improves in the model the moment growth gets hard. When CAC rises, teams refine the retention assumption, and the ratio appears to recover while the business is getting worse.
+
+<KeyPoint>
+A metric that improves when reality worsens is not a metric.
+</KeyPoint>
 
 ## What actually goes into the calculation
 
 The components, and the failure mode of each:
 
-**Gross margin, not revenue.** A customer who buys a low-margin product for three years is worth less than one who buys a high-margin product for a year. Using revenue overstates LTV by exactly the difference between your margin structure and 100%. This is the single most common error, and it is not a rounding difference.
+**Gross margin, not revenue.** A customer who buys a low-margin product for three years is worth less than one who buys a high-margin product for a year. <Mark>Using revenue overstates LTV by exactly the difference between your margin structure and 100%</Mark>.
+
+<Trap>
+This is the single most common error, and it is not a rounding difference.
+</Trap>
 
 **Retention measured as a rate, used as a curve.** A monthly churn rate converts to an expected lifetime through a geometric relationship, which means small changes in churn produce large changes in the resulting LTV — and the relationship is highly sensitive to the curve's shape in the early months. Churn that is concentrated in month one is a different business from churn spread evenly.
 
@@ -45,7 +55,7 @@ The lifetime value number remains useful — but as the *ceiling* on what you co
 
 Before any of this can be computed, the underlying behaviour has to be captured, and analytics systems make the event model explicit about what is possible.
 
-Google Analytics describes it directly: "An event allows you to measure a specific interaction or occurrence on your website or app", with examples including when someone loads a page, clicks a link, completes a purchase, or when an app crashes or an impression is served. That definition carries a consequence that is easy to miss: what you can report is bounded by what you decided to record as an event.
+Google Analytics describes it directly: "An event allows you to measure a specific interaction or occurrence on your website or app", with examples including when someone loads a page, clicks a link, completes a purchase, or when an app crashes or an impression is served. That definition carries a consequence that is easy to miss: <Mark>what you can report is bounded by what you decided to record as an event</Mark>.
 
 A retention model computed from a funnel that tracks sign-ups but not the second session is not a weak model — it is measuring something else, and it will disagree with the finance team's version for reasons that have nothing to do with either team's competence. Before debating the LTV formula, check that the event definitions on both sides are the same events.
 
@@ -69,7 +79,11 @@ The following is hypothetical and illustrative. Suppose a subscription firm cons
 
 ## A counterargument
 
-A reasonable critic would push back that the payback window relocates the problem rather than solving it. Google Analytics' event definition makes the point: what can be reported is bounded by what was recorded, so a payback cohort built from sign-ups but not the second session is as much a proxy as the LTV it replaces. Wes Bush's activation framing sharpens it - if the event is 'created a workspace' while the loop is 'invited a colleague', both metrics drift as the product changes. NRF's sell-in versus sell-out distinction is a reminder that even revenue depends on which event is counted. The warning against false precision is sound; the claim that a different metric escapes modelling is not.
+A reasonable critic would push back that the payback window relocates the problem rather than solving it. Google Analytics' event definition makes the point: what can be reported is bounded by what was recorded, so a payback cohort built from sign-ups but not the second session is as much a proxy as the LTV it replaces. Wes Bush's activation framing sharpens it - if the event is 'created a workspace' while the loop is 'invited a colleague', both metrics drift as the product changes. NRF's sell-in versus sell-out distinction is a reminder that even revenue depends on which event is counted.
+
+<PullQuote>
+The warning against false precision is sound; the claim that a different metric escapes modelling is not.
+</PullQuote>
 
 ## References & Further Reading
 

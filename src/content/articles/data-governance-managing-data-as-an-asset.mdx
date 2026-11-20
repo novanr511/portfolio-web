@@ -9,7 +9,9 @@ tags:
   - Risk Management
 ---
 
+<Lead>
 Organisations routinely say that data is an asset and then treat it as a byproduct — something that accumulates in warehouses with no owner, no definition, and no agreed standard of quality. Calling data an asset is not a metaphor with consequences; it is a claim that should be testable. The test is whether a person can find the data, understand what it means, and trust it for a decision.
+</Lead>
 
 **Direct answer:** Data governance is the system of ownership, definitions, documentation, and controls that makes data usable and accountable. Two concrete instruments do much of the work: datasheets, which document a dataset's "motivation, composition, collection process, recommended uses", and model cards, which record intended use and evaluation conditions. NIST's AI Risk Management Framework is "intended for voluntary use" to incorporate trustworthiness into "design, development, use, and evaluation". The boundary: documentation describes a dataset at a point in time; it does not keep it correct as the data changes.
 
@@ -17,7 +19,11 @@ Organisations routinely say that data is an asset and then treat it as a byprodu
 
 Three questions expose whether governance exists:
 
-**Who owns it?** A named owner decides who may access the data, what quality bar it must meet, and when it is retired. A dataset with no owner is a liability that happens to be stored.
+**Who owns it?** A named owner decides who may access the data, what quality bar it must meet, and when it is retired.
+
+<PullQuote>
+A dataset with no owner is a liability that happens to be stored.
+</PullQuote>
 
 **What does it mean?** A column called "active user" can mean someone who logged in this week, this month, or ever. Without a definition and a stated measurement window, two teams will compute different numbers from the same table and argue about which is correct.
 
@@ -31,11 +37,11 @@ A documented dataset whose documentation lives elsewhere is undocumented in prac
 
 **It is co-located.** The definition and caveats must be reachable from where the data is accessed, not in a document nobody opens.
 
-**It names the failures.** A datasheet that lists only the intended use is incomplete. It should state what was not measured, which groups are underrepresented, and what uses are discouraged. Absence of evidence is not evidence of suitability.
+**It names the failures.** A datasheet that lists only the intended use is incomplete. It should state what was not measured, which groups are underrepresented, and what uses are discouraged. <Mark>Absence of evidence is not evidence of suitability</Mark>.
 
 **It is versioned.** A dataset that has been retraining, backfilled, or resampled is a different object. The documentation must say which version it describes, or it will describe something that no longer exists.
 
-Model cards extend the same discipline to models. Mitchell et al. call for "benchmarked evaluation in a variety of conditions" across relevant groups, with the intended use stated alongside. In a governance programme, the model card and the datasheet together form a chain of provenance: what went in, what was built, and where it is valid.
+Model cards extend the same discipline to models. Mitchell et al. call for "benchmarked evaluation in a variety of conditions" across relevant groups, with the intended use stated alongside. In a governance programme, the model card and the datasheet together form <Mark>a chain of provenance</Mark>: what went in, what was built, and where it is valid.
 
 NIST's AI RMF is the process layer. Its voluntary status is important to state plainly: it is a framework for producing and organising evidence, not a certification or a legal requirement.
 
@@ -53,7 +59,11 @@ Three consequences follow:
 
 The fix is not a new tool. It is a definition with an owner: the population, the event, the window, the exclusion rules, and the name of the person who approves changes. That definition belongs with the dataset, in the datasheet, and it should be versioned so that historical figures can be interpreted against the definition that produced them.
 
-This example shows why "data as an asset" is a discipline rather than a slogan. An asset has a defined value and a clearly identified owner; an ambiguous column with two meanings has neither.
+This example shows why "data as an asset" is a discipline rather than a slogan.
+
+<KeyPoint>
+An asset has a defined value and a clearly identified owner; an ambiguous column with two meanings has neither.
+</KeyPoint>
 
 ## Where governance meets privacy
 
@@ -65,11 +75,17 @@ The California Privacy Protection Agency illustrates the regulatory layer. It st
 
 Three limitations deserve more than a footnote.
 
-**It goes stale.** A datasheet written at collection time does not describe later processing, and a model card does not update itself. Governance requires a review trigger — a retrain, a schema change, a new use case — not a one-off document.
+**It goes stale.** A datasheet written at collection time does not describe later processing, and a model card does not update itself. Governance requires <Mark>a review trigger</Mark> — a retrain, a schema change, a new use case — not a one-off document.
 
 **It does not create quality.** Recording that a dataset has missing values is useful; it does not fix them. Governance sets expectations and makes gaps visible, but the engineering work remains.
 
-**It can become theatre.** A programme that measures success by the number of documents produced will generate documents nobody reads. The useful measure is whether a question about a dataset can be answered quickly and correctly.
+**It can become theatre.**
+
+<Trap>
+A programme that measures success by the number of documents produced will generate documents nobody reads.
+</Trap>
+
+The useful measure is whether a question about a dataset can be answered quickly and correctly.
 
 The counterargument to heavy documentation — that it slows down a small team — is real. The proportionate response is to document the datasets that decisions depend on, rather than every table in the warehouse.
 

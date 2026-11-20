@@ -9,7 +9,9 @@ tags:
   - Architecture
 ---
 
+<Lead>
 A customer data platform is usually bought to solve a visible problem: the same customer appears as several people across systems, so messages are duplicated, offers conflict, and personalization is built on fragments. The purchase is often justified by a vision of a single customer view, and the vision is fine — but the hard part is not the software. It is deciding what identity means and what the unified record is allowed to be used for.
+</Lead>
 
 **Direct answer:** A CDP unifies customer data by resolving identities across sources and making the resulting profile available to downstream systems. It works when the rules for matching, the provenance of each field, and the permitted uses are explicit; it fails when it is treated as a technical integration that will produce a truthful customer automatically. The practical sequence is to decide which decisions need unification, define identity for those decisions, build the minimum data set that supports them, and measure whether personalization actually changed outcomes.
 
@@ -17,7 +19,7 @@ A customer data platform is usually bought to solve a visible problem: the same 
 
 Customers appear differently across systems: an email address here, a device identifier there, a logged-in account somewhere else, an offline purchase that never carried an identifier at all. A CDP resolves these into profiles using deterministic matches — a shared login, a shared email — and probabilistic ones — behavioural similarity, device graphs.
 
-Each choice has a cost. Deterministic matching under-merges the same person who used different identifiers; probabilistic matching over-merges two different people. Both errors are invisible in a dashboard that reports a profile count, and both corrupt every decision downstream: over-merging sends a customer an offer meant for a stranger; under-merging breaks the journey the personalization was supposed to continue.
+Each choice has a cost. Deterministic matching under-merges the same person who used different identifiers; probabilistic matching <Mark>over-merges two different people</Mark>. Both errors are invisible in a dashboard that reports a profile count, and both corrupt every decision downstream: over-merging sends a customer an offer meant for a stranger; under-merging breaks the journey the personalization was supposed to continue.
 
 The right way to choose is to start from the decision. A system that decides whether to send a high-value customer a retention offer needs high precision in identity — wrongly sending it is expensive. A system that recommends content on a website can tolerate more uncertainty, because a wrong recommendation is cheap. A single identity policy applied to both is wrong for one of them.
 
@@ -29,17 +31,25 @@ A unified profile is not a merged table. It is a record with three properties:
 
 **Uncertainty.** A field should carry confidence, especially where matching was probabilistic. A downstream system that treats all fields as equally certain will act on noise.
 
-**Scope.** The profile should say what it can be used for. This is the governance layer, and it is where CDPs most often under-deliver — the technical ability to join data arrives before the organisational agreement about whether it should be joined.
+**Scope.** The profile should say what it can be used for. This is the governance layer, and it is where CDPs most often under-deliver — <Mark>the technical ability to join data arrives before the organisational agreement about whether it should be joined</Mark>.
 
-Google Analytics describes the underlying unit simply: "An event allows you to measure a specific interaction or occurrence on your website or app". A CDP aggregates those events with other sources, and the quality of the result is bounded by what those events actually recorded. If the organisation never captured the step that matters — the second session, the renewal conversation, the support interaction — no amount of unification will create it.
+Google Analytics describes the underlying unit simply: "An event allows you to measure a specific interaction or occurrence on your website or app". A CDP aggregates those events with other sources, and <Mark>the quality of the result is bounded by what those events actually recorded</Mark>. If the organisation never captured the step that matters — the second session, the renewal conversation, the support interaction — no amount of unification will create it.
 
 ## Personalization is a decision, not a feature
 
-The reason to unify data is to make a different decision for different people. That is a narrow claim and it is testable.
+<KeyPoint>
+The reason to unify data is to make a different decision for different people.
+</KeyPoint>
+
+That is a narrow claim and it is testable.
 
 A useful personalization project starts with one decision: which message, which offer, which content, which next step. It then asks what information would change that decision and whether the CDP can supply it at the moment the decision is made. The moment matters as much as the data — a profile that is refreshed nightly cannot personalise a session that lasts three minutes.
 
-And the decision must be worth changing. If the same message would be sent regardless of the data, the project is infrastructure, not personalization, and it should be valued accordingly.
+And the decision must be worth changing.
+
+<Trap>
+If the same message would be sent regardless of the data, the project is infrastructure, not personalization, and it should be valued accordingly.
+</Trap>
 
 ## Measuring whether it worked
 
@@ -67,7 +77,11 @@ The following is hypothetical and illustrative. Consider a retailer weighing a C
 
 ## A counterargument
 
-A reasonable critic would note that the prescription assumes an organisational agreement a CDP cannot create. 'Start from the decision' and 'write the permitted uses' require a shared view of which decisions matter; Google Ads' attribution models show how far measurement can run ahead of that agreement, allocating credit without establishing that any change caused the outcome. The randomised holdout is also harder than it sounds: once a profile drives messaging, withholding a treatment from comparable customers is political, not just statistical. Damodaran's valuation datasets point to a gap - the article asks teams to weigh full cost against incremental result but defines no cost convention. The identity discipline is sound; the claim that the rest follows from a sequence is incomplete.
+A reasonable critic would note that the prescription assumes an organisational agreement a CDP cannot create. 'Start from the decision' and 'write the permitted uses' require a shared view of which decisions matter; Google Ads' attribution models show how far measurement can run ahead of that agreement, allocating credit without establishing that any change caused the outcome. The randomised holdout is also harder than it sounds: once a profile drives messaging, withholding a treatment from comparable customers is political, not just statistical. Damodaran's valuation datasets point to a gap - the article asks teams to weigh full cost against incremental result but defines no cost convention.
+
+<PullQuote>
+The identity discipline is sound; the claim that the rest follows from a sequence is incomplete.
+</PullQuote>
 
 ## References & Further Reading
 

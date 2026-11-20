@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Docker images are often described as lightweight virtual machines, which hides what they actually are. The Wikipedia entry describes images and layers, and the Open Container Initiative defines the specifications behind the format. The common questions concern layers, reproducibility, and size.
+</Lead>
 
 **Direct answer:** Treat an image as a layered artefact with a defined base and a reproducible build recipe, then verify that it contains what the runtime needs. The sources define the format; the verification rule is a synthesis.
 
@@ -21,11 +23,15 @@ Three points matter:
 
 <Figure src="/images/articles/inline/docker-images-common-questions-1.png" alt="A four-step flow: choose the base, write a reproducible recipe, inventory the contents, then test behaviour." caption="Conceptual: an image is understood by its layers, base, recipe, and tested behaviour." />
 
-- **Layers accumulate.** The Wikipedia entry describes how instructions add layers. A later instruction that overwrites a file does not remove the earlier layer from the image history.
+- **Layers accumulate.** The Wikipedia entry describes how instructions add layers. A later instruction that overwrites a file <Mark>does not remove the earlier layer from the image history</Mark>.
 - **The base is inherited.** A base image brings its own contents and their history. Choosing it is a supply decision as much as a technical one.
 - **Specifications define portability.** The OCI entry describes the standard format. Conformance makes an image usable across runtimes that support the specification.
 
-The sequence is: choose the base, write a reproducible recipe, inventory the contents, then test behaviour. Choosing the base is judgement, so it is `inferred`; the format is `source-reported`.
+<KeyPoint>
+The sequence is: choose the base, write a reproducible recipe, inventory the contents, then test behaviour.
+</KeyPoint>
+
+Choosing the base is judgement, so it is `inferred`; the format is `source-reported`.
 
 ## A worked example
 
@@ -37,13 +43,17 @@ The outcome is a build decision with a recorded trade-off. The scenario is hypot
 
 ## Why layers explain the surprises
 
-A build instruction that creates a temporary file and a later instruction that deletes it do not cancel out. The first layer still contains the file, and the image includes both layers. This surprises people who think of the build as a sequence of edits to a final state, and it is the reason a large image can contain material that appears to have been removed.
+A build instruction that creates a temporary file and a later instruction that deletes it do not cancel out. The first layer still contains the file, and the image includes both layers.
 
-The base image is the other source of surprises. It contributes its own layers and its own history, which the application did not choose. Reading the base is therefore part of understanding the final image, not an optional step after something goes wrong.
+<Trap>
+This surprises people who think of the build as a sequence of edits to a final state, and it is the reason a large image can contain material that appears to have been removed.
+</Trap>
+
+The base image is the other source of surprises. It contributes its own layers and its own history, which the application did not choose. Reading the base is therefore part of understanding the final image, <Mark>not an optional step after something goes wrong</Mark>.
 
 ## Why reproducibility is the real question
 
-A image that builds differently on two machines is not a controlled artefact. Reproducibility depends on pinning the base, the toolchain, and any sources fetched during the build. Testing reproducibility is simpler than it sounds: build twice from a clean state and compare the result. A difference is a defect in the recipe, not a quirk of the environment.
+A image that builds differently on two machines is not a controlled artefact. Reproducibility depends on pinning the base, the toolchain, and any sources fetched during the build. Testing reproducibility is simpler than it sounds: build twice from a clean state and compare the result. A difference is <Mark>a defect in the recipe, not a quirk of the environment</Mark>.
 
 ## Evidence status
 
@@ -69,7 +79,9 @@ A reproducible build is also easier to audit, because the same recipe produces t
 
 It cannot guarantee a secure runtime. It does not replace scanning or inventory. And it cannot fix a build recipe that is not reproducible.
 
+<PullQuote>
 The counterargument that the smallest image is always best is fair for transfer time and incomplete for functionality.
+</PullQuote>
 
 ## A decision test
 

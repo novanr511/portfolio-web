@@ -9,7 +9,9 @@ tags:
   - Crawling
 ---
 
+<Lead>
 Before a search engine crawler can negotiate a TCP connection, execute a TLS handshake, or request an HTML document, it must resolve your human-readable hostname (e.g., `example.com`) into an IP address. If this fundamental translation fails or times out, the crawl terminates before it ever begins.
+</Lead>
 
 **Direct Answer:** Domain Name System (DNS) resolution is the foundation of web accessibility. Search engine crawlers query recursive and authoritative resolvers to map hostnames to `A` (IPv4) or `AAAA` (IPv6) records. DNS failures—such as `SERVFAIL`, nameserver timeouts, or misconfigured cutovers—immediately abort crawling. Because search engines prioritize user experience, sustained DNS outages trigger exponential crawler back-off, followed by de-indexing if unresolvable states persist.
 
@@ -35,7 +37,7 @@ Understanding the mechanics of DNS hierarchy and caching allows engineers to exe
 
 ## 1. The Resolution Hierarchy: How Hostnames Become IPs
 
-DNS is a globally distributed, hierarchical database. When a crawler attempts to fetch a URL, the resolution request travels through four discrete stages:
+DNS is a globally distributed, hierarchical database. When a crawler attempts to fetch a URL, the resolution request travels through <Mark>four discrete stages</Mark>:
 
 1. **Local Resolver Cache:** The crawler's internal networking layer checks its local DNS cache. If the record exists and its Time-to-Live (TTL) has not expired, resolution takes less than 1 millisecond.
 2. **Recursive Resolvers:** If uncached, the query is sent to a recursive resolver (operated by the ISP, cloud provider, or search engine datacenter).
@@ -81,7 +83,7 @@ In reality, **DNS does not propagate; it expires**.
 ```
 
 ### Time-to-Live (TTL) Explained
-When an authoritative nameserver responds to a query, it attaches a **TTL value** (measured in seconds). The TTL instructs recursive resolvers exactly how long they may cache and serve that response without querying the authoritative server again.
+When an authoritative nameserver responds to a query, it attaches a **TTL value** (measured in seconds). <Mark>The TTL instructs recursive resolvers</Mark> exactly how long they may cache and serve that response without querying the authoritative server again.
 
 * **Long TTL (e.g., 86400 seconds / 24 hours):** Maximizes caching efficiency, minimizes DNS lookup latency, and reduces query traffic to nameservers.
 * **Short TTL (e.g., 300 seconds / 5 minutes):** Enables rapid cutovers during migrations or failovers, but increases overall DNS query overhead.
@@ -134,7 +136,7 @@ dig @ns1.exampledns.com example.com A
 example.com.        300 IN  A   192.0.2.1
 ```
 
-If `ns1` returns the new IP but `ns2` returns an old IP or times out, you have an out-of-sync zone replication error between primary and secondary nameservers.
+If `ns1` returns the new IP but `ns2` returns an old IP or times out, you have an <Mark>out-of-sync zone replication error</Mark> between primary and secondary nameservers.
 
 ### Recipe 3: Checking IPv6 `AAAA` Resolution
 Always test both IP stacks:
@@ -161,7 +163,15 @@ curl -6 -Iv https://example.com
 
 ## Summary & Next Steps
 
-DNS is the unheralded gatekeeper of search engine crawling. If resolution fails, no amount of content optimization or schema markup will preserve your search visibility. By deploying Anycast DNS, monitoring dual-stack health, and actively managing TTLs during migrations, engineers can guarantee seamless crawl availability.
+<KeyPoint>
+DNS is the unheralded gatekeeper of search engine crawling.
+</KeyPoint>
+
+<PullQuote>
+If resolution fails, no amount of content optimization or schema markup will preserve your search visibility.
+</PullQuote>
+
+By deploying Anycast DNS, monitoring dual-stack health, and actively managing TTLs during migrations, engineers can guarantee seamless crawl availability.
 
 Continue exploring the infrastructure stack:
 * **[HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects)** — Securing the socket connection once DNS resolves.
@@ -174,7 +184,13 @@ The following is hypothetical and illustrative. A team moves a site to a new hos
 
 ## A counterargument
 
-A reasonable critic can argue that the operational certainty exceeds the sources. RFC 1035 defines the protocol's messages and record formats but leaves resolver caching policy - how long a response is held, whether a TTL is honoured, how negative answers are cached - to each implementation. Google's crawler overview explains crawling in general terms, and the Chrome DevTools reference covers network inspection, neither of which supports the article's specific promise that resolvers receive a new address within five minutes of a TTL change. The 'DNS does not propagate; it expires' simplification is useful teaching, but it understates resolver behaviour the specification deliberately leaves open. The objection is not that TTL management matters; it is that a prescriptive migration timetable is presented as a protocol guarantee, when the cited sources only define the mechanism and its supporting tools.
+A reasonable critic can argue that the operational certainty exceeds the sources. RFC 1035 defines the protocol's messages and record formats but leaves resolver caching policy - how long a response is held, whether a TTL is honoured, how negative answers are cached - to each implementation. Google's crawler overview explains crawling in general terms, and the Chrome DevTools reference covers network inspection, neither of which supports the article's specific promise that resolvers receive a new address within five minutes of a TTL change.
+
+<Trap>
+The 'DNS does not propagate; it expires' simplification is useful teaching, but it understates resolver behaviour the specification deliberately leaves open.
+</Trap>
+
+The objection is not that TTL management matters; it is that a prescriptive migration timetable is presented as a protocol guarantee, when the cited sources only define the mechanism and its supporting tools.
 
 ## References & Further Reading
 

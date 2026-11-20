@@ -9,9 +9,15 @@ tags:
   - Incident Response
 ---
 
+<Lead>
 Security advice often collapses into a list of tools. A more useful starting point is a question: what are you protecting, from whom, and what happens when a control fails? Threat modeling, zero trust, and incident response are three ways of making that question explicit at different moments — before a system is built, while it runs, and after something goes wrong.
+</Lead>
 
-**Direct answer:** Threat modeling identifies assets, adversaries, and likely attack paths before implementation; zero trust is an architecture that removes implicit trust based on network location; incident response is the organised process of detecting, containing, and learning from a breach. NIST SP 800-30 provides the risk-assessment method, SP 800-207 defines zero trust, MITRE ATT&CK catalogues adversary behaviour, and SP 800-53 supplies the control catalogue. The boundary is that none of these is a product you can buy: they are disciplines whose value depends on being applied to your actual assets and threat model.
+**Direct answer:** Threat modeling identifies assets, adversaries, and likely attack paths before implementation; zero trust is an architecture that removes implicit trust based on network location; incident response is the organised process of detecting, containing, and learning from a breach. NIST SP 800-30 provides the risk-assessment method, SP 800-207 defines zero trust, MITRE ATT&CK catalogues adversary behaviour, and SP 800-53 supplies the control catalogue.
+
+<KeyPoint>
+The boundary is that none of these is a product you can buy: they are disciplines whose value depends on being applied to your actual assets and threat model.
+</KeyPoint>
 
 ## Threat modeling: decide before you build
 
@@ -27,7 +33,7 @@ Three practical steps turn this into an exercise:
 2. **Choose relevant adversaries** and consult ATT&CK for techniques plausible against your environment, rather than inventing a generic attacker.
 3. **Map controls to the paths** and record the residual risk — what remains after the controls are applied.
 
-The last step is where threat modeling earns its keep. A control that does not reduce a plausible path is a cost, not a protection.
+The last step is where threat modeling earns its keep. A control that does not reduce a plausible path is <Mark>a cost, not a protection</Mark>.
 
 ## Zero trust: remove implicit trust
 
@@ -41,7 +47,7 @@ Three principles follow, and they are more concrete than the slogan:
 - **Use least privilege.** Grant the minimum access needed, for the minimum time, with just-in-time elevation where possible.
 - **Assume breach.** Design as if an attacker is already inside: segment access, encrypt traffic, and monitor continuously so that one compromised account does not expose everything.
 
-The honest limitation is that zero trust is a direction, not a switch. SP 800-207 describes a set of principles and possible deployment models; migrating an existing estate takes years, and a partial implementation can create gaps where the old perimeter assumption still lingers.
+The honest limitation is that <Mark>zero trust is a direction, not a switch</Mark>. SP 800-207 describes a set of principles and possible deployment models; migrating an existing estate takes years, and a partial implementation can create gaps where the old perimeter assumption still lingers.
 
 ## Incident response: assume the controls will fail
 
@@ -51,7 +57,7 @@ NIST SP 800-53, "Security and Privacy Controls for Information Systems and Organ
 
 The OWASP Top 10 complements this at the application layer. OWASP calls it "the reference standard for the most critical web application security risks" and "a standard awareness document for developers and web application security", representing "a broad consensus about the most critical security risks". The current release is the OWASP Top 10 2025. A team that maps its incident history to these categories is looking at the problems that recur across the industry, not just its own last outage.
 
-Incident response has a measurable rhythm: detect, triage, contain, eradicate, recover, and review. The review is the step most often skipped, and it is the one that converts an incident into a control improvement.
+Incident response has a measurable rhythm: detect, triage, contain, eradicate, recover, and review. <Mark>The review is the step most often skipped</Mark>, and it is the one that converts an incident into a control improvement.
 
 ## A worked example of a risk decision
 
@@ -75,7 +81,11 @@ Three limits are worth stating plainly.
 
 **ATT&CK describes behaviour, not your exposure.** The knowledge base is built from real-world observations, but a technique being in the catalogue does not mean it is plausible in your environment. Relevance has to be judged locally.
 
-**Zero trust can be performed badly.** Turning it into a product purchase without changing identity, segmentation, and monitoring practices reproduces the old perimeter problem with new branding.
+**Zero trust can be performed badly.**
+
+<Trap>
+Turning it into a product purchase without changing identity, segmentation, and monitoring practices reproduces the old perimeter problem with new branding.
+</Trap>
 
 ## A decision test
 
@@ -90,7 +100,11 @@ For the organisational case for this work, see [Why Cybersecurity Is Becoming a 
 
 ## A counterargument
 
-A reasonable critic would push back that the discipline-not-a-product framing understates how much security depends on budget and incentives. NIST SP 800-30 and SP 800-53 supply a vocabulary and a control catalogue, but the worked example ends at \"what residual risk are we willing to accept, at what cost\" - a budget judgement, not a technical output. MITRE ATT&CK is built from observed behaviour and therefore lags novel techniques; mapping controls to a catalogue can reassure about known paths while missing the one that matters. SP 800-207 presents zero trust as a multi-year direction, and the article concedes partial migrations create gaps. The frameworks are necessary, but incomplete where the piece implies correct application is mostly a matter of method rather than of power and attention.
+A reasonable critic would push back that the discipline-not-a-product framing understates how much security depends on budget and incentives. NIST SP 800-30 and SP 800-53 supply a vocabulary and a control catalogue, but the worked example ends at \"what residual risk are we willing to accept, at what cost\" - a budget judgement, not a technical output. MITRE ATT&CK is built from observed behaviour and therefore lags novel techniques; mapping controls to a catalogue can reassure about known paths while missing the one that matters. SP 800-207 presents zero trust as a multi-year direction, and the article concedes partial migrations create gaps.
+
+<PullQuote>
+The frameworks are necessary, but incomplete where the piece implies correct application is mostly a matter of method rather than of power and attention.
+</PullQuote>
 
 ## References & Further Reading
 

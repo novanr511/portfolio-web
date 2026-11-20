@@ -9,17 +9,30 @@ tags:
   - Compliance
 ---
 
+<Lead>
 Privacy is often presented as a set of policies to publish. In practice it is a set of constraints on what an organisation may do with personal data, when it must act, and what it must be able to prove afterwards. A policy that is not backed by those capabilities is a statement of intent rather than compliance.
+</Lead>
 
 **Direct answer:** Two major regimes shape the operating environment. The EU's GDPR requires notification of a personal-data breach to the supervisory authority "without undue delay and, where feasible, not later than 72 hours after having become aware of it", unless the breach is unlikely to result in a risk to people. California's CCPA was amended by Proposition 24 in November 2020, which also established the California Privacy Protection Agency. The boundary: these are legal instruments with jurisdiction and effective dates; educational summaries cannot substitute for current legal advice.
 
+<KeyFigures items={[
+  { value: "72 hours", label: "Breach notification to the supervisory authority", source: "European Union (GDPR text via gdpr-info.eu), 2016" },
+  { value: "1 January 2026", label: "Delete Act effective date", source: "California Privacy Protection Agency, 2026" },
+]} />
+
 ## The two regimes
 
-**GDPR.** Article 33 of Regulation (EU) 2016/679 sets the breach-notification clock quoted above. The exception is risk-based: notification is not required if the controller "is able to demonstrate, in accordance with the accountability principle, that the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons". The burden of proof sits with the organisation, and the deadline begins at awareness, not at the end of the investigation.
+**GDPR.** Article 33 of Regulation (EU) 2016/679 sets the breach-notification clock quoted above. The exception is risk-based: notification is not required if the controller "is able to demonstrate, in accordance with the accountability principle, that the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons". The burden of proof sits with the organisation, and <Mark>the deadline begins at awareness, not at the end of the investigation</Mark>.
 
 **CCPA and the CPPA.** The California Privacy Protection Agency states that voters passed Proposition 24 in November 2020, "amending the California Consumer Privacy Act of 2018" and establishing the agency. It is "responsible for implementing and enforcing the CCPA as well as the Delete Act, which creates additional requirements unique to data brokers". The Delete Act took effect on 1 January 2026, and the agency notes that the Delete Request and Opt-out Platform is live.
 
-The operational difference matters. A 72-hour notification deadline is a clock that starts on an event; a delete or opt-out right is a capability that must exist continuously. An organisation can prepare for the first with an incident plan and for the second only by building the data plumbing in advance.
+The operational difference matters.
+
+<KeyPoint>
+A 72-hour notification deadline is a clock that starts on an event; a delete or opt-out right is a capability that must exist continuously.
+</KeyPoint>
+
+An organisation can prepare for the first with an incident plan and for the second only by building the data plumbing in advance.
 
 ## Privacy by design is a sequence
 
@@ -32,7 +45,7 @@ The operational difference matters. A 72-hour notification deadline is a clock t
 5. **Design the deletion path** — how a request is found, executed, and verified across every system that holds a copy.
 6. **Record the lawful basis** and the decisions, so they can be demonstrated.
 
-The order is the point. A retention rule added after five years of accumulation is a cleanup project; a deletion capability designed into the data model is a feature.
+<Mark>The order is the point</Mark>. A retention rule added after five years of accumulation is a cleanup project; a deletion capability designed into the data model is a feature.
 
 Datasheets contribute to the same sequence. Gebru et al.'s documentation of "composition, collection process, recommended uses" is the record of what was collected and for what purpose — the evidence that a later use is or is not compatible with the original one.
 
@@ -62,9 +75,15 @@ Three qualifications keep the topic honest.
 
 **Jurisdiction and effective dates matter.** The CPPA's rules and the GDPR's obligations apply in specific territories and change over time. The Delete Act's 1 January 2026 effective date is a concrete example. Any implementation must check the current rule, not a summary written last year.
 
-**A right is not a capability.** Stating that customers may delete their data is different from being able to find and delete every copy across production, backups, analytics, and third-party processors. The engineering work is the substance of compliance.
+**<Mark>A right is not a capability</Mark>.** Stating that customers may delete their data is different from being able to find and delete every copy across production, backups, analytics, and third-party processors. The engineering work is the substance of compliance.
 
-**Notice is not consent, and consent is not a purpose.** Collecting a lawful basis at signup does not authorise a later, incompatible use. Datasheets help here by recording the original purpose, but the decision to reuse data still requires a fresh assessment.
+**Notice is not consent, and consent is not a purpose.**
+
+<Trap>
+Collecting a lawful basis at signup does not authorise a later, incompatible use.
+</Trap>
+
+Datasheets help here by recording the original purpose, but the decision to reuse data still requires a fresh assessment.
 
 This article is educational and is not legal advice. For a high-impact implementation, qualified counsel in the relevant jurisdiction should review the design.
 
@@ -82,7 +101,11 @@ For the governance layer, see [Data Governance](/articles/data-governance-managi
 
 ## A counterargument
 
-Privacy by design is presented as a finishable sequence, but a reasonable critic would say the cited sources describe something less tidy. Article 33 starts its clock at awareness and requires low risk to be demonstrated, not declared; NIST SP 800-53 is a catalogue to be selected against a changing threat model, not a one-pass checklist. The CPPA material points the same way: the Delete Act's 1 January 2026 effective date shows the rules move, so a sequence completed once is already dated. The article also leans on Gebru et al.'s datasheets to record original purpose, yet a datasheet documents a dataset, not the copies scattered across production, backups, and processors that a deletion request must reach. A decision sequence is a memory aid, not the continuous capability the article says compliance actually requires.
+Privacy by design is presented as a finishable sequence, but a reasonable critic would say the cited sources describe something less tidy. Article 33 starts its clock at awareness and requires low risk to be demonstrated, not declared; NIST SP 800-53 is a catalogue to be selected against a changing threat model, not a one-pass checklist. The CPPA material points the same way: the Delete Act's 1 January 2026 effective date shows the rules move, so a sequence completed once is already dated. The article also leans on Gebru et al.'s datasheets to record original purpose, yet a datasheet documents a dataset, not the copies scattered across production, backups, and processors that a deletion request must reach.
+
+<PullQuote>
+A decision sequence is a memory aid, not the continuous capability the article says compliance actually requires.
+</PullQuote>
 
 ## References & Further Reading
 

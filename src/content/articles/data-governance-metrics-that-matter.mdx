@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Data governance programs often measure the wrong thing. They count meetings held or policies written, then declare success while data stays hard to find and hard to trust. The sources define governance and the models that structure data, but they do not hand over a metric set. The real problem is turning the aims of governance into measures that drive a decision.
+</Lead>
 
 **Direct answer:** Data governance metrics should trace back to the goals of governance: availability, usability, integrity, and security. Wikipedia describes governance as the management of data's availability, usability, integrity, and security, and describes data modeling as defining the structure of data. The practical step is to attach a measure to each aim and decide what a change in that measure means.
 
@@ -25,7 +27,7 @@ Wikipedia describes data modeling as the process of defining data elements, thei
 
 The translation from aim to measure is where a working map gets built. Availability becomes a question of whether consumers can obtain the data they need. Usability becomes a question of whether they can understand it, which depends on documented definitions. Integrity becomes a question of whether records conform to the rules the model states. Security becomes a question of whether access is limited to appropriate roles. Each indicator should point to a decision, such as release, remediate, or restrict. This map is a synthesis from the two sources and is treated as inferred, not reported.
 
-Once the indicators exist, they function as trends rather than verdicts. A single reading says little; a direction over time says more. The review cadence matters as much as the number, because governance is ongoing. A metric that moves without anyone acting on it is decoration. The model stays the shared reference that keeps the measures consistent, so when a definition changes, the metric changes with it and the change is visible to reviewers.
+Once the indicators exist, they function as trends rather than verdicts. A single reading says little; <Mark>a direction over time says more</Mark>. The review cadence matters as much as the number, because governance is ongoing. <Mark>A metric that moves without anyone acting on it is decoration</Mark>. The model stays the shared reference that keeps the measures consistent, so when a definition changes, the metric changes with it and the change is visible to reviewers.
 
 ## A worked example
 
@@ -45,15 +47,21 @@ The first two rows are factual claims drawn directly from the sources and stay s
 
 The sources define the aims of governance and the structure of data, but they supply no thresholds. No source says what level of availability is good enough or how much integrity gap is tolerable. Those targets are local decisions that depend on the cost of being wrong and the purpose of the data. A metric without a target can be tracked, but it cannot tell a reviewer whether the situation is acceptable. The team has to set the bar itself and record why it was set there.
 
-There is a hidden cost in maintaining measures. Instrumenting a dataset, agreeing definitions, and keeping them current require stewardship time that is easy to underestimate. Once a number is published, it also becomes a target, and targets can be gamed: a team may improve the measure while the underlying problem persists. That behavior is an inference about incentives rather than a statement from the sources, but it is a real risk. A well-designed metric set pairs each number with a qualitative check so that a rising score cannot hide a falling trust level.
+There is a hidden cost in maintaining measures. Instrumenting a dataset, agreeing definitions, and keeping them current require stewardship time that is easy to underestimate. Once a number is published, it also becomes a target, and <Mark>targets can be gamed</Mark>: a team may improve the measure while the underlying problem persists. That behavior is an inference about incentives rather than a statement from the sources, but it is a real risk. A well-designed metric set pairs each number with a qualitative check so that a rising score cannot hide a falling trust level.
 
-The main failure mode is measuring activity instead of outcomes. Counting policies signed or reviews held is easy, and those counts can rise while availability, integrity, and security stay poor. Activity metrics are attractive because they are cheap to produce and flattering to report. The goal-to-measure map exists to resist that pull by forcing every indicator back to one of the four aims. If a proposed metric cannot be traced to an aim, it is probably measuring the program rather than the data.
+<Trap>
+The main failure mode is measuring activity instead of outcomes.
+</Trap>
+
+Counting policies signed or reviews held is easy, and those counts can rise while availability, integrity, and security stay poor. Activity metrics are attractive because they are cheap to produce and flattering to report. The goal-to-measure map exists to resist that pull by forcing every indicator back to one of the four aims. If a proposed metric cannot be traced to an aim, it is probably measuring the program rather than the data.
 
 There is a boundary around the method. The four aims can conflict: tightening security can reduce availability, and a strict integrity rule can slow delivery. A single metric cannot resolve those tradeoffs, and a dashboard that shows them side by side still leaves a human decision to make. The map also covers data within the modeled scope. Data outside the model, or uses nobody documented, will not appear in the measures, which is a limitation of relying on a model as the shared reference.
 
 Because both data and models change, the metrics need periodic review. A new source, a changed definition, or a new consumer can invalidate an indicator without warning. Each metric should carry a recheck condition and an owner, and the review should ask whether the measure still traces to an aim. Without that discipline, the metric set drifts into a collection of stale numbers that look authoritative and describe nothing current.
 
+<PullQuote>
 Counterargument: the claim that a goal-to-measure map improves governance is fair for a program starting from vague aims and incomplete for a mature program, where scores may already be trusted and the harder problem is acting on them.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +73,11 @@ Counterargument: the claim that a goal-to-measure map improves governance is fai
 6. **Assign an owner** and a recheck condition to every indicator.
 7. **Review the set** whenever a data source, model definition, or consumer changes.
 
-A metric set is useful only when a reading can change a decision. The test turns four abstract aims into indicators with owners and review points, so a reader can see what each number is for. That is the difference between governance that can be inspected and governance that is only asserted.
+<KeyPoint>
+A metric set is useful only when a reading can change a decision.
+</KeyPoint>
+
+The test turns four abstract aims into indicators with owners and review points, so a reader can see what each number is for. That is the difference between governance that can be inspected and governance that is only asserted.
 
 For further reading, see [Data Governance](/articles/data-governance-managing-data-as-an-asset).
 

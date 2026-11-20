@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Datasheets and model cards are often treated as paperwork finished after a model ships. The sources propose them as transparency instruments, but they do not say how to keep them useful when an organization holds many datasets and models. The real problem is making documentation a decision input rather than an archive that nobody reads.
+<Lead>
+Datasheets and model cards are often treated as paperwork finished after a model ships. The sources propose them as transparency instruments, but they do not say how to keep them useful when an organization holds many datasets and models. The real problem is <Mark>making documentation a decision input rather than an archive that nobody reads</Mark>.
+</Lead>
 
 **Direct answer:** A datasheet documents a dataset's motivation, composition, collection, preprocessing, uses, and maintenance, while a model card reports a model's intended use, evaluation data, metrics, and limitations. Gebru et al. propose the datasheet and Mitchell et al. propose the model card. The practical step is to tie each documentation field to a release decision so the document changes what actually ships.
 
@@ -17,7 +19,7 @@ Datasheets and model cards are often treated as paperwork finished after a model
 
 ## The mechanism
 
-The datasheet proposal from Gebru et al. argues that every dataset should be accompanied by a document describing its motivation, composition, collection process, preprocessing, uses, distribution, and maintenance. The aim is transparency: a consumer should be able to understand the context in which a dataset was created and the purposes it was meant to serve. The practical consequence is that a datasheet surfaces what a dataset is and is not fit for, so a team can judge fit before building on it rather than discovering problems later.
+The datasheet proposal from Gebru et al. argues that every dataset should be accompanied by a document describing its motivation, composition, collection process, preprocessing, uses, distribution, and maintenance. The aim is transparency: a consumer should be able to understand the context in which a dataset was created and the purposes it was meant to serve. The practical consequence is that <Mark>a datasheet surfaces what a dataset is and is not fit for</Mark>, so a team can judge fit before building on it rather than discovering problems later.
 
 <Figure src="/images/articles/inline/datasheets-at-scale-1.png" alt="A four-step flow: a datasheet of dataset context, a model card of use, metrics and limits, fields mapped to fit and risk checks, then a release, remediate, or hold decision with a change trigger." caption="Conceptual: documentation earns its keep when a field can stop a release." />
 
@@ -25,7 +27,11 @@ The model card proposal from Mitchell et al. makes a parallel case for trained m
 
 A documentation-to-decision map is built by connecting fields to the choices they should inform. Composition and collection fields answer whether data is fit for an intended use. Evaluation metrics and their breakdowns answer whether performance holds in the context that matters. Ethical considerations and limitations answer whether residual risks are understood and accepted. Each field can be read as an input to a release, remediate, or hold decision. This map is a synthesis of the two proposals, not a claim either paper makes, and it is treated as inferred.
 
-At scale, the hard part is consistency and freshness rather than the first document. A template alone decays: fields get copied, intended use is stated generically, and limitations go unread. Tying each field to a decision keeps it alive, because a change trigger such as new data or a retrained model forces the relevant document back into review. Documentation earns its keep only when a missing or stale field can stop a release, which is a local governance choice rather than something the sources prescribe.
+At scale, the hard part is consistency and freshness rather than the first document. <Mark>A template alone decays</Mark>: fields get copied, intended use is stated generically, and limitations go unread. Tying each field to a decision keeps it alive, because a change trigger such as new data or a retrained model forces the relevant document back into review.
+
+<KeyPoint>
+Documentation earns its keep only when a missing or stale field can stop a release, which is a local governance choice rather than something the sources prescribe.
+</KeyPoint>
 
 ## A worked example
 
@@ -43,11 +49,19 @@ The first two rows summarize the field lists proposed in the papers and remain s
 
 ## What it cannot do
 
-The sources propose formats and fields; they do not provide enforcement. A filled template is not evidence that the answers are honest, complete, or current. Both papers describe what a document should contain and why transparency matters, but neither can make an author disclose an uncomfortable limitation or know every downstream use of a dataset. The documents describe what the authors knew at writing time. Treating a completed datasheet as proof of safety confuses a record of disclosure with a guarantee about the system.
+The sources propose formats and fields; they do not provide enforcement. A filled template is not evidence that the answers are honest, complete, or current. Both papers describe what a document should contain and why transparency matters, but neither can make an author disclose an uncomfortable limitation or know every downstream use of a dataset. The documents describe what the authors knew at writing time.
+
+<PullQuote>
+Treating a completed datasheet as proof of safety confuses a record of disclosure with a guarantee about the system.
+</PullQuote>
 
 There is a real hidden cost. Writing these documents takes time and expertise, and the cost multiplies with the number of datasets and models an organization maintains. Some fields, such as distribution or maintenance, may depend on facts the original authors no longer hold. At scale, the work can become a bottleneck that teams resent, which creates pressure to fill fields quickly and move on. That pressure is exactly what produces the boilerplate the proposals were meant to replace. Any scaling plan has to budget authorship and review effort, not just distribute a template.
 
-The main failure mode is boilerplate that satisfies the form without informing the decision. An intended use written as a broad generic phrase, or a limitations section that lists only trivial caveats, looks complete while telling a reviewer nothing. A gate that accepts such a document is worse than no gate, because it records a check that did not happen. The defense is to make specific fields answerable, for example by asking which condition a metric was broken out for and which use a warning actually rules out, so a vague answer is visibly inadequate.
+<Trap>
+The main failure mode is boilerplate that satisfies the form without informing the decision.
+</Trap>
+
+An intended use written as a broad generic phrase, or a limitations section that lists only trivial caveats, looks complete while telling a reviewer nothing. A gate that accepts such a document is worse than no gate, because it records a check that did not happen. The defense is to make specific fields answerable, for example by asking which condition a metric was broken out for and which use a warning actually rules out, so a vague answer is visibly inadequate.
 
 There is also a clear boundary around what documentation can establish. A datasheet or model card reports what is known; it does not itself detect bias, prove fairness, or validate a system in a new context. It cannot cover uses that nobody anticipated, and it cannot substitute for testing in the deployment setting. The proposals are transparency instruments, not verification instruments. A reader who expects a card to settle whether a model is acceptable has misunderstood the kind of claim it makes.
 

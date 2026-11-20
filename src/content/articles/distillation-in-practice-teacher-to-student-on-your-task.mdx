@@ -9,7 +9,9 @@ tags:
   - Compression
 ---
 
+<Lead>
 A large model can be a better teacher than it is a servant. Its outputs on your task can train a smaller model that is cheaper to run, provided the teacher is right often enough and the student is evaluated against the real objective rather than the teacher's style.
+</Lead>
 
 **Direct answer:** Knowledge distillation trains a student model on a teacher's outputs — traditionally soft probability distributions, in practice often generated text or labels. The original distillation paper establishes the soft-target mechanism. The boundary: a student trained on a teacher's mistakes learns those mistakes, so distillation transfers the teacher's behaviour, not correctness — which is why a held-out evaluation on ground truth is required.
 
@@ -17,13 +19,13 @@ A large model can be a better teacher than it is a servant. Its outputs on your 
 
 Three forms are common:
 
-**Soft targets.** The teacher's full probability distribution over outputs carries information about how confident it is and what alternatives it considered. The original paper showed that this richer signal helps students learn.
+**Soft targets.** The teacher's <Mark>full probability distribution</Mark> over outputs carries information about how confident it is and what alternatives it considered. The original paper showed that this richer signal helps students learn.
 
 **Generated text.** For language models, the teacher produces answers or reasoning traces that the student is trained to imitate. This is cheaper to collect than soft distributions and works when the output is text.
 
 **Labels and rationales.** The teacher labels examples and explains why. The student learns both the decision and the stated reasoning, which may or may not reflect the teacher's actual process, as the interpretability article warns.
 
-Three properties matter: coverage of the task, quality of the teacher's outputs, and a way to check the student against ground truth.
+Three properties matter: coverage of the task, quality of the teacher's outputs, and a way to check the student against <Mark>ground truth</Mark>.
 
 ## A worked distillation decision
 
@@ -63,7 +65,7 @@ The counterargument — that a smaller model is always cheaper overall — ignor
 
 ## The data is the product
 
-A distillation project is mostly a data project. Three decisions determine its quality:
+A distillation project is <Mark>mostly a data project</Mark>. Three decisions determine its quality:
 
 **Which questions to include.** Sample from the distribution the student will actually see, including edge cases. A set drawn from a convenient source will produce a student that performs well on that source and poorly elsewhere, as the data-quality article warns.
 
@@ -71,13 +73,23 @@ A distillation project is mostly a data project. Three decisions determine its q
 
 **How to handle disagreement.** When two teacher runs produce different answers to the same question, that is a signal of uncertainty. Resolving it with a verified source is better than picking one arbitrarily, which the evaluation-rubric article explains for preference data.
 
+<KeyPoint>
 These choices matter more than the training hyperparameters, because the student can only reproduce what it is shown.
+</KeyPoint>
 
 ## What distillation cannot do
 
-**It cannot improve on the teacher's knowledge.** It compresses behaviour; it does not add truth.
+**It cannot improve on the teacher's knowledge.**
 
-**It cannot substitute for evaluation.** The student must be scored against ground truth, not against how closely it matches the teacher, which the benchmarks article argues more generally.
+<PullQuote>
+It compresses behaviour; it does not add truth.
+</PullQuote>
+
+**It cannot substitute for evaluation.**
+
+<Trap>
+The student must be scored against ground truth, not against how closely it matches the teacher, which the benchmarks article argues more generally.
+</Trap>
 
 **It is not interpretability.** A student that mimics a teacher's reasoning traces does not thereby make the reasoning understandable, as the mechanistic-interpretability article explains.
 

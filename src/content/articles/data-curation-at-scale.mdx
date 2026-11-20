@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 Data curation is often treated as a cleaning pass before training. The Wikipedia entry describes curation as ongoing management and quality control, and the data-modeling entry covers structure. At scale, the deciding factor is what the process removes as much as what it keeps.
+</Lead>
 
-**Direct answer:** Curate with documented rules, measure what each rule removes, and keep a record that makes the final dataset reproducible. The sources define curation and structure; the measurement rule is a synthesis.
+**Direct answer:** Curate with documented rules, <Mark>measure what each rule removes</Mark>, and keep a record that makes the final dataset reproducible. The sources define curation and structure; the measurement rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked pipeline review, separating documented definitions from the local decisions about thresholds.
 
@@ -37,15 +39,23 @@ The outcome is a threshold decision with a recorded trade-off. The numbers are h
 
 ## Why rules need owners
 
-A curation rule is a decision expressed as code. It decides which records are legitimate, which sources are trusted, and which rare cases are collateral damage. Treating that decision as a configuration detail removes the possibility of challenging it later.
+<KeyPoint>
+A curation rule is a decision expressed as code.
+</KeyPoint>
 
-An owner is useful for two reasons. First, they can explain why a threshold was chosen, which matters when the data changes and the rule no longer fits. Second, they can be asked to review the sample of removed records, which is the check most likely to catch a systematic error. Without an owner, the rule becomes a habit that nobody remembers choosing.
+It decides which records are legitimate, which sources are trusted, and which rare cases are <Mark>collateral damage</Mark>. Treating that decision as a configuration detail removes the possibility of challenging it later.
+
+An owner is useful for two reasons. First, they can explain why a threshold was chosen, which matters when the data changes and the rule no longer fits. Second, they can be asked to review the sample of removed records, which is the check most likely to catch a systematic error.
+
+<PullQuote>
+Without an owner, the rule becomes a habit that nobody remembers choosing.
+</PullQuote>
 
 Reproducibility is the other discipline. A dataset built from a source snapshot and a documented set of rules can be rebuilt. A dataset built by a sequence of manual edits cannot, and the difference becomes visible only when someone asks how a figure was produced. Recording the snapshot date and the rule versions is a small cost that makes the result auditable.
 
 ## What changes at scale
 
-At small scale, a bad rule is visible because someone reads the data. At large scale, the same rule operates on millions of records and its errors are invisible unless they are measured. Sampling is the bridge: a small, deliberate sample of what was kept and what was removed provides evidence that a metric alone cannot.
+At small scale, a bad rule is visible because someone reads the data. At large scale, the same rule operates on millions of records and its errors are invisible unless they are measured. Sampling is the bridge: <Mark>a small, deliberate sample</Mark> of what was kept and what was removed provides evidence that a metric alone cannot.
 
 ## Evidence status
 
@@ -67,7 +77,9 @@ The choice of what to keep is ultimately a decision about the task the dataset w
 
 It cannot guarantee a high-quality dataset, because quality is defined by the task. It does not remove the need for provenance, which makes the result auditable. And it cannot be finished once, because sources change.
 
+<Trap>
 The counterargument that a stricter filter is always better is fair for obvious noise and incomplete for rare cases.
+</Trap>
 
 ## A decision test
 

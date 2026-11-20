@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 DNS resolution is often described as a single lookup, which hides the sequence and the caches. RFC 1035 defines the DNS implementation, and the Wikipedia overview describes the system. The practical consequences appear when an answer is wrong or stale.
+</Lead>
 
 **Direct answer:** Follow the query path — resolver, root, authoritative server — and check each cache when an address looks wrong. The RFC provides the protocol; the diagnostic sequence is a synthesis.
 
@@ -21,9 +23,15 @@ Three steps matter for diagnosis:
 
 - **Recursive lookup.** A resolver asks other servers until it obtains an answer. RFC 1035 defines the query and response format.
 - **Caching.** Answers are stored for a time-to-live. The same RFC defines the record structure that carries that value.
-- **Authoritative answer.** The server that holds the zone provides the definitive record. A cached answer is not authoritative, though it is often correct.
+- **Authoritative answer.** The server that holds the zone provides the definitive record. <Mark>A cached answer is not authoritative</Mark>, though it is often correct.
 
-The diagnostic order follows from this: identify which server answered, check the TTL, then compare with the authoritative record. Treating a cached answer as a fact is the common error. This ordering is `inferred`; the existence of caches and TTLs is `source-reported`.
+The diagnostic order follows from this: identify which server answered, check the TTL, then compare with the authoritative record.
+
+<Trap>
+Treating a cached answer as a fact is the common error.
+</Trap>
+
+This ordering is `inferred`; the existence of caches and TTLs is `source-reported`.
 
   <Figure src="/images/articles/inline/dns-resolution-examples-1.png" alt="A query path from a recursive resolver through a cached answer with a TTL to the authoritative server." caption="Conceptual: identify the answering server and its TTL before changing records." />
 
@@ -35,17 +43,21 @@ Three checks decide. First, did the region's resolver return a cached record, as
 
 A second example: a hostname fails only for one user. The checks are the same, but the cause may be a local resolver or a stale operating-system cache. In both cases the method is to identify who answered before changing anything.
 
-The outcome is a diagnosis rule: locate the answering server first, then decide whether to wait, flush, or escalate. That rule is the article's synthesis.
+<KeyPoint>
+The outcome is a diagnosis rule: locate the answering server first, then decide whether to wait, flush, or escalate.
+</KeyPoint>
+
+That rule is the article's synthesis.
 
 ## Why the path matters more than the record
 
-When a name resolves incorrectly, the record itself is rarely the problem. The problem is usually which server answered and how long that answer has been cached. Starting from the record invites configuration changes that cannot affect a cached response, which is why the change appears to do nothing.
+When a name resolves incorrectly, <Mark>the record itself is rarely the problem</Mark>. The problem is usually which server answered and how long that answer has been cached. Starting from the record invites configuration changes that cannot affect a cached response, which is why the change appears to do nothing.
 
 The resolver is the first useful observation. It may hold an answer from an earlier query, and the time-to-live on that answer decides how long the observation remains valid. A short remaining TTL is a reason to wait; a long one is a reason to investigate who supplied the answer. Both conclusions come from the same measurement, which is why checking the answering server comes first.
 
 The authoritative server is the second observation. If it returns the expected address, the record is correct and the problem is local to a cache. If it returns the old address, the delegation or the zone content needs attention. Reversing this order leads teams to flush caches that were never wrong.
 
-Time is part of the diagnosis. A change made minutes ago cannot be expected to be visible everywhere, because cached answers are valid until their TTL expires. Lowering a TTL before a planned move helps future caches, not existing ones. Treating propagation as an error condition is a misunderstanding of the protocol, not a monitoring failure.
+Time is part of the diagnosis. A change made minutes ago cannot be expected to be visible everywhere, because cached answers are valid until their TTL expires. <Mark>Lowering a TTL before a planned move helps future caches</Mark>, not existing ones. Treating propagation as an error condition is a misunderstanding of the protocol, not a monitoring failure.
 
 The examples in this article therefore describe a sequence, not a set of fixed answers. Once the sequence is known, a new symptom can be placed in it and the next observation becomes obvious.
 
@@ -65,7 +77,9 @@ A TTL is a promise about how long an answer may be reused. Shortening it before 
 
 The examples cannot identify a specific provider's cache behaviour without local evidence. They do not replace querying the authoritative server. And they cannot guarantee that a flush takes effect everywhere at once.
 
+<PullQuote>
 The counterargument that a DNS problem must be a configuration error is fair for new records and incomplete for recently changed ones, where a cached answer is often the explanation.
+</PullQuote>
 
 ## A decision test
 

@@ -9,27 +9,39 @@ tags:
   - Debugging
 ---
 
+<Lead>
 A log tells you what one component did; a trace tells you what happened to one request as it moved through the system. In a microservices architecture, that difference is decisive: a slow response may be fast in every service but slow in the waits between them. Tracing is the instrument that reveals those gaps.
+</Lead>
 
 **Direct answer:** A distributed trace is a tree of spans, each representing a unit of work with a parent, timing, attributes, and a shared trace context propagated across service boundaries. OpenTelemetry's tracing documentation is the primary source for the model, and the specification defines how context is propagated. The boundary: a trace is useful only if the services participate and the sampling strategy retains the requests you need to investigate, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) argues for signals that support a decision.
 
 ## The sampling decision
 
-Tracing every request in a high-volume system is expensive, which is why nearly every implementation samples. Head-based sampling decides at the start of a request, which is cheap and simple but cannot know that a request will later fail or become slow, as the tracing documentation explains. A failure that occurs deep in a call chain can therefore be invisible because the request was not selected at the edge, which is the exact event most worth retaining.
+Tracing every request in a high-volume system is expensive, which is why nearly every implementation samples. <Mark>Head-based sampling</Mark> decides at the start of a request, which is cheap and simple but cannot know that a request will later fail or become slow, as the tracing documentation explains.
+
+<PullQuote>
+A failure that occurs deep in a call chain can therefore be invisible because the request was not selected at the edge, which is the exact event most worth retaining.
+</PullQuote>
 
 Tail-based sampling waits until the trace is complete and then decides whether to keep it, which allows a policy that retains errors and slow traces, as the OpenTelemetry guidance recommends. The cost is that all spans must be held briefly and the decision logic must be operated, which the cloud-cost article treats as a workload with its own expense. For most teams, a hybrid is practical: a low baseline rate with a rule that always keeps failures and high-latency traces, which the observability article argues for signals that support an investigation.
 
-Sampling should be reviewed after an incident. If the team could not find the trace that explained the failure, the policy kept the wrong evidence, which the incident-response article treats as a failure of the control. A dated record of that review, with the change made, is the discipline the decision-memo article recommends for consequential choices.
+Sampling should be reviewed after an incident.
+
+<Trap>
+If the team could not find the trace that explained the failure, the policy kept the wrong evidence, which the incident-response article treats as a failure of the control.
+</Trap>
+
+A dated record of that review, with the change made, is the discipline the decision-memo article recommends for consequential choices.
 
 ## What a span contains
 
 **A parent and a trace ID.** These connect the span to the request, which is how a system reconstructs a path across services, as the tracing documentation explains for context propagation.
 
-**Timing.** Start and duration, which show where time was spent. The gap between a child span ending and its parent continuing is often the signal of queuing or a slow dependency, which the batching-economics article treats as waiting time that local speed cannot remove.
+**Timing.** Start and duration, which show where time was spent. The gap between a child span ending and its parent continuing is often <Mark>the signal of queuing or a slow dependency</Mark>, which the batching-economics article treats as waiting time that local speed cannot remove.
 
 **Attributes and events.** A name, a status, and key fields such as an operation or error code. These should be useful for diagnosis without embedding sensitive data, as the data-governance article requires for relied-upon records.
 
-Three consequences follow. Instrumentation must cover the boundaries between services, not only their internals, which the microservices article treats as where failures appear. Context must propagate through queues and async calls, which the message-queue article explains for decoupled work. And the volume of spans makes sampling necessary, which is where many implementations lose the events they most need.
+Three consequences follow. Instrumentation must cover <Mark>the boundaries between services</Mark>, not only their internals, which the microservices article treats as where failures appear. Context must propagate through queues and async calls, which the message-queue article explains for decoupled work. And the volume of spans makes sampling necessary, which is where many implementations lose the events they most need.
 
 ## A worked investigation
 
@@ -37,7 +49,13 @@ The following is hypothetical and illustrative. A checkout request takes 4 secon
 
 The trace shows the API gateway span lasting 4 seconds, with a child call to the payment service that starts after a 2-second gap. The payment service span itself is 150 milliseconds. Three checks decide the cause. First, is the gap between spans a queue or a network delay, as the tracing documentation recommends reading timing across the tree? Second, does the same gap appear in other traces, which the observability article treats as a pattern worth an alert? Third, is the affected request retained by sampling, as the tracing guidance warns that head-based sampling can drop the slow tail?
 
-Three conclusions follow. The bottleneck was between services, not inside one, which the trace revealed and logs could not. A targeted alert on the gap is more useful than a generic latency threshold, as the SLO article argues for symptoms that matter. And sampling should be reviewed to retain slow requests, as the tracing documentation advises for error-heavy and latency-heavy paths.
+Three conclusions follow.
+
+<KeyPoint>
+The bottleneck was between services, not inside one, which the trace revealed and logs could not.
+</KeyPoint>
+
+A targeted alert on the gap is more useful than a generic latency threshold, as the SLO article argues for symptoms that matter. And sampling should be reviewed to retain slow requests, as the tracing documentation advises for error-heavy and latency-heavy paths.
 
 ## What tracing cannot do
 

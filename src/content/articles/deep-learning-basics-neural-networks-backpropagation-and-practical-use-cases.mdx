@@ -9,7 +9,9 @@ tags:
   - Backpropagation
 ---
 
+<Lead>
 Deep learning is often explained with metaphors — layers as "neurons", networks that "learn" — and the metaphors obscure a simple mechanism. A neural network is a chain of mathematical functions with adjustable parameters. Training means nudging those parameters in the direction that reduces a loss, using derivatives computed efficiently by backpropagation. Everything else — attention, distillation, scaling laws — is a refinement of that loop.
+</Lead>
 
 **Direct answer:** A network learns by composing simple transformations, measuring the error at the output, and propagating the gradient of that error back through the chain to update each parameter. The approach works when there is enough data and structure for the learned representations to help, and the empirical scaling literature shows that performance improves predictably with model size, data, and compute. The boundary: scaling laws are measured on cross-entropy loss for language modelling, not on your task, and deep learning loses to simpler methods on many tabular problems.
 
@@ -25,7 +27,7 @@ Three pieces make training work.
 
 **Gradient descent** updates each parameter in the direction that reduces the loss. The gradient tells you the slope; a learning rate controls how far you step. Too large and training diverges; too small and it never arrives.
 
-**Backpropagation** computes those gradients efficiently. It applies the chain rule layer by layer from the output backward, reusing intermediate results so the cost is roughly proportional to the cost of a forward pass — not to the number of parameters times the number of paths. Without that efficiency, training deep networks would be impractical.
+**Backpropagation** computes those gradients efficiently. It applies the chain rule layer by layer from the output backward, reusing intermediate results so the cost is <Mark>roughly proportional to the cost of a forward pass</Mark> — not to the number of parameters times the number of paths. Without that efficiency, training deep networks would be impractical.
 
 A useful consequence: a network does not "store" facts in the way a database does. It encodes regularities in the weights, distributed across many parameters. This is why a trained model can generalise to inputs it has never seen, and why it can fail in ways that are hard to localise.
 
@@ -47,7 +49,7 @@ Suppose you train a classifier on 50,000 examples in batches of 256, for 10 epoc
 
 Now change one thing. Doubling the batch size to 512 halves the number of updates to about 975, but each update processes twice as much data, so the wall-clock time barely changes — while the memory requirement doubles. This is the common surprise: batch size is usually a memory and optimisation-stability decision, not a speed decision.
 
-The learning rate interacts with this. A larger batch gives a lower-variance gradient estimate, which often permits a larger learning rate, but the safe range depends on the model and optimiser. The point is that the "hyperparameters" are not arbitrary settings; they are knobs on a specific numerical procedure with predictable trade-offs.
+The learning rate interacts with this. A larger batch gives a lower-variance gradient estimate, which often permits a larger learning rate, but the safe range depends on the model and optimiser. The point is that the "hyperparameters" are not arbitrary settings; they are <Mark>knobs on a specific numerical procedure</Mark> with predictable trade-offs.
 
 For tabular data, the comparison matters. A gradient-boosted tree model on 50,000 rows can often be trained in seconds, needs less preprocessing, and is easier to interpret. Deep learning earns its cost when the input has structure the network can exploit — images, text, audio — or when transfer learning from a pretrained model gives a head start.
 
@@ -57,15 +59,27 @@ Three limitations deserve more than a disclaimer.
 
 **Data and compute are real constraints.** Scaling laws describe what happens *given* more compute and data; they do not provide them. For a small dataset, a deep model will typically underperform a well-tuned classical method because it has enough capacity to memorise the training set.
 
-**The objective is a proxy.** Cross-entropy on held-out text is not the same as usefulness, safety, or correctness on your task. The scaling papers optimise loss; downstream gains are supportive evidence, not the target. A model can improve its loss and still fail at what you deployed it for.
+**The objective is a proxy.** Cross-entropy on held-out text is not the same as usefulness, safety, or correctness on your task. The scaling papers optimise loss; <Mark>downstream gains are supportive evidence, not the target</Mark>.
+
+<Trap>
+A model can improve its loss and still fail at what you deployed it for.
+</Trap>
 
 **Interpretability lags capability.** A network's decision can be probed but not easily read off its weights. In regulated or high-stakes settings, that matters: the model card discipline of documenting evaluation conditions and known limits is not optional paperwork when you cannot fully explain a prediction.
 
-On the other side, the strongest counterargument to "just use classical methods" is representation learning. On unstructured data, hand-engineered features are hard to beat, and pretrained deep models let a small team start from features learned on a much larger corpus. The honest position is task-dependent, not ideological.
+On the other side, the strongest counterargument to "just use classical methods" is representation learning. On unstructured data, hand-engineered features are hard to beat, and pretrained deep models let a small team start from features learned on a much larger corpus.
+
+<PullQuote>
+The honest position is task-dependent, not ideological.
+</PullQuote>
 
 ## A decision test
 
-Choose deep learning when the input has exploitable structure, when a pretrained model exists for the domain, or when the scale of data makes hand-engineered features the weaker option. Prefer classical methods for small tabular datasets, when interpretability is required, or when the training budget is tight.
+<KeyPoint>
+Choose deep learning when the input has exploitable structure, when a pretrained model exists for the domain, or when the scale of data makes hand-engineered features the weaker option.
+</KeyPoint>
+
+Prefer classical methods for small tabular datasets, when interpretability is required, or when the training budget is tight.
 
 1. **Establish a simple baseline first** — logistic regression or gradient boosting — so the deep model must earn its complexity.
 2. **Check the data volume and structure** against what the architecture needs.
