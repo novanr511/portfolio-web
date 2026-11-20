@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Lazy loading is often applied to every image at once, which can make a page slower. The Wikipedia entry describes deferring resources until they are needed, and the Web Vitals material defines the metrics it affects. The starting point is knowing which resources are critical.
+<Lead>
+Lazy loading is often applied to every image at once, which can make a page slower. The Wikipedia entry describes deferring resources until they are needed, and the Web Vitals material defines the metrics it affects. The starting point is knowing <Mark>which resources are critical</Mark>.
+</Lead>
 
 **Direct answer:** Defer only resources below the fold or unlikely to be used, and keep the largest paint eager. The sources describe the technique and the metrics; the selection rule is a synthesis.
 
@@ -41,7 +43,7 @@ The idea of above and below the fold is a simplification of where attention goes
 
 ## Why measurement closes the loop
 
-A lazy-loading change is easy to make and hard to evaluate without a before-and-after comparison on the same connection and device. A faster score on a developer machine may not describe a user's experience. Re-measuring under realistic conditions is what turns the change from a belief into evidence.
+A lazy-loading change is easy to make and hard to evaluate without <Mark>a before-and-after comparison on the same connection and device</Mark>. A faster score on a developer machine may not describe a user's experience. Re-measuring under realistic conditions is what turns the change from a belief into evidence.
 
 ## Evidence status
 
@@ -53,11 +55,17 @@ A lazy-loading change is easy to make and hard to evaluate without a before-and-
 
 ## Why selection matters more than the technique
 
-A deferred resource saves initial work only when it was not needed initially. Applying the technique to a critical resource moves work into the measurement window instead of removing it. Knowing which resources are critical is therefore the real task.
+A deferred resource saves initial work only when it was not needed initially. Applying the technique to a critical resource <Mark>moves work into the measurement window instead of removing it</Mark>. Knowing which resources are critical is therefore the real task.
 
 A related issue is accessibility. A resource that is deferred until an interaction may delay content that assistive technology needs, and a page that appears fast can still be slow to use. Testing with the same care applied to visual performance is part of a responsible implementation.
 
-The technique also interacts with caching. A deferred image loaded on scroll will still consume bandwidth, and on a metered connection that cost is real. Treating deferral as a way to reduce total data is a misunderstanding; it changes timing, not volume. The distinction matters when the audience pays for data.
+The technique also interacts with caching. A deferred image loaded on scroll will still consume bandwidth, and on a metered connection that cost is real.
+
+<Trap>
+Treating deferral as a way to reduce total data is a misunderstanding; it changes timing, not volume.
+</Trap>
+
+The distinction matters when the audience pays for data.
 
 A final point is that the technique can hide problems rather than solve them. A large image deferred until a user scrolls will still load slowly when it finally appears, which is a different failure from loading it too early. Testing the deferred path is part of the work, not an optional check after the main metric improves.
 
@@ -65,7 +73,9 @@ The decision should also record what was deliberately left eager and why. A futu
 
 The deferred path should be tested on the devices the audience actually uses.
 
+<KeyPoint>
 Selection is the skill here; the technique itself is easy to apply and easy to apply wrongly.
+</KeyPoint>
 
 The record should include the connection used for the measurement, since results do not transfer across networks.
 
@@ -73,7 +83,9 @@ The record should include the connection used for the measurement, since results
 
 It cannot remove a resource. It does not fix an oversized image. And it cannot guarantee a better score on every device.
 
+<PullQuote>
 The counterargument that lazy loading everything is simplest is fair for small pages and incomplete when the largest paint is deferred.
+</PullQuote>
 
 ## A decision test
 

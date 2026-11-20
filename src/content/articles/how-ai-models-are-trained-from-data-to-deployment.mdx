@@ -9,19 +9,27 @@ tags:
   - Deployment
 ---
 
+<Lead>
 Most explanations of model training are a list of stages, and the list is the problem. It reads as if the stages were independent, when in practice each one spends a budget that the next one then has to live with. Data choice constrains what the model can learn. The compute budget constrains which architecture is even worth training. The evaluation design constrains which numbers you are allowed to believe.
+</Lead>
 
-**Direct answer:** Training is a sequence of budget decisions: how much data to collect and how to document it, which architecture to instantiate, how to split a fixed compute budget between model size and training tokens, how to evaluate without leaking information, and what to ship. Every stage can invalidate the last one. The most common failure is not a bad model — it is a good model measured on a broken split, or a well-trained model that was never a good idea to deploy. The paper that most usefully reframes the whole process is the compute-optimal training study, because it shows that the popular instinct — make the model bigger — is frequently the wrong allocation of a fixed budget.
+**Direct answer:**
+
+<KeyPoint>
+Training is a sequence of budget decisions: how much data to collect and how to document it, which architecture to instantiate, how to split a fixed compute budget between model size and training tokens, how to evaluate without leaking information, and what to ship.
+</KeyPoint>
+
+Every stage can invalidate the last one. The most common failure is not a bad model — it is a good model measured on a broken split, or a well-trained model that was never a good idea to deploy. The paper that most usefully reframes the whole process is the compute-optimal training study, because it shows that the popular instinct — make the model bigger — is frequently the wrong allocation of a fixed budget.
 
 ## Where the ceiling is set: the data
 
-Data is usually described as the input to training. It is more accurately the ceiling on what training can achieve, and it is also the part of the pipeline most often undocumented.
+Data is usually described as the input to training. It is more accurately <Mark>the ceiling on what training can achieve</Mark>, and it is also the part of the pipeline most often undocumented.
 
 Gebru et al. proposed *datasheets for datasets* by analogy with electronics: every component ships with a datasheet describing its operating characteristics, test results, and recommended uses, and they argue a dataset should ship with the equivalent — its motivation, composition, collection process, recommended uses, and known limits. The problem they set out to solve is that the machine learning community has no standardised process for documenting datasets, and that this "can lead to severe consequences in high stakes domains". That is a claim about evidence, not about sentiment: a dataset nobody documented is a dataset whose provenance nobody can reconstruct.
 
 Mitchell et al. make the complementary argument for models, proposing *model cards* — short documents accompanying trained models that report benchmarked evaluation "in a variety of conditions, such as across different cultural, demographic, or phenotypic groups ... and intersectional groups" relevant to the intended application. Their motivation is equally concrete: trained models are used for tasks "in areas such as law enforcement, medicine, education, and employment", where intended-use context and evaluation procedure are part of the artefact, not optional metadata.
 
-The practical consequence for a team: a dataset card and a model card are not paperwork. They are the only artefacts that let a later reader tell the difference between a model that is accurate and a model that is accurate on the distribution someone happened to collect.
+The practical consequence for a team: a dataset card and a model card are not paperwork. They are the only artefacts that let a later reader tell the difference between a model that is accurate and a model that is <Mark>accurate on the distribution someone happened to collect</Mark>.
 
 ## Architecture: what the transformer actually changed
 
@@ -43,11 +51,22 @@ They then tested it: Chinchilla, a predicted compute-optimal model with 70B para
 
 The decision this changes is concrete. Under a fixed budget, halving the parameter count and doubling the tokens is a different experiment from keeping the parameter count and training longer. The popular path — scale the model, keep the data roughly constant — is the one the compute-optimal work identifies as undertrained. The detailed treatment of how these two studies conflict is in [Chinchilla and the Scaling Laws](/articles/chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule).
 
+<KeyFigures items={[
+  { value: "67.5%", label: "MMLU average accuracy reported for Chinchilla, greater than a 7% improvement over Gopher", source: "Hoffmann et al., Training Compute-Optimal Large Language Models" },
+  { value: "28.4 BLEU", label: "WMT 2014 English-to-German score for the transformer model", source: "Vaswani et al., Attention Is All You Need" },
+]} />
+
 ## Evaluation: the stage that silently invalidates the others
 
 A model that scores well on a broken evaluation tells you nothing about the model. scikit-learn's guidance on data leakage is the cleanest statement of the failure mode: "Data leakage occurs when information that would not be available at prediction time is used when building the model." Their remedy is blunt — "Always split the data into train and test subsets first, particularly before any preprocessing steps" — and they note that a pipeline "ensures that the appropriate method is performed on the correct data subset".
 
-That last point is the one teams skip. If you fit a scaler, an imputer, or a feature selector on the full dataset before splitting, the test set has already leaked into training, and no amount of careful model selection repairs it. The symptom is a validation score that looks wonderful and a production score that does not.
+That last point is the one teams skip.
+
+<Trap>
+If you fit a scaler, an imputer, or a feature selector on the full dataset before splitting, the test set has already leaked into training, and no amount of careful model selection repairs it.
+</Trap>
+
+The symptom is <Mark>a validation score that looks wonderful and a production score that does not</Mark>.
 
 Broader evaluation is a separate job, and it is where model cards earn their place: reporting performance across demographic and other relevant groups, disclosing intended use, and describing the evaluation procedure, rather than reporting one headline metric on one aggregate.
 
@@ -77,7 +96,11 @@ The following is hypothetical and illustrative. A team plans to train a language
 
 ## A counterargument
 
-A critic could argue that the budget-chain framing is tidier than the evidence it cites. The compute-optimal result is presented as the decision that changes everything, but Kaplan and Hoffmann disagree, and both settings are language modelling under a fixed training budget; Hoffmann's 'optimal' is defined by that budget, not by the serving constraint Hinton et al. say dominates deployment. Its deployment section undercuts the compute section: if the validated model is replaced by a distilled or quantised one, the earlier allocation is only part of the story. Sculley et al. go further, describing most of the work as data collection, serving, and monitoring rather than training. The linear pipeline is a useful teaching device, but it flatters a process the cited sources describe as iterative and mostly non-model.
+A critic could argue that the budget-chain framing is tidier than the evidence it cites. The compute-optimal result is presented as the decision that changes everything, but Kaplan and Hoffmann disagree, and both settings are language modelling under a fixed training budget; Hoffmann's 'optimal' is defined by that budget, not by the serving constraint Hinton et al. say dominates deployment. Its deployment section undercuts the compute section: if the validated model is replaced by a distilled or quantised one, the earlier allocation is only part of the story. Sculley et al. go further, describing most of the work as data collection, serving, and monitoring rather than training.
+
+<PullQuote>
+The linear pipeline is a useful teaching device, but it flatters a process the cited sources describe as iterative and mostly non-model.
+</PullQuote>
 
 ## References & Further Reading
 

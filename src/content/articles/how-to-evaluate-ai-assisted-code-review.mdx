@@ -9,19 +9,33 @@ tags:
   - Verified
 ---
 
-AI-assisted code review is often measured by the number of issues it finds, which rewards noise. Anthropic's use-case guides describe what models can do in production, and the engineering blog material covers code review practice. The evaluation question is whether the tool improves the review.
+<Lead>
+AI-assisted code review is often measured by the number of issues it finds, <Mark>which rewards noise</Mark>. Anthropic's use-case guides describe what models can do in production, and the engineering blog material covers code review practice. The evaluation question is whether the tool improves the review.
+</Lead>
 
-**Direct answer:** Evaluate AI review by the precision of its findings, the issues it misses, and the time reviewers spend acting on it. The sources describe capability and practice; the method is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Evaluate AI review by the precision of its findings, the issues it misses, and the time reviewers spend acting on it.
+</KeyPoint>
+
+The sources describe capability and practice; the method is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented capability from local choices about what counts as a useful finding.
 
 ## The mechanism
 
-The first consideration is precision. The use-case guides describe what a model can identify, but a finding that is wrong costs reviewer time and teaches the team to ignore the tool. Precision matters more than volume, and it should be measured on the codebase in question.
+The first consideration is precision. The use-case guides describe what a model can identify, but a finding that is wrong costs reviewer time and teaches the team to ignore the tool. <Mark>Precision matters more than volume</Mark>, and it should be measured on the codebase in question.
 
 <Figure src="/images/articles/inline/how-to-evaluate-ai-assisted-code-review-1.png" alt="A four-step evaluation: define a useful finding, test on past changes with known defects, measure precision and misses, then check time to merge." caption="Conceptual: judge AI review by precision, misses and time to merge, not finding count." />
 
-The second consideration is misses. A tool that finds many style issues while missing a logic error has not improved the review, and a count of findings will not reveal it. Comparing against known defects in past changes is the way to measure what the tool misses.
+The second consideration is misses.
+
+<Trap>
+A tool that finds many style issues while missing a logic error has not improved the review, and a count of findings will not reveal it.
+</Trap>
+
+Comparing against known defects in past changes is the way to measure what the tool misses.
 
 The third consideration is reviewer time. The engineering material treats review as a practice with a purpose, and a tool that adds comments requiring investigation can slow it down. Measuring the total time to merge, not just the number of findings, captures the effect.
 
@@ -45,7 +59,7 @@ The outcome is a decision about where the tool helps. The scenario is hypothetic
 
 ## Why findings are not the result
 
-A finding is useful only if it leads to a better change. A tool that generates many comments which reviewers dismiss has produced activity, not improvement, and the distinction is visible in the time to merge.
+<Mark>A finding is useful only if it leads to a better change</Mark>. A tool that generates many comments which reviewers dismiss has produced activity, not improvement, and the distinction is visible in the time to merge.
 
 A further issue is that the tool's findings can be correct and unhelpful. A comment that points to a real style violation may still be lower priority than a design concern the reviewer noticed, and a tool that surfaces many small issues can crowd out the important ones. Prioritisation is part of the evaluation, not an afterthought.
 
@@ -65,7 +79,9 @@ Findings should be measured against known defects, not counted on their own.
 
 It cannot judge whether a change fits the system's intent. It does not replace a reviewer. And it cannot guarantee that a bug-free diff is a correct one.
 
+<PullQuote>
 The counterargument that any automation helps is fair for routine checks and incomplete for the judgement that review requires.
+</PullQuote>
 
 ## A decision test
 

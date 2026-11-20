@@ -9,7 +9,9 @@ tags:
   - Recommender Systems
 ---
 
+<Lead>
 Most machine learning assumes the input is a neatly arranged vector. Graph data is not: a social network, a molecule, a citation graph, or a user-item interaction catalogue has a shape that carries information, and flattening it into rows throws that information away. Graph neural networks exist to learn directly from the structure.
+</Lead>
 
 **Direct answer:** A graph neural network learns a representation for each node by aggregating information from its neighbours, repeatedly, so that a node's vector comes to encode its position in the structure. The mechanism is message passing: collect information from neighbours, combine it with the node's own state, and update. It helps when relationships carry signal that node attributes alone do not — which is exactly the case in recommender systems, where the user-item interaction graph is the thing a matrix factorisation model used only as a training target.
 
@@ -28,9 +30,9 @@ GNNs follow a message-passing neural network paradigm, and the operation is simp
 3. The messages are aggregated — by sum, mean, or attention-weighted combination.
 4. The node's own vector is updated using its previous state and the aggregated message.
 
-After $k$ layers, a node's representation incorporates information from nodes up to $k$ hops away. That is both the capability and a limitation: shallow GNNs cannot see long-range dependencies, and deep ones suffer from over-smoothing, in which all node representations converge toward the same vector and become useless.
+After $k$ layers, a node's representation incorporates information from nodes up to $k$ hops away. That is both the capability and a limitation: shallow GNNs cannot see long-range dependencies, and deep ones suffer from <Mark>over-smoothing</Mark>, in which all node representations converge toward the same vector and become useless.
 
-Hamilton et al.'s GraphSAGE addresses the scaling side of the problem. Neighbour sampling means a node does not aggregate over its entire neighbourhood, which makes training on large graphs feasible and lets the model generalise to new nodes. Their framing — inductive representation learning on large graphs — is the right one for any production system where the graph keeps growing.
+Hamilton et al.'s GraphSAGE addresses the scaling side of the problem. Neighbour sampling means a node does not aggregate over its entire neighbourhood, which makes training on large graphs feasible and lets the model generalise to new nodes. Their framing — <Mark>inductive representation learning on large graphs</Mark> — is the right one for any production system where the graph keeps growing.
 
 Veličković et al.'s graph attention networks add a learned weighting: instead of averaging neighbours uniformly, the model learns which neighbours matter for the current node. This is useful where neighbourhoods are heterogeneous, which is most real graphs.
 
@@ -38,7 +40,11 @@ Veličković et al.'s graph attention networks add a learned weighting: instead 
 
 Wang et al. make the case that applies most directly to this publication's audience. They argue that a drawback of existing approaches — "ranging from early matrix factorization to recently emerged deep learning based methods" — is that a user's or item's embedding is obtained "by mapping from pre-existing features that describe the user (or the item), such as ID and attributes". The consequence is that "the collaborative signal, which is latent in user-item interactions, is not encoded in the embedding process" — so the resulting embeddings "may not be sufficient to capture the collaborative filtering effect".
 
-Neural Graph Collaborative Filtering takes the interaction graph itself as an input to the embedding, so the representation is shaped by the relationships rather than only by the fit. This is the clearest example of what graph methods add: they move a signal from the loss function into the representation.
+Neural Graph Collaborative Filtering takes the interaction graph itself as an input to the embedding, so the representation is shaped by the relationships rather than only by the fit.
+
+<KeyPoint>
+This is the clearest example of what graph methods add: they move a signal from the loss function into the representation.
+</KeyPoint>
 
 ## Where they fail
 
@@ -48,13 +54,19 @@ Three failure modes are worth knowing before choosing a GNN.
 
 **Scale and neighbourhood explosion.** Aggregating over all neighbours at every layer grows combinatorially. Sampling, as in GraphSAGE, is a practical necessity at production scale.
 
-**A wrong graph.** If the edges do not encode a meaningful relationship, message passing propagates noise. A recommender built on co-clicks will learn a different structure from one built on purchases, and the choice of edge is the modelling decision.
+**A wrong graph.**
+
+<Trap>
+If the edges do not encode a meaningful relationship, message passing propagates noise.
+</Trap>
+
+A recommender built on co-clicks will learn a different structure from one built on purchases, and the choice of edge is the modelling decision.
 
 ## When to use one
 
 Use a graph neural network when the relationship is part of the signal — when who is connected to whom, or what is bonded to what, carries information that attributes do not. Recommender systems, fraud detection over transaction graphs, molecular property prediction, and knowledge-graph reasoning are the natural cases.
 
-Do not use one when the rows are independent, or when a simpler relational feature — a neighbour count, a graph-derived statistic — already captures the useful part. The extra machinery has to earn its place against that baseline.
+Do not use one when the rows are independent, or when a simpler relational feature — a neighbour count, a graph-derived statistic — already captures the useful part. The extra machinery has to <Mark>earn its place against that baseline</Mark>.
 
 For the recommender application, see [Recommender Systems](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches); for the relational features that provide a simpler baseline, see [Feature Engineering](/articles/feature-engineering-turning-raw-data-into-predictive-signals).
 
@@ -64,7 +76,11 @@ The following is hypothetical and illustrative. A recommender team considers a g
 
 ## A counterargument
 
-A reasonable critic would argue that the case for graph methods is stacked by assuming the graph is already there and meaningful. The article's own rule says to use a GNN only when the relationship carries signal, and its failure section concedes that a wrong graph merely propagates noise - yet in practice the edges are the disputed thing, chosen from co-clicks or purchases rather than given. The simpler relational baseline it recommends may capture most of the gain, since the article itself says the machinery must earn its place against that baseline. GraphSAGE's neighbour sampling is framed as a practical necessity, hinting that full message passing is as much a liability as a capability at scale. A GNN is a bet on edge quality, not a default.
+A reasonable critic would argue that the case for graph methods is stacked by assuming the graph is already there and meaningful. The article's own rule says to use a GNN only when the relationship carries signal, and its failure section concedes that a wrong graph merely propagates noise - yet in practice the edges are the disputed thing, chosen from co-clicks or purchases rather than given. The simpler relational baseline it recommends may capture most of the gain, since the article itself says the machinery must earn its place against that baseline. GraphSAGE's neighbour sampling is framed as a practical necessity, hinting that full message passing is as much a liability as a capability at scale.
+
+<PullQuote>
+A GNN is a bet on edge quality, not a default.
+</PullQuote>
 
 ## References & Further Reading
 

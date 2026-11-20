@@ -9,9 +9,17 @@ tags:
   - Business
 ---
 
+<Lead>
 A model that predicts customer churn is not a decision. Nothing changes until someone decides what to do with the prediction, at what threshold, and with what budget. The gap between a good model and a good outcome is a design problem that most technical discussions skip.
+</Lead>
 
-**Direct answer:** Predictive analytics creates value when a predicted quantity is linked to an action, an intervention cost, and a measured result. Kuhn and Johnson's *Feature Engineering and Selection* is useful here because it treats features in the context of the modelling problem, while scikit-learn's cross-validation guidance supplies the validation discipline. The boundary: a model estimates a probability under the conditions it was trained on; it does not guarantee that an intervention will work, and it does not establish causation.
+**Direct answer:**
+
+<KeyPoint>
+Predictive analytics creates value when a predicted quantity is linked to an action, an intervention cost, and a measured result.
+</KeyPoint>
+
+Kuhn and Johnson's *Feature Engineering and Selection* is useful here because it treats features in the context of the modelling problem, while scikit-learn's cross-validation guidance supplies the validation discipline. The boundary: a model estimates a probability under the conditions it was trained on; it does not guarantee that an intervention will work, and it does not establish causation.
 
 ## The decision chain
 
@@ -23,7 +31,11 @@ Five links connect a model to a business result:
 4. **The intervention** — what actually happens to the flagged case?
 5. **The measurement** — did the intervention change the outcome relative to a control?
 
-Most analytics projects stop at link two and declare success. Links three to five are where the value is created or destroyed.
+<Trap>
+Most analytics projects stop at link two and declare success.
+</Trap>
+
+Links three to five are where the value is created or destroyed.
 
 scikit-learn's guidance on leakage is relevant at the prediction step: "data leakage occurs when information that would not be available at prediction time is used when building the model". In a business context, a common form is using a field recorded after the decision was made — a cancellation reason that only exists because the customer already left. A model built on that field will look excellent and be useless.
 
@@ -47,13 +59,13 @@ Now change the threshold so the business contacts only the top 3,000 scores, whi
 - Contribution saved: 600 × 200 = 120,000.
 - Net result: **+30,000**.
 
-The model did not change. Only the threshold and the intervention scope changed, and the decision flipped from a loss to a gain.
+The model did not change. Only the threshold and the intervention scope changed, and <Mark>the decision flipped from a loss to a gain</Mark>.
 
 Three lessons follow:
 
-1. **Accuracy is the wrong objective.** The relevant quantity is expected value at a threshold, which combines precision, intervention cost, and saved contribution.
+1. **Accuracy is the wrong objective.** The relevant quantity is <Mark>expected value at a threshold</Mark>, which combines precision, intervention cost, and saved contribution.
 2. **The threshold is a business decision**, not a modelling default. It should be recomputed when any input changes.
-3. **The 25% success rate is an assumption**, not a fact. If the offer works less well on model-identified customers — perhaps they were going to stay anyway — the calculation collapses. That is why a holdout group is required.
+3. **The 25% success rate is an assumption**, not a fact. If the offer works less well on model-identified customers — perhaps they were going to stay anyway — the calculation collapses. That is why <Mark>a holdout group is required</Mark>.
 
 The holdout is the fifth link in the chain. Without a group that receives no offer, the business cannot know whether the 25% was caused by the intervention or would have happened anyway.
 
@@ -93,7 +105,11 @@ Three limitations change the conclusion.
 
 **Optimisation can be gamed.** If customers learn that complaining triggers a discount, the model's "churn risk" feature becomes a target. A feedback loop of this kind is a business problem that no amount of model tuning fixes.
 
-The counterargument to a rigorous decision chain — that the business just needs a good model — is a category error. A good model is a component; a good decision system includes the threshold, the intervention, and the measurement.
+The counterargument to a rigorous decision chain — that the business just needs a good model — is a category error.
+
+<PullQuote>
+A good model is a component; a good decision system includes the threshold, the intervention, and the measurement.
+</PullQuote>
 
 ## A decision test
 

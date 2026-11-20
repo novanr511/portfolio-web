@@ -9,9 +9,15 @@ tags:
   - Infrastructure
 ---
 
-The internet is often drawn as a cloud, which hides how it actually works. It is not a single thing. It is a network of networks, held together by agreements, cables, and protocols that most users never see.
+<Lead>
+The internet is often drawn as a cloud, which hides how it actually works. It is not a single thing. It is <Mark>a network of networks</Mark>, held together by agreements, cables, and protocols that most users never see.
+</Lead>
 
-**Direct answer:** The internet works by breaking data into packets, addressing them with IP, routing them across interconnected networks via BGP, and translating human-readable names into addresses via DNS. A request from your browser to a server on another continent typically crosses multiple autonomous systems, undersea cables, and exchange points before a response comes back. No single company owns or controls the whole path.
+**Direct answer:** The internet works by breaking data into packets, addressing them with IP, routing them across interconnected networks via BGP, and translating human-readable names into addresses via DNS. A request from your browser to a server on another continent typically crosses multiple autonomous systems, undersea cables, and exchange points before a response comes back.
+
+<KeyPoint>
+No single company owns or controls the whole path.
+</KeyPoint>
 
 ## Names become addresses: DNS
 
@@ -19,11 +25,15 @@ Before a browser can connect to a server, it needs an IP address. DNS (Domain Na
 
 DNS is hierarchical. The root zone knows where top-level domains like `.com` live. TLD servers know where authoritative servers for individual domains live. Resolvers—operated by ISPs, public DNS providers, or your network—walk this hierarchy, cache answers, and return them to your device.
 
-A DNS failure looks like an internet failure: the network is fine, but names cannot be resolved, so nothing loads. That is why DNS is often the first thing checked when a site is unreachable.
+<Trap>
+A DNS failure looks like an internet failure: the network is fine, but names cannot be resolved, so nothing loads.
+</Trap>
+
+That is why DNS is often the first thing checked when a site is unreachable.
 
 ## Packets and IP: the best-effort delivery
 
-Once a name is resolved, data is broken into packets. Each packet carries a source and destination IP address. IP (Internet Protocol) is best-effort: it tries to deliver packets, but does not guarantee delivery, order, or speed. Lost packets are handled by higher layers such as TCP.
+Once a name is resolved, data is broken into packets. Each packet carries a source and destination IP address. IP (Internet Protocol) is <Mark>best-effort</Mark>: it tries to deliver packets, but does not guarantee delivery, order, or speed. Lost packets are handled by higher layers such as TCP.
 
 Packets from the same message can take different paths. The internet routes around damage dynamically, which is why it is resilient—but also why latency and packet loss vary moment to moment.
 
@@ -31,7 +41,7 @@ Packets from the same message can take different paths. The internet routes arou
 
 The internet is made of autonomous systems (ASes): networks operated by ISPs, universities, companies, and governments. Each AS controls its own routing policy. BGP (Border Gateway Protocol) is the protocol ASes use to tell each other which IP prefixes they can reach.
 
-BGP is trust-based. An AS announces routes, and neighbors accept them. Misconfigurations or malicious announcements can misdirect traffic—a BGP hijack—or make a network unreachable—a BGP leak. Because BGP relies on trust rather than validation, routing incidents happen regularly and can affect large parts of the internet.
+<Mark>BGP is trust-based</Mark>. An AS announces routes, and neighbors accept them. Misconfigurations or malicious announcements can misdirect traffic—a BGP hijack—or make a network unreachable—a BGP leak. Because BGP relies on trust rather than validation, routing incidents happen regularly and can affect large parts of the internet.
 
 ## The physical layer: cables and exchange points
 
@@ -84,7 +94,11 @@ If the answer is yes at every layer, the fault is likely in the application rath
 
 ## A counterargument
 
-A reasonable critic can argue that the article's tidy layering is more pedagogical than analytical. Every cited source is a protocol specification - DNS in RFC 1035, TCP in RFC 9293, HTTP in RFC 9110 and RFC 9114 - and none of them says anything about undersea cables, exchange points, or the commercial agreements the article emphasizes. The 'network of networks' claim and the diagnostic sequence are therefore asserted rather than supported by the references given. The layering is useful for forming checkable questions, but it may also conceal how much traffic is concentrated in a few transit and cloud operators, where the failure is neither a clean DNS nor a clean routing problem. The model is a starting heuristic, not a description of where control actually sits.
+A reasonable critic can argue that the article's tidy layering is more pedagogical than analytical. Every cited source is a protocol specification - DNS in RFC 1035, TCP in RFC 9293, HTTP in RFC 9110 and RFC 9114 - and none of them says anything about undersea cables, exchange points, or the commercial agreements the article emphasizes. The 'network of networks' claim and the diagnostic sequence are therefore asserted rather than supported by the references given. The layering is useful for forming checkable questions, but it may also conceal how much traffic is concentrated in a few transit and cloud operators, where the failure is neither a clean DNS nor a clean routing problem.
+
+<PullQuote>
+The model is a starting heuristic, not a description of where control actually sits.
+</PullQuote>
 
 ## References & Further Reading
 

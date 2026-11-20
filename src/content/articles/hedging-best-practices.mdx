@@ -9,21 +9,27 @@ tags:
   - Verified
 ---
 
+<Lead>
 Hedging is often described as insurance, but the term covers positions with very different payoffs, and it is frequently used loosely to mean simply reducing exposure. The practical problem is deciding what risk you actually face, whether a hedge is the right tool, and what it costs when the hedge does not pay off. The finance reference defines hedging as reducing or offsetting risk, while the options council documents the instruments used to do it.
+</Lead>
 
-**Direct answer:** A hedge is a position taken to offset a defined risk in another holding, such as an option or forward that moves against the underlying exposure. It reduces downside but gives up some upside and carries costs such as premiums, spreads, and basis risk. The decision is whether that reduction is worth the cost for your specific exposure, not whether hedging is good in general.
+**Direct answer:** A hedge is a position taken to offset a defined risk in another holding, such as an option or forward that moves against the underlying exposure. It reduces downside but gives up some upside and carries costs such as premiums, spreads, and basis risk.
+
+<KeyPoint>
+The decision is whether that reduction is worth the cost for your specific exposure, not whether hedging is good in general.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and a hedge-selection test beyond the general definition and the options reference: it maps exposure types to hedge choices, with claim status explicit.
 
 ## The mechanism
 
-The starting point is a precise definition. In finance, a hedge is a position that offsets the risk of an existing investment or liability. The concept is relational: you cannot hedge an abstraction, only a specific exposure with an amount, a direction, and a horizon. The practical consequence is that the first task is to define the risk you want to remove. A vague worry about prices is not hedgeable; a receivable of a set size in a set currency due on a set date is.
+The starting point is a precise definition. In finance, a hedge is a position that offsets the risk of an existing investment or liability. The concept is relational: you cannot hedge an abstraction, <Mark>only a specific exposure with an amount, a direction, and a horizon</Mark>. The practical consequence is that the first task is to define the risk you want to remove. A vague worry about prices is not hedgeable; a receivable of a set size in a set currency due on a set date is.
 
 <Figure src="/images/articles/inline/hedging-best-practices-1.png" alt="A flow from defining the exposure, through choosing an option or forward and checking basis risk, to weighing the cost against the risk." caption="Conceptual: a hedge offsets a defined exposure and is judged against it." />
 
 The instruments differ in what they give up. The options council describes options as contracts that give the holder a right, not an obligation, to buy or sell an asset at a set price. A protective option limits loss while preserving upside, but it costs a premium. A forward or future locks a price and removes both downside and upside, usually with margin requirements rather than an upfront premium. The practical consequence is that instrument choice follows the goal: insuring against a bad outcome calls for a different tool than fixing a known future cash flow.
 
-No hedge is perfect. Basis risk is the gap between the hedge's payoff and the loss on the underlying exposure, and it arises whenever the two are not perfectly matched in asset, amount, or timing. The practical consequence is that a hedge can leave residual risk, or create a small new exposure of its own when the relationship between hedge and underlying breaks down. A position that looks like protection can become a bet if the correlation fails.
+No hedge is perfect. Basis risk is the gap between the hedge's payoff and the loss on the underlying exposure, and it arises whenever the two are not perfectly matched in asset, amount, or timing. The practical consequence is that a hedge can leave residual risk, or create a small new exposure of its own when the relationship between hedge and underlying breaks down. A position that looks like protection <Mark>can become a bet if the correlation fails</Mark>.
 
 Hedging is also an economic trade, not a profit center. Paying a premium or giving up upside lowers expected return in exchange for a narrower range of outcomes. The practical consequence is that a hedge should be judged against the exposure it protects, not against a benchmark return. A program that reduces volatility while costing more than the risk is worth has failed on its own terms, even if it avoided a loss in one period.
 
@@ -47,13 +53,19 @@ A hedge cannot remove all risk. Even a well-matched position leaves basis risk, 
 
 It carries costs that are easy to overlook. Options require a premium that is lost if the option expires unused. Futures and forwards may require margin and can create cash-flow pressure when markets move against the position even if the underlying exposure is sound. There are also bid-ask spreads, roll costs for contracts that are renewed, and the operational time to monitor the position. These costs are certain, while the loss the hedge prevents is only possible, which is why hedging can look expensive in calm periods.
 
-The main failure mode is hedging the wrong thing. A position that offsets a different exposure, or one that is larger than the exposure, stops being insurance and becomes speculation. Over-hedging is especially tempting after an adverse move, when the desire to avoid a repeat leads to a position that would profit from the very outcome that would hurt the business. The discipline is to size the hedge to the documented exposure and to resist enlarging it in response to fear.
+<Trap>
+The main failure mode is hedging the wrong thing.
+</Trap>
+
+A position that offsets a different exposure, or one that is larger than the exposure, stops being insurance and becomes speculation. Over-hedging is especially tempting after an adverse move, when the desire to avoid a repeat leads to a position that would profit from the very outcome that would hurt the business. The discipline is to size the hedge to the documented exposure and to resist enlarging it in response to fear.
 
 There is a boundary around changing exposures. A hedge is defined relative to an underlying position, so if that position changes in amount, date, or currency, the hedge no longer matches. A receivable paid early, or in a different currency, leaves a hedge that no longer offsets anything. The hedge must be reviewed whenever the underlying changes, not only at inception. A static hedge around a moving exposure is a common source of unexpected losses.
 
 Finally, correlations can fail under stress. The historical relationship that justified a hedge may weaken exactly when protection is most needed, as markets dislocate and liquidity thins. This does not make hedging useless, but it means the assumption behind the hedge must be monitored, not set once. The decision needs a review trigger tied to the health of that relationship, and a clear rule for what to do if the hedge stops tracking the exposure.
 
+<PullQuote>
 Counterargument: "The counterargument that hedging is only for large institutions is fair for small, diversified exposures and incomplete for concentrated positions where a single adverse move is material."
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +77,7 @@ Counterargument: "The counterargument that hedging is only for large institution
 6. Set a review trigger for changes to the exposure or the correlation.
 7. Record the decision and the conditions under which you would unwind it.
 
-The test converts a general instinct into a bounded decision. Each step forces a claim about the exposure to be made explicit, and the recorded unwind conditions prevent a hedge from quietly becoming a long-term bet. The goal is not to hedge everything but to know which exposure justifies the cost.
+The test converts a general instinct into a bounded decision. Each step forces a claim about the exposure to be made explicit, and the recorded unwind conditions prevent a hedge from quietly becoming a long-term bet. The goal is not to hedge everything but to <Mark>know which exposure justifies the cost</Mark>.
 
 For further reading, see [Cash Flow Forecasting](/articles/cash-flow-forecasting-a-13-week-operating-model).
 

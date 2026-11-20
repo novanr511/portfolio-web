@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Rollback strategies are often treated as a feature of the deployment tool. The GitHub Actions documentation describes automation for workflows, and NIST's incident-handling guide treats recovery as part of a lifecycle. The starting point is knowing what you can return to.
+</Lead>
 
 **Direct answer:** Prepare a rollback before release, make it fast and tested, and decide in advance when to roll back versus roll forward. The sources describe automation and lifecycle; the decision rule is a synthesis.
 
@@ -21,11 +23,11 @@ Three points matter:
 
 <Figure src="/images/articles/inline/getting-started-with-rollback-strategies-1.png" alt="A five-step flow: classify reversibility, prepare the rollback path, automate and rehearse, trigger on an objective, then verify with signals." caption="Conceptual: a rollback becomes a plan only after classification, rehearsal, and an owned trigger." />
 
-- **Reversibility is a property of the change.** A schema migration may not be reversible. The incident guide treats recovery as a process, which begins before the incident.
+- **Reversibility is a property of the change.** A <Mark>schema migration</Mark> may not be reversible. The incident guide treats recovery as a process, which begins before the incident.
 - **Automation reduces delay.** The CI documentation describes repeatable workflows. An automated rollback is faster than a runbook someone must read under pressure.
 - **A trigger must be defined.** A rollback that depends on a judgement made during an incident can be delayed by uncertainty. The objective defines the trigger.
 
-The sequence is: classify the change by reversibility, prepare the path, automate it, then define the trigger. The classification is local judgement, so it is `inferred`; the tooling is `source-reported`.
+The sequence is: classify the change by <Mark>reversibility</Mark>, prepare the path, automate it, then define the trigger. The classification is local judgement, so it is `inferred`; the tooling is `source-reported`.
 
 ## A worked release
 
@@ -43,7 +45,13 @@ The most common gap is data. A code change can often be reverted in seconds; a s
 
 ## Why the trigger needs an owner
 
-A trigger tied to a service objective removes a debate during an incident, but only if someone is authorised to act on it. Without an owner, the team waits for consensus while the failure continues. The owner does not need to be the person who understands the cause; they need to be the person who can decide to contain.
+A trigger tied to a service objective removes a debate during an incident, but only if someone is authorised to act on it.
+
+<Trap>
+Without an owner, the team waits for consensus while the failure continues.
+</Trap>
+
+The owner does not need to be the person who understands the cause; they need to be the person who can decide to contain.
 
 ## Evidence status
 
@@ -55,13 +63,15 @@ A trigger tied to a service objective removes a debate during an incident, but o
 
 ## Why an untested rollback is not a plan
 
-A rollback described in a document is a claim. It becomes a plan when it has been executed in conditions close to a release. Testing reveals the details that are usually missing: permissions, stale artefacts, and changes that were not included in the original step.
+A rollback described in a document is a claim. It becomes a plan when it has been executed in conditions close to a release. Testing reveals the details that are usually missing: permissions, <Mark>stale artefacts</Mark>, and changes that were not included in the original step.
 
 Reversibility is the deeper constraint. A deployment that changes data cannot always be undone by redeploying the previous code. Recognising that before release changes the design, often by separating the code change from the data change. Doing it during an incident is much harder.
 
 The final constraint is observability. A rollback can execute successfully and still leave the system in a bad state if the previous version depends on data written by the new one. Verification must therefore include the application's behaviour, not only the completion of the rollback command. Recording what signal confirmed recovery closes the loop and gives the next incident a clearer standard.
 
+<KeyPoint>
 A rollback should therefore be treated as a hypothesis about recovery, tested like any other assumption before it is relied upon during an incident.
+</KeyPoint>
 
 It also helps to record which artefacts were rolled back and when, so a later investigation can reconstruct the sequence without relying on memory.
 
@@ -69,7 +79,9 @@ It also helps to record which artefacts were rolled back and when, so a later in
 
 It cannot undo a data change that was not designed for reversal. It does not guarantee that the restored state is correct. And it cannot replace monitoring, which is what tells you the rollback worked.
 
+<PullQuote>
 The counterargument that a fast rollback makes testing less important is fair for speed and incomplete for confidence.
+</PullQuote>
 
 ## A decision test
 

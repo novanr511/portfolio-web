@@ -9,7 +9,9 @@ tags:
   - Operations
 ---
 
-A report that writes itself is only useful if someone can trust the numbers. Most reporting automation focuses on the prose — generating the summary — while the data gathering and validation remain manual. That is the wrong half of the problem, because errors in a report are usually wrong numbers, not wrong sentences.
+<Lead>
+A report that writes itself is only useful if someone can trust the numbers. Most reporting automation focuses on the prose — generating the summary — while the data gathering and validation remain manual. That is the wrong half of the problem, because errors in a report are usually <Mark>wrong numbers, not wrong sentences</Mark>.
+</Lead>
 
 **Direct answer:** Automate reporting in four layers: data collection, validation, narrative generation, and review. Anthropic's use-case guides cover extraction and summarisation patterns, and cloud architecture resources describe the implementation structures available. The boundary: a model can draft the narrative from verified data, but it cannot certify that the data is correct — validation needs rules and, for high-impact reports, a person.
 
@@ -17,13 +19,17 @@ A report that writes itself is only useful if someone can trust the numbers. Mos
 
 **1. Collection.** Pull the numbers from defined sources on a schedule. The source and the extraction query should be recorded so a reader can reproduce the figure.
 
-**2. Validation.** Check the numbers before they enter a narrative. Row counts, totals, and comparisons with prior periods catch most errors. A validation failure should stop the report, not produce a caveat in the prose.
+**2. Validation.** Check the numbers before they enter a narrative. Row counts, totals, and comparisons with prior periods catch most errors. A validation failure should <Mark>stop the report, not produce a caveat in the prose</Mark>.
 
 **3. Narrative.** Generate the commentary from the validated numbers. Ask the model to use the supplied values verbatim and to cite the metric name, not to compute or recall figures.
 
 **4. Review.** A person signs off on high-impact reports. The reviewer should see the validation results alongside the narrative, not only the final text.
 
-The layers are ordered. Automating the narrative before the validation produces a faster way to distribute wrong numbers.
+The layers are ordered.
+
+<KeyPoint>
+Automating the narrative before the validation produces a faster way to distribute wrong numbers.
+</KeyPoint>
 
 ## A worked example of a weekly report
 
@@ -46,7 +52,7 @@ If any check fails, the report is marked BLOCKED and no narrative is generated.
 
 Three frictions decide whether this works:
 
-1. **A validation rule that always passes.** If the tolerance is too wide, the check provides false comfort. Set it from historical variation, not convenience.
+1. **A validation rule that always passes.** If the tolerance is too wide, the check provides <Mark>false comfort</Mark>. Set it from historical variation, not convenience.
 2. **Narrative drift.** The model may add causal claims ("revenue rose because of the campaign") that the data does not support. The instruction must forbid unsupported causes, and review must catch violations.
 3. **Source changes.** If the warehouse schema changes, collection may silently return partial data. The row-count check exists for this reason.
 
@@ -68,9 +74,19 @@ The reporting-automation article's companion topic, AI for Spreadsheets, covers 
 
 **It does not remove accountability.** Someone must own the report and the decision to distribute it. A generated narrative with no owner is an orphan.
 
-**It does not save time if review expands.** If reviewers now spend an hour checking a narrative they no longer understand, the net gain shrinks. Measure the whole cycle.
+**It does not save time if review expands.**
 
-The counterargument — that dashboards have replaced reports — is true in some organisations and irrelevant to others. A narrative still matters when a decision depends on interpreting a change, which is why the report survives even where the data is visualised.
+<Trap>
+If reviewers now spend an hour checking a narrative they no longer understand, the net gain shrinks.
+</Trap>
+
+Measure the whole cycle.
+
+The counterargument — that dashboards have replaced reports — is true in some organisations and irrelevant to others.
+
+<PullQuote>
+A narrative still matters when a decision depends on interpreting a change, which is why the report survives even where the data is visualised.
+</PullQuote>
 
 ## A decision test
 

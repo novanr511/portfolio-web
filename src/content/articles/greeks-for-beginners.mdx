@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Options and other derivatives are often described through a set of sensitivity measures called the Greeks, but beginners frequently treat them as predictions rather than as local measures of risk. The hedge entry describes positions taken to offset exposure, and the volatility entry describes the dispersion of returns. The real problem is understanding what each sensitivity measures and when it stops being useful.
+</Lead>
 
 **Direct answer:** The Greeks are sensitivities of a derivative's price to small changes in inputs such as the underlying price, time, and volatility. They describe local behaviour, not forecasts. The hedge and volatility entries supply the concepts; the mapping from each sensitivity to a risk decision here is a synthesis.
 
@@ -21,7 +23,7 @@ The hedge entry describes taking a position to offset exposure in another positi
 
 <Figure src="/images/articles/inline/greeks-for-beginners-1.png" alt="Three local checks of price, volatility and time-decay sensitivity feeding a hedge that is rebalanced as exposures drift." caption="Conceptual: hedge the exposure that grew fastest, not the one largest on paper." />
 
-The volatility entry describes volatility as the dispersion of returns over time. Volatility is an input into option prices, and one sensitivity measures how much an option's price changes when that input changes. Because volatility is not directly observable in the same way a price is, this sensitivity depends on how volatility is estimated. A beginner who reads it as a fixed property of the option misses that it is a bet on the estimate.
+The volatility entry describes volatility as the dispersion of returns over time. Volatility is an input into option prices, and one sensitivity measures how much an option's price changes when that input changes. Because volatility is not directly observable in the same way a price is, this sensitivity depends on how volatility is estimated. A beginner who reads it as a fixed property of the option misses that it is <Mark>a bet on the estimate</Mark>.
 
 Time is another input, and a sensitivity describes how an option's value erodes as expiry approaches. This erosion is not linear, and it interacts with the position of the underlying relative to the strike. A practical consequence is that a hedge which looks balanced today can drift as time passes, even if the underlying price does not move. Rebalancing is the response, and the sensitivities indicate which exposure is growing.
 
@@ -29,7 +31,7 @@ The sequence is to identify the exposures a position carries, match each to the 
 
 ## A worked example
 
-The following is hypothetical and illustrative. A trader holds a short position in a call option on a stock and watches the stock rise. Three checks decide the response. First, how much does the option's price change for a small move in the stock price, and is that exposure growing as the stock approaches the strike? Second, how much does the price change for a small change in estimated volatility, given that the estimate has been rising? Third, how much value is lost to time decay over the remaining days? The outcome is a hedge adjusted for the exposure that grew fastest, not for the one that is largest on paper. The scenario is hypothetical; the method of mapping a sensitivity to an action is the contribution.
+The following is hypothetical and illustrative. A trader holds a short position in a call option on a stock and watches the stock rise. Three checks decide the response. First, how much does the option's price change for a small move in the stock price, and is that exposure growing as the stock approaches the strike? Second, how much does the price change for a small change in estimated volatility, given that the estimate has been rising? Third, how much value is lost to time decay over the remaining days? The outcome is a hedge adjusted for <Mark>the exposure that grew fastest</Mark>, not for the one that is largest on paper. The scenario is hypothetical; the method of mapping a sensitivity to an action is the contribution.
 
 ## Evidence status
 
@@ -43,17 +45,27 @@ The table separates the concepts the sources define from the risk practice built
 
 ## What it cannot do
 
-The Greeks cannot predict price moves. Each is a local sensitivity, measured for a small change in one input while others are held fixed. Markets do not move one input at a time, and large moves change the sensitivities themselves. A beginner who reads a sensitivity as a forecast will hedge for a small move that never arrives, or misjudge a large move that does. The hedge entry describes offsetting positions, not forecasting, and the sensitivities serve that offsetting role.
+<KeyPoint>
+The Greeks cannot predict price moves.
+</KeyPoint>
 
-The hidden cost is rebalancing. A hedge that matches exposures at one moment drifts as prices, time, and volatility change, so maintaining it requires repeated trades. Each trade has a cost, and frequent rebalancing can consume the benefit of the hedge in a choppy market. There is also a modelling cost: computing sensitivities requires a model and inputs, and a false precision in those inputs can make a hedge look exact when it is not.
+Each is a local sensitivity, measured for a small change in one input while others are held fixed. Markets do not move one input at a time, and large moves change the sensitivities themselves. A beginner who reads a sensitivity as a forecast will hedge for a small move that never arrives, or misjudge a large move that does. The hedge entry describes offsetting positions, not forecasting, and the sensitivities serve that offsetting role.
 
-A common failure mode is treating the volatility sensitivity as if volatility were directly observed. The volatility entry describes dispersion of returns, but the figure used in a pricing model is an estimate, often implied by market prices. When the estimate shifts, the sensitivity shifts with it, and a hedge built on the old estimate is suddenly wrong. The beginner sees a stable number and misses that the number is a moving estimate.
+The hidden cost is rebalancing. A hedge that matches exposures at one moment drifts as prices, time, and volatility change, so maintaining it requires repeated trades. Each trade has a cost, and frequent rebalancing can consume the benefit of the hedge in a choppy market. There is also a modelling cost: computing sensitivities requires a model and inputs, and <Mark>a false precision</Mark> in those inputs can make a hedge look exact when it is not.
+
+<Trap>
+A common failure mode is treating the volatility sensitivity as if volatility were directly observed.
+</Trap>
+
+The volatility entry describes dispersion of returns, but the figure used in a pricing model is an estimate, often implied by market prices. When the estimate shifts, the sensitivity shifts with it, and a hedge built on the old estimate is suddenly wrong. The beginner sees a stable number and misses that the number is a moving estimate.
 
 The boundary is that these measures assume a model. Different pricing models can produce different sensitivities for the same option, especially when assumptions about volatility behaviour differ. Two traders using the same position but different models may disagree about the correct hedge. The hedge and volatility entries provide concepts, not a single correct model, and the choice of model remains a local decision that the sources cannot settle.
 
 For these reasons the sensitivities and the model behind them need regular review. As expiry approaches, time decay accelerates and the exposures change faster, so a hedge that was adequate early in a position's life may be inadequate late. The inputs should be refreshed, the model assumptions questioned, and the rebalancing cost weighed against the protection gained. A sensitivity is a tool for a moment, not a permanent description of a position.
 
+<PullQuote>
 The counterargument that a single risk number is easier to communicate is fair for a high-level report and incomplete for a hedge, because one number cannot show which input is driving the current exposure.
+</PullQuote>
 
 ## A decision test
 

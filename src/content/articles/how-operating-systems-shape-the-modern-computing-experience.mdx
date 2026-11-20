@@ -9,9 +9,17 @@ tags:
   - Performance
 ---
 
+<Lead>
 The operating system is the layer that turns physical hardware into something a program can use. Most of what a developer experiences as "the environment" — processes, files, network sockets, memory — is an OS abstraction. When those abstractions behave unexpectedly, the cause is often a resource decision the OS made on behalf of the application.
+</Lead>
 
-**Direct answer:** An OS manages processes, memory, filesystems, and devices while presenting applications with a stable interface to them. The Linux kernel documentation describes its own documentation tree as "very much a work in progress", which is an honest reminder that OS behaviour is complex and incompletely described. RFC 9293 specifies TCP, one of the networking services an OS provides. The boundary: an abstraction is not a guarantee, and the cost of a workload depends on how the OS and the underlying hardware interact, not on the application alone.
+**Direct answer:**
+
+<KeyPoint>
+An OS manages processes, memory, filesystems, and devices while presenting applications with a stable interface to them.
+</KeyPoint>
+
+The Linux kernel documentation describes its own documentation tree as "very much a work in progress", which is an honest reminder that OS behaviour is complex and incompletely described. RFC 9293 specifies TCP, one of the networking services an OS provides. The boundary: an abstraction is not a guarantee, and the cost of a workload depends on how the OS and the underlying hardware interact, not on the application alone.
 
 ## What the OS actually does
 
@@ -19,13 +27,13 @@ Four responsibilities shape most application behaviour:
 
 **Process and thread management.** The OS decides which code runs on which CPU core and for how long. Scheduling affects latency, especially when a machine is shared.
 
-**Memory management.** Virtual memory gives each process the illusion of a private address space and maps it to physical memory. When memory is tight, the OS may swap, and a swapped process becomes dramatically slower — a symptom that looks like a bug in the application.
+**Memory management.** Virtual memory gives each process the illusion of a private address space and maps it to physical memory. When memory is tight, the OS may swap, and a swapped process becomes dramatically slower — <Mark>a symptom that looks like a bug in the application</Mark>.
 
 **Filesystems and storage.** The OS organises persistent data and mediates access. Caching at this layer means a write that appears complete may not yet be on disk, which matters for durability.
 
 **Networking.** Protocols such as TCP, specified in RFC 9293, are implemented in the OS network stack. Connection setup, buffering, and retransmission are OS-level behaviours that shape application latency.
 
-The abstraction is valuable because an application can be written without knowing the hardware. It becomes a constraint when the abstraction hides a cost the application needs to control — for example, when a default buffer size determines throughput.
+The abstraction is valuable because an application can be written without knowing the hardware. It becomes a constraint when <Mark>the abstraction hides a cost the application needs to control</Mark> — for example, when a default buffer size determines throughput.
 
 ## A worked example of workload cost
 
@@ -65,19 +73,27 @@ Three practical consequences follow:
 
 **Filesystem layers change durability assumptions.** Writes to a container's writable layer are lost when the container is replaced. An application that treats that layer as persistent storage will lose data — a classic leak of the abstraction that the container was supposed to hide.
 
-This is why understanding the OS remains useful even in a containerised stack: the container's guarantees are the OS's guarantees, expressed with different boundaries.
+This is why understanding the OS remains useful even in a containerised stack: <Mark>the container's guarantees are the OS's guarantees, expressed with different boundaries</Mark>.
 
 ## What the OS is not
 
 Three corrections to common framing:
 
-**It is not the only performance lever.** Application design, data access patterns, and network topology often dominate. Tuning the OS for a poorly designed application is a common waste of effort.
+**It is not the only performance lever.** Application design, data access patterns, and network topology often dominate.
+
+<Trap>
+Tuning the OS for a poorly designed application is a common waste of effort.
+</Trap>
 
 **It is not uniform.** Two operating systems solve the same problems with different mechanisms, and a behaviour that is cheap on one can be expensive on another. A claim about "the OS" should name which one.
 
 **It is not free in the cloud.** The OS image, its patching, and its overhead contribute to cost and attack surface. A smaller image with fewer services is a security and cost decision, not a stylistic one.
 
-The counterargument — that managed platforms eliminate the need to understand the OS — is true until something goes wrong. Serverless and container platforms hide the OS but do not remove resource limits, and a memory limit expressed in megabytes is still an OS-level constraint in disguise.
+<PullQuote>
+The counterargument — that managed platforms eliminate the need to understand the OS — is true until something goes wrong.
+</PullQuote>
+
+Serverless and container platforms hide the OS but do not remove resource limits, and a memory limit expressed in megabytes is still an OS-level constraint in disguise.
 
 ## A decision test
 

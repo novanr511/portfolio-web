@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often treat reporting as a query problem when the real constraint is data integration. Source systems disagree on keys, definitions, and history, so two dashboards can show different numbers for the same metric. A data warehouse is the structural answer, but only when its load process and scope are chosen deliberately.
+</Lead>
 
 **Direct answer:** A data warehouse is a central repository that integrates data from multiple sources for reporting and analysis, typically populated by extract, transform, load (ETL) pipelines. The practical decision is not whether to build one, but how much transformation to push into the pipeline and which questions the warehouse must answer first.
 
@@ -17,13 +19,17 @@ Teams often treat reporting as a query problem when the real constraint is data 
 
 ## The mechanism
 
-The defining property of a data warehouse is integration, not storage. Sources such as order systems, billing tools, and logs are built for distinct operational tasks, so each encodes the same business fact differently. A warehouse pulls those records into one repository organized around subjects like customers or revenue rather than around the applications that produced them. The practical consequence is that reporting stops competing with transaction processing: analytical scans run against a structure designed for reading history, while operational systems keep serving day-to-day writes.
+<KeyPoint>
+The defining property of a data warehouse is integration, not storage.
+</KeyPoint>
+
+Sources such as order systems, billing tools, and logs are built for distinct operational tasks, so each encodes the same business fact differently. A warehouse pulls those records into one repository organized around subjects like customers or revenue rather than around the applications that produced them. The practical consequence is that reporting stops competing with transaction processing: analytical scans run against a structure designed for reading history, while operational systems keep serving day-to-day writes.
 
 <Figure src="/images/articles/inline/getting-started-with-data-warehouses-1.png" alt="An ETL pipeline from order, billing, and log sources through extract, transform, and load into a subject-area warehouse." caption="Conceptual: integration happens in the pipeline, and transform placement decides ownership." />
 
-ETL is the mechanism that makes the integration real. Extract reads from sources, transform reconciles types, keys, and business rules, and load writes the result into the warehouse. The placement of the transform step is the first genuine design choice. Transforming before load keeps the warehouse clean and enforces one definition of each metric at the boundary; transforming after load preserves raw data for later reinterpretation but pushes complexity into the query layer. Either choice is defensible, yet each quietly decides who owns a definition and how quickly a change can ship.
+ETL is the mechanism that makes the integration real. Extract reads from sources, transform reconciles types, keys, and business rules, and load writes the result into the warehouse. <Mark>The placement of the transform step is the first genuine design choice</Mark>. Transforming before load keeps the warehouse clean and enforces one definition of each metric at the boundary; transforming after load preserves raw data for later reinterpretation but pushes complexity into the query layer. Either choice is defensible, yet each quietly decides who owns a definition and how quickly a change can ship.
 
-A warehouse is also time-variant: it keeps history rather than only the current state. That property is what allows a question about last quarter to be answered the way the business understood it last quarter, instead of how it is understood today. The practical consequence is that dimensions which change over time, such as a customer's region or a product's category, need an explicit rule for whether old records are rewritten or preserved. Choosing that rule is not a technical detail; it determines whether trend reports remain comparable across periods.
+A warehouse is also time-variant: it <Mark>keeps history rather than only the current state</Mark>. That property is what allows a question about last quarter to be answered the way the business understood it last quarter, instead of how it is understood today. The practical consequence is that dimensions which change over time, such as a customer's region or a product's category, need an explicit rule for whether old records are rewritten or preserved. Choosing that rule is not a technical detail; it determines whether trend reports remain comparable across periods.
 
 Scope is the last lever. A single enterprise warehouse promises one version of the truth but takes the longest to deliver, while a focused data mart answers a narrow set of questions quickly. For a first build, starting with one subject and one trusted flow produces a working feedback loop sooner than attempting to model every source at once. The mechanism pays off only when a real decision consumes the output, so the warehouse should be sized to the questions that will actually be asked in the first cycle.
 
@@ -43,17 +49,23 @@ The source-reported rows describe what a warehouse and ETL are; they do not pres
 
 ## What it cannot do
 
-A warehouse does not create data quality; it relocates it. If source records are wrong, the warehouse faithfully stores the wrong values and may even make them harder to correct because downstream reports now depend on the cleaned presentation. The promise of a single version of the truth is conditional on someone maintaining the definitions that produce it. Without that ownership, the warehouse becomes a place where conflicting numbers are aggregated rather than resolved, and the integration step that was meant to clarify matters instead cements the disagreement behind a friendlier interface.
+A warehouse <Mark>does not create data quality; it relocates it</Mark>. If source records are wrong, the warehouse faithfully stores the wrong values and may even make them harder to correct because downstream reports now depend on the cleaned presentation. The promise of a single version of the truth is conditional on someone maintaining the definitions that produce it. Without that ownership, the warehouse becomes a place where conflicting numbers are aggregated rather than resolved, and the integration step that was meant to clarify matters instead cements the disagreement behind a friendlier interface.
 
 The hidden cost is maintenance of the pipeline rather than its initial construction. Source schemas change, APIs are retired, and business rules are revised; each event requires the transform layer to be updated and historical data to be reconciled. Teams that budget only for the first load often discover that the recurring effort to keep definitions stable exceeds the build. That cost is real even when the underlying technology is inexpensive, because it is paid in attention and coordination rather than in licences.
 
-A common failure mode is the warehouse that nobody trusts. It happens when transformation logic is opaque, when a metric cannot be traced back to its source, or when a late-arriving record silently changes a published figure. Once trust is lost, users revert to private spreadsheets and the integration benefit disappears. Guardrails such as lineage, documentation, and reconciliation checks help, but they require a discipline that the source material does not supply and that no tool enforces on its own.
+<Trap>
+A common failure mode is the warehouse that nobody trusts.
+</Trap>
+
+It happens when transformation logic is opaque, when a metric cannot be traced back to its source, or when a late-arriving record silently changes a published figure. Once trust is lost, users revert to private spreadsheets and the integration benefit disappears. Guardrails such as lineage, documentation, and reconciliation checks help, but they require a discipline that the source material does not supply and that no tool enforces on its own.
 
 There is also a boundary between what a warehouse answers and what it cannot. It reports on recorded history; it does not explain causation, predict demand, or replace judgment about which questions matter. Subject areas and historical snapshots impose a frame, and anything outside that frame, such as an unmodeled event or a new product line, will not appear until someone extends the design. The tool reflects decisions already made about scope rather than making those decisions for the business.
 
 For these reasons the design needs periodic review, not one-time approval. The choice of transform boundary, grain, and history rule should be revisited when the business adds a source, changes a definition, or asks a question the current model cannot answer. Treat each revision as a change to a shared contract rather than a local patch, because the warehouse's value depends on many consumers reading the same definition the same way over time.
 
+<PullQuote>
 Counterargument: the claim that a warehouse is unnecessary for small teams is fair for a single source and a handful of reports, and incomplete once definitions must be shared across functions or history must be reconstructed.
+</PullQuote>
 
 ## A decision test
 

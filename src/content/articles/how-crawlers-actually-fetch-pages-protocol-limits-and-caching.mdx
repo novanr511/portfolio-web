@@ -9,9 +9,23 @@ tags:
   - Technical SEO
 ---
 
+<Lead>
 Crawl-budget arguments are usually conducted in the abstract: "Googlebot is consuming my resources." The published documentation actually answers most of these questions at the wire level — which protocol it negotiates, what it accepts compressed, where it truncates, what it revalidates with, and how it tells you to slow down. Knowing the specifics changes what you optimise.
+</Lead>
 
-**Direct Answer:** Google's documentation specifies that its crawlers support HTTP/1.1 and HTTP/2, send `Accept-Encoding: gzip, deflate, br`, truncate files at 15MB by default with per-project and per-file-type limits that can be lower, and revalidate using `ETag`/`If-None-Match` (preferred) and `Last-Modified`/`If-Modified-Since` — with the explicit rule that when both validators are present, the `ETag` wins. Crawl rate is negotiated by the crawler against your server's capacity, and the documented lever you have is responding with a specific HTTP status code. AI crawlers from OpenAI, Anthropic, and Perplexity follow the same HTTP contract, differ in user agent and purpose, and publish their own IP ranges and propagation delays.
+**Direct Answer:**
+
+<KeyPoint>
+Google's documentation specifies that its crawlers support HTTP/1.1 and HTTP/2, send `Accept-Encoding: gzip, deflate, br`, truncate files at 15MB by default with per-project and per-file-type limits that can be lower, and revalidate using `ETag`/`If-None-Match` (preferred) and `Last-Modified`/`If-Modified-Since` — with the explicit rule that when both validators are present, the `ETag` wins.
+</KeyPoint>
+
+Crawl rate is negotiated by the crawler against your server's capacity, and the documented lever you have is responding with a specific HTTP status code. AI crawlers from OpenAI, Anthropic, and Perplexity follow the same HTTP contract, differ in user agent and purpose, and publish their own IP ranges and propagation delays.
+
+<KeyFigures items={[
+  { value: "15MB", label: "default file size crawled, beyond which content is ignored", source: "Google Search Central" },
+  { value: "2MB", label: "example smaller size limit for HTML", source: "Google Search Central" },
+  { value: "24-hour", label: "robots.txt propagation delay mentioned in the documentation", source: "OpenAI" },
+]} />
 
 ## The three categories of client
 
@@ -23,7 +37,7 @@ Google's crawler documentation draws a distinction that is worth internalising b
 
 **User-triggered fetchers** — "part of tools and product functions where the end user triggers a fetch. For example, Google Site Verifier acts on the request of a user."
 
-This is the same three-way split that the AI vendors use — search collection, product-specific, and user-initiated — and it recurs because the underlying distinction is real: whether the request is autonomous, contractual, or on behalf of a person. Each category has different robots.txt semantics, and conflating them is how sites end up blocking the wrong one.
+This is the same three-way split that the AI vendors use — search collection, product-specific, and user-initiated — and it recurs because the underlying distinction is real: whether the request is autonomous, contractual, or on behalf of a person. Each category has different robots.txt semantics, and <Mark>conflating them is how sites end up blocking the wrong one</Mark>.
 
 Note the precision in the special-case description: `AdsBot` ignores the `*` group *with the publisher's permission*. That is a negotiated exception, not a general capability, and the distinction matters if you are reasoning about what a bot "can" do.
 
@@ -33,7 +47,11 @@ Google's crawlers "support HTTP/1.1 and HTTP/2." The documentation is unusually 
 
 > The default protocol version used by Google's crawlers is HTTP/1.1; crawling over HTTP/2 may save computing resources (for example, CPU, RAM) for your site and Googlebot, but otherwise there's no Google-product specific benefit to the site (for example, no ranking boost in Google Search).
 
-So HTTP/2 is a mutual efficiency option, not a ranking factor. If you have been holding off on HTTP/2 for SEO reasons, that reasoning is not supported.
+So HTTP/2 is a mutual efficiency option, not a ranking factor.
+
+<Trap>
+If you have been holding off on HTTP/2 for SEO reasons, that reasoning is not supported.
+</Trap>
 
 The protocol version is not fixed per session either: crawlers "will use the protocol version that provides the best crawling performance and may switch protocols between crawling sessions depending on previous crawling statistics."
 
@@ -45,7 +63,7 @@ The documentation also notes that crawling infrastructure "supports crawling thr
 
 Content encodings: "Google's crawlers and fetchers support the following content encodings (compressions): gzip, deflate, and Brotli (br)." The specific set is advertised per request in the `Accept-Encoding` header, and the documentation notes "The content encodings supported by each Google user agent is advertised in the Accept-Encoding header of each request they make. For example, Accept-Encoding: gzip, deflate, br."
 
-This is worth verifying on your own logs rather than assuming, because the encoding set is a per-user-agent property. A crawler that requests `br` and receives `gzip` is telling you your compression negotiation is not working — a real, measurable inefficiency that no SEO tool will flag for you.
+This is worth verifying on your own logs rather than assuming, because the encoding set is a per-user-agent property. A crawler that requests `br` and receives `gzip` is telling you <Mark>your compression negotiation is not working</Mark> — a real, measurable inefficiency that no SEO tool will flag for you.
 
 File size limits are the more consequential item:
 
@@ -102,7 +120,7 @@ awk '$9 == 304 { print $0 }' /var/log/nginx/access.log \
   | grep -oE '"[^"]+"$' | sort | uniq -c | sort -rn | head
 ```
 
-For AI crawlers specifically, verify identity rather than trusting the header. Each vendor publishes its IP ranges as JSON — `openai.com/gptbot.json`, `openai.com/searchbot.json`, `perplexity.ai/perplexitybot.json` — and Anthropic notes that "If a crawler has a source IP address on this list, it indicates that the crawler is coming from Anthropic." A `User-Agent` string is trivially spoofed; the IP list is the check.
+For AI crawlers specifically, verify identity rather than trusting the header. Each vendor publishes its IP ranges as JSON — `openai.com/gptbot.json`, `openai.com/searchbot.json`, `perplexity.ai/perplexitybot.json` — and Anthropic notes that "If a crawler has a source IP address on this list, it indicates that the crawler is coming from Anthropic." A `User-Agent` string is trivially spoofed; <Mark>the IP list is the check</Mark>.
 
 ## What this changes in practice
 
@@ -119,7 +137,11 @@ For the surrounding request path — from DNS through TLS to the rendered respon
 
 ## A counterargument
 
-A reasonable critic would say the article oversells documentation as certainty. Its own caveats undermine the opening promise: the 15MB limit varies per project and file type, with a 2MB HTML example; caching is used or not 'depending on the needs of the product'; protocols may switch between sessions; and the AI vendors publish no crawl-rate negotiation at all. The repeated instruction to verify on your own logs is an admission that the documented rules are defaults, not answers. The article also treats Google's documentation and the RFCs as the whole story, when they describe what one vendor chooses to implement, not how the wider crawler ecosystem behaves - the `Crawl-delay` extension that Google ignores and Anthropic accepts is the counterexample in its own text. The wire-level detail is useful, but the framing is closer to a guided reading of one vendor's docs than the general account the introduction implies.
+A reasonable critic would say the article oversells documentation as certainty. Its own caveats undermine the opening promise: the 15MB limit varies per project and file type, with a 2MB HTML example; caching is used or not 'depending on the needs of the product'; protocols may switch between sessions; and the AI vendors publish no crawl-rate negotiation at all. The repeated instruction to verify on your own logs is an admission that the documented rules are defaults, not answers. The article also treats Google's documentation and the RFCs as the whole story, when they describe what one vendor chooses to implement, not how the wider crawler ecosystem behaves - the `Crawl-delay` extension that Google ignores and Anthropic accepts is the counterexample in its own text.
+
+<PullQuote>
+The wire-level detail is useful, but the framing is closer to a guided reading of one vendor's docs than the general account the introduction implies.
+</PullQuote>
 
 ## References & Further Reading
 

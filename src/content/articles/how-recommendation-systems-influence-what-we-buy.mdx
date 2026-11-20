@@ -9,17 +9,25 @@ tags:
   - Product
 ---
 
+<Lead>
 A recommendation system is often described as a mirror of preferences, and the metaphor is partly true — it is trained on behaviour — and partly misleading, because the output changes the behaviour that trains it. The system is not merely finding what you would have chosen; it is participating in the choice.
+</Lead>
 
-**Direct answer:** Recommenders influence purchasing through three mechanisms: they change the choice set by deciding what is visible, they shape attention through ranking and position, and they create feedback loops in which early exposure becomes evidence of preference. The consequence is that a system optimised purely for immediate clicks can narrow what a person sees and reinforce their past behaviour, and the effect is measurable at the level of the marketplace, not only the individual session.
+**Direct answer:**
+
+<KeyPoint>
+Recommenders influence purchasing through three mechanisms: they change the choice set by deciding what is visible, they shape attention through ranking and position, and they create feedback loops in which early exposure becomes evidence of preference.
+</KeyPoint>
+
+The consequence is that a system optimised purely for immediate clicks can narrow what a person sees and reinforce their past behaviour, and the effect is measurable at the level of the marketplace, not only the individual session.
 
 ## The choice set is the first lever
 
 A purchase happens among the options a person actually encounters. A recommender decides that set, which means it has power before any persuasion occurs.
 
-This is the same mechanism that makes distribution strategically important: a customer cannot choose an item that was never shown to them, and no amount of product quality fixes absence from the consideration set. A recommender is distribution at the level of the individual session, and its most consequential decision is which items get the chance to be considered.
+This is the same mechanism that makes distribution strategically important: <Mark>a customer cannot choose an item that was never shown to them</Mark>, and no amount of product quality fixes absence from the consideration set. A recommender is distribution at the level of the individual session, and its most consequential decision is which items get the chance to be considered.
 
-The effect compounds. An item that receives exposure accumulates interactions, which makes it more likely to be recommended again. An item that never receives exposure never accumulates the evidence needed to be recommended. The system therefore has a systematic bias toward its own past, which is why new items are structurally disadvantaged and why a deliberate exploration policy is a design requirement rather than an experiment.
+The effect compounds. An item that receives exposure accumulates interactions, which makes it more likely to be recommended again. An item that never receives exposure never accumulates the evidence needed to be recommended. The system therefore has <Mark>a systematic bias toward its own past</Mark>, which is why new items are structurally disadvantaged and why a deliberate exploration policy is a design requirement rather than an experiment.
 
 ## Attention and position
 
@@ -31,7 +39,7 @@ The research on ranking and click-through reflects this. DeepFM's work is motiva
 
 ## Feedback loops and the narrowing of choice
 
-The most consequential effect is temporal. A user clicks an item, the system recommends similar items, the user clicks those, and the system's estimate of their preferences becomes more confident. The loop is a sensible use of evidence and it has a side effect: the range of items the user is shown can narrow over time, which reduces the chance of discovering a different preference.
+The most consequential effect is temporal. A user clicks an item, the system recommends similar items, the user clicks those, and the system's estimate of their preferences becomes more confident. The loop is a sensible use of evidence and it has a side effect: <Mark>the range of items the user is shown can narrow over time</Mark>, which reduces the chance of discovering a different preference.
 
 This is the recommenders-as-filter-bubble argument in its precise form. It does not require any intent to manipulate; it follows from optimising immediate engagement on a system that also controls exposure. The practical response is to include diversity and exploration as explicit objectives, and to measure longer-term outcomes — catalogue coverage, discovery of new categories, retained usage — rather than only the click metrics that drive the loop.
 
@@ -57,11 +65,21 @@ For the modelling side, see [Deep Learning for Recommendations](/articles/deep-l
 
 ## A worked example
 
-The following is hypothetical and illustrative. A retailer's recommendation panel is optimised for click-through, and a developer suspects it is narrowing what customers see. Three checks follow from the argument. First, does the click log record ranking position, so a click on a top slot can be separated from a click caused by relevance - the DeepFM result implies that a better CTR predictor is not evidence that exposure changes choice? Second, does the system track exposure diversity and new-item discovery - the share of the catalogue receiving impressions, not clicks - so a cold-start item can escape the loop described in collaborative filtering? Third, is the A/B test long enough to capture repeat behaviour and scored on retained usage and segmented effects, rather than a same-session click lift, consistent with the constructed-preference point from Kahneman's lecture? If position is unlogged and the test is short, an apparent lift may be the ranking reinforcing itself. If all three checks pass, the team can attribute a change to exposure rather than inference. The outcome is a decision about what to measure, not a claim about any measured marketplace.
+The following is hypothetical and illustrative. A retailer's recommendation panel is optimised for click-through, and a developer suspects it is narrowing what customers see. Three checks follow from the argument. First, does the click log record ranking position, so a click on a top slot can be separated from a click caused by relevance - the DeepFM result implies that a better CTR predictor is not evidence that exposure changes choice? Second, does the system track exposure diversity and new-item discovery - the share of the catalogue receiving impressions, not clicks - so a cold-start item can escape the loop described in collaborative filtering? Third, is the A/B test long enough to capture repeat behaviour and scored on retained usage and segmented effects, rather than a same-session click lift, consistent with the constructed-preference point from Kahneman's lecture?
+
+<Trap>
+If position is unlogged and the test is short, an apparent lift may be the ranking reinforcing itself.
+</Trap>
+
+If all three checks pass, the team can attribute a change to exposure rather than inference. The outcome is a decision about what to measure, not a claim about any measured marketplace.
 
 ## A counterargument
 
-A reasonable critic can argue that the article's central claim outruns its sources. DeepFM is presented as evidence that ranking shapes attention, but the cited work models feature interactions to predict click-through rate; a better CTR model is not itself evidence that exposure changes what people buy. Kahneman's lecture supports the idea that preferences are constructed in the moment, yet that generality does not establish that a recommender specifically narrows choice rather than merely reveals it. The feedback-loop story is plausible, but the references are about modelling and judgment, not measured marketplace-level effects. The framing is incomplete where it treats a design concern as a demonstrated outcome.
+A reasonable critic can argue that the article's central claim outruns its sources. DeepFM is presented as evidence that ranking shapes attention, but the cited work models feature interactions to predict click-through rate; a better CTR model is not itself evidence that exposure changes what people buy. Kahneman's lecture supports the idea that preferences are constructed in the moment, yet that generality does not establish that a recommender specifically narrows choice rather than merely reveals it. The feedback-loop story is plausible, but the references are about modelling and judgment, not measured marketplace-level effects.
+
+<PullQuote>
+The framing is incomplete where it treats a design concern as a demonstrated outcome.
+</PullQuote>
 
 ## References & Further Reading
 

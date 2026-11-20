@@ -9,9 +9,15 @@ tags:
   - Decision Guide
 ---
 
-The cloud-versus-device debate is usually framed as privacy versus capability. That is only two of four constraints. Latency, cost, and operational capacity matter just as much, and the right answer is often a split: small tasks on device, hard tasks in the cloud.
+<Lead>
+The cloud-versus-device debate is usually framed as <Mark>privacy versus capability</Mark>. That is only two of four constraints. Latency, cost, and operational capacity matter just as much, and the right answer is often a split: small tasks on device, hard tasks in the cloud.
+</Lead>
 
-**Direct answer:** Choose on-device when data residency, offline availability, or tight latency dominates and a sufficiently small model can do the task. Choose cloud when capability, model freshness, or elastic scale matters more. Google lists 1M-token context and multimodal inputs in its Gemini 4 family, which illustrates the capability available in the cloud; AWS's cost guidance supplies the discipline for attributing the expense. The boundary: a hybrid design is usually better than a single choice, provided the routing between tiers is measured.
+**Direct answer:** Choose on-device when data residency, offline availability, or tight latency dominates and a sufficiently small model can do the task. Choose cloud when capability, model freshness, or elastic scale matters more. Google lists 1M-token context and multimodal inputs in its Gemini 4 family, which illustrates <Mark>the capability available in the cloud</Mark>; AWS's cost guidance supplies the discipline for attributing the expense. The boundary: a hybrid design is usually better than a single choice, provided the routing between tiers is measured.
+
+<KeyFigures items={[
+  { value: "1M", label: "token context listed for the Gemini 4 family", source: "Google, Gemini API (Models)" },
+]} />
 
 ## Four constraints
 
@@ -19,7 +25,7 @@ The cloud-versus-device debate is usually framed as privacy versus capability. T
 
 **Privacy and residency.** Some data cannot leave a boundary, by policy or by law. On-device processing removes the transfer, though the device itself still needs protection. The data-privacy article covers the regulatory side.
 
-**Latency and availability.** A local model has no network round trip and works offline. A cloud model depends on connectivity and provider availability.
+**Latency and availability.** A local model has <Mark>no network round trip</Mark> and works offline. A cloud model depends on connectivity and provider availability.
 
 **Cost and operations.** Cloud inference is metered with no hardware to manage; on-device requires hardware, model updates, and a maintenance path. The GPU article and the cost estimator cover the economics.
 
@@ -37,7 +43,11 @@ Three decisions follow:
 
 1. **Split by task, not by product.** A single architecture for both features would either sacrifice privacy on transcription or accept weak summarisation.
 2. **Route explicitly.** The app must decide where each request goes based on task type, with a fallback when the cloud is unavailable.
-3. **Measure both paths.** On-device latency and cloud cost need separate metrics. A hybrid design with no measurement is two unmanaged systems.
+3. **Measure both paths.** On-device latency and cloud cost need separate metrics.
+
+<KeyPoint>
+A hybrid design with no measurement is two unmanaged systems.
+</KeyPoint>
 
 The trade-off is clear: the company accepts cloud cost and data transfer for summarisation to gain capability, and accepts device constraints for transcription to gain privacy and offline use.
 
@@ -45,7 +55,11 @@ The trade-off is clear: the company accepts cloud cost and data transfer for sum
 
 **It does not remove security obligations.** A device can be lost or compromised. Local models and cached data need protection.
 
-**It does not stay current for free.** Updates must be delivered and applied. A model that ages on a device produces stale behaviour.
+**It does not stay current for free.** Updates must be delivered and applied.
+
+<Trap>
+A model that ages on a device produces stale behaviour.
+</Trap>
 
 **It is not always cheaper.** The hardware cost is borne per user, and low utilisation wastes it. The cloud's metered model can be cheaper for infrequent tasks.
 
@@ -57,7 +71,11 @@ The trade-off is clear: the company accepts cloud cost and data transfer for sum
 
 **It does not guarantee better answers on every task.** A small, task-specific local model can outperform a frontier model on a narrow, well-defined job, as the task-taxonomy article argues.
 
-The counterargument — that devices will soon run frontier models — is plausible and does not change the method. Re-evaluate the four constraints when hardware changes; do not assume the answer is permanent.
+The counterargument — that devices will soon run frontier models — is plausible and does not change the method.
+
+<PullQuote>
+Re-evaluate the four constraints when hardware changes; do not assume the answer is permanent.
+</PullQuote>
 
 ## A decision test
 

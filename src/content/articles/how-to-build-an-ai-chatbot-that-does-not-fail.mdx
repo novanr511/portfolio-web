@@ -9,9 +9,11 @@ tags:
   - AI
 ---
 
-Most chatbot demos are conversations with a friendly text generator. The hard part appears later: the bot answers a question it should have escalated, forgets what the user said three turns ago, or promises an action it cannot perform. Reliability is designed at those boundaries, not in the tone of the replies.
+<Lead>
+Most chatbot demos are conversations with a friendly text generator. <Mark>The hard part appears later</Mark>: the bot answers a question it should have escalated, forgets what the user said three turns ago, or promises an action it cannot perform. Reliability is designed at those boundaries, not in the tone of the replies.
+</Lead>
 
-**Direct answer:** A chatbot that does not fail has three explicit boundaries: a knowledge boundary that defines what it may answer, an escalation boundary that says when a person takes over, and an action boundary that limits what tools it may call. Anthropic's customer-support guide covers context-aware assistants, and its prompt-engineering guidance puts success criteria before wording. The boundary: "does not fail" means failures are detected and contained, not that the bot is never wrong.
+**Direct answer:** A chatbot that does not fail has three explicit boundaries: a knowledge boundary that defines what it may answer, an escalation boundary that says when a person takes over, and an action boundary that limits what tools it may call. Anthropic's customer-support guide covers context-aware assistants, and its prompt-engineering guidance puts success criteria before wording. The boundary: "does not fail" means <Mark>failures are detected and contained</Mark>, not that the bot is never wrong.
 
 ## Three boundaries
 
@@ -19,13 +21,17 @@ Most chatbot demos are conversations with a friendly text generator. The hard pa
 
 **Escalation boundary.** Some cases need a person: angry customers, unusual requests, anything involving money or legal commitments. The escalation must be cheap for the user — a clear handoff with the conversation history, not a restart.
 
-**Action boundary.** If the bot can call tools, each tool needs its own authorisation and limits. A refund tool should enforce an amount ceiling and a policy check regardless of what the model decides. Prompt Injection in LLM Applications explains why the tool is the real security boundary.
+**Action boundary.** If the bot can call tools, each tool needs its own authorisation and limits. A refund tool should enforce an amount ceiling and a policy check regardless of what the model decides. Prompt Injection in LLM Applications explains why <Mark>the tool is the real security boundary</Mark>.
 
 ## Memory and context
 
 A conversation accumulates state: who the user is, what they asked, what was already resolved. Three practical rules:
 
-**Keep a structured state, not just a transcript.** Store the verified facts — account ID, issue type, steps tried — as fields. A transcript is hard to query and easy to misread.
+**Keep a structured state, not just a transcript.** Store the verified facts — account ID, issue type, steps tried — as fields.
+
+<Trap>
+A transcript is hard to query and easy to misread.
+</Trap>
 
 **Summarise long histories deliberately.** When context grows, compress it with a fixed schema rather than letting the oldest turns fall out randomly. The long-context article shows why position matters.
 
@@ -49,7 +55,11 @@ Three failure modes are measured:
 2. **Failed handoffs.** If escalated conversations lose context in 10% of cases, users repeat themselves. The handoff needs to carry the structured state, not just the chat log.
 3. **Tool overreach.** The account tool is read-only, so a request for a refund cannot be executed. The bot should say "I can't issue refunds; I'll connect you with a person" — an exact response that can be tested.
 
-The arithmetic matters less than the measurement design: each boundary has a metric, and a failing metric points to a specific fix. "Users seem happy" is not a control.
+<KeyPoint>
+The arithmetic matters less than the measurement design: each boundary has a metric, and a failing metric points to a specific fix.
+</KeyPoint>
+
+"Users seem happy" is not a control.
 
 ## What to test before launch
 
@@ -70,7 +80,11 @@ Score each set before launch and after every change. The prompt-engineering guid
 
 **The knowledge base will go stale.** A bot grounded in outdated documentation gives confident wrong answers. Content ownership is part of the system.
 
-The counterargument — that a general assistant can handle anything — confuses breadth with reliability. A bounded bot that handles 80% of cases well is more useful than one that attempts 100% unpredictably.
+The counterargument — that a general assistant can handle anything — confuses breadth with reliability.
+
+<PullQuote>
+A bounded bot that handles 80% of cases well is more useful than one that attempts 100% unpredictably.
+</PullQuote>
 
 ## A decision test
 

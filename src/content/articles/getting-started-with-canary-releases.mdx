@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A canary release sends a change to a small share of traffic before the rest. The GitHub Actions documentation describes automation for deployment workflows, and the SRE alerting workbook ties signals to objectives. The starting point is not the traffic split but the signal that decides whether to continue.
+</Lead>
 
 **Direct answer:** Start with a small, reversible rollout and a defined signal for success or failure, then expand only when the signal supports it. The sources describe automation and objectives; the rollout rule is a synthesis.
 
@@ -20,7 +22,7 @@ A canary release sends a change to a small share of traffic before the rest. The
 Three points matter:
 
 - **Exposure is limited.** A canary reduces the number of users affected by a bad change. The tooling documentation describes how to automate the steps.
-- **A signal is required.** The SRE workbook argues for alerting tied to service objectives. Without a signal, a small rollout is a delay rather than a test.
+- **A signal is required.** The SRE workbook argues for alerting tied to service objectives. Without a signal, a small rollout is <Mark>a delay rather than a test</Mark>.
 - **Reversibility still matters.** A canary does not undo a data change. The rollback path must exist independently.
 
 The sequence is: define the signal, choose the first slice, watch, then expand or revert. Choosing the signal is local judgement, so it is `inferred`; the automation is `source-reported`.
@@ -37,7 +39,7 @@ The outcome is a decision to expand, hold, or revert. The scenario is hypothetic
 
 ## Why the slice has to be representative
 
-A canary that excludes the users most likely to hit a change tells you little. If the first slice is drawn only from internal accounts or a quiet region, the result will look reassuring while the affected population remains untouched. Choosing a representative slice is part of the design, not a detail of the rollout.
+A canary that excludes the users most likely to hit a change tells you little. If the first slice is drawn only from internal accounts or a quiet region, the result will look reassuring while the affected population remains untouched. Choosing a representative slice is <Mark>part of the design, not a detail of the rollout</Mark>.
 
 The duration matters for the same reason. A short window may miss a failure that appears only under normal load or at a particular time of day. Holding the canary long enough to cover ordinary conditions costs time, but it is the cost that makes the signal credible.
 
@@ -55,7 +57,11 @@ A canary limits exposure; it does not undo the change. If the deployment include
 
 ## Why the signal comes first
 
-A rollout without a decision rule is an interval during which nobody knows what to do. Defining the signal before release turns the interval into a test. It also prevents the threshold from being chosen after seeing the data, which would make any result interpretable as success.
+A rollout without a decision rule is an interval during which nobody knows what to do. Defining the signal before release <Mark>turns the interval into a test</Mark>.
+
+<Trap>
+It also prevents the threshold from being chosen after seeing the data, which would make any result interpretable as success.
+</Trap>
 
 A final constraint is that the canary only observes what it can measure. A failure that appears as a slow degradation in correctness may not trigger an alert tied to latency or errors. Choosing signals that cover both failure and quality is therefore part of the release design, not an improvement to be added later.
 
@@ -65,13 +71,17 @@ A canary that never fails tells you that the signal was not sensitive enough, no
 
 The same applies to the traffic share: a very small slice can miss a failure that only appears under ordinary load.
 
+<KeyPoint>
 A representative slice and a defined signal together are what make a small rollout a test rather than a delay.
+</KeyPoint>
 
 ## What it cannot do
 
 It cannot protect against a change that only fails at full scale. It does not replace testing. And it cannot revert a data change that was not designed for reversal.
 
+<PullQuote>
 The counterargument that a canary is slow is fair for trivial changes and incomplete for ones that can affect many users.
+</PullQuote>
 
 ## A decision test
 

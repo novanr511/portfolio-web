@@ -9,9 +9,17 @@ tags:
   - Search Engines
 ---
 
+<Lead>
 Search engine crawling is an automated graph-traversal problem executed across billions of distributed documents. To maintain an up-to-date representation of the web without exhausting host resources or storage clusters, search engines rely on continuous scheduling pipelines known as **crawl frontiers**.
+</Lead>
 
-**Direct Answer:** Googlebot discovers URLs through three primary mechanisms: extracting crawlable anchor links (`<a href>`) from parsed HTML, ingesting XML sitemaps, and following HTTP redirect locations. Once discovered, URLs enter a prioritized crawl frontier where fetch scheduling is dynamically calculated based on host health, crawl demand (popularity and refresh frequency), and crawl capacity limits. Discovered URLs are never guaranteed immediate crawling; they are fetched only when the scheduler allocates capacity.
+**Direct Answer:**
+
+<KeyPoint>
+Googlebot discovers URLs through three primary mechanisms: extracting crawlable anchor links (`<a href>`) from parsed HTML, ingesting XML sitemaps, and following HTTP redirect locations.
+</KeyPoint>
+
+Once discovered, URLs enter a prioritized crawl frontier where fetch scheduling is dynamically calculated based on host health, crawl demand (popularity and refresh frequency), and crawl capacity limits. Discovered URLs are never guaranteed immediate crawling; they are fetched only when the scheduler allocates capacity.
 
 Understanding how URLs move from discovery to fetch scheduling allows engineers to optimize site architecture for rapid, predictable crawl coverage.
 
@@ -48,7 +56,7 @@ The crawl frontier is the central coordination database responsible for storing,
 1. **Unvisited URLs:** Discovered links waiting to be crawled for the first time.
 2. **Visited URLs:** Existing URLs scheduled for periodic re-crawling to detect changes, deletions, or new outgoing links.
 
-When Googlebot discovers a new URL, the URL is not fetched immediately. It is normalized (removing fragments like `#section`, standardizing protocol and casing) and evaluated against known host constraints.
+When Googlebot discovers a new URL, <Mark>the URL is not fetched immediately</Mark>. It is normalized (removing fragments like `#section`, standardizing protocol and casing) and evaluated against known host constraints.
 
 If the host server is currently exhibiting high latency or returning `5xx` errors, the frontier throttles requests to that host, queuing discovered URLs until server metrics stabilize.
 
@@ -85,7 +93,7 @@ An XML sitemap is a machine-readable protocol (`sitemaps.org`) hosted on your we
 </urlset>
 ```
 
-**The Reality of Sitemap Submission:** Submitting an XML sitemap in Google Search Console does not force an immediate crawl. It simply supplies Googlebot with a structured manifest of candidate URLs. Googlebot cross-references sitemap URLs against its crawl frontier, using the `<lastmod>` timestamp to prioritize re-fetching updated documents.
+**The Reality of Sitemap Submission:** Submitting an XML sitemap in Google Search Console <Mark>does not force an immediate crawl</Mark>. It simply supplies Googlebot with a structured manifest of candidate URLs. Googlebot cross-references sitemap URLs against its crawl frontier, using the `<lastmod>` timestamp to prioritize re-fetching updated documents.
 
 > [!IMPORTANT]
 > **Sitemap Hygiene:** Never include URLs that return `3xx` redirects, `404 Not Found`, or emit `noindex` directives inside an XML sitemap. Sitemaps should strictly contain `200 OK` canonical documents. Polluting sitemaps with broken or redirected URLs erodes Googlebot's trust in your `<lastmod>` metadata.
@@ -143,7 +151,7 @@ Googlebot traverses the web as a directed graph. The physical efficiency of this
 Pages buried beyond 4 or 5 hops from the homepage experience significantly lower crawl frequency. If deep URLs are not reinforced through category hubs, related links, or internal contextual anchors, Googlebot may only fetch them once every few months—or miss them entirely during routine crawl cycles.
 
 ### Orphan Pages
-An orphan page is a URL that exists on your server and may be listed in your XML sitemap, but has zero inbound internal links from any other page on your domain. While Googlebot may discover an orphan page via the sitemap, the complete absence of internal link equity signals that the page is isolated and low-priority, severely delaying both crawling and indexation.
+An orphan page is a URL that exists on your server and may be listed in your XML sitemap, but has <Mark>zero inbound internal links from any other page on your domain</Mark>. While Googlebot may discover an orphan page via the sitemap, the complete absence of internal link equity signals that the page is isolated and low-priority, severely delaying both crawling and indexation.
 
 ---
 
@@ -193,7 +201,11 @@ The following is hypothetical and illustrative. A documentation site publishes a
 
 ## A counterargument
 
-A critic would argue that the article presents an engineering model as documented behaviour. The three Google references describe discovery, bot identity, and sitemap submission at a high level; they do not establish the two-state frontier, the sub-200ms TTFB threshold, the claim that pages beyond four or five hops are fetched only every few months, or the 'deterministic' scheduler in the conclusion. Those specifics are plausible mechanisms, but they are inferences dressed as documentation. The article also weakens its own thesis: discovery is said to be 'never guaranteed immediate crawling,' demand and capacity are dynamic, and sitemaps are 'signals, not mandates,' which is a long way from the deterministic pipeline the diagrams imply. A reasonable objection is not that the model is useless - it is a clear way to reason about crawl coverage - but that readers cannot tell which parts Google published and which parts the article supplied.
+A critic would argue that the article presents an engineering model as documented behaviour. The three Google references describe discovery, bot identity, and sitemap submission at a high level; they do not establish the two-state frontier, the sub-200ms TTFB threshold, the claim that pages beyond four or five hops are fetched only every few months, or the 'deterministic' scheduler in the conclusion. Those specifics are plausible mechanisms, but they are inferences dressed as documentation. The article also weakens its own thesis: discovery is said to be 'never guaranteed immediate crawling,' demand and capacity are dynamic, and sitemaps are 'signals, not mandates,' which is a long way from the deterministic pipeline the diagrams imply.
+
+<PullQuote>
+A reasonable objection is not that the model is useless - it is a clear way to reason about crawl coverage - but that readers cannot tell which parts Google published and which parts the article supplied.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Evaluating consent mode means checking that a technical signal produces the behavior a policy promises. Google's Analytics Help describes how consent states change tag behavior and where modeling fills reporting gaps, while the California Privacy Protection Agency publishes regulations governing consumer rights and opt-outs. The real problem is that teams evaluate the implementation and the legal obligation as one thing, so a passing tag test is read as a compliance conclusion.
+<Lead>
+Evaluating consent mode means checking that a technical signal produces the behavior a policy promises. Google's Analytics Help describes how consent states change tag behavior and where modeling fills reporting gaps, while the California Privacy Protection Agency publishes regulations governing consumer rights and opt-outs. The real problem is that teams evaluate the implementation and the legal obligation as one thing, so <Mark>a passing tag test is read as a compliance conclusion</Mark>.
+</Lead>
 
-**Direct answer:** Evaluate consent mode on two separate tracks: does the tag behave as configured under each consent state, and does that behavior satisfy the applicable rules? The vendor guidance informs the first; the regulations inform the second. A result is only as strong as the weaker track.
+**Direct answer:**
+
+<KeyPoint>
+Evaluate consent mode on two separate tracks: does the tag behave as configured under each consent state, and does that behavior satisfy the applicable rules?
+</KeyPoint>
+
+The vendor guidance informs the first; the regulations inform the second. A result is only as strong as the weaker track.
 
 **Delta:** This article adds a claim-status table and a two-track evaluation test beyond the sources: it maps each check to a decision, with claim status explicit.
 
@@ -25,7 +33,7 @@ The California Privacy Protection Agency publishes regulations that implement st
 
 The sources provide a behavior specification and a regulatory baseline but not a combined evaluation procedure. Designing that procedure is a synthesis and is marked inferred. A reasonable structure runs the technical check first, because a tag that does not honor its state fails regardless of law, then the legal check, because correct behavior under the wrong basis still fails. Other teams may reverse the order, and the claim is only that keeping the tracks separate prevents a clean result on one from masking a gap in the other.
 
-The output of an evaluation is a paired record: for each purpose, a technical result and a legal result, each with its own evidence. That pairing is the decision instrument. Without it, a reviewer sees only a green test and cannot tell which question it answered, so a narrow pass is easily read as a broad assurance.
+The output of an evaluation is a paired record: for each purpose, a technical result and a legal result, each with its own evidence. That pairing is the decision instrument. Without it, a reviewer sees only a green test and cannot tell which question it answered, so <Mark>a narrow pass is easily read as a broad assurance</Mark>.
 
 ## A worked example
 
@@ -47,13 +55,19 @@ An evaluation cannot certify compliance. It produces evidence about specific que
 
 The hidden cost is repetition. Consent behavior depends on the current tag set, the current consent platform, and the current interpretation of the rules, all of which change. An evaluation that is not repeated goes stale quietly, because the test result stays green while the underlying configuration drifts. The cost is paid in scheduled re-testing and in the discipline to keep the paired record current, and it is invisible until someone asks for evidence that no longer matches the site.
 
-A common failure mode is testing only the granted state. Tags often behave correctly when consent is given and incorrectly when it is denied, yet many checks verify only the easy path. Another is conflating the signal with the right: a tag may honor an opt-out preference signal correctly while the underlying purpose remains one for which the law requires more. Both failures hide behind a clean result, which is why the denied path deserves at least as much attention as the granted one.
+<Trap>
+A common failure mode is testing only the granted state.
+</Trap>
+
+Tags often behave correctly when consent is given and incorrectly when it is denied, yet many checks verify only the easy path. Another is conflating the signal with the right: a tag may honor an opt-out preference signal correctly while the underlying purpose remains one for which the law requires more. Both failures hide behind a clean result, which is why the denied path deserves at least as much attention as the granted one.
 
 There is a boundary around what a technical test can show. It can observe that a tag stayed quiet; it cannot establish that the processing was lawful or that the consent was informed. Nor does the vendor guidance resolve questions of purpose limitation or retention. Those require a separate legal review, and an evaluation that claims to cover them has overstated its reach. The honest report names what was tested and leaves the rest open.
 
 Because law and configuration move, the evaluation needs a review cadence. Each finding should carry a recheck condition, so a regulatory amendment or a new tag triggers a fresh check rather than a quiet assumption. Without that record, a future reviewer cannot tell whether a pass reflected the current rules or an older set, and the evaluation stops being reliable evidence.
 
+<PullQuote>
 The counterargument that a single green tag test is fair for a quick sanity check is incomplete when the result is used to answer a legal question.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +79,7 @@ The counterargument that a single green tag test is fair for a quick sanity chec
 6. Record technical and legal results separately.
 7. Attach a recheck condition to each finding.
 
-Evaluation is useful when it answers a bounded question. The two-track test keeps a passing tag check from being read as a compliance verdict, and it forces the legal question to be answered on its own evidence rather than borrowed from a technical pass.
+Evaluation is useful when it answers a bounded question. The two-track test <Mark>keeps a passing tag check from being read as a compliance verdict</Mark>, and it forces the legal question to be answered on its own evidence rather than borrowed from a technical pass.
 For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
 
 ## References & Further Reading
