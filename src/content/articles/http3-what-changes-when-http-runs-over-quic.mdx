@@ -9,7 +9,9 @@ tags:
   - Web Infrastructure
 ---
 
-HTTP/3 is often described as “HTTP/2, but faster.” That shorthand hides the main change: HTTP semantics remain familiar, while the transport underneath changes from TCP to QUIC over UDP. This affects stream behavior, connection setup, and network compatibility. It does not guarantee that every request becomes faster, or that a server supporting HTTP/3 will cause a browser to use it for a particular visit.
+<Lead>
+HTTP/3 is often described as “HTTP/2, but faster.” That shorthand hides the main change: HTTP semantics remain familiar, while <Mark>the transport underneath changes from TCP to QUIC over UDP</Mark>. This affects stream behavior, connection setup, and network compatibility. It does not guarantee that every request becomes faster, or that a server supporting HTTP/3 will cause a browser to use it for a particular visit.
+</Lead>
 
 **Direct answer:** HTTP/3 maps HTTP semantics onto QUIC. QUIC provides encrypted, multiplexed streams with transport-level reliability and flow control; TLS 1.3 is integrated into its handshake. Unlike HTTP/2 over TCP, packet loss affecting one QUIC stream does not inherently block delivery on every other stream in the connection. But performance still depends on the path, endpoint implementation, workload, and whether the client can establish QUIC over UDP. [RFC 9114](https://www.rfc-editor.org/rfc/rfc9114) and [RFC 9000](https://www.rfc-editor.org/rfc/rfc9000) define the protocol behavior.
 
@@ -19,11 +21,19 @@ HTTP/3 uses the same HTTP semantics: methods, status codes, fields, and resource
 
 HTTP/2 also multiplexes requests, but it typically runs over TCP. TCP presents an ordered byte stream to its application. If a TCP segment is lost, later bytes on that connection cannot be delivered to the application until the missing bytes are recovered. Since HTTP/2’s concurrent streams share that TCP connection, a loss can temporarily stall data across the connection.
 
-QUIC instead provides ordered delivery independently for each stream. Loss on one stream does not require another stream’s bytes to wait for in-order delivery of the lost stream’s data. The connection still has congestion control and packet loss recovery, so loss can affect how much data the connection sends overall. “No cross-stream head-of-line blocking from transport ordering” is accurate; “packet loss no longer affects performance” is not.
+QUIC instead provides ordered delivery independently for each stream. Loss on one stream does not require another stream’s bytes to wait for in-order delivery of the lost stream’s data. The connection still has congestion control and packet loss recovery, so loss can affect how much data the connection sends overall.
+
+<KeyPoint>
+“No cross-stream head-of-line blocking from transport ordering” is accurate; “packet loss no longer affects performance” is not.
+</KeyPoint>
 
 ## How HTTP/3 is discovered and negotiated
 
-A browser does not infer HTTP/3 merely because a server supports it. RFC 9114 describes advertising an alternative HTTP/3 endpoint using the `Alt-Svc` response header or an HTTP/2 `ALTSVC` frame. For example:
+<Trap>
+A browser does not infer HTTP/3 merely because a server supports it.
+</Trap>
+
+RFC 9114 describes advertising an alternative HTTP/3 endpoint using the `Alt-Svc` response header or an HTTP/2 `ALTSVC` frame. For example:
 
 ```http
 Alt-Svc: h3=":443"; ma=86400
@@ -37,13 +47,13 @@ QUIC uses UDP datagrams. Networks that block or impair UDP can prevent QUIC conn
 
 QUIC uses TLS 1.3 or later for its handshake and cryptographic key negotiation. TLS handshake messages are carried in QUIC `CRYPTO` frames; QUIC packet protection then uses keys derived through TLS. This differs from HTTP/2 over TLS, where TLS records are carried over TCP.
 
-QUIC’s 0-RTT mode deserves a careful caveat. A client with suitable prior session state may send early application data before the handshake completes. The data can be replayed, so RFC 9001 warns that 0-RTT is unsuitable for actions whose replay could cause unwanted effects. Applications and servers must account for that risk; 0-RTT is not a blanket “free latency” switch.
+QUIC’s 0-RTT mode deserves a careful caveat. A client with suitable prior session state may send early application data before the handshake completes. The data can be replayed, so RFC 9001 warns that 0-RTT is unsuitable for actions whose replay could cause unwanted effects. Applications and servers must account for that risk; 0-RTT is <Mark>not a blanket “free latency” switch</Mark>.
 
 ## A practical verification workflow
 
 For a browser visit, use the browser’s developer tools and inspect the Protocol column in the Network panel (enable it from the column menu if hidden). A request marked `h3` indicates the browser reports HTTP/3 for that request. This is a client-side observation, not a guarantee that every client, route, or resource uses HTTP/3.
 
-You can also inspect response headers for an `Alt-Svc` advertisement, but that only shows the server offered an alternative service; it does not prove that the client connected over QUIC. To investigate an apparent failure:
+You can also inspect response headers for an `Alt-Svc` advertisement, but that only shows the server offered an alternative service; it <Mark>does not prove that the client connected over QUIC</Mark>. To investigate an apparent failure:
 
 1. Confirm that the DNS name and certificate are valid for the intended origin.
 2. Check whether the response advertises an `h3` alternative service, or whether the deployment has another documented discovery path.
@@ -62,7 +72,13 @@ If you are evaluating adoption or performance, measure actual clients and repres
 
 ## A counterargument
 
-A fair objection is that the article's emphasis on per-stream independence overstates what most users will feel. RFC 9000 gives each QUIC stream ordered delivery, but congestion control and recovery still operate at the connection level, and the article itself concedes that loss can reduce how much the whole connection sends. A reasonable critic would push back that on a lossy, bandwidth-limited path the aggregate connection rate, not head-of-line blocking, is the binding constraint, so the headline advantage can shrink to near zero even though the mechanism is real. The 0-RTT discussion points the same way: RFC 9001's replay warning means the latency win is unavailable for actions with side effects, which is precisely many of the requests a browser sends. The article's caution is well placed, but a critic could argue it still lets the transport story carry more weight than the measured end-to-end evidence warrants.
+A fair objection is that the article's emphasis on per-stream independence overstates what most users will feel. RFC 9000 gives each QUIC stream ordered delivery, but congestion control and recovery still operate at the connection level, and the article itself concedes that loss can reduce how much the whole connection sends.
+
+<PullQuote>
+A reasonable critic would push back that on a lossy, bandwidth-limited path the aggregate connection rate, not head-of-line blocking, is the binding constraint, so the headline advantage can shrink to near zero even though the mechanism is real.
+</PullQuote>
+
+The 0-RTT discussion points the same way: RFC 9001's replay warning means the latency win is unavailable for actions with side effects, which is precisely many of the requests a browser sends. The article's caution is well placed, but a critic could argue it still lets the transport story carry more weight than the measured end-to-end evidence warrants.
 
 ## References & Further Reading
 

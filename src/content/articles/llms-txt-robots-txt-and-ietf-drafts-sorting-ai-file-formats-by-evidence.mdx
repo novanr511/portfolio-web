@@ -9,9 +9,17 @@ tags:
   - Evidence-Based SEO
 ---
 
+<Lead>
 There is now a file you can add to your site that some people call an "AI SEO" technique, and there is a pair of IETF drafts that define a related mechanism. Both are real. Neither is what most coverage says. The problem is not that these things are fake — it is that they are proposals and experimental conventions being reported as established practice, and the gap between those two things is where sites waste effort.
+</Lead>
 
-**Direct Answer:** `llms.txt` is a **proposal** by Jeremy Howard, first published 3 September 2024 and now at version 2 (modified 10 August 2026) — a voluntary Markdown file at a site path, for agents that want a curated overview. It is not an IETF standard, not a Google or OpenAI requirement, and Google explicitly states you do not need it: "You don't need to create new machine readable files, AI text files, or markup to appear in these features." The IETF `aipref` working group's `Content-Usage` mechanism is a **different** thing — a standards-track effort to express machine-readable AI usage preferences, currently at Active Internet-Draft stage, not RFC. Neither is a ranking factor. Here is what each one actually is, and what the evidence supports.
+**Direct Answer:** `llms.txt` is a **proposal** by Jeremy Howard, first published 3 September 2024 and now at version 2 (modified 10 August 2026) — a voluntary Markdown file at a site path, for agents that want a curated overview. It is not an IETF standard, not a Google or OpenAI requirement, and Google explicitly states you do not need it: "You don't need to create new machine readable files, AI text files, or markup to appear in these features." The IETF `aipref` working group's `Content-Usage` mechanism is a **different** thing — a standards-track effort to express machine-readable AI usage preferences, currently at Active Internet-Draft stage, not RFC.
+
+<KeyPoint>
+Neither is a ranking factor.
+</KeyPoint>
+
+Here is what each one actually is, and what the evidence supports.
 
 ## What `llms.txt` is
 
@@ -36,7 +44,7 @@ That is a meaningful signal, and it is the strongest part of the argument. But r
 
 The proposal itself is careful about the purpose split, and its framing is directly relevant to SEO. On the distinction from `robots.txt`: "robots.txt lets automated tools know what access to a site is considered acceptable, such as for search indexing bots. llms.txt information is instead used on demand, when an agent needs information about a topic while assisting a user." And critically: "Our expectation was that llms.txt would mainly be useful for inference rather than training, and that is how it has been used, though training runs could take advantage of the information too."
 
-So by its author's own account, `llms.txt` is an *agent-navigation convenience*, not a discoverability mechanism for search. A page that already ranks well and is easy to crawl does not need one to be found. A page that ranks poorly does not get found by adding one.
+So by its author's own account, `llms.txt` is an *agent-navigation convenience*, <Mark>not a discoverability mechanism for search</Mark>. A page that already ranks well and is easy to crawl does not need one to be found. A page that ranks poorly does not get found by adding one.
 
 The proposal also explains what it is *not*, which is refreshingly direct. It is not a `sitemap.xml` substitute, for reasons that apply directly to SEO: a sitemap "Often won't have the LLM-readable versions of pages listed," "Doesn't include URLs to external sites, even though they might be helpful," and "Will generally cover documents that in aggregate will be too large to fit in an LLM context window, and will include a lot of information that isn't necessary to understand the site."
 
@@ -46,13 +54,17 @@ That last point is the one SEO practitioners should internalise. A sitemap exist
 
 This is where most coverage merges two unrelated things. The `aipref` working group is not building an `llms.txt` successor. It is standardising **usage preferences** — machine-readable statements about how content may be used.
 
-The vocabulary draft (`draft-ietf-aipref-vocab-08`, 14 September 2026) defines three categories of use with the labels `train-ai`, `ai-use`, and `search`, and a preference model where each category takes one of three values: allowed, disallowed, or **unknown**. That third value is the operationally important one — silence is not consent.
+The vocabulary draft (`draft-ietf-aipref-vocab-08`, 14 September 2026) defines three categories of use with the labels `train-ai`, `ai-use`, and `search`, and a preference model where each category takes one of three values: allowed, disallowed, or **unknown**. That third value is the operationally important one — <Mark>silence is not consent</Mark>.
 
 The attachment draft (`draft-ietf-aipref-attach-05`, 19 August 2026) defines two ways to express those preferences: a `Content-Usage` HTTP response header, and a new `robots.txt` rule extending RFC 9309's ABNF.
 
-The relationship to `llms.txt` is essentially nil. `llms.txt` says "here is a curated overview for agents." `Content-Usage` says "here is what you are allowed to do with this content." One is navigation; the other is permission. Treating them as two versions of the same "AI file" is a category error in the opposite direction.
+The relationship to `llms.txt` is essentially nil. `llms.txt` says "here is a curated overview for agents." `Content-Usage` says "here is what you are allowed to do with this content." One is navigation; the other is permission.
 
-And the status matters enormously for anyone about to implement. Both documents are **Active Internet-Drafts**, not RFCs. The datatracker records the WG state as "WG Document" and IESG state as "I-D Exists." Their *intended* RFC status is Proposed Standard — the vocabulary draft was described in the IETF announcement as "a standard track specification describing vocabulary for expressing AI-related preferences to the IESG for publication" with an August 2026 milestone. Intended status is not current status.
+<Trap>
+Treating them as two versions of the same "AI file" is a category error in the opposite direction.
+</Trap>
+
+And the status matters enormously for anyone about to implement. Both documents are **Active Internet-Drafts**, not RFCs. The datatracker records the WG state as "WG Document" and IESG state as "I-D Exists." Their *intended* RFC status is Proposed Standard — the vocabulary draft was described in the IETF announcement as "a standard track specification describing vocabulary for expressing AI-related preferences to the IESG for publication" with an August 2026 milestone. <Mark>Intended status is not current status.</Mark>
 
 There is also an explicit caveat inside the vocabulary draft itself: the core section "does not yet have consensus," with a note attached. A careful reader should treat a specification with a no-consensus marker in its central section as a work in progress, and the draft says so.
 
@@ -92,7 +104,13 @@ For most content sites, in priority order:
 4. **An `llms.txt` file if you run documentation** and it costs you an afternoon. Treat it as developer experience, not as SEO.
 5. **No `Content-Usage` rules in production yet** — unless you have a specific partner that has announced support, and you are prepared for the syntax to change. The drafts are not consensus, and Anthropic's own implementation note says the reading of these settings "may change too."
 
-The through-line is worth stating plainly: the AI-facing web is being standardised, but the standards are about *permission* and *navigation*, not about *promotion*. No specification in this space makes your content rank better or get cited. The parts that decide that — crawlability, indexability, usefulness, and the structure of your content — are the parts that have always decided it.
+The through-line is worth stating plainly: the AI-facing web is being standardised, but the standards are about *permission* and *navigation*, not about *promotion*.
+
+<PullQuote>
+No specification in this space makes your content rank better or get cited.
+</PullQuote>
+
+The parts that decide that — crawlability, indexability, usefulness, and the structure of your content — are the parts that have always decided it.
 
 ## A worked example
 

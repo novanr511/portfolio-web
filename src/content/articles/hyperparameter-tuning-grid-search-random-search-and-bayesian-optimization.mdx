@@ -9,9 +9,15 @@ tags:
   - Optimization
 ---
 
+<Lead>
 Hyperparameter tuning is often treated as a tedious but mechanical step: list the options, try them all, pick the best. The trouble is that "try them all" is impossible in any realistic space, and the choices about what to try are where most of the value — and most of the waste — sits. The best-known empirical result in this area is that the obvious strategy is usually the wrong one.
+</Lead>
 
-**Direct answer:** Grid search spends compute uniformly across a configured space, which is wasteful when only a few hyperparameters materially affect the result. Bergstra and Bengio found that "random search over the same domain is able to find models that are as good or better within a small fraction of the computation time" than grid search, and that at the same budget it "finds better models by effectively searching a larger, less promising configuration space". Bayesian and bandit-based methods go further by allocating trials adaptively, but they cost more to run and are not automatically better. The practical discipline is to decide which parameters matter and what the search budget is before choosing the algorithm.
+**Direct answer:** Grid search spends compute uniformly across a configured space, which is wasteful when <Mark>only a few hyperparameters materially affect the result</Mark>. Bergstra and Bengio found that "random search over the same domain is able to find models that are as good or better within a small fraction of the computation time" than grid search, and that at the same budget it "finds better models by effectively searching a larger, less promising configuration space". Bayesian and bandit-based methods go further by allocating trials adaptively, but they cost more to run and are not automatically better.
+
+<KeyPoint>
+The practical discipline is to decide which parameters matter and what the search budget is before choosing the algorithm.
+</KeyPoint>
 
 ## Why grid search fails
 
@@ -21,15 +27,23 @@ The deeper problem is that the grid is not a representative sample of the space.
 
 Bergstra and Bengio's comparison makes the consequence concrete. Against deep belief networks configured by "a thoughtful combination of manual search and grid search", purely random search over the same 32-dimensional space "found statistically equal performance on four of seven data sets, and superior performance on one of seven". The authors conclude that "this phenomenon makes grid search a poor choice for configuring algorithms for new data sets".
 
+<KeyFigures items={[
+  { value: "four of seven", label: "data sets where random search found statistically equal performance", source: "Bergstra and Bengio" },
+]} />
+
 That is a strong claim, and it is bounded: it is a comparison on specific models and datasets, not a theorem that grids are always worse. What generalises is the mechanism — when few parameters matter, uniform enumeration is a bad allocation of trials.
 
 ## Random search is a baseline, not a shortcut
 
 Random search draws configurations from distributions over each parameter. Its virtue is that it samples broadly in every dimension, so it is more likely to find a good value for the one or two parameters that actually matter, and it goes deeper along those dimensions than a grid of the same size.
 
-Two practical consequences follow. First, the distributions matter more than the algorithm. If a learning rate is sampled uniformly between 0 and 1, almost every draw will be useless; a log-uniform distribution over a sensible range is a better search space and requires no cleverer optimiser. Second, random search is embarrassingly parallel and easy to reproduce, which makes it a strong baseline that more sophisticated methods must beat.
+Two practical consequences follow. First, <Mark>the distributions matter more than the algorithm</Mark>. If a learning rate is sampled uniformly between 0 and 1, almost every draw will be useless; a log-uniform distribution over a sensible range is a better search space and requires no cleverer optimiser. Second, random search is embarrassingly parallel and easy to reproduce, which makes it a strong baseline that more sophisticated methods must beat.
 
-The honest comparison is not "random versus grid" but "what does a well-chosen search space plus random sampling achieve for this budget?" Many teams adopt an optimiser without fixing the ranges, and the optimiser then spends its intelligence exploring regions that were never plausible.
+The honest comparison is not "random versus grid" but "what does a well-chosen search space plus random sampling achieve for this budget?"
+
+<Trap>
+Many teams adopt an optimiser without fixing the ranges, and the optimiser then spends its intelligence exploring regions that were never plausible.
+</Trap>
 
 ## Adaptive methods and what they buy
 
@@ -51,7 +65,7 @@ The choice of search method is easier to see with numbers. Suppose a model has f
 
 The numbers are illustrative, not a benchmark, and that is the point: the comparison can be made before any code is written. A team that knows its per-run cost and its total budget can decide how many trials it can afford and which method uses them best, rather than discovering after a week that the grid will not finish.
 
-The same arithmetic exposes a second problem. Running 500 trials and reporting the best score is a multiple-comparisons problem: with enough trials, a configuration will appear excellent by chance. The score that matters is the one on a nested held-out set, evaluated once, and the gap between the selection score and that final score is a measure of how much the search overfitted the validation set.
+The same arithmetic exposes a second problem. Running 500 trials and reporting the best score is <Mark>a multiple-comparisons problem</Mark>: with enough trials, a configuration will appear excellent by chance. The score that matters is the one on a nested held-out set, evaluated once, and the gap between the selection score and that final score is a measure of how much the search overfitted the validation set.
 
 ## The evaluation that makes tuning meaningful
 
@@ -81,7 +95,11 @@ The following is hypothetical and illustrative. A team has a budget of 500 train
 
 ## A counterargument
 
-A fair critic would argue that the article promotes a bounded empirical finding into a general rule. Bergstra and Bengio's result is explicitly a comparison on specific deep belief networks and data sets, and Li et al. report Hyperband's order-of-magnitude gain only "in the settings tested", yet the guide turns these into a default that random search is the baseline all other methods must beat. In a low-dimensional space, or where parameters interact strongly, a grid is affordable and exhaustive, and the article's own "illustrative, not a benchmark" example does not establish otherwise. A critic could also say that calling adaptive methods merely "not automatically better" understates the cited evidence: Optuna's pruning and auto-sklearn's meta-learning exist because sample efficiency can matter. The mechanism is sound; its universality is assumed rather than shown.
+A fair critic would argue that the article promotes a bounded empirical finding into a general rule. Bergstra and Bengio's result is explicitly a comparison on specific deep belief networks and data sets, and Li et al. report Hyperband's order-of-magnitude gain only "in the settings tested", yet the guide turns these into a default that random search is the baseline all other methods must beat. In a low-dimensional space, or where parameters interact strongly, a grid is affordable and exhaustive, and the article's own "illustrative, not a benchmark" example does not establish otherwise. A critic could also say that calling adaptive methods merely "not automatically better" understates the cited evidence: Optuna's pruning and auto-sklearn's meta-learning exist because sample efficiency can matter.
+
+<PullQuote>
+The mechanism is sound; its universality is assumed rather than shown.
+</PullQuote>
 
 ## References & Further Reading
 

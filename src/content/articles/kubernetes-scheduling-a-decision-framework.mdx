@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 Kubernetes scheduling is often treated as automatic, which hides the decisions that determine where work runs. The Kubernetes scheduler documentation describes how pods are assigned to nodes, and the QoS material covers resource guarantees. The framework starts with what the workload needs.
+</Lead>
 
-**Direct answer:** Schedule with explicit resource requests, defined priority, and a clear placement rule, then verify where pods actually landed. The sources describe the mechanism; the framework is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Schedule with explicit resource requests, defined priority, and a clear placement rule, then verify where pods actually landed.
+</KeyPoint>
+
+The sources describe the mechanism; the framework is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented scheduler behaviour from local choices about placement.
 
@@ -23,7 +31,7 @@ The first input is resource requests. The scheduler documentation describes how 
 
 The second input is guarantees. The QoS material describes how resource classes behave under pressure, which matters when a node is near its limit. A workload that cannot tolerate eviction needs a different treatment from a batch job that can be retried.
 
-The third input is placement rules. The scheduler can spread or pack workloads, and the right choice depends on the failure domain and the cost of idle capacity. A rule chosen without those factors produces a placement that is tidy and wrong.
+The third input is placement rules. The scheduler can spread or pack workloads, and the right choice depends on the failure domain and the cost of idle capacity. A rule chosen without those factors produces <Mark>a placement that is tidy and wrong</Mark>.
 
 The sequence is: state the resource need, choose the guarantee, set the placement rule, then verify the result. The choices are local, so the conclusions are `inferred`; the mechanism is `source-reported`.
 
@@ -51,9 +59,13 @@ A default scheduler placement optimises for its own criteria, not for the applic
 
 It cannot make an under-resourced node sufficient. It does not remove the need for capacity planning. And it cannot guarantee that a placement rule will always be satisfiable.
 
-A further consideration is that placement changes over time. A pod that was placed well at deployment may sit badly after the cluster grows or a node fails, and observing the result after a change is part of the practice. A rule that is never reviewed becomes an assumption that nobody checked.
+A further consideration is that placement changes over time. A pod that was placed well at deployment may sit badly after the cluster grows or a node fails, and observing the result after a change is part of the practice.
 
-The framework also cannot fix a workload that requests the wrong amount. Requests that are too small invite eviction, and requests that are too large waste capacity, so the measurement behind them matters more than the scheduling rule that consumes them. Recording how the numbers were chosen gives the next reviewer a place to start.
+<Trap>
+A rule that is never reviewed becomes an assumption that nobody checked.
+</Trap>
+
+The framework also cannot fix a workload that requests the wrong amount. Requests that are too small invite eviction, and requests that are too large waste capacity, so <Mark>the measurement behind them matters more than the scheduling rule that consumes them</Mark>. Recording how the numbers were chosen gives the next reviewer a place to start.
 
 The third limit is that spreading and packing pull in opposite directions. A rule that maximises resilience wastes capacity, while one that maximises utilisation concentrates risk. The decision between them belongs to the application, and it should be made explicitly rather than inherited from a default that nobody examined.
 
@@ -78,7 +90,11 @@ For the resource side, see [Requests and Limits](/articles/kubernetes-requests-a
 
 ## A counterargument
 
-An objection is that the framework's authority exceeds its sources: the evidence table marks its conclusions as `inferred` while the Kubernetes scheduler and QoS documentation only describe the mechanism, so the prescriptive sequence is a local synthesis rather than documented practice. A critic could add that the advice to set placement rules is not right for every workload - the article itself concedes that spreading and packing pull in opposite directions and that the choice belongs to the application, so "define a rule" is a reminder, not a procedure. Requests that are too large waste capacity, so acting on the first step can make things worse before verification helps. The framework is honest about these limits, but they leave less prescriptive power than the title implies.
+An objection is that the framework's authority exceeds its sources: the evidence table marks its conclusions as `inferred` while the Kubernetes scheduler and QoS documentation only describe the mechanism, so the prescriptive sequence is a local synthesis rather than documented practice. A critic could add that the advice to set placement rules is not right for every workload - the article itself concedes that spreading and packing pull in opposite directions and that the choice belongs to the application, so "define a rule" is a reminder, not a procedure. Requests that are too large waste capacity, so acting on the first step can make things worse before verification helps.
+
+<PullQuote>
+The framework is honest about these limits, but they leave less prescriptive power than the title implies.
+</PullQuote>
 
 ## References & Further Reading
 

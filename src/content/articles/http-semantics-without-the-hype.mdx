@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-HTTP is often treated as a transport detail, which hides the semantics that decide how systems behave. RFC 9110 defines the request and response model, and RFC 9111 covers caching. The useful knowledge is what the protocol actually says, not what a framework assumes.
+<Lead>
+HTTP is often treated as a transport detail, which hides the semantics that decide how systems behave. RFC 9110 defines the request and response model, and RFC 9111 covers caching. The useful knowledge is <Mark>what the protocol actually says, not what a framework assumes</Mark>.
+</Lead>
 
 **Direct answer:** Read HTTP behaviour from the normative semantics — methods, status classes, headers — then diagnose against those definitions. The RFCs are the sources; the diagnostic rule is a synthesis.
 
@@ -20,7 +22,7 @@ HTTP is often treated as a transport detail, which hides the semantics that deci
 Three points matter:
 
 - **Methods have meaning.** RFC 9110 defines what each method is for. Using a method for the wrong purpose can break caching and intermediaries.
-- **Status classes are signals.** The RFC defines classes such as client and server failure. A status says where the problem sits, not what caused it.
+- **Status classes are signals.** The RFC defines classes such as client and server failure. A status says <Mark>where the problem sits, not what caused it</Mark>.
 - **Headers are contracts.** RFC 9111 defines caching behaviour. A header that is present but incorrect changes behaviour without an error.
 
 The sequence is: name the observed behaviour, map it to the RFC definition, then check the actual request and response. The mapping is analysis, so it is `inferred`; the definitions are `source-reported`.
@@ -37,7 +39,13 @@ The outcome is a diagnosis tied to a definition. The scenario is hypothetical; t
 
 ## Why intermediaries matter
 
-A request passes through proxies and caches that read headers and act on them. A header that is locally meaningful but not standard will be interpreted differently by each intermediary. Reading the RFC definition is what makes behaviour predictable across a system you do not control.
+A request passes through proxies and caches that read headers and act on them.
+
+<Trap>
+A header that is locally meaningful but not standard will be interpreted differently by each intermediary.
+</Trap>
+
+Reading the RFC definition is <Mark>what makes behaviour predictable across a system you do not control</Mark>.
 
 ## Why the request is the evidence
 
@@ -65,13 +73,17 @@ The headers are another source of complexity. A header that controls caching is 
 
 For a practitioner, the lasting value of the semantics is that they give a shared vocabulary for disagreement. When two systems behave differently, the RFC settles which one is following the protocol and which one is relying on a convention. That is a more productive starting point than comparing framework defaults, which change between versions.
 
+<KeyPoint>
 A recorded request and response is a better starting point than an assumption about what the framework does.
+</KeyPoint>
 
 ## What it cannot do
 
 It cannot fix an application bug. It does not guarantee intermediaries behave as specified. And it cannot replace observing the actual requests.
 
+<PullQuote>
 The counterargument that frameworks hide these details is fair for convenience and incomplete when behaviour surprises you.
+</PullQuote>
 
 ## A decision test
 

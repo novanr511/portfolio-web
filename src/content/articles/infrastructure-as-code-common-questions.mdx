@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Teams often automate infrastructure and then find themselves asking the same questions again: whether to keep mutable servers, how to handle the state file, and what a safe change review looks like. The practical problem is that infrastructure definitions get treated as ad hoc scripts rather than as reviewable, version-controlled artifacts. That habit turns routine changes into hard-to-predict events and makes ownership unclear.
+<Lead>
+Teams often automate infrastructure and then find themselves asking the same questions again: whether to keep mutable servers, how to handle the state file, and what a safe change review looks like. The practical problem is that infrastructure definitions get treated as ad hoc scripts rather than as <Mark>reviewable, version-controlled artifacts</Mark>. That habit turns routine changes into hard-to-predict events and makes ownership unclear.
+</Lead>
 
-**Direct answer:** Infrastructure as code means defining and provisioning infrastructure through machine-readable definition files instead of interactive configuration or hand-run scripts. Declarative tools such as Terraform describe a desired end state and let the tool work toward it, so a change becomes a committed file diff that can be reviewed before it is applied. The practical consequence is that repeatability and review replace improvisation, but only when state and drift are managed deliberately.
+**Direct answer:**
+
+<KeyPoint>
+Infrastructure as code means defining and provisioning infrastructure through machine-readable definition files instead of interactive configuration or hand-run scripts.
+</KeyPoint>
+
+Declarative tools such as Terraform describe a desired end state and let the tool work toward it, so a change becomes a committed file diff that can be reviewed before it is applied. The practical consequence is that repeatability and review replace improvisation, but only when state and drift are managed deliberately.
 
 **Delta:** This article adds a decision map beyond the sources: it maps state and drift concepts to a review-gating decision, with claim status explicit.
 
@@ -21,9 +29,13 @@ The sources distinguish declarative from imperative approaches. Imperative code 
 
 <Figure src="/images/articles/inline/infrastructure-as-code-common-questions-1.png" alt="A five-step flow: declare desired state, review the plan, gate on peer review, apply, then check state and drift." caption="Conceptual: declaration, plan, review and apply make a change inspectable." />
 
-Terraform, as described in the source, uses a declarative configuration language and providers to manage resources across platforms. Its plan step shows what would change before apply. That separation gives teams a concrete review gate: the plan is the artifact to inspect, not the applied result. Destructive replacements can therefore be caught before they run, provided the plan is attached to the change request and someone actually reads it. Skipping this step collapses the benefit of the model into a straightforward automation script.
+Terraform, as described in the source, uses a declarative configuration language and providers to manage resources across platforms. Its plan step shows what would change before apply. That separation gives teams a concrete review gate: the plan is the artifact to inspect, not the applied result. Destructive replacements can therefore be caught before they run, provided the plan is attached to the change request and someone actually reads it.
 
-State is the recorded mapping between the definition and the real resources. Because the tool compares desired state against recorded state, a change made out of band creates drift. Drift detection is thus a property of the model rather than an added feature. The consequence is operational: if engineers edit resources through a console, the next plan can propose updates that no one intended, and the review gate becomes the place where those surprises surface.
+<Trap>
+Skipping this step collapses the benefit of the model into a straightforward automation script.
+</Trap>
+
+State is the recorded mapping between the definition and the real resources. Because the tool compares desired state against recorded state, <Mark>a change made out of band creates drift</Mark>. Drift detection is thus a property of the model rather than an added feature. The consequence is operational: if engineers edit resources through a console, the next plan can propose updates that no one intended, and the review gate becomes the place where those surprises surface.
 
 Idempotence and convergence mean repeated application tends toward the same end state. Automation becomes safer to re-run, but convergence assumes the tool has accurate state and sufficient permissions. The mechanism buys consistency only within the boundary the definition covers, so partial coverage is a real limit rather than a minor detail.
 
@@ -47,13 +59,17 @@ The model only governs what the definition covers. Resources created by hand out
 
 State carries a hidden cost. It can contain resource metadata and sometimes sensitive values, so it needs access control, encryption, and locking. A remote state store adds a shared dependency that every apply relies on, and concurrent runs contend for the same lock. What looks like a local file problem becomes a coordination problem as soon as more than one engineer or pipeline applies changes.
 
-A failure mode is that a plan can propose destructive replacements, such as replacing a database instance, which may destroy data even when the intent was a minor setting change. Idempotence is not the same as safety: applying repeatedly is safe relative to intent, but a wrong intent applies consistently and at scale. The tool faithfully converges to what was written, which is precisely why the written definition deserves scrutiny.
+A failure mode is that a plan can propose destructive replacements, such as replacing a database instance, which may destroy data even when the intent was a minor setting change. <Mark>Idempotence is not the same as safety</Mark>: applying repeatedly is safe relative to intent, but a wrong intent applies consistently and at scale. The tool faithfully converges to what was written, which is precisely why the written definition deserves scrutiny.
 
 The boundary is narrower than many teams assume. Declarative provisioning is a weak fit for one-off exploration or throwaway experiments where the overhead of a definition exceeds the benefit, and interactive work may be faster there. Multi-provider abstractions can also lag behind new provider features, so teams sometimes drop to native tooling and break the single source of truth that the approach depends on.
 
 This approach still needs ongoing review. Definitions require the same discipline as application code: peer review of plan output, policy checks, and controlled apply permissions. Tool licensing and ecosystem changes can affect reuse and distribution, so the tool choice itself belongs on a periodic review list rather than being treated as settled forever.
 
-Counterargument: "The counterargument that treating infrastructure as reviewable code is fair for repeatable shared environments is incomplete for ephemeral exploration where speed outweighs traceability, so the rule is a default rather than a universal mandate."
+Counterargument:
+
+<PullQuote>
+"The counterargument that treating infrastructure as reviewable code is fair for repeatable shared environments is incomplete for ephemeral exploration where speed outweighs traceability, so the rule is a default rather than a universal mandate."
+</PullQuote>
 
 ## A decision test
 

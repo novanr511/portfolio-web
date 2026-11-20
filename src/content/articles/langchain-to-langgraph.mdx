@@ -10,11 +10,19 @@ tags:
   - Python
 ---
 
+<Lead>
 LangChain was the library that made LLM apps approachable: chains, prompts, memory, all composed in a few lines. And for prototypes, it still is. But somewhere between the demo and production, most agent systems built as linear chains fall apart — not because the models got worse, but because the architecture can't express what real agent workloads need: state that survives, flow that branches, and humans who step in at the right moment.
+</Lead>
 
 LangGraph is the answer that emerged from that failure mode. This article explains what actually changed, why it changed, and how to build agents on the graph model that hold up when things go wrong.
 
-**Direct answer:** Linear chains are adequate for single-turn, one-tool calls but cannot cleanly express long-horizon state, branching, loops, or approval gates. LangGraph models an agent as a state machine with typed state, nodes, and conditional edges, adding checkpoints and interrupts for resumability and human review. The move is justified when those failure modes appear, not for every LLM application.
+**Direct answer:**
+
+<KeyPoint>
+Linear chains are adequate for single-turn, one-tool calls but cannot cleanly express long-horizon state, branching, loops, or approval gates.
+</KeyPoint>
+
+LangGraph models an agent as a state machine with typed state, nodes, and conditional edges, adding checkpoints and interrupts for resumability and human review. The move is justified when those failure modes appear, not for every LLM application.
 
 ## Why chains break in production
 
@@ -74,7 +82,7 @@ graph = builder.compile()
 result = graph.invoke({"messages": [("user", "Book me a table for 2 at 7pm")]})
 ```
 
-That last edge — `tools` back to `agent` — is the entire point. The agent is a loop now, not a line. Notice what you got for free: the state accumulates across iterations, every node is a pure function you can unit-test, and the control flow ("keep calling tools until the model stops requesting them") reads like documentation rather than an accident of nested callbacks.
+That last edge — `tools` back to `agent` — is the entire point. <Mark>The agent is a loop now, not a line.</Mark> Notice what you got for free: the state accumulates across iterations, every node is a pure function you can unit-test, and the control flow ("keep calling tools until the model stops requesting them") reads like documentation rather than an accident of nested callbacks.
 
 ## Checkpointing: state that survives
 
@@ -111,7 +119,11 @@ The reason this matters beyond convenience: it means the *architecture* enforces
 
 ## What LangChain is still for
 
-A common misreading of this story: "LangChain is deprecated." It isn't. The libraries compose:
+<Trap>
+A common misreading of this story: "LangChain is deprecated."
+</Trap>
+
+It isn't. The libraries compose:
 
 - **LangChain** remains the toolkit for the components: model clients, prompt templates, retrievers, tool definitions. If you're building [a RAG pipeline](/articles/rag-explained), LangChain's retrievers and loaders are still an excellent, well-integrated way to assemble it.
 - **LangGraph** is the orchestration layer for anything with state, branching, or loops — which is to say, most agents beyond single-turn demos.
@@ -130,7 +142,7 @@ Beyond the primitives, there are graph patterns worth knowing by name:
 
 And some engineering discipline that applies regardless of topology:
 
-1. **Bound every loop.** A `recursion_limit` on the graph — an unbounded agent loop is a bill generator.
+1. **Bound every loop.** A `recursion_limit` on the graph — <Mark>an unbounded agent loop is a bill generator</Mark>.
 2. **Make nodes pure and small.** If a node does "several things," it's two nodes. Testability comes free from the architecture if you respect it.
 3. **Keep state minimal and typed.** State is your agent's working memory; everything in it should be data the graph actually needs to route or resume.
 4. **Trace from day one.** Wire up observability before the first incident, not after.
@@ -149,7 +161,11 @@ For an applied agent that uses LangGraph with SQLite checkpoints and an investig
 
 ## A counterargument
 
-Reasonable critics could argue the piece sets up a straw version of chains. Its later sections concede that a one-call agent is fine as a chain and that LangChain components compose into RAG pipelines, while ReAct - the cited work by Yao and colleagues on interleaved reasoning and tool use - is a loop that need not require a graph. The four failure modes are real, but they are features of a naive linear chain, not of chains as a category; the article notes people nest chains to fake loops. Checkpointing and interrupts are conveniences, yet the claim that architecture alone enforces human gates understates what a code-review convention can do. The move to graphs is one of degree, not the clean break the opening suggests.
+Reasonable critics could argue the piece sets up a straw version of chains. Its later sections concede that a one-call agent is fine as a chain and that LangChain components compose into RAG pipelines, while ReAct - the cited work by Yao and colleagues on interleaved reasoning and tool use - is a loop that need not require a graph. The four failure modes are real, but they are features of a naive linear chain, not of chains as a category; the article notes people nest chains to fake loops. Checkpointing and interrupts are conveniences, yet the claim that architecture alone enforces human gates understates what a code-review convention can do.
+
+<PullQuote>
+The move to graphs is one of degree, not the clean break the opening suggests.
+</PullQuote>
 
 ## References & Further Reading
 

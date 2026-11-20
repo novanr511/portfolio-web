@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Interaction to Next Paint is often treated as another score to optimise, which hides where its cost comes from. The Web Vitals material defines the metric, and the SRE alerting workbook ties signals to objectives. The cost of improving INP is usually in the main thread, not in the styling.
+<Lead>
+Interaction to Next Paint is often treated as another score to optimise, which hides where its cost comes from. The Web Vitals material defines the metric, and the SRE alerting workbook ties signals to objectives. The cost of improving INP is usually <Mark>in the main thread, not in the styling</Mark>.
+</Lead>
 
-**Direct answer:** Find the interaction that is slow, identify what blocks the main thread, then weigh the engineering cost of each fix against the improvement. The sources define the metric; the cost rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Find the interaction that is slow, identify what blocks the main thread, then weigh the engineering cost of each fix against the improvement.
+</KeyPoint>
+
+The sources define the metric; the cost rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating the documented metric from the local choice of which fix to fund.
 
@@ -37,13 +45,19 @@ The outcome is a prioritised fix with a recorded trade-off. The scenario is hypo
 
 ## Why devices change the answer
 
-An interaction that is fast on a developer machine can be slow on a mid-range phone, where the same JavaScript takes longer to execute. Testing only on fast hardware produces a score that does not describe the users who experience the problem. A realistic device is part of the measurement, not an optional refinement.
+An interaction that is fast on a developer machine can be slow on a mid-range phone, where the same JavaScript takes longer to execute.
+
+<Trap>
+Testing only on fast hardware produces a score that does not describe the users who experience the problem.
+</Trap>
+
+A realistic device is part of the measurement, not an optional refinement.
 
 The second source of variation is timing. A page that is busy loading may respond slowly to an early interaction and normally once loading finishes. Recording when the interaction occurred helps separate a startup problem from a persistent one, and the two have different fixes.
 
 ## Why re-measurement is part of the cost
 
-A fix can improve one interaction and worsen another, particularly when it moves work to a different thread. Measuring after the change is the only way to know. The cost of optimization therefore includes the measurement loop, not just the engineering work.
+A fix can improve one interaction and worsen another, particularly when it moves work to a different thread. Measuring after the change is the only way to know. The cost of optimization therefore <Mark>includes the measurement loop, not just the engineering work</Mark>.
 
 ## Evidence status
 
@@ -59,7 +73,7 @@ Moving a small handler off the main thread may be cheap; rewriting a third-party
 
 A final constraint is that the metric reflects real interactions, not synthetic ones. A test that clicks a button without reading the page will miss the long tasks that occur during genuine use. Field data, where available, is therefore more informative than a laboratory measurement, and the two should be read together.
 
-Optimization also has diminishing returns. The first fix often removes a large blocking task; later fixes address smaller contributors for more effort. Knowing when to stop requires comparing the remaining improvement with the cost, which is a decision the metric alone cannot make.
+Optimization also has <Mark>diminishing returns</Mark>. The first fix often removes a large blocking task; later fixes address smaller contributors for more effort. Knowing when to stop requires comparing the remaining improvement with the cost, which is a decision the metric alone cannot make.
 
 The decision should also name what would count as success. A reduction in the metric on a fixed set of interactions is a reasonable target, provided the set includes the interactions users actually perform and the devices they use.
 
@@ -71,7 +85,9 @@ The result should be recorded with the device and interaction used, so a future 
 
 It cannot guarantee a score under other devices. It does not replace tracing, which identifies the cause. And it cannot remove the need to re-measure after a change.
 
+<PullQuote>
 The counterargument that a single score tells the whole story is fair as a summary and incomplete as a diagnosis.
+</PullQuote>
 
 ## A decision test
 

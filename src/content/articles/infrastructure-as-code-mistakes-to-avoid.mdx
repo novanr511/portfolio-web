@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Infrastructure as code turns environment setup into reviewable definitions. The Wikipedia entry describes the approach, and Terraform's documentation defines the declarative model. The errors are rarely syntactic: they are state drift, unsafe changes, and definitions that nobody can map to a real effect.
+<Lead>
+Infrastructure as code turns environment setup into reviewable definitions. The Wikipedia entry describes the approach, and Terraform's documentation defines the declarative model. The errors are rarely syntactic: they are state drift, unsafe changes, and <Mark>definitions that nobody can map to a real effect</Mark>.
+</Lead>
 
-**Direct answer:** Keep definitions in version control, review the planned change before applying it, and verify the result against the real environment. The primary sources are the Wikipedia overview and Terraform documentation.
+**Direct answer:**
+
+<KeyPoint>
+Keep definitions in version control, review the planned change before applying it, and verify the result against the real environment.
+</KeyPoint>
+
+The primary sources are the Wikipedia overview and Terraform documentation.
 
 **Delta:** Unlike the vendor overviews, this article maps each common mistake to a specific verification step, and labels which claims are documented (`source-reported`) versus which are illustrative decisions (`illustrative`).
 
@@ -25,7 +33,11 @@ A declarative definition states the desired end state; the tool computes the ste
 - **Unreviewed plans.** A plan is a proposed set of changes. Applying without reading it is equivalent to approving an unread patch.
 - **State treated as a file.** State records what the tool believes exists. Losing or editing it by hand breaks the map between definition and reality.
 
-Shared modules add a fourth mistake: a change to a module affects every consumer. A version pin and a changelog are the control, not the module's internal quality.
+<Trap>
+Shared modules add a fourth mistake: a change to a module affects every consumer.
+</Trap>
+
+A version pin and a changelog are the control, not the module's internal quality.
 
 Three consequences follow. Read the plan as a diff. Keep state backed up and access-controlled. Version shared modules. These are practical rules derived from the declarative model, not normative statements from the standard (`inferred`).
 
@@ -41,11 +53,11 @@ The outcome is a decision rule: apply only when all three checks pass. That rule
 
 A definition that parses correctly can still describe the wrong environment. The tool's plan is the point where a written intention becomes a concrete sequence of creations, replacements, and deletions. Reading that sequence is the only moment when a reviewer can catch an unintended replacement before it happens. Once the change is applied, the same information is much harder to reconstruct, because the live environment now reflects the new state and the history of the transition is only partial.
 
-This is why a plan should be treated as a diff. A diff has a reader's job: to say what changed and to make surprises visible. A plan that merely reports success hides the most important information, which is the set of resources the tool intends to destroy and recreate. In practice, replacements are where outages come from, because identity changes even when configuration looks similar. A reviewer who scans only additions and deletions will miss that distinction.
+This is why <Mark>a plan should be treated as a diff</Mark>. A diff has a reader's job: to say what changed and to make surprises visible. A plan that merely reports success hides the most important information, which is the set of resources the tool intends to destroy and recreate. In practice, replacements are where outages come from, because identity changes even when configuration looks similar. A reviewer who scans only additions and deletions will miss that distinction.
 
 State deserves the same discipline. The state record is not the environment; it is the tool's belief about the environment. When those diverge, the plan is computed from a false premise. Drift detection is the process of noticing the divergence, and it works best when it is routine rather than triggered by an incident. A team that checks for drift on a schedule treats it as maintenance; a team that discovers it during an outage treats it as luck.
 
-Shared modules change the scale of the problem. A module used by six services is six potential changes, not one. Pinning a version is a way of converting an implicit dependency into an explicit decision: the consumer agrees to a particular reviewed state and opts into updates deliberately. Without that pin, a change made for one service propagates to the others without any of their owners seeing a plan. The technical consequence is a surprise; the organisational consequence is that nobody owns the change.
+Shared modules change the scale of the problem. A module used by six services is <Mark>six potential changes, not one</Mark>. Pinning a version is a way of converting an implicit dependency into an explicit decision: the consumer agrees to a particular reviewed state and opts into updates deliberately. Without that pin, a change made for one service propagates to the others without any of their owners seeing a plan. The technical consequence is a surprise; the organisational consequence is that nobody owns the change.
 
 None of these rules require a new tool. They require that the existing tool's outputs — plans, state, and module versions — be treated as reviewable artefacts. That is the practical difference between using a declarative system and merely storing declarations in a repository.
 
@@ -61,7 +73,9 @@ None of these rules require a new tool. They require that the existing tool's ou
 
 It cannot guarantee a correct environment, because the definition can itself be wrong. It does not replace monitoring, which observes the result rather than the intent. And it cannot repair a state file that has been altered without a record.
 
+<PullQuote>
 The counterargument that a passing plan proves safety is fair for syntax and incomplete for effect, which the worked review shows.
+</PullQuote>
 
 ## A decision test
 

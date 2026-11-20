@@ -9,19 +9,31 @@ tags:
   - Efficiency
 ---
 
+<Lead>
 Full fine-tuning updates every parameter in a model, which for a large model is expensive in memory, storage, and compute. Parameter-efficient fine-tuning, or PEFT, freezes most of the model and trains a small set of additional parameters. LoRA is the best-known method, and it changed what fine-tuning is practical for a small team.
+</Lead>
 
 **Direct answer:** LoRA freezes pretrained weights and trains low-rank update matrices alongside them, reducing trainable parameters by orders of magnitude while often matching full fine-tuning on a task. The LoRA paper reports this on several model families. The boundary: parameter efficiency is not automatically quality — a small update may be insufficient when the task requires substantial behavioural change, in which case full fine-tuning or continued pretraining may be needed.
 
 ## How LoRA works
 
-A weight matrix in a layer is frozen. LoRA adds a pair of small matrices whose product has the same shape as the weight update, and trains only those. Three properties follow:
+A weight matrix in a layer is frozen.
+
+<KeyPoint>
+LoRA adds a pair of small matrices whose product has the same shape as the weight update, and trains only those.
+</KeyPoint>
+
+Three properties follow:
 
 **Trainable parameters drop sharply.** The paper reports reductions on the order of 10,000× in some settings, which lowers optimizer memory and storage.
 
-**The base model stays intact.** Multiple LoRA adapters can be trained for different tasks and swapped at inference without duplicating the full model, as the deployment article explains for adapters.
+<KeyFigures items={[
+  { value: "10,000×", label: "reduction in trainable parameters reported in some settings", source: "Edward Hu et al., 2021 (LoRA)" },
+]} />
 
-**Capacity is bounded by the rank.** A low-rank update can express a limited family of changes. If the task needs more, a higher rank or full fine-tuning is required.
+**The base model stays intact.** Multiple LoRA adapters can be trained for different tasks and <Mark>swapped at inference without duplicating the full model</Mark>, as the deployment article explains for adapters.
+
+**Capacity is bounded by the rank.** A low-rank update can express <Mark>a limited family of changes</Mark>. If the task needs more, a higher rank or full fine-tuning is required.
 
 ## A worked resource comparison
 
@@ -58,7 +70,11 @@ The numbers are illustrative; the method is to compare trainable parameters, mem
 
 **Cases where full fine-tuning is affordable and clearly better.** The method is an efficiency trade, not a virtue.
 
-The counterargument — that LoRA always matches full fine-tuning — is too strong. The LoRA paper shows strong results in its settings; whether it holds for yours is an empirical question answered by evaluation.
+The counterargument — that LoRA always matches full fine-tuning — is too strong.
+
+<PullQuote>
+The LoRA paper shows strong results in its settings; whether it holds for yours is an empirical question answered by evaluation.
+</PullQuote>
 
 ## Operating adapters
 
@@ -70,7 +86,7 @@ An adapter is a versioned artifact, and that creates operational responsibilitie
 
 **Watch for interference.** When several adapters are composed or switched on one base model, behaviour can change in ways not predicted by individual evaluations. Test combinations, not only single adapters, which the evaluation article covers.
 
-These practices are the cost of the flexibility PEFT provides. The small checkpoint is an advantage only if it is managed as carefully as a large one.
+These practices are the cost of the flexibility PEFT provides. The small checkpoint is <Mark>an advantage only if it is managed as carefully as a large one</Mark>.
 
 ## What PEFT cannot do
 
@@ -78,7 +94,11 @@ These practices are the cost of the flexibility PEFT provides. The small checkpo
 
 **It eliminates training cost rather than inference cost.** The deployed model still runs the base weights plus the adapter, as the serving article explains.
 
-**It is not a substitute for good data.** A small adapter trained on poor labels learns poor behaviour quickly, which the data-quality article covers.
+**It is not a substitute for good data.**
+
+<Trap>
+A small adapter trained on poor labels learns poor behaviour quickly, which the data-quality article covers.
+</Trap>
 
 ## A decision test
 

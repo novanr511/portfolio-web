@@ -9,7 +9,9 @@ tags:
   - Law and Technology
 ---
 
-An HTTP 451 response can look like an ordinary error page, but its status has a specific meaning: the server is denying access to a resource as a consequence of a legal demand. The response is intended to make certain restrictions more transparent. It does not prove that the requested resource exists, identify the legal authority on its own, or guarantee that every legal restriction will be reported with 451.
+<Lead>
+An HTTP 451 response can look like an ordinary error page, but its status has a specific meaning: the server is denying access to a resource <Mark>as a consequence of a legal demand</Mark>. The response is intended to make certain restrictions more transparent. It does not prove that the requested resource exists, identify the legal authority on its own, or guarantee that every legal restriction will be reported with 451.
+</Lead>
 
 **Direct answer:** RFC 7725 defines `451 Unavailable For Legal Reasons` for a server denying access because of a legal demand. The responding server may not be the origin; an ISP, search engine, cache provider, DNS service, or another entity in the access path may be involved. The status implies neither that the requested resource exists nor that it does not. The RFC recommends an explanatory response body and a `Link` field with `rel="blocked-by"` to identify the entity implementing the block.
 
@@ -17,15 +19,23 @@ An HTTP 451 response can look like an ordinary error page, but its status has a 
 
 RFC 7725 describes a case in which a server operator has received a legal demand to deny access to a resource or set of resources that includes the requested one. The status can help explain why a request is being refused, instead of leaving the user to guess whether the resource is missing or the server is malfunctioning.
 
-The responding server need not be the origin server. The blocking entity might be an ISP or another intermediary involved in delivering the request. The distinction is important: the entity implementing the restriction is not necessarily the party that made the demand or the institution that issued it.
+The responding server need not be the origin server. <Mark>The blocking entity</Mark> might be an ISP or another intermediary involved in delivering the request. The distinction is important: the entity implementing the restriction is not necessarily the party that made the demand or the institution that issued it.
 
 ## What a 451 response does not prove
 
 The status does not establish whether the named resource would otherwise be available. RFC 7725 explicitly says that 451 implies neither the existence nor the nonexistence of the resource. Even if the legal demand were removed, the request might still fail for another reason.
 
-Nor can clients assume that all legal blocks use 451. RFC 7725 notes that clients cannot rely on the code being used; an authority or operator might not disclose that a legal demand was made. The code is a transparency mechanism when deployed, not a complete measurement of all restrictions on access.
+<Trap>
+Nor can clients assume that all legal blocks use 451.
+</Trap>
 
-The response also is not itself a legal opinion. Its body can describe the demand, relevant legislation or regulation, and the classes of people or resources affected, but the status code does not independently verify that explanation or settle a dispute about the legal basis.
+RFC 7725 notes that clients cannot rely on the code being used; an authority or operator might not disclose that a legal demand was made.
+
+<KeyPoint>
+The code is a transparency mechanism when deployed, not a complete measurement of all restrictions on access.
+</KeyPoint>
+
+The response also is not itself a legal opinion. Its body can describe the demand, relevant legislation or regulation, and the classes of people or resources affected, but the status code does not independently <Mark>verify that explanation or settle a dispute</Mark> about the legal basis.
 
 ## Reading the transparency signals
 
@@ -63,7 +73,13 @@ The following is hypothetical and illustrative. A user reports that a URL return
 
 ## A counterargument
 
-A fair objection is that the article overstates 451's transparency value. RFC 7725 makes both the explanatory body and the `blocked-by` link recommendations rather than requirements, and it explicitly says clients cannot rely on the code being used at all, so an operator can emit a bare 451 that reveals nothing. The article itself notes that `blocked-by` names the entity implementing the block, not the party that made or issued the demand, which means even a fully compliant response may leave the most consequential question unanswered. A critic could argue that a standardised code with optional disclosure risks looking more authoritative than the evidence behind it, inviting users to read a terse status line as a verified account of the legal basis. On that view the RFC's transparency goal is only partly achievable through the status code alone.
+A fair objection is that the article overstates 451's transparency value. RFC 7725 makes both the explanatory body and the `blocked-by` link recommendations rather than requirements, and it explicitly says clients cannot rely on the code being used at all, so an operator can emit a bare 451 that reveals nothing. The article itself notes that `blocked-by` names the entity implementing the block, not the party that made or issued the demand, which means even a fully compliant response may leave the most consequential question unanswered.
+
+<PullQuote>
+A critic could argue that a standardised code with optional disclosure risks looking more authoritative than the evidence behind it, inviting users to read a terse status line as a verified account of the legal basis.
+</PullQuote>
+
+On that view the RFC's transparency goal is only partly achievable through the status code alone.
 
 ## References & Further Reading
 

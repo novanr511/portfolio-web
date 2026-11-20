@@ -9,7 +9,9 @@ tags:
   - DNS
 ---
 
-When a service says it uses anycast, it is tempting to picture a request being sent to the physically closest server. That is not quite what happens. Anycast makes one service address reachable from multiple locations; the routing system selects a path and, in doing so, directs packets toward one of those service nodes. The selected node is a product of routing topology and policy—not a promise of minimum geographic distance or lowest round-trip time.
+<Lead>
+When a service says it uses anycast, it is tempting to picture a request being sent to the physically closest server. That is not quite what happens. Anycast makes one service address <Mark>reachable from multiple locations</Mark>; the routing system selects a path and, in doing so, directs packets toward one of those service nodes. The selected node is a product of routing topology and policy—not a promise of minimum geographic distance or lowest round-trip time.
+</Lead>
 
 **Direct answer:** In IP anycast, multiple nodes advertise reachability for the same service IP address. Routing delivers a client’s packets to one of the reachable nodes, which defines that client’s current catchment. Routing “closeness” is topological, and can differ from physical or latency closeness. The approach can improve resilience or distribute demand, but requires careful service design, route-health coupling, and monitoring from multiple network locations. [RFC 4786](https://www.rfc-editor.org/rfc/rfc4786) describes operational considerations; [RFC 7094](https://www.rfc-editor.org/rfc/rfc7094) discusses architectural implications.
 
@@ -17,9 +19,15 @@ When a service says it uses anycast, it is tempting to picture a request being s
 
 In ordinary unicast service, a destination address identifies a route toward one network endpoint. With anycast, multiple discrete nodes make the same service address reachable. The routing system chooses among the available routes according to its routing information and policies.
 
-The region of the network whose packets are directed to one particular node is commonly called that node’s **catchment**. Catchments are not fixed geographic circles. Routing changes, policy changes, failures, and differences between networks can change which node serves a given client. Two clients in the same city may follow different routes; one client may also reach a different node after a route change.
+The region of the network whose packets are directed to one particular node is commonly called that node’s **catchment**. Catchments are <Mark>not fixed geographic circles</Mark>. Routing changes, policy changes, failures, and differences between networks can change which node serves a given client. Two clients in the same city may follow different routes; one client may also reach a different node after a route change.
 
-This is why “nearest” needs a qualifier. A routing system can choose a topologically preferred path without that path minimizing physical distance or measured latency. RFC 4786 explicitly cautions that topological nearness does not generally correlate with round-trip performance; in some cases response time may not improve and may increase.
+This is why “nearest” needs a qualifier.
+
+<KeyPoint>
+A routing system can choose a topologically preferred path without that path minimizing physical distance or measured latency.
+</KeyPoint>
+
+RFC 4786 explicitly cautions that topological nearness does not generally correlate with round-trip performance; in some cases response time may not improve and may increase.
 
 ## Why operators deploy anycast
 
@@ -35,11 +43,15 @@ Anycast is often a natural fit for short, independent transactions, but long-liv
 
 RFC 7094 explains this risk for stateful transports: different packets with the same anycast destination can reach different hosts, and a host without the session state may reset or disrupt the connection. RFC 4786 similarly recommends comparing routing stability with transaction duration when deciding whether a service is suitable for anycast.
 
-This is not a claim that anycast can never support connection-oriented services. Actual behavior depends on the transport, routing design, and deployment architecture. QUIC, for example, has connection IDs and connection migration mechanisms, but those features do not remove the need for an operator’s routing and state architecture to be designed for the deployment. Do not assume that a transport feature automatically makes every anycast topology safe.
+This is not a claim that anycast can never support connection-oriented services. Actual behavior depends on the transport, routing design, and deployment architecture. QUIC, for example, has connection IDs and connection migration mechanisms, but those features do not remove the need for an operator’s routing and state architecture to be designed for the deployment.
+
+<Trap>
+Do not assume that a transport feature automatically makes every anycast topology safe.
+</Trap>
 
 ## Monitor the service from more than one place
 
-A single probe to an anycast address can give a misleadingly narrow view. It measures the node and path selected from that probe’s network location at that time. RFC 4786 recommends distributed monitoring and, where possible, recording the identity of the node that answered each request.
+A single probe to an anycast address can give a misleadingly narrow view. It measures the node and path selected from that probe’s network location at that time. RFC 4786 recommends <Mark>distributed monitoring</Mark> and, where possible, recording the identity of the node that answered each request.
 
 A practical monitoring plan should combine:
 
@@ -62,7 +74,11 @@ If clients report intermittent errors against an anycast service address:
 5. Determine whether failures affect only long-running or stateful sessions, which may point toward route changes or missing session state.
 6. Validate the corrective change from the affected catchment and from unaffected locations; one successful probe cannot establish global recovery.
 
-The goal is to identify whether the fault is service-wide, node-specific, or limited to a routing catchment. Treat anycast as a property of the network path and service deployment together—not as a DNS trick or a guarantee that every request goes to the nearest healthy server.
+The goal is to identify whether the fault is service-wide, node-specific, or limited to a routing catchment.
+
+<PullQuote>
+Treat anycast as a property of the network path and service deployment together—not as a DNS trick or a guarantee that every request goes to the nearest healthy server.
+</PullQuote>
 
 For a related explanation of DNS routing and record behavior, see [DNS for SEO: How Domain Resolution Works and How to Debug It](/articles/dns-for-seo-how-domain-resolution-works). For the separate role of content delivery networks in sampled web measurements, see [What HTTP Archive’s CDN Numbers Can—and Cannot—Tell You](/articles/what-http-archives-cdn-numbers-can-and-cannot-tell-you).
 

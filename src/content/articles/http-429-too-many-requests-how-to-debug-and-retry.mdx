@@ -9,13 +9,19 @@ tags:
   - Web Infrastructure
 ---
 
-An HTTP 429 response means a server is rate-limiting requests. It does not tell you, by itself, whether the limit applies to one account, one IP address, one resource, or an entire service. Those policies are implementation-specific. Treating every 429 as a generic server failure—or immediately retrying in a tight loop—can make the problem worse.
+<Lead>
+An HTTP 429 response means a server is <Mark>rate-limiting requests</Mark>. It does not tell you, by itself, whether the limit applies to one account, one IP address, one resource, or an entire service. Those policies are implementation-specific. Treating every 429 as a generic server failure—or immediately retrying in a tight loop—can make the problem worse.
+</Lead>
 
-**Direct answer:** RFC 6585 defines `429 Too Many Requests` for a client that has sent too many requests in a given amount of time. A response may include `Retry-After` to indicate how long to wait. The RFC intentionally leaves the identity and counting rules to the server, and requires that 429 responses not be stored by caches. To diagnose one, record the response and request context, identify which layer generated it, and retry only according to the published policy or `Retry-After` guidance.
+**Direct answer:** RFC 6585 defines `429 Too Many Requests` for a client that has sent too many requests in a given amount of time. A response may include `Retry-After` to indicate how long to wait. The RFC intentionally leaves the <Mark>identity and counting rules</Mark> to the server, and requires that 429 responses not be stored by caches. To diagnose one, record the response and request context, identify which layer generated it, and retry only according to the published policy or `Retry-After` guidance.
 
 ## What a 429 tells you—and what it does not
 
-The status code identifies a rate-limiting condition, not the server’s algorithm. RFC 6585 gives examples of limits applied per resource, across a server, or across a group of servers; it also notes that a server might identify a user through authentication credentials or a stateful cookie. These are examples, not a prescribed universal scheme.
+<KeyPoint>
+The status code identifies a rate-limiting condition, not the server’s algorithm.
+</KeyPoint>
+
+RFC 6585 gives examples of limits applied per resource, across a server, or across a group of servers; it also notes that a server might identify a user through authentication credentials or a stateful cookie. These are examples, not a prescribed universal scheme.
 
 Therefore, a 429 from a website does not prove that a particular visitor exceeded an account quota. A proxy, API gateway, CDN, or application component may have emitted the response. The status alone does not identify the responsible layer, the applicable window, or whether the quota is shared with other clients.
 
@@ -32,7 +38,11 @@ This asks the recipient to wait 60 seconds before retrying. It does not disclose
 
 ## Why immediate retries create trouble
 
-If many clients retry as soon as they receive a 429, the service can receive another burst precisely when it is limiting demand. A client should respect explicit wait guidance and avoid synchronized retry loops. For automated clients, exponential backoff with random jitter is a common engineering strategy, but the exact policy is an implementation choice rather than a behavior mandated by RFC 6585.
+<Trap>
+If many clients retry as soon as they receive a 429, the service can receive another burst precisely when it is limiting demand.
+</Trap>
+
+A client should respect explicit wait guidance and avoid synchronized retry loops. For automated clients, <Mark>exponential backoff with random jitter</Mark> is a common engineering strategy, but the exact policy is an implementation choice rather than a behavior mandated by RFC 6585.
 
 Also consider whether the request is safe to repeat. A 429 response generally indicates that the request was rate-limited, but the status alone is not a complete application-level guarantee about how far a request progressed through a distributed system. For a non-idempotent operation such as creating a payment or order, follow the API’s idempotency and retry contract rather than resending blindly. See [Safe and Idempotent HTTP Methods](/articles/http-safe-and-idempotent-methods-what-retries-mean) for the protocol distinction.
 
@@ -58,7 +68,11 @@ For search infrastructure, seeing a 429 in a crawl log is a request-level observ
 
 ## A counterargument
 
-A reasonable critic would argue that the diagnostic workflow promises more than the protocol can deliver. RFC 6585 deliberately leaves the identity and counting rules to each server, and RFC 9111's caching rules do not expose the quota either, so captured fields cannot reveal the rate-limit key unless the provider documents it. Comparing affected and unaffected requests can narrow the field to a plausible hypothesis, but it cannot confirm which principal or window the server counted, and the article's own warning against inferring the key from one incident applies to the whole procedure. For a small operator that cannot correlate logs across a CDN, gateway, and origin, that evidence-gathering may cost more than the conservative backoff it is meant to justify.
+A reasonable critic would argue that the diagnostic workflow promises more than the protocol can deliver. RFC 6585 deliberately leaves the identity and counting rules to each server, and RFC 9111's caching rules do not expose the quota either, so captured fields cannot reveal the rate-limit key unless the provider documents it. Comparing affected and unaffected requests can narrow the field to a plausible hypothesis, but it cannot confirm which principal or window the server counted, and the article's own warning against inferring the key from one incident applies to the whole procedure.
+
+<PullQuote>
+For a small operator that cannot correlate logs across a CDN, gateway, and origin, that evidence-gathering may cost more than the conservative backoff it is meant to justify.
+</PullQuote>
 
 ## References & Further Reading
 

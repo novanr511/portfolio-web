@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 The KV cache stores attention keys and values so they need not be recomputed on each token. The PagedAttention paper describes how memory management affects serving efficiency, and Anthropic's caching guide covers reuse of repeated prefixes. The management question is what to keep in memory and what to evict.
+</Lead>
 
-**Direct answer:** Budget cache memory per active request, reuse prefixes that actually repeat, and measure cost per successful answer. The paper provides the mechanism; the budget rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Budget cache memory per active request, reuse prefixes that actually repeat, and measure cost per successful answer.
+</KeyPoint>
+
+The paper provides the mechanism; the budget rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked budget example, separating the documented mechanism from local capacity decisions.
 
@@ -37,15 +45,19 @@ The outcome is a capacity decision with a recorded trade-off. The numbers are hy
 
 ## Why the prefix decides the benefit
 
-A cache yields value only when the same content is requested again. A prefix that includes a timestamp or a user identifier changes on every call and produces no reuse, even though it occupies cache memory. Splitting the stable part from the variable part is often a more effective change than tuning cache size.
+A cache yields value only when the same content is requested again. A prefix that includes a timestamp or a user identifier changes on every call and produces no reuse, even though it occupies cache memory. <Mark>Splitting the stable part from the variable part</Mark> is often a more effective change than tuning cache size.
 
 The stable part should be placed first. Serving systems reuse a prefix from the beginning of a request, so a stable prefix followed by a changing suffix can be reused, while the reverse cannot. This is a practical consequence of how prefix caching works, and it is available from the documented behaviour rather than from a benchmark.
 
 Memory is the competing constraint. Each active request needs space for its attention state, and a larger context consumes more of it. Reserving too much for cache reduces the number of concurrent requests that fit, which can raise latency even though individual requests are faster. The right balance depends on the distribution of prefix lengths in real traffic.
 
-Hit rate is the diagnostic. A cache with a low hit rate is consuming memory without a benefit; a cache with a high hit rate may be too small if new prefixes are being evicted before they are reused. Reporting both alongside cost per successful answer gives a clearer picture than cache size alone.
+<Mark>Hit rate is the diagnostic</Mark>. A cache with a low hit rate is consuming memory without a benefit; a cache with a high hit rate may be too small if new prefixes are being evicted before they are reused. Reporting both alongside cost per successful answer gives a clearer picture than cache size alone.
 
-The management rule is therefore a measurement rule first. Decide what repeats, measure whether it is reused, then size the cache. The opposite order produces a configuration that looks reasonable and performs poorly.
+The management rule is therefore a measurement rule first. Decide what repeats, measure whether it is reused, then size the cache.
+
+<Trap>
+The opposite order produces a configuration that looks reasonable and performs poorly.
+</Trap>
 
 ## Evidence status
 
@@ -65,7 +77,9 @@ Capacity is the other constraint. A larger cache can hold more prefixes, but it 
 
 It cannot make a changing prefix reusable. It does not guarantee lower latency under all loads. And it cannot replace measuring the total cost, which includes the cache itself.
 
+<PullQuote>
 The counterargument that a bigger cache is always better is fair for repeated prefixes and incomplete when memory is needed for concurrency.
+</PullQuote>
 
 ## A decision test
 

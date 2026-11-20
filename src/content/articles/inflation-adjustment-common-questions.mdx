@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Numbers from different years are not directly comparable when the price level changes. A salary that doubled over a decade can represent less purchasing power if prices rose faster, yet nominal figures hide this. The practical question is which price index to apply and what the adjusted number can legitimately claim.
+<Lead>
+Numbers from different years are not directly comparable when the price level changes. A salary that doubled over a decade can represent less purchasing power if prices rose faster, yet nominal figures hide this. The practical question is <Mark>which price index to apply and what the adjusted number can legitimately claim</Mark>.
+</Lead>
 
-**Direct answer:** Inflation adjustment converts a nominal value into a real value by dividing by a price index referenced to a chosen base year. The inflation source describes a general rise in prices and the erosion of purchasing power; FRED supplies dated economic series used as indices. The boundary: an adjusted figure is only as good as the index choice and the base year.
+**Direct answer:**
+
+<KeyPoint>
+Inflation adjustment converts a nominal value into a real value by dividing by a price index referenced to a chosen base year.
+</KeyPoint>
+
+The inflation source describes a general rise in prices and the erosion of purchasing power; FRED supplies dated economic series used as indices. The boundary: an adjusted figure is only as good as the index choice and the base year.
 
 **Delta:** This article adds an index-choice map beyond the two sources: it maps the question asked to the series selected, with claim status explicit.
 
@@ -21,11 +29,11 @@ The inflation source describes inflation as a sustained increase in the general 
 
 <Figure src="/images/articles/inline/inflation-adjustment-common-questions-1.png" alt="A flow from a nominal amount, divided by a past index and scaled by a current index, to a real amount." caption="Conceptual: a real value is a nominal amount divided by a past index and scaled to now." />
 
-The mechanics are simple but the choices are not. To express a past amount in current terms, you divide by the index value in the past year and multiply by the index value in the current year. The result depends on the index: a consumer price index tracks a basket of household goods, while other series track producer prices or a broader deflator. FRED publishes many such series as dated observations, so the analyst must pick the one whose coverage matches the question. A wage comparison calls for a consumer series; a capital spending comparison may call for an investment deflator.
+The mechanics are simple but the choices are not. To express a past amount in current terms, you divide by the index value in the past year and multiply by the index value in the current year. <Mark>The result depends on the index</Mark>: a consumer price index tracks a basket of household goods, while other series track producer prices or a broader deflator. FRED publishes many such series as dated observations, so the analyst must pick the one whose coverage matches the question. A wage comparison calls for a consumer series; a capital spending comparison may call for an investment deflator.
 
 Base-year choice is another decision that is easy to overlook. An index is normalized so that a chosen year equals a reference value, but the ratio between two years is what actually matters for adjustment. Changing the base year rescales all values without changing the real relationship between them. The practical consequence is that a figure reported in constant 2020 currency is a presentation choice, not a different fact, and the base should be stated so readers can compare like with like.
 
-Frequency and revisions matter too. Some series are monthly, others annual, and many are revised as better data arrives. FRED records observation dates and vintage information, which lets an analyst see what was known at a given time. The consequence is that an adjustment made today and one made next year can differ even with the same method, because the underlying series was revised. A defensible adjustment therefore records the series identifier, the observation dates, and the access date.
+Frequency and revisions matter too. Some series are monthly, others annual, and many are revised as better data arrives. FRED records observation dates and vintage information, which lets an analyst see what was known at a given time. The consequence is that <Mark>an adjustment made today and one made next year can differ even with the same method</Mark>, because the underlying series was revised. A defensible adjustment therefore records the series identifier, the observation dates, and the access date.
 
 ## A worked example
 
@@ -45,11 +53,21 @@ The table distinguishes reference statements from inference. The inflation defin
 
 Inflation adjustment cannot tell you which index is right for your question. It can only apply the one you choose. A consumer price index reflects the spending pattern of a typical household, which may bear little resemblance to a firm's input costs or a specific city's rents. The consequence is that two analysts using the method correctly can produce different real values, and neither is strictly wrong unless the index is mismatched to the thing being measured. The method is a transformation, not a verdict.
 
-The hidden cost is the chain of small decisions behind an adjusted number: index, base year, frequency, seasonal adjustment, and access date. Each is defensible on its own, but together they create a figure that looks authoritative and is actually conditional. Teams that publish only the adjusted figure invite readers to treat it as a fact rather than a choice. The cost shows up later when someone tries to reproduce the number and cannot, because the series vintage was never recorded.
+The hidden cost is the chain of small decisions behind an adjusted number: index, base year, frequency, seasonal adjustment, and access date. Each is defensible on its own, but together they create a figure that looks authoritative and is actually conditional.
+
+<Trap>
+Teams that publish only the adjusted figure invite readers to treat it as a fact rather than a choice.
+</Trap>
+
+The cost shows up later when someone tries to reproduce the number and cannot, because the series vintage was never recorded.
 
 A common failure is deflating the wrong thing. Nominal flows such as revenue can be adjusted, but so-called real quantities such as units shipped should not be, because they are already physical measures. Another failure is mixing price indices with exchange rates, which answers a different question about cross-currency comparison. A subtler error is comparing a nominal figure to a real one in the same chart, which produces a gap that is purely an artifact of units.
 
-The boundary is what the adjustment means. A real value tells you about purchasing power relative to a basket of goods and a base year. It does not tell you about relative prices within that basket, about quality changes, or about whether a specific household actually faced the average price change. An adjusted salary can rise in real terms while a particular family feels worse off if its spending is concentrated in categories that rose faster. The method answers an average question, not an individual one.
+The boundary is what the adjustment means. A real value tells you about purchasing power relative to a basket of goods and a base year. It does not tell you about relative prices within that basket, about quality changes, or about whether a specific household actually faced the average price change. An adjusted salary can rise in real terms while a particular family feels worse off if its spending is concentrated in categories that rose faster.
+
+<PullQuote>
+The method answers an average question, not an individual one.
+</PullQuote>
 
 Indices are revised and series are retired, so an adjustment is not a one-time fact. A figure computed from a series vintage that was later revised will differ from one computed today. Teams that rely on adjusted figures for contracts, benchmarks, or historical comparisons should recheck the series and base on a fixed schedule, and keep the computation reproducible. The discipline is not complicated, but it is easy to skip when the adjusted number is only a footnote in a larger analysis.
 

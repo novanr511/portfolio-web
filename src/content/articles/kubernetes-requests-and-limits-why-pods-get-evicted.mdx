@@ -9,7 +9,9 @@ tags:
   - Resource Management
 ---
 
-A Pod can be healthy at noon and terminated at 3 a.m. without any code change. The cause was decided when the Pod was created: how much resource it requested, how much it was allowed to use, and which quality-of-service class those numbers produced. Kubernetes does not evaluate those choices at the moment of failure — it acts on them automatically.
+<Lead>
+A Pod can be healthy at noon and terminated at 3 a.m. without any code change. The cause was decided when the Pod was created: how much resource it requested, how much it was allowed to use, and which <Mark>quality-of-service class</Mark> those numbers produced. Kubernetes does not evaluate those choices at the moment of failure — it acts on them automatically.
+</Lead>
 
 **Direct answer:** A resource **request** is what the scheduler uses to place a Pod; a **limit** is what the kubelet and kernel enforce while it runs. CPU limits are enforced by throttling; memory limits by out-of-memory kills. Kubernetes assigns a QoS class — Guaranteed, Burstable, or BestEffort — at Pod creation, and uses it when deciding which Pods to evict under node pressure. The boundary: requests and limits are not autoscaling, and a QoS class cannot be changed without recreating the Pod.
 
@@ -17,7 +19,13 @@ A Pod can be healthy at noon and terminated at 3 a.m. without any code change. T
 
 The Kubernetes documentation separates the two fields cleanly. When you specify a **request**, "the kube-scheduler uses this information to decide which node to place the Pod on". When you specify a **limit**, "the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set". The kubelet "also reserves at least the request amount of that system resource specifically for that container to use".
 
-This distinction explains the most common surprise: a container is allowed to use more than its request. "If the node where a Pod is running has enough of a resource available, it's possible (and allowed) for a container to use more resource than its request". A request is a scheduling input and a reservation floor, not a ceiling. The limit is the ceiling.
+This distinction explains the most common surprise: a container is allowed to use more than its request. "If the node where a Pod is running has enough of a resource available, it's possible (and allowed) for a container to use more resource than its request".
+
+<KeyPoint>
+A request is a scheduling input and a reservation floor, not a ceiling.
+</KeyPoint>
+
+The limit is the ceiling.
 
 Both CPU and memory limits "are applied by the kubelet (and container runtime), and are ultimately enforced by the kernel" — on Linux nodes, through cgroups. But the behaviour differs:
 
@@ -38,6 +46,11 @@ The criteria, from the Kubernetes documentation:
 
 The class is not a label. "Kubernetes uses QoS classes to make decisions about evicting Pods when Node resources are exceeded." That is why a field that seems like bookkeeping determines what survives a bad night.
 
+<KeyFigures items={[
+  { value: "200 Mi", label: "memory limit in the documentation's Burstable example", source: "Kubernetes Documentation, Configure Quality of Service for Pods" },
+  { value: "100 Mi", label: "memory request in the documentation's Burstable example", source: "Kubernetes Documentation, Configure Quality of Service for Pods" },
+]} />
+
 ## Node-pressure eviction is different from a graceful shutdown
 
 Node-pressure eviction is "the process by which the kubelet proactively terminates pods" to reclaim resources. The kubelet monitors "memory, disk space, and filesystem inodes"; when a resource crosses a consumption threshold, it "can proactively fail one or more pods on the node to reclaim resources and prevent starvation". During the event it sets the selected Pods' phase to `Failed` and terminates them.
@@ -47,7 +60,11 @@ Two details are easy to miss and expensive in an incident:
 1. **Node-pressure eviction is not the same as API-initiated eviction.**
 2. **The kubelet does not respect a configured PodDisruptionBudget or the Pod's `terminationGracePeriodSeconds`.** If soft eviction thresholds are used, it respects `evictionMaxPodGracePeriod` instead.
 
-A team that assumes its disruption budget protects it from node pressure will be wrong. That budget governs voluntary, API-initiated disruption, not the kubelet reclaiming memory.
+<Trap>
+A team that assumes its disruption budget protects it from node pressure will be wrong.
+</Trap>
+
+That budget governs voluntary, API-initiated disruption, not the kubelet reclaiming memory.
 
 ## A worked example of node pressure
 
@@ -62,7 +79,7 @@ Suppose a node has 7.5 GiB of allocatable memory and runs four Pods:
 | C (worker) | 1 GiB | 2 GiB | Burstable |
 | D (batch) | none | none | BestEffort |
 
-**Scheduling check.** Total requests are 4 GiB, comfortably below 7.5 GiB, so the scheduler was right to place all four there. This is the key point: a correctly scheduled node can still be overcommitted, because limits sum to 8 GiB and the BestEffort Pod has no ceiling at all.
+**Scheduling check.** Total requests are 4 GiB, comfortably below 7.5 GiB, so the scheduler was right to place all four there. This is the key point: <Mark>a correctly scheduled node can still be overcommitted</Mark>, because limits sum to 8 GiB and the BestEffort Pod has no ceiling at all.
 
 **Failure sequence.** Suppose A stays at 2 GiB, B spikes to 4 GiB, and C rises to 2 GiB. That is 8 GiB, above allocatable memory, and the node enters memory pressure.
 
@@ -73,7 +90,7 @@ Suppose a node has 7.5 GiB of allocatable memory and runs four Pods:
 Three decisions follow from the table:
 
 - **The database's equal request and limit are not waste.** They are what bought it the Guaranteed class and last-in-line protection.
-- **Pod B's generous limit is a double-edged setting.** It allowed a 4 GiB spike that pushed the node into pressure, and it made B the eviction candidate. The limit was not a safety mechanism; it was permission to burst.
+- **Pod B's generous limit is a double-edged setting.** It allowed a 4 GiB spike that pushed the node into pressure, and it made B the eviction candidate. The limit was not a safety mechanism; <Mark>it was permission to burst</Mark>.
 - **Pod D was always disposable.** If that batch job mattered, leaving it BestEffort was the real configuration error.
 
 The CPU column would behave differently. If B had a CPU limit of 2000 m on a four-core node, exceeding it would cause throttling — latency, not eviction. Memory is the non-compressible resource that triggers the OOM and eviction paths.
@@ -88,7 +105,11 @@ Three limits are worth stating plainly.
 
 **Tight limits cause their own incidents.** A CPU limit set below the application's normal peak produces throttling that looks like a slow dependency. A memory limit set below the working set produces restart loops. Correct sizing needs measurement of both steady state and peaks — the same discipline as right-sizing in any other environment.
 
-The counterargument to setting limits everywhere — that they cause avoidable throttling — is real. The answer is not to omit them, but to set them from observed behaviour and accept that BestEffort Pods are the first to go when the node is under pressure.
+The counterargument to setting limits everywhere — that they cause avoidable throttling — is real.
+
+<PullQuote>
+The answer is not to omit them, but to set them from observed behaviour and accept that BestEffort Pods are the first to go when the node is under pressure.
+</PullQuote>
 
 ## A decision test
 

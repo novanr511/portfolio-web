@@ -9,21 +9,29 @@ tags:
   - Verified
 ---
 
-Site owners often treat indexing as one switch that either works or fails. In practice, crawling and indexing are distinct stages with different controls, and a page can be fetched successfully yet never appear in search results. The Google Search Central crawler overview and the Google SEO Starter Guide describe the stages, but neither turns them into a repeatable diagnostic routine.
+<Lead>
+Site owners often treat indexing as one switch that either works or fails. In practice, <Mark>crawling and indexing are distinct stages with different controls</Mark>, and a page can be fetched successfully yet never appear in search results. The Google Search Central crawler overview and the Google SEO Starter Guide describe the stages, but neither turns them into a repeatable diagnostic routine.
+</Lead>
 
-**Direct answer:** Diagnose indexing in two passes: first confirm the crawler can discover and fetch the URL, then confirm the page is eligible and useful enough to include. The sources document crawler behavior and basic site hygiene; the ordering is a synthesis offered for practice, not a quotation from either document.
+**Direct answer:**
+
+<KeyPoint>
+Diagnose indexing in two passes: first confirm the crawler can discover and fetch the URL, then confirm the page is eligible and useful enough to include.
+</KeyPoint>
+
+The sources document crawler behavior and basic site hygiene; the ordering is a synthesis offered for practice, not a quotation from either document.
 
 **Delta:** This article adds a claim-status table and a worked diagnostic, mapping crawler concepts to a specific inspection decision while marking which statements come from the sources and which are inferred.
 
 ## The mechanism
 
-The Google Search Central crawler overview describes how search crawlers discover, fetch, and process pages before any question of ranking arises. That description carries a practical consequence: a fetch problem and an index problem are different failures requiring different fixes. Treating them as one condition leads teams to rewrite content when the real issue is a blocked request, or to study server logs when the content itself is the obstacle.
+The Google Search Central crawler overview describes how search crawlers discover, fetch, and process pages before any question of ranking arises. That description carries a practical consequence: <Mark>a fetch problem and an index problem are different failures requiring different fixes</Mark>. Treating them as one condition leads teams to rewrite content when the real issue is a blocked request, or to study server logs when the content itself is the obstacle.
 
 <Figure src="/images/articles/inline/indexing-diagnostics-best-practices-1.png" alt="A three-step flow: check fetch access, then robots or noindex instructions, then content value." caption="Conceptual: diagnose an absent page in order - access, instructions, then content value." />
 
 The Google SEO Starter Guide covers the site-side conditions that make crawling and inclusion more reliable: a clear structure, internal links that expose important pages, and content that is distinctive and useful. The practical consequence is that many issues labeled "indexing" are really structure or content problems surfaced at the indexing stage. A page buried behind weak internal links may be crawled rarely, and a page that merely repeats another offers little reason for inclusion.
 
-The two stages also have different levers. Robots directives govern whether a URL may be fetched, while noindex directives act after a page has been fetched to keep it out of the index. Duplicate or thin content affects inclusion without being a technical block at all. Because the levers differ, diagnostic order matters: check access, then instructions, then content value, in that sequence. Starting with content quality risks solving the wrong problem, and starting with directives can miss a site-wide access fault.
+The two stages also have different levers. Robots directives govern whether a URL may be fetched, while noindex directives act after a page has been fetched to keep it out of the index. Duplicate or thin content affects inclusion without being a technical block at all. Because the levers differ, diagnostic order matters: <Mark>check access, then instructions, then content value</Mark>, in that sequence. Starting with content quality risks solving the wrong problem, and starting with directives can miss a site-wide access fault.
 
 The concepts of crawling, fetching, and indexing are reported by the sources; the decision sequence and its priority ordering are inferred from those concepts.
 
@@ -47,7 +55,11 @@ The first two rows are descriptive claims taken from the documentation. The thir
 
 ## What it cannot do
 
-A diagnostic routine cannot guarantee inclusion or ranking. The sources describe how crawling and indexing work, not a threshold a page must cross to appear. A page can pass every check and still be absent because the index is selective and competitive. Reading a routine as a guarantee is the most common misuse, and it produces false confidence when results do not follow from the work.
+A diagnostic routine cannot guarantee inclusion or ranking. The sources describe how crawling and indexing work, not a threshold a page must cross to appear. A page can pass every check and still be absent because the index is selective and competitive.
+
+<Trap>
+Reading a routine as a guarantee is the most common misuse, and it produces false confidence when results do not follow from the work.
+</Trap>
 
 It cannot substitute for content quality. Diagnostics tell a team where a failure sits, but a page that offers little distinct value may be excluded for that reason alone. No amount of log inspection or directive checking converts duplicate content into a reason to include it. The practical cost is that teams prefer technical checks because they feel objective, while the harder content work stays undone and the same exclusion recurs on the next set of pages.
 
@@ -57,7 +69,9 @@ A failure mode is misreading coverage reports. A report entry can indicate that 
 
 The boundary is between indexing and ranking. Passing the checks makes a page eligible; it does not make it visible for a particular query. Teams that blur this boundary keep re-auditing indexing after a ranking complaint, repeating work that cannot answer the question actually asked. Review the routine when site structure, directives, or the reporting interface changes, since each can alter what the checks mean and which order is most efficient.
 
+<PullQuote>
 Counterargument: the claim that indexing checks are overrated is fair when content is clearly strong and site structure simple, and incomplete when access faults or stray directives are quietly suppressing pages.
+</PullQuote>
 
 ## A decision test
 

@@ -9,9 +9,17 @@ tags:
   - Finance
 ---
 
-A price list tells you the cost of a million tokens. It does not tell you what your application will cost, because that depends on how many tokens you send, how many requests you make, and what happens on retries. Teams that budget from the headline rate are routinely surprised by the invoice.
+<Lead>
+A price list tells you the cost of a million tokens. It does not tell you what your application will cost, because that depends on how many tokens you send, how many requests you make, and what happens on retries. Teams that budget from <Mark>the headline rate</Mark> are routinely surprised by the invoice.
+</Lead>
 
 **Direct answer:** Monthly LLM spend is a product of four inputs: request volume, input tokens per request, output tokens per request, and the published per-million-token price for the chosen model — plus retries, tool calls, and cached or discarded attempts. OpenAI publishes per-million-token prices and context limits for its GPT-6 tiers in its model catalogue; AWS's cost-optimization guidance supplies the broader discipline of attributing spend to a workload. The boundary: a calculation is an estimate until measured traffic confirms the assumptions.
+
+<KeyFigures items={[
+  { value: "$10", label: "per million input tokens", source: "OpenAI" },
+  { value: "$50", label: "per million output tokens", source: "OpenAI" },
+  { value: "$45,000/month", label: "Total, Illustrative", source: "OpenAI" },
+]} />
 
 ## The four inputs
 
@@ -35,7 +43,7 @@ Three additional factors matter in practice:
 
 ## A worked estimate
 
-The following combines OpenAI's published list prices with a hypothetical workload. It is a calculation, not a forecast.
+The following combines OpenAI's published list prices with a hypothetical workload. It is <Mark>a calculation, not a forecast</Mark>.
 
 OpenAI lists GPT-6 Astra at $10 per million input tokens and $50 per million output tokens; GPT-6.1 Sol at $2 and $10. A product handles 1 million requests a month, averaging 2,000 input and 500 output tokens.
 
@@ -63,13 +71,23 @@ Three lessons follow:
 
 A calculation is useful only when it becomes a number someone owns. Three habits make that transition:
 
-**Log the inputs, not just the charges.** A provider invoice tells you what you spent, not which feature generated it. Instrument each request with the feature name, input tokens, output tokens, model tier, and whether a retry occurred. Without those fields, a cost spike becomes an argument rather than a diagnosis. The pattern is the same as showback in cloud cost management: attribution precedes control.
+**Log the inputs, not just the charges.** A provider invoice tells you what you spent, not which feature generated it. Instrument each request with the feature name, input tokens, output tokens, model tier, and whether a retry occurred.
+
+<Trap>
+Without those fields, a cost spike becomes an argument rather than a diagnosis.
+</Trap>
+
+The pattern is the same as showback in cloud cost management: attribution precedes control.
 
 **Set a budget per feature, not per model.** A single model budget hides the fact that one expensive workflow may be consuming most of the tokens. When each feature has a monthly allowance and a measured actual, a team can see which part of the product has a viable unit economy. A summarisation feature that costs more per active user than the user pays is a product decision disguised as a technical one.
 
-**Re-estimate on a fixed cadence and on every change.** Traffic patterns shift, conversation histories grow, and providers revise prices. A monthly comparison of predicted against actual spend catches drift early. A prompt change that adds retrieved context should trigger a fresh estimate before it reaches production, because the input-token assumption is the one most likely to break.
+**Re-estimate on a fixed cadence and on every change.** Traffic patterns shift, conversation histories grow, and providers revise prices. A monthly comparison of predicted against actual spend catches drift early. A prompt change that adds retrieved context should trigger a fresh estimate before it reaches production, because <Mark>the input-token assumption is the one most likely to break</Mark>.
 
-These habits turn the worked arithmetic into a management process. The formula gives you a number; the logging and ownership give you a way to keep that number honest.
+These habits turn the worked arithmetic into a management process.
+
+<KeyPoint>
+The formula gives you a number; the logging and ownership give you a way to keep that number honest.
+</KeyPoint>
 
 ## The costs that do not appear in the formula
 
@@ -81,7 +99,11 @@ These habits turn the worked arithmetic into a management process. The formula g
 
 **Caching and batch discounts.** Both can reduce the effective price, but neither is guaranteed for your traffic pattern. Model them as scenarios, not certainties.
 
-The counterargument — that token prices are falling, so estimation does not matter — misses the scale effect. A 5× difference between tiers still exists, and at a million requests it is the difference between a viable and an unviable product.
+The counterargument — that token prices are falling, so estimation does not matter — misses the scale effect.
+
+<PullQuote>
+A 5× difference between tiers still exists, and at a million requests it is the difference between a viable and an unviable product.
+</PullQuote>
 
 ## A decision test
 

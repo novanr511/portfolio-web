@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Teams often treat Interaction to Next Paint as just another score to raise, then discover the number barely moves. The web.dev material defines what the metric observes, but the cost of changing it lives in the event handlers and scripts that block the main thread. The real problem is not the score; it is attributing a slow response to the right phase of an interaction.
+<Lead>
+Teams often treat Interaction to Next Paint as just another score to raise, then discover the number barely moves. The web.dev material defines what the metric observes, but the cost of changing it lives in the event handlers and scripts that block the main thread. The real problem is not the score; it is <Mark>attributing a slow response to the right phase of an interaction</Mark>.
+</Lead>
 
-**Direct answer:** INP assesses a page's overall responsiveness by looking at the latency of user interactions across a visit, not a single paint. To improve it, find the slow interaction, identify which phase - input delay, processing, or presentation - consumes the time, then weigh each fix against its engineering cost. The definition is documented; the choice of fix is local judgment.
+**Direct answer:**
+
+<KeyPoint>
+INP assesses a page's overall responsiveness by looking at the latency of user interactions across a visit, not a single paint.
+</KeyPoint>
+
+To improve it, find the slow interaction, identify which phase - input delay, processing, or presentation - consumes the time, then weigh each fix against its engineering cost. The definition is documented; the choice of fix is local judgment.
 
 **Delta:** This article adds a claim-status table and a worked diagnosis beyond the sources: it maps interaction phases to a fix decision, with claim status explicit.
 
@@ -25,7 +33,7 @@ An interaction has three phases: the delay before the event handler runs, the pr
 
 The Web Vitals guidance places INP among the Core Web Vitals with defined thresholds and recommends evaluating at a high percentile of real page loads. Thresholds turn the metric into a pass-or-fail signal, but they also invite overfitting: a result just under the boundary is not proof of a responsive interface, and a result just over it does not identify the cause. The sources define the signal; they do not prescribe a fix for a given site.
 
-The cost of improvement is therefore concentrated in diagnosis and trade-offs. Splitting a long handler may be cheap; replacing a third-party tag may be neither cheap nor under the team's control. Because the metric reflects real interactions on real devices, a fix verified only on a developer machine can fail for the users who generated the poor score. The defensible workflow is to measure in the field where possible, trace a representative slow interaction, fix the dominant phase, and re-measure under the same conditions.
+The cost of improvement is therefore <Mark>concentrated in diagnosis and trade-offs</Mark>. Splitting a long handler may be cheap; replacing a third-party tag may be neither cheap nor under the team's control. Because the metric reflects real interactions on real devices, a fix verified only on a developer machine can fail for the users who generated the poor score. The defensible workflow is to measure in the field where possible, trace a representative slow interaction, fix the dominant phase, and re-measure under the same conditions.
 
 ## A worked example
 
@@ -47,13 +55,19 @@ This framing has a clear limit. The sources define INP and its thresholds; they 
 
 A hidden cost is that the score compresses many interactions into one number. A single severe stall can dominate the result while other slow paths go unexamined, so a team can fix the reported interaction and still leave users facing a different one. Because the metric reports a high percentile rather than an average, improvement in the median may not move it at all. Recording the distribution of interaction latencies, not just the headline value, is part of the work, and that data collection has its own instrumentation cost and noise.
 
-The main failure mode is optimizing in the lab and assuming the field will follow. Synthetic clicks can miss the long tasks that occur during genuine use - scrolling, typing into a search box, or switching tabs while scripts run - and fast test hardware hides the execution cost that affects mid-range devices. A second failure is treating every long task as first-party code; a third-party integration may own the blocking work, and the fix then becomes a vendor conversation or a loading decision rather than a refactor. A third is fixing processing time by moving work to a timer or idle callback, which can shorten one interaction and create a stall later.
+<Trap>
+The main failure mode is optimizing in the lab and assuming the field will follow.
+</Trap>
 
-The boundary is when INP is the right signal at all. Pages with almost no interaction have little INP to improve, and the effort is better spent on loading or layout stability. Conversely, a page may pass the threshold while a specific, high-value flow - checkout or form submission - remains slow for a small but important group; the aggregate metric will not surface that. INP is a population-level responsiveness signal, not a guarantee about any particular user journey, and it should be read alongside direct observation of the flows that matter commercially.
+Synthetic clicks can miss the long tasks that occur during genuine use - scrolling, typing into a search box, or switching tabs while scripts run - and fast test hardware hides the execution cost that affects mid-range devices. A second failure is treating every long task as first-party code; a third-party integration may own the blocking work, and the fix then becomes a vendor conversation or a loading decision rather than a refactor. A third is fixing processing time by moving work to a timer or idle callback, which can shorten one interaction and create a stall later.
+
+The boundary is when INP is the right signal at all. Pages with almost no interaction have little INP to improve, and the effort is better spent on loading or layout stability. Conversely, a page may pass the threshold while a specific, high-value flow - checkout or form submission - remains slow for a small but important group; the aggregate metric will not surface that. INP is <Mark>a population-level responsiveness signal, not a guarantee about any particular user journey</Mark>, and it should be read alongside direct observation of the flows that matter commercially.
 
 Diagnoses also need review. Scripts change, vendors update, and traffic mixes shift toward different devices, so the interaction that dominated a trace last quarter may no longer be the constraint. Keep the trace, device profile, and interaction steps with each recorded fix, and set a trigger to recheck when a script bundle or third-party tag changes. Without that, the team accumulates fixes whose rationale nobody can reconstruct, and the next decline starts from zero.
 
+<PullQuote>
 The counterargument that INP is simply a score to push below a threshold is fair as a summary of the target and incomplete as a diagnosis, because the number cannot say which interaction or which phase produced it.
+</PullQuote>
 
 ## A decision test
 

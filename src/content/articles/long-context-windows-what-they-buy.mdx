@@ -9,9 +9,17 @@ tags:
   - Architecture
 ---
 
+<Lead>
 A 1M-token context window sounds like a solution to retrieval: stop chunking documents, put everything in the prompt, and ask the model. The published specs now make that possible — Google lists 1M tokens across Gemini 4, and OpenAI lists 1.05M for GPT-6 models. But capacity is not the same as reliable use, and a prompt that fits is not necessarily a prompt that works.
+</Lead>
 
 **Direct answer:** A long context window lets a model consider a whole codebase, a long contract set, or a multi-document corpus in one pass without a retrieval step. The caution comes from Liu et al.'s "Lost in the Middle" study: performance "can degrade significantly when changing the position of relevant information", meaning models "do not robustly make use of information in long input contexts". The boundary: long context is useful when the material is bounded, cross-referenced, and affordable; it is not a replacement for retrieval when the corpus is large, the query is repeated, or the cost per request matters.
+
+<KeyFigures items={[
+  { value: "1M", label: "token context listed for the Gemini 4 family", source: "Google, Models - Gemini API" },
+  { value: "1.05M", label: "token context listed for GPT-6 models", source: "OpenAI, Models | OpenAI API" },
+  { value: "$10 per million", label: "input-token list price for GPT-6 Astra", source: "OpenAI, Models | OpenAI API" },
+]} />
 
 ## What a long window changes
 
@@ -33,9 +41,9 @@ Three implications follow:
 
 - **Ordering is a design variable.** Putting the most important material at the start or end is a cheap intervention, not a hack — it is a response to a measured behaviour.
 - **A single successful test is weak evidence.** If you test a question with the relevant passage in one position, you have not established that the system works when the passage moves.
-- **Retrieval still has a role.** A retriever that narrows the context to a few relevant passages sidesteps the position problem by shortening the haystack.
+- **Retrieval still has a role.** A retriever that narrows the context to a few relevant passages sidesteps the position problem by <Mark>shortening the haystack</Mark>.
 
-The study is from 2023 and models have improved since. The correct response is to treat it as a reason to *test position sensitivity*, not as a permanent law.
+The study is from 2023 and models have improved since. The correct response is to treat it as a reason to *<Mark>test position sensitivity</Mark>*, not as a permanent law.
 
 ## A worked example of context versus retrieval
 
@@ -51,7 +59,11 @@ The ratio is about 160× on input tokens. Three qualifications matter:
 2. **Option A is competitive when queries are rare.** For a one-off analysis of a bounded corpus, paying $8 for a thorough pass can be cheaper than building retrieval infrastructure.
 3. **Quality decides, not cost.** If Option A answers correctly on cross-document questions that Option B's retriever misses, the more expensive option may be the right one. The test is a labelled evaluation set, not the price.
 
-The practical decision is a hybrid: use retrieval for the common, narrow questions and a long-context pass for the rare questions that need the whole corpus. That requires a way to decide which kind of question you have — which is itself a classification task.
+<KeyPoint>
+The practical decision is a hybrid: use retrieval for the common, narrow questions and a long-context pass for the rare questions that need the whole corpus.
+</KeyPoint>
+
+That requires a way to decide which kind of question you have — which is itself a classification task.
 
 ## Testing position sensitivity
 
@@ -79,11 +91,19 @@ Three conditions favour it:
 
 **Capacity is not attention.** A model can accept 1M tokens and still fail to use a specific fact in the middle. Test position sensitivity with the relevant material moved around.
 
-**Cost scales with the window.** Every request pays for the whole prompt. A large context is a recurring operating cost, not a one-time setup cost.
+**Cost scales with the window.** Every request pays for the whole prompt. A large context is <Mark>a recurring operating cost, not a one-time setup cost</Mark>.
 
-**More context can hurt.** Irrelevant material competes for attention and can degrade answers. Sending the whole corpus when a page would do is not thoroughness; it is noise.
+**More context can hurt.** Irrelevant material competes for attention and can degrade answers.
 
-The counterargument — that models will get better at using long contexts — is plausible. The response is the same as elsewhere: design so the system still works when the model is wrong, and re-evaluate when it changes.
+<Trap>
+Sending the whole corpus when a page would do is not thoroughness; it is noise.
+</Trap>
+
+The counterargument — that models will get better at using long contexts — is plausible.
+
+<PullQuote>
+The response is the same as elsewhere: design so the system still works when the model is wrong, and re-evaluate when it changes.
+</PullQuote>
 
 ## A decision test
 

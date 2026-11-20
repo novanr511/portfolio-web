@@ -9,21 +9,31 @@ tags:
   - Infrastructure
 ---
 
-Teams budget inference by multiplying tokens by a published price, which misses the operational factors that decide the bill: batching, memory, repeated prefixes, and idle capacity. The PagedAttention paper explains how memory management changes serving efficiency, as the AWS cost framework treats waste as a design problem, as [LLM Cost Estimator: How to Predict Your Monthly Bill](/articles/llm-cost-estimator-how-to-predict-your-monthly-bill) requires an honest total, as the serving-frameworks article treats batching as a lever.
+<Lead>
+Teams budget inference by multiplying tokens by a published price, which misses the operational factors that decide the bill: batching, memory, repeated prefixes, and <Mark>idle capacity</Mark>. The PagedAttention paper explains how memory management changes serving efficiency, as the AWS cost framework treats waste as a design problem, as [LLM Cost Estimator: How to Predict Your Monthly Bill](/articles/llm-cost-estimator-how-to-predict-your-monthly-bill) requires an honest total, as the serving-frameworks article treats batching as a lever.
+</Lead>
 
 **Direct answer:** Control inference cost by measuring tokens per request, reusing cached prefixes, batching where possible, and counting idle capacity — not by looking at a single token price. PagedAttention is the primary source on serving memory, and the AWS cost framework covers waste. The boundary: this is educational orientation, not a guarantee — prices and workloads change, as the benchmarks article warns about broad results, as the publication standard forbids guaranteed savings.
 
 ## The pitfalls
 
-**Ignoring repeated prefixes.** The same system prompt sent on every request is paid for every time, which the prompt-caching article explains, as the cost estimator requires, as the PagedAttention paper treats memory reuse, as the routing article treats cost per correct answer as the metric.
+**Ignoring repeated prefixes.**
+
+<Trap>
+The same system prompt sent on every request is paid for every time, which the prompt-caching article explains, as the cost estimator requires, as the PagedAttention paper treats memory reuse, as the routing article treats cost per correct answer as the metric.
+</Trap>
 
 **Assuming perfect batching.** Serving frameworks batch requests to raise throughput, which the serving-frameworks article describes, as the PagedAttention paper explains memory fragmentation, as the capacity-planning article advises, as the AWS cost framework treats waste.
 
 **Paying for idle capacity.** Reserved GPUs cost money when traffic is low, which the cloud-cost article advises, as the AWS cost framework treats utilisation, as the unit-economics article requires for contribution, as the cash-flow article requires for cash spent.
 
-**Counting tokens, not outcomes.** A cheaper answer that fails the task costs more, which the cost estimator treats as cost per correct answer, as the evaluation-rubric article requires for concrete criteria, as the routing article advises, as the decision-memo article requires for a recorded judgement.
+**Counting tokens, not outcomes.**
 
-Three consequences follow. The measurement should be cost per successful task, as the cost estimator requires, as the routing article advises, as the rubric article requires. Capacity should be reviewed against traffic, as the AWS cost framework advises, as the monitoring article treats as a trigger. And the result should be recorded, as the decision-memo article requires.
+<KeyPoint>
+A cheaper answer that fails the task costs more, which the cost estimator treats as cost per correct answer, as the evaluation-rubric article requires for concrete criteria, as the routing article advises, as the decision-memo article requires for a recorded judgement.
+</KeyPoint>
+
+Three consequences follow. The measurement should be <Mark>cost per successful task</Mark>, as the cost estimator requires, as the routing article advises, as the rubric article requires. Capacity should be reviewed against traffic, as the AWS cost framework advises, as the monitoring article treats as a trigger. And the result should be recorded, as the decision-memo article requires.
 
 ## A worked example
 
@@ -35,9 +45,11 @@ Three conclusions follow. The repeated prefix is a direct saving, which the cach
 
 ## What inference-cost analysis cannot do
 
-It cannot guarantee a saving, which the publication standard forbids claiming, as the benchmarks article warns about broad results, as the risk article requires residual risk. It does not replace quality measurement, which the evaluation-rubric article requires, as the routing article treats cost per correct answer, as the hallucination article warns about wrong answers. And it cannot fix a workload that needs the model, which the value-proposition article treats as prior, as the build-versus-buy article advises.
+It cannot guarantee a saving, which the publication standard forbids claiming, as the benchmarks article warns about broad results, as the risk article requires residual risk. It does not replace <Mark>quality measurement</Mark>, which the evaluation-rubric article requires, as the routing article treats cost per correct answer, as the hallucination article warns about wrong answers. And it cannot fix a workload that needs the model, which the value-proposition article treats as prior, as the build-versus-buy article advises.
 
+<PullQuote>
 The counterargument that token price is the whole cost is fair as a starting number and incomplete once caching, batching, and idle capacity are counted, which the worked example shows, as the cost estimator advises.
+</PullQuote>
 
 ## A decision test
 

@@ -9,9 +9,15 @@ tags:
   - Crawling
 ---
 
-When a search engine crawler requests a URL, the HTTP response status code is the very first piece of information it evaluates. Before the crawler reads a single byte of your HTML, parses a title tag, or queues an internal link, the three-digit status code dictates whether that payload is eligible for indexing, should be redirected, or must trigger an immediate crawler back-off.
+<Lead>
+When a search engine crawler requests a URL, the HTTP response status code is <Mark>the very first piece of information it evaluates</Mark>. Before the crawler reads a single byte of your HTML, parses a title tag, or queues an internal link, the three-digit status code dictates whether that payload is eligible for indexing, should be redirected, or must trigger an immediate crawler back-off.
+</Lead>
 
-**Direct Answer:** HTTP status codes communicate state, not quality. A `200 OK` confirms document retrieval but does not guarantee indexing if content is thin (triggering a soft 404). Permanent redirects (`301`/`308`) pass canonical signals and link equity, whereas temporary redirects (`302`/`307`) preserve the original URL in the index. Client errors (`404`/`410`) remove pages from the crawl frontier, while rate limits (`429`) and server errors (`5xx`) force crawlers to reduce fetch velocity to prevent infrastructure collapse.
+<KeyPoint>
+HTTP status codes communicate state, not quality.
+</KeyPoint>
+
+**Direct Answer:** A `200 OK` confirms document retrieval but does not guarantee indexing if content is thin (triggering a soft 404). Permanent redirects (`301`/`308`) <Mark>pass canonical signals and link equity</Mark>, whereas temporary redirects (`302`/`307`) preserve the original URL in the index. Client errors (`404`/`410`) remove pages from the crawl frontier, while rate limits (`429`) and server errors (`5xx`) force crawlers to reduce fetch velocity to prevent infrastructure collapse.
 
 Understanding how search engine crawlers interpret these status codes allows engineers to prevent indexing drops, diagnose redirect latency, and protect origin infrastructure.
 
@@ -35,7 +41,11 @@ Understanding how search engine crawlers interpret these status codes allows eng
 
 ## 1. 200 OK, 204 No Content, and the Limits of "Success"
 
-A `200 OK` response code indicates that the request succeeded and the origin server has returned the requested resource. However, one of the most common misconceptions in technical SEO is assuming that a `200 OK` guarantees indexing.
+A `200 OK` response code indicates that the request succeeded and the origin server has returned the requested resource.
+
+<Trap>
+However, one of the most common misconceptions in technical SEO is assuming that a `200 OK` guarantees indexing.
+</Trap>
 
 ### The Problem of the "Soft 404"
 
@@ -241,11 +251,15 @@ Continue through the Technical SEO series to understand how search engines rende
 
 ## A worked example
 
-The following is hypothetical and illustrative. A legacy URL is traced with `curl -IL`, and the hop-by-hop output shows two 301s before a 200, with an `X-Robots-Tag: noindex` on the first hop. Three checks decide the triage. First, what is the terminal status and `Content-Type` - a 200 retrieving the document is fine, but a 200 rendering an error layout is a soft 404, state not quality. Second, can the chain be collapsed into a single hop to the canonical destination, since each 301 adds a round trip and the hop limit is crawler behaviour, not HTTP per RFC 9110? Third, are throttling signals absent or handled - a 429 or 5xx with `Retry-After` tells a crawler to back off, while a stray `noindex` on an early 301 is a header to remove? If the chain stays and the `noindex` remains, the destination may be reached without the intended signal. If all three checks pass, the trace shows one clean redirect to indexable content. The outcome is a diagnosis of that route: RFC 9111 and RFC 9112 specify caching and messaging, not the SEO consequences the matrix describes.
+The following is hypothetical and illustrative. A legacy URL is traced with `curl -IL`, and the hop-by-hop output shows two 301s before a 200, with an `X-Robots-Tag: noindex` on the first hop. Three checks decide the triage. First, what is the terminal status and `Content-Type` - a 200 retrieving the document is fine, but a 200 rendering an error layout is a soft 404, state not quality. Second, can the chain be <Mark>collapsed into a single hop</Mark> to the canonical destination, since each 301 adds a round trip and the hop limit is crawler behaviour, not HTTP per RFC 9110? Third, are throttling signals absent or handled - a 429 or 5xx with `Retry-After` tells a crawler to back off, while a stray `noindex` on an early 301 is a header to remove? If the chain stays and the `noindex` remains, the destination may be reached without the intended signal. If all three checks pass, the trace shows one clean redirect to indexable content. The outcome is a diagnosis of that route: RFC 9111 and RFC 9112 specify caching and messaging, not the SEO consequences the matrix describes.
 
 ## A counterargument
 
-A critic would object that the article borrows normative authority from standards that do not support its strongest claims. RFC 9110, RFC 9111, and RFC 9112 define status codes and caching semantics; they say nothing about link equity, crawl budget, soft-404 classification, or a five-to-ten hop limit, which are behaviours of particular search engines rather than properties of HTTP. Soft-404 and heuristic 302-to-permanent examples show that content and crawler inference change the outcome for the same `200` or `302`, which sits uneasily with the matrix's definitive action column. Calling status codes a "contractual boundary" blurs what a server emits and how a proprietary crawler interprets it; the cited references cannot certify those SEO consequences.
+A critic would object that the article borrows normative authority from standards that do not support its strongest claims. RFC 9110, RFC 9111, and RFC 9112 define status codes and caching semantics; they say nothing about link equity, crawl budget, soft-404 classification, or a five-to-ten hop limit, which are behaviours of particular search engines rather than properties of HTTP. Soft-404 and heuristic 302-to-permanent examples show that content and crawler inference change the outcome for the same `200` or `302`, which sits uneasily with the matrix's definitive action column.
+
+<PullQuote>
+Calling status codes a "contractual boundary" blurs what a server emits and how a proprietary crawler interprets it; the cited references cannot certify those SEO consequences.
+</PullQuote>
 
 ## References & Further Reading
 

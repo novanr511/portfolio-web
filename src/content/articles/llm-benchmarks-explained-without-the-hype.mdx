@@ -9,9 +9,17 @@ tags:
   - AI
 ---
 
+<Lead>
 A leaderboard says model A beats model B by two points. The natural conclusion is that A is better. That conclusion is only valid if both models were tested on the same tasks, under the same conditions, with the same metric — which, before HELM, they often were not.
+</Lead>
 
 **Direct answer:** A benchmark is a measurement of a model on a defined set of scenarios with defined metrics. HELM's authors found that before their work, models "on average were evaluated on just 17.9% of the core HELM scenarios", with some prominent models sharing no scenario at all. HELM evaluated 30 models across 42 scenarios and raised shared coverage to 96.0%, measuring seven metrics including accuracy, calibration, robustness, fairness, bias, toxicity and efficiency. The boundary: even a well-designed benchmark measures those scenarios, not your application.
+
+<KeyFigures items={[
+  { value: "96.0%", label: "shared coverage", source: "Percy Liang et al." },
+  { value: "17.9%", label: "of the core HELM scenarios", source: "Percy Liang et al." },
+  { value: "30 models", label: "across 42 scenarios", source: "Percy Liang et al." },
+]} />
 
 ## Why two ranks can disagree
 
@@ -21,13 +29,21 @@ Three differences explain most contradictions:
 
 **Different metrics.** Accuracy is the default, but a model can be accurate and badly calibrated — overconfident when wrong — or slow and expensive. HELM's inclusion of efficiency and trustworthiness metrics exists because "metrics beyond accuracy don't fall to the wayside".
 
-**Different conditions.** Prompt format, number of examples, decoding settings, and even the evaluation harness affect results. A score without those details is not reproducible.
+**Different conditions.** Prompt format, number of examples, decoding settings, and even the evaluation harness affect results.
 
-A benchmark is therefore a claim with a scope. Reading it critically means asking what that scope was.
+<Trap>
+A score without those details is not reproducible.
+</Trap>
+
+<KeyPoint>
+A benchmark is therefore a claim with a scope.
+</KeyPoint>
+
+Reading it critically means asking what that scope was.
 
 ## What HELM changed
 
-HELM's approach was to taxonomise the space of scenarios and metrics, select a broad but feasible subset, and evaluate every model on the same core set under standardised conditions. The paper reports that the core matrix covers 16 scenarios with seven metrics "when possible (87.5% of the time)", plus targeted evaluations across 26 further scenarios.
+HELM's approach was to taxonomise the space of scenarios and metrics, select a broad but feasible subset, and evaluate every model on the same core set under <Mark>standardised conditions</Mark>. The paper reports that the core matrix covers 16 scenarios with seven metrics "when possible (87.5% of the time)", plus targeted evaluations across 26 further scenarios.
 
 Three consequences follow:
 
@@ -55,18 +71,22 @@ Now apply a decision lens: if your application needs grounded extraction from do
 Three conclusions follow:
 
 - **A rank is a summary, not a recommendation.** Use it to build a shortlist, then test on your own work.
-- **A gap smaller than the condition noise is not a result.** Without error bars or repeated runs, two points may be measurement variation.
+- **A gap smaller than the condition noise is not a result.** Without error bars or repeated runs, two points may be <Mark>measurement variation</Mark>.
 - **Documented limitations are a sign of quality.** A benchmark that states what it does not cover is more useful than one that claims universality.
 
 ## What benchmarks cannot tell you
 
-**They are not deployment outcomes.** A model that scores well on a benchmark can still be wrong in your workflow because of data quality, tool integration, or prompt design. The capability-to-outcome gap is the central caution in the AI literature.
+**They are not deployment outcomes.** A model that scores well on a benchmark can still be wrong in your workflow because of data quality, tool integration, or prompt design. <Mark>The capability-to-outcome gap</Mark> is the central caution in the AI literature.
 
 **They age.** Models are updated, and a benchmark can become saturated or contaminated when its questions appear in training data. A score from an older version may not describe the current one.
 
 **They encode values.** Choosing which scenarios matter is a judgement. A benchmark heavy on English-language tasks will rank models differently from one balanced across languages, and neither ranking is neutral.
 
-The counterargument — that benchmarks are still better than gut feeling — is correct. The response is to use them properly: as standardised evidence with a stated scope, not as a universal hierarchy.
+The counterargument — that benchmarks are still better than gut feeling — is correct.
+
+<PullQuote>
+The response is to use them properly: as standardised evidence with a stated scope, not as a universal hierarchy.
+</PullQuote>
 
 ## A decision test
 

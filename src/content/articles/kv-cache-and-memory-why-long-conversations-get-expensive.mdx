@@ -9,7 +9,9 @@ tags:
   - Performance
 ---
 
+<Lead>
 A long conversation feels cheap because each new message is short. The model, however, has been carrying the entire history in a growing key-value cache, and that cache consumes GPU memory for every token in the context. At some point the conversation ends not because the model forgot, but because the memory ran out.
+</Lead>
 
 **Direct answer:** The KV cache stores the attention keys and values computed for previous tokens so they need not be recomputed at each generation step. Its size grows linearly with context length and with the number of concurrent requests. FlashAttention reduces the memory cost of computing attention but does not eliminate the KV cache itself. The boundary: a large context window is a capacity limit, not a free resource — every token stored has a memory cost that affects throughput and cost.
 
@@ -21,9 +23,11 @@ During generation, each layer of a transformer produces a key and a value vector
 
 **It is per-request.** Each concurrent conversation has its own cache. A server handling 100 conversations holds 100 caches.
 
-**It is distinct from model weights.** Weights are fixed; the cache is working memory that grows with use.
+**It is distinct from model weights.** Weights are fixed; the cache is <Mark>working memory that grows with use</Mark>.
 
+<KeyPoint>
 This is why long-context serving is a memory problem as much as a compute problem, which the GPU article explains at the hardware level.
+</KeyPoint>
 
 ## A worked memory calculation
 
@@ -45,7 +49,7 @@ Three lessons follow:
 2. **Concurrency is the hidden multiplier.** A single request may fit; a hundred do not.
 3. **Model weights are only part of the budget.** A server planner that counts weights but not cache will be surprised at high context lengths.
 
-The arithmetic is simplified — implementations vary in precision and layout — but the linear relationship is the point.
+The arithmetic is simplified — implementations vary in precision and layout — but <Mark>the linear relationship is the point</Mark>.
 
 ## Mitigations
 
@@ -65,9 +69,17 @@ The arithmetic is simplified — implementations vary in precision and layout �
 
 **It is not the same as prompt caching.** Prompt caching, as the previous article explains, reuses computation across requests and is billed by the provider. The KV cache is the in-session working state.
 
-**It is not eliminated by FlashAttention.** FlashAttention makes attention computation memory-efficient by avoiding the full attention matrix; the KV cache still holds the per-token keys and values needed for future steps.
+**It is not eliminated by FlashAttention.**
 
-The counterargument — that larger GPUs solve the problem — is true up to a point. Memory capacity grows, but so do context lengths and concurrency, and the linear relationship remains.
+<Trap>
+FlashAttention makes attention computation memory-efficient by avoiding the full attention matrix; the KV cache still holds the per-token keys and values needed for future steps.
+</Trap>
+
+The counterargument — that larger GPUs solve the problem — is true up to a point.
+
+<PullQuote>
+Memory capacity grows, but so do context lengths and concurrency, and the linear relationship remains.
+</PullQuote>
 
 ## A decision test
 
