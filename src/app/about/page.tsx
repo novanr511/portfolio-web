@@ -48,9 +48,8 @@ export default function AboutPage() {
     >
       <div className="mx-auto max-w-5xl px-6 pb-24 pt-16 sm:pt-24">
         <Reveal>
-          <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-[44px]">
-            About
-          </h1>
+          <p className="page-eyebrow">03 / About</p>
+          <h1 className="page-title mt-5">About</h1>
         </Reveal>
 
         <Reveal delay={80}>
@@ -110,10 +109,15 @@ export default function AboutPage() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-3">
-          {focus.map((item, i) => (
+        <div className="page-band mt-14 -mx-6 px-6 py-12">
+          <Reveal>
+            <p className="page-eyebrow">Focus</p>
+            <h2 className="page-title mt-3 text-[28px]">Where the work happens</h2>
+          </Reveal>
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            {focus.map((item, i) => (
             <Reveal key={item.title} delay={i * 90}>
-              <div className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6">
+              <div className="editorial-card flex h-full flex-col rounded-2xl border border-border bg-surface p-6">
                 <h2 className="text-[16px] font-semibold tracking-tight text-foreground">
                   {item.title}
                 </h2>
@@ -133,16 +137,15 @@ export default function AboutPage() {
               </div>
             </Reveal>
           ))}
+          </div>
         </div>
 
         <Reveal>
-          <div className="mt-14 rounded-2xl border border-border bg-surface px-7 py-8">
-            <h2 className="text-[18px] font-semibold tracking-tight text-foreground">
-              Get in touch
-            </h2>
-            <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-muted">
+          <div className="editorial-card mt-14 rounded-2xl border border-border bg-surface px-7 py-8">
+            <h2 className="page-title text-[24px]">Get in touch</h2>
+            <p className="page-subtitle mt-2 max-w-xl text-[14px]">
               Whether it&apos;s web development, SEO, a data science role, or
-              something at the intersection — I&apos;d love to hear from you.
+              something at the intersection, I&apos;d love to hear from you.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <a

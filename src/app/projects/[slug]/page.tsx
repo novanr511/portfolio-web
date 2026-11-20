@@ -161,10 +161,11 @@ export default async function ProjectStudyPage({
                     </span>
                   ))}
                 </div>
-                <h1 className="mt-5 text-[26px] font-semibold leading-[1.25] tracking-[-0.02em] text-foreground sm:text-[34px]">
+                <p className="page-eyebrow mt-6">02 / Work</p>
+                <h1 className="page-title mt-3 text-[28px] sm:text-[38px]">
                   {study.title}
                 </h1>
-                <p className="mt-4 text-[17px] leading-relaxed text-muted">
+                <p className="page-subtitle mt-4 text-[16px]">
                   {study.description}
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-5 text-[13px] text-muted">
@@ -208,7 +209,7 @@ export default async function ProjectStudyPage({
                 <Link
                   href="/projects"
                   transitionTypes={["nav-back"]}
-                  className="group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
+                  className="editorial-card group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
                 >
                   <span className="text-[12px] font-medium uppercase tracking-wide text-muted">
                     Back
@@ -221,7 +222,7 @@ export default async function ProjectStudyPage({
                   <Link
                     href="/articles/why-data-quality-matters-more-than-model-complexity"
                     transitionTypes={["nav-forward"]}
-                    className="group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
+                    className="editorial-card group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
                   >
                     <span className="text-[12px] font-medium uppercase tracking-wide text-muted">
                       Related reading
@@ -233,7 +234,7 @@ export default async function ProjectStudyPage({
                   <Link
                     href="/articles/scenario-analysis-and-monte-carlo-when-to-use-each"
                     transitionTypes={["nav-forward"]}
-                    className="group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
+                    className="editorial-card group rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/30 hover:bg-tint"
                   >
                     <span className="text-[12px] font-medium uppercase tracking-wide text-muted">
                       Related reading

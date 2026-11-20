@@ -21,25 +21,25 @@ export function Footer() {
         >
           <Link
             href="/articles"
-            className="text-muted transition-colors hover:text-accent"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             Articles
           </Link>
           <Link
             href="/projects"
-            className="text-muted transition-colors hover:text-accent"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             Projects
           </Link>
           <Link
             href="/about"
-            className="text-muted transition-colors hover:text-accent"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             About
           </Link>
           <a
             href="/feed.xml"
-            className="text-muted transition-colors hover:text-accent"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             RSS feed
           </a>
@@ -47,7 +47,7 @@ export function Footer() {
             href={site.social.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted transition-colors hover:text-accent"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             LinkedIn ↗
           </a>

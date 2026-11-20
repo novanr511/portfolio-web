@@ -91,17 +91,16 @@ export default async function ArticlesPage() {
       />
       <div className="mx-auto max-w-5xl px-6 pb-24 pt-16 sm:pt-24">
         <Reveal>
-          <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-[44px]">
-            Articles
-          </h1>
-          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-muted">
-            Practical, researched deep dives on AI engineering — getting
+          <p className="page-eyebrow">01 / Library</p>
+          <h1 className="page-title mt-5">Articles</h1>
+          <p className="page-subtitle mt-4 max-w-2xl">
+            Practical, researched deep dives on AI engineering, getting
             started, retrieval-augmented generation, and building agents with
             LangChain and LangGraph.
           </p>
         </Reveal>
 
-        <section className="mt-9" aria-label="Article categories">
+        <section className="page-band mt-10 -mx-6 px-6 py-9 sm:-mx-6" aria-label="Article categories">
           <CategoryScroller>
             {[...new Set(sortedArticles.flatMap((article) => article.tags))]
               .sort((a, b) => a.localeCompare(b))
@@ -109,7 +108,7 @@ export default async function ArticlesPage() {
                 <Link
                   key={category}
                   href={`/articles/category/${categorySlug(category)}`}
-                  className="shrink-0 whitespace-nowrap rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
+                  className="page-topic shrink-0 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {category}
                 </Link>

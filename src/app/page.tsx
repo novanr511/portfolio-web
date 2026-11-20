@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
+import { HomeMarquee } from "@/components/home-marquee";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
 import { ProjectCard } from "@/components/project-card";
@@ -7,7 +9,7 @@ import { getSortedArticles } from "@/lib/articles";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
-/** Home page JSON-LD: Person — WebSite identity lives in the root layout */
+/** Home page JSON-LD: Person, WebSite identity lives in the root layout */
 function homeJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -15,29 +17,15 @@ function homeJsonLd() {
       {
         "@type": "Person",
         "@id": `${site.url}/#person`,
-        name: site.author.name,
+        name: site.author.penName,
         jobTitle: site.author.jobTitle,
         url: site.url,
-        description:
-          "Web developer and SEO specialist from Jakarta with years of WordPress and search-engine work, now building with Next.js and transitioning into data science and applied AI.",
+        description: site.description,
         address: {
           "@type": "PostalAddress",
           addressLocality: "Jakarta",
           addressCountry: "ID",
         },
-        knowsAbout: [
-          "Next.js",
-          "WordPress",
-          "Frontend Development",
-          "Search Engine Optimization",
-          "Technical SEO",
-          "Web Performance",
-          "Data Science",
-          "Machine Learning",
-          "RAG",
-          "LangChain",
-          "LangGraph",
-        ],
         sameAs: [site.social.github, site.social.linkedin],
       },
     ],
@@ -45,8 +33,20 @@ function homeJsonLd() {
 }
 
 export default async function Home() {
-  const latest = (await getSortedArticles()).slice(0, 3);
+  const articles = await getSortedArticles();
+  const latest = articles.slice(0, 3);
   const featured = projects.filter((p) => p.featured);
+
+  const topicCounts = new Map<string, number>();
+  for (const article of articles) {
+    for (const tag of article.tags) {
+      topicCounts.set(tag, (topicCounts.get(tag) ?? 0) + 1);
+    }
+  }
+  const topics = [...topicCounts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 8)
+    .map(([tag]) => tag);
 
   return (
     <ViewTransition
@@ -61,76 +61,138 @@ export default async function Home() {
         }}
       />
 
-      {/* Hero */}
-      <section className="mx-auto max-w-5xl px-6 pb-20 pt-20 sm:pt-28">
-        <Reveal>
-          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-muted">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-40 animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-            </span>
-            Currently learning data science &amp; applied AI
-          </p>
-        </Reveal>
+      {/* Hero: identity statement, with a decorative marquee and a real portrait */}
+      <section className="home-hero" aria-labelledby="home-heading">
+        <div className="home-hero-stage">
+          <HomeMarquee name="Novandri" />
 
-        <Reveal delay={80}>
-          <h1 className="mt-7 max-w-3xl text-[40px] font-semibold leading-[1.08] tracking-[-0.02em] text-foreground sm:text-[56px]">
-            I build for the web — and I&apos;m going deep on{" "}
-            <span className="text-accent">data science &amp; AI</span>.
-          </h1>
-        </Reveal>
+          <div className="home-portrait">
+            <Image
+              src="/novandri-portrait.jpg"
+              alt="Portrait of Novandri"
+              width={500}
+              height={667}
+              fetchPriority="high"
+              loading="eager"
+              sizes="(max-width: 640px) 150px, 250px"
+            />
+          </div>
 
-        <Reveal delay={160}>
-          <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-muted sm:text-[19px]">
-            I&apos;m {site.author.name}, a web developer who spent years on
-            WordPress builds and SEO — from freelance sites to the Ministry of
-            Health — now building with Next.js and going deep on machine
-            learning, RAG systems, and AI agents. I write about what I learn
-            along the way.
-          </p>
-        </Reveal>
+          <div className="home-hero-copy">
+            <h1 id="home-heading">
+              Web developer. SEO specialist. Learning AI in public.
+            </h1>
+            <p>
+              {site.author.name}, based in {site.location}. Building with Next.js
+              and WordPress, going deep on data science and applied AI.
+            </p>
+          </div>
 
-        <Reveal delay={240}>
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div className="home-hero-bar">
             <Link
               href="/articles"
               transitionTypes={["nav-forward"]}
-              className="rounded-full bg-accent px-6 py-3 text-[14px] font-medium text-accent-contrast transition-colors duration-300 hover:bg-accent-strong"
+              className="primary"
             >
-              Read the articles
+              Read the writing
             </Link>
-            <Link
-              href="/projects"
-              transitionTypes={["nav-forward"]}
-              className="rounded-full border border-border bg-surface px-6 py-3 text-[14px] font-medium text-foreground transition-colors duration-300 hover:bg-tint hover:border-accent/30"
-            >
-              See my work
+            <Link href="/projects" transitionTypes={["nav-forward"]}>
+              See the work
             </Link>
           </div>
-        </Reveal>
+        </div>
       </section>
 
-      {/* Latest articles */}
-      <section className="border-t border-border bg-surface/50">
-        <div className="mx-auto max-w-5xl px-6 py-20">
+      {/* Statement: only facts already in site config */}
+      <section className="home-statement border-b border-border">
+        <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
           <Reveal>
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-[32px]">
-                  Latest writing
-                </h2>
-                <p className="mt-2 text-[15px] text-muted">
-                  Deep dives on AI, RAG, and agent engineering.
-                </p>
-              </div>
-              <Link
-                href="/articles"
-                transitionTypes={["nav-forward"]}
-                className="hidden shrink-0 text-[14px] font-medium text-accent transition-opacity hover:opacity-70 sm:inline-flex"
-              >
-                All articles →
-              </Link>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-accent">
+              01 / Position
+            </p>
+          </Reveal>
+          <Reveal delay={80}>
+            <h2 className="mt-6 max-w-3xl text-[32px] sm:text-[44px]">
+              Practical web work, now with machine learning underneath.
+            </h2>
+          </Reveal>
+          <Reveal delay={140}>
+            <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-muted sm:text-[18px]">
+              {site.description}
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Work: real featured projects */}
+      {featured.length > 0 && (
+        <section className="home-work border-b border-border">
+          <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
+            <Reveal>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-accent">
+                02 / Work
+              </p>
+              <h2 className="mt-6 text-[32px] sm:text-[44px]">Selected project</h2>
+            </Reveal>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              {featured.map((project, i) => (
+                <Reveal key={project.slug} delay={i * 90}>
+                  <ProjectCard project={project} />
+                </Reveal>
+              ))}
             </div>
+            <Reveal>
+              <Link
+                href="/projects"
+                transitionTypes={["nav-forward"]}
+                className="mt-8 inline-flex min-h-11 items-center text-[14px] font-medium text-accent transition-opacity hover:opacity-70"
+              >
+                All projects
+              </Link>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* Focus band: real tags counted from the article bank, shown without numbers */}
+      {topics.length > 0 && (
+        <section className="home-focus py-20 sm:py-24">
+          <div className="mx-auto max-w-5xl px-6">
+            <Reveal>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--band-acc)" }}>
+                03 / Focus
+              </p>
+              <h2 className="mt-6 text-[32px] sm:text-[44px]">
+                Topics I keep returning to.
+              </h2>
+              <p className="mt-4 max-w-2xl text-[15px] leading-relaxed opacity-80">
+                Drawn from the tags on the writing, not from a list of claimed skills.
+              </p>
+            </Reveal>
+            <Reveal delay={80}>
+              <ul className="mt-10 flex flex-wrap gap-2.5">
+                {topics.map((topic) => (
+                  <li key={topic} className="home-topic">
+                    {topic}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* Writing: latest real articles */}
+      <section className="home-writing border-b border-border">
+        <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
+          <Reveal>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-accent">
+              04 / Writing
+            </p>
+            <h2 className="mt-6 text-[32px] sm:text-[44px]">Latest writing</h2>
+            <p className="mt-4 text-[15px] text-muted">
+              Deep dives on AI, RAG, and agent engineering.
+            </p>
           </Reveal>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {latest.map((article, i) => (
@@ -143,67 +205,41 @@ export default async function Home() {
             <Link
               href="/articles"
               transitionTypes={["nav-forward"]}
-              className="mt-8 inline-flex text-[14px] font-medium text-accent sm:hidden"
+              className="mt-8 inline-flex min-h-11 items-center text-[14px] font-medium text-accent transition-opacity hover:opacity-70"
             >
-              All articles →
+              All articles
             </Link>
           </Reveal>
         </div>
       </section>
 
-      {/* Highlighted projects — hidden while there are no featured projects */}
-      {featured.length > 0 && (
-        <section className="border-t border-border">
-          <div className="mx-auto max-w-5xl px-6 py-20">
-            <Reveal>
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-[32px]">
-                    Highlighted work
-                  </h2>
-                  <p className="mt-2 text-[15px] text-muted">
-                    A selection of projects — from the web stack into the AI stack.
-                  </p>
-                </div>
-                <Link
-                  href="/projects"
-                  transitionTypes={["nav-forward"]}
-                  className="hidden shrink-0 text-[14px] font-medium text-accent transition-opacity hover:opacity-70 sm:inline-flex"
-                >
-                  All projects →
-                </Link>
-              </div>
-            </Reveal>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2">
-              {featured.map((project, i) => (
-                <Reveal key={project.slug} delay={i * 90}>
-                  <ProjectCard project={project} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* CTA band */}
-      <section className="border-t border-border">
-        <div className="mx-auto max-w-5xl px-6 py-20">
+      {/* Contact: real destinations only */}
+      <section className="home-contact">
+        <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
           <Reveal>
-            <div className="rounded-3xl bg-accent px-8 py-14 text-center sm:px-16">
-              <h2 className="text-[26px] font-semibold tracking-[-0.02em] text-accent-contrast sm:text-[32px]">
-                The web today, the models tomorrow.
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-accent-contrast/80">
-                Want to talk frontend, data science, or where the two meet?
-                I&apos;m always up for a good technical conversation.
-              </p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-accent">
+              05 / Contact
+            </p>
+            <h2 className="mt-6 text-[32px] sm:text-[52px]">Let&apos;s connect.</h2>
+            <p className="mt-5 max-w-xl text-[16px] leading-relaxed text-muted">
+              Good conversations about the web, SEO, or applied AI are welcome.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={site.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-flex rounded-full bg-background px-6 py-3 text-[14px] font-medium text-accent transition-opacity duration-300 hover:opacity-90"
+                className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-[14px] font-medium text-accent-contrast transition-opacity hover:opacity-90"
               >
-                Connect on LinkedIn
+                LinkedIn
+              </a>
+              <a
+                href={site.social.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center rounded-full border border-border px-6 py-3 text-[14px] font-medium text-foreground transition-colors hover:border-accent/40"
+              >
+                GitHub
               </a>
             </div>
           </Reveal>

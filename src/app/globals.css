@@ -41,6 +41,7 @@
   --color-tint: var(--tint);
   --color-border: var(--border);
   --font-sans: var(--font-inter);
+  --font-serif: var(--font-editorial);
 }
 
 html {
@@ -51,7 +52,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
-  transition: background-color 400ms ease, color 400ms ease;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
 ::selection {
@@ -63,10 +64,10 @@ body {
    --------------------------------------------------------------------------- */
 .reveal {
   opacity: 0;
-  translate: 0 18px;
+  translate: 0 10px;
   transition:
-    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
-    translate 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    translate 420ms cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -350,6 +351,7 @@ body {
 }
 
 .prose-article :where(code):not(:where(pre code)) {
+  overflow-wrap: anywhere;
   font-size: 0.875em;
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -420,4 +422,339 @@ body {
 }
 .toc-mobile > summary::-webkit-details-marker {
   display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Home: editorial hero and colour zones
+   Reason: the home page carries the portfolio's identity, while /articles and
+   /projects keep the shared theme tokens. Both themes are defined explicitly.
+   See docs/home-design.md.
+   --------------------------------------------------------------------------- */
+.home-hero {
+  --hero-bg: #f8f9fb;
+  --hero-ink: #1b2a42;
+  --hero-muted: #5c6b82;
+  --hero-acc: #264a80;
+  --hero-line: rgba(27, 42, 66, 0.16);
+  position: relative;
+  height: 150vh;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+
+.dark .home-hero {
+  --hero-bg: #0b0e13;
+  --hero-ink: #f5f5f7;
+  --hero-muted: #9ba1ab;
+  --hero-acc: #8fb4e4;
+  --hero-line: rgba(245, 245, 247, 0.18);
+}
+
+.home-hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-marquee {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vh, 1.6rem);
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: home-marquee 38s linear infinite;
+  will-change: transform;
+}
+
+.home-marquee-track.reverse {
+  animation-direction: reverse;
+}
+
+.home-marquee[data-paused="true"] .home-marquee-track {
+  animation-play-state: paused;
+}
+
+.home-marquee-row {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(3.6rem, 11vw, 9rem);
+  line-height: 0.9;
+  white-space: nowrap;
+  color: var(--hero-ink);
+  opacity: 0.12;
+}
+
+.home-marquee-row.outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--hero-ink);
+  opacity: 0.26;
+}
+
+@keyframes home-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.home-portrait {
+  position: relative;
+  z-index: 2;
+  width: clamp(150px, 22vw, 250px);
+  aspect-ratio: 3 / 4;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--hero-line);
+}
+
+.home-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(1) contrast(1.05);
+}
+
+.home-hero-copy {
+  position: relative;
+  z-index: 2;
+  margin-top: clamp(1.75rem, 4.5vh, 3rem);
+  max-width: 46ch;
+  padding: 0 1.25rem;
+  text-align: center;
+}
+
+.home-hero-copy h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+.home-hero-copy p {
+  margin-top: 1rem;
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  line-height: 1.6;
+  color: var(--hero-muted);
+  text-wrap: pretty;
+}
+
+.home-hero-bar {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  box-sizing: border-box;
+  border: 1px solid var(--hero-line);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--hero-bg) 94%, transparent);
+}
+
+.home-hero-bar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--hero-ink);
+  cursor: pointer;
+}
+
+.home-hero-bar a.primary {
+  background: var(--hero-acc);
+  color: var(--hero-bg);
+}
+
+.home-hero-bar a:hover {
+  filter: brightness(1.08);
+}
+
+.home-marquee-toggle {
+  position: absolute;
+  right: 1rem;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  z-index: 5;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--hero-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--hero-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.home-marquee-toggle:hover {
+  color: var(--hero-ink);
+}
+
+.home-focus {
+  --band-bg: #eef3f9;
+  --band-ink: #1b2a42;
+  --band-acc: #264a80;
+  background: var(--band-bg);
+  color: var(--band-ink);
+  box-shadow: 0 0 0 100vmax var(--band-bg);
+  clip-path: inset(0 -100vmax);
+}
+
+.dark .home-focus {
+  --band-bg: #16202e;
+  --band-ink: #f5f5f7;
+  --band-acc: #8fb4e4;
+}
+
+.home-topic {
+  border: 1px solid color-mix(in oklab, var(--band-ink) 22%, transparent);
+  border-radius: 2px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.home-statement h2,
+.home-focus h2,
+.home-writing h2,
+.home-work h2,
+.home-contact h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.home-contact a {
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .home-hero {
+    height: 130vh;
+  }
+  .home-hero-stage {
+    min-height: 520px;
+  }
+  .home-marquee-row {
+    font-size: clamp(3rem, 16vw, 5.5rem);
+  }
+  .home-marquee-toggle {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0.6rem;
+  }
+  .home-hero-bar {
+    bottom: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-marquee-track {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Shared page language for /articles, /projects, /about and case studies.
+   Reason: the same editorial voice as home, with the site's soft-blue accent.
+   See docs/home-design.md.
+   --------------------------------------------------------------------------- */
+.page-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.page-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.25rem, 6vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.page-subtitle {
+  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  line-height: 1.65;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.page-band {
+  --band-bg: #eef3f9;
+  --band-ink: #1b2a42;
+  --band-acc: #264a80;
+  background: var(--band-bg);
+  color: var(--band-ink);
+  box-shadow: 0 0 0 100vmax var(--band-bg);
+  clip-path: inset(0 -100vmax);
+}
+
+.dark .page-band {
+  --band-bg: #16202e;
+  --band-ink: #f5f5f7;
+  --band-acc: #8fb4e4;
+}
+
+.page-band .page-eyebrow {
+  color: var(--band-acc);
+}
+
+.page-band .page-subtitle {
+  color: color-mix(in oklab, var(--band-ink) 76%, transparent);
+}
+
+.page-band .page-title {
+  color: var(--band-ink);
+}
+
+.editorial-card {
+  border-radius: 2px;
+}
+
+.editorial-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.page-topic {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border: 1px solid color-mix(in oklab, var(--band-ink) 22%, transparent);
+  border-radius: 2px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--band-ink);
+}
+
+.page-topic:hover {
+  border-color: var(--band-acc);
+  color: var(--band-acc);
+  cursor: pointer;
 }

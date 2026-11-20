@@ -30,7 +30,7 @@ export function Header() {
         <Link
           href="/"
           transitionTypes={["nav-back"]}
-          className="text-[17px] font-semibold tracking-tight text-foreground"
+          className="inline-flex min-h-11 items-center text-[17px] font-semibold tracking-tight text-foreground"
         >
           {site.wordmark.replace(/\.$/, "")}
           <span className="text-accent">.</span>
@@ -43,7 +43,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               transitionTypes={[isActive(item.href) ? "nav-back" : "nav-forward"]}
-              className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-300 ${
+              className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-300 ${
                 isActive(item.href)
                   ? "bg-tint text-accent"
                   : "text-muted hover:text-foreground"
@@ -64,7 +64,7 @@ export function Header() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-foreground"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-foreground"
           >
             <svg
               width="18"
@@ -97,7 +97,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className={`rounded-xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
+              className={`inline-flex min-h-11 items-center rounded-xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
                 isActive(item.href)
                   ? "bg-tint text-accent"
                   : "text-muted hover:bg-surface hover:text-foreground"

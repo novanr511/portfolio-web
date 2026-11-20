@@ -3,7 +3,7 @@ import type { Project } from "@/lib/projects";
 
 export function ProjectCard({ project }: { project: Project }) {
   const body = (
-    <article className="flex h-full flex-col rounded-2xl border border-border bg-surface p-7 transition-colors duration-300 group-hover:border-accent/40 group-hover:bg-tint/60">
+    <article className="editorial-card flex h-full flex-col rounded-2xl border border-border bg-surface p-7 transition-colors duration-300 group-hover:border-accent/40 group-hover:bg-tint/60">
       <div className="flex items-center justify-between">
         <span className="rounded-full bg-tint px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-accent">
           {project.year}

@@ -6,7 +6,7 @@ export function ArticleCard({ article }: { article: Article }) {
     <Link
       href={`/articles/${article.slug}`}
       transitionTypes={["nav-forward"]}
-      className="group flex h-full flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:bg-tint focus-visible:outline-2 focus-visible:outline-accent"
+      className="editorial-card group flex h-full flex-col rounded-2xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:bg-tint focus-visible:outline-2 focus-visible:outline-accent"
     >
       <div className="flex flex-wrap gap-1.5">
         {article.tags.slice(0, 3).map((tag) => (

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
@@ -8,6 +8,14 @@ import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+/** Editorial display face for the home page. Reason: gives the portfolio its own voice; see docs/home-design.md. */
+const editorial = Instrument_Serif({
+  variable: "--font-editorial",
+  weight: "400",
   subsets: ["latin"],
   display: "swap",
 });
@@ -90,7 +98,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} ${editorial.variable} h-full antialiased`}
     >
       <head>
         <script

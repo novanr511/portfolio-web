@@ -31,11 +31,10 @@ export default function ProjectsPage() {
     >
       <div className="mx-auto max-w-5xl px-6 pb-24 pt-16 sm:pt-24">
         <Reveal>
-          <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-[44px]">
-            Projects
-          </h1>
-          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-muted">
-            Work I&apos;m proud of — from shipping production web platforms to
+          <p className="page-eyebrow">02 / Work</p>
+          <h1 className="page-title mt-5">Projects</h1>
+          <p className="page-subtitle mt-4 max-w-2xl">
+            Work I&apos;m proud of, from shipping production web platforms to
             the data science projects marking my transition into AI.
           </p>
         </Reveal>
@@ -63,11 +62,10 @@ export default function ProjectsPage() {
         ) : (
           <>
             {featured.length > 0 && (
-              <>
+              <div className="page-band mt-14 -mx-6 px-6 py-10">
                 <Reveal>
-                  <h2 className="mt-14 text-[12px] font-semibold uppercase tracking-widest text-muted">
-                    Highlighted
-                  </h2>
+                  <p className="page-eyebrow">Featured</p>
+                  <h2 className="page-title mt-3 text-[28px]">Highlighted</h2>
                 </Reveal>
                 <div className="mt-6 grid gap-5 sm:grid-cols-2">
                   {featured.map((project, i) => (
@@ -76,13 +74,13 @@ export default function ProjectsPage() {
                     </Reveal>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
             {others.length > 0 && (
               <>
                 <Reveal>
-                  <h2 className="mt-16 text-[12px] font-semibold uppercase tracking-widest text-muted">
+                  <h2 className="page-eyebrow mt-16">
                     More work
                   </h2>
                 </Reveal>

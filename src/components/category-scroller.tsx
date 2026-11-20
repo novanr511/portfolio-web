@@ -101,7 +101,7 @@ export function CategoryScroller({ children }: CategoryScrollerProps) {
             onClick={() => scrollBy(-1)}
             disabled={atStart}
             aria-label="Scroll categories left"
-            className="rounded-full border border-border p-1.5 text-muted transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
           >
             <Chevron direction="left" />
           </button>
@@ -110,7 +110,7 @@ export function CategoryScroller({ children }: CategoryScrollerProps) {
             onClick={() => scrollBy(1)}
             disabled={atEnd}
             aria-label="Scroll categories right"
-            className="rounded-full border border-border p-1.5 text-muted transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
           >
             <Chevron direction="right" />
           </button>
