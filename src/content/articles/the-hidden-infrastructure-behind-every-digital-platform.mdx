@@ -9,15 +9,21 @@ tags:
   - HTTP
 ---
 
+<Lead>
 A digital product appears simple at the surface: a URL, a page, a response. Underneath, a name has to become an address, a connection has to be established, and a request has to be interpreted according to rules written decades before the application existed. Those layers are hidden until they fail, and then they are all that matters.
+</Lead>
 
-**Direct answer:** The visible web rests on a stack of standardised protocols. DNS maps names to addresses; HTTP defines the semantics of requests and responses; the transport carries the bytes, with HTTP/3 mapping HTTP semantics over QUIC. RFC 9110 describes HTTP as "a stateless application-level protocol for distributed, collaborative, hypertext information systems", and RFC 9114 states that "HTTP/3 supports the same semantics over a new transport protocol: QUIC". The boundary: knowing the protocols explains what *can* happen, not what a particular deployment actually does.
+**Direct answer:** The visible web rests on a stack of standardised protocols. DNS maps names to addresses; HTTP defines the semantics of requests and responses; the transport carries the bytes, with HTTP/3 mapping HTTP semantics over QUIC. RFC 9110 describes HTTP as "a stateless application-level protocol for distributed, collaborative, hypertext information systems", and RFC 9114 states that "HTTP/3 supports the same semantics over a new transport protocol: QUIC".
+
+<KeyPoint>
+The boundary: knowing the protocols explains what *can* happen, not what a particular deployment actually does.
+</KeyPoint>
 
 ## Name resolution: DNS
 
 RFC 1035, published in November 1987, specifies the implementation of the Domain Name System. A resolver translates a human-readable name into the data needed to connect — typically an IP address — by querying a hierarchy of servers and caching the results.
 
-Caching is what makes the system usable at scale, and it is also where most confusion lives. A DNS answer has a time-to-live; once it expires, the resolver asks again. A change to a record therefore propagates gradually, and an old address can persist in caches long after the authoritative source has changed. This is why a migration plan includes a TTL reduction before the switch, not just the switch itself.
+Caching is what makes the system usable at scale, and <Mark>it is also where most confusion lives</Mark>. A DNS answer has a time-to-live; once it expires, the resolver asks again. A change to a record therefore propagates gradually, and an old address can persist in caches long after the authoritative source has changed. This is why a migration plan includes a TTL reduction before the switch, not just the switch itself.
 
 Three properties matter operationally:
 
@@ -35,7 +41,7 @@ Two distinctions in the specification prevent a great deal of confusion:
 
 **Status codes describe the outcome of the protocol request**, not the business outcome. A `200 OK` means the request was processed; it does not mean the data was useful, the operation succeeded semantically, or a search engine indexed the page. Confusing these is the source of many bad operational assumptions.
 
-RFC 9114 adds the transport evolution. QUIC offers "stream multiplexing, per-stream flow control, and low-latency connection establishment", and HTTP/3 maps the same HTTP semantics onto it. The important phrase is "the same semantics": a change of transport does not change what a request means, only how the bytes move. That is why an application can adopt HTTP/3 without rewriting its API.
+RFC 9114 adds the transport evolution. QUIC offers "stream multiplexing, per-stream flow control, and low-latency connection establishment", and HTTP/3 maps the same HTTP semantics onto it. The important phrase is "the same semantics": <Mark>a change of transport does not change what a request means</Mark>, only how the bytes move. That is why an application can adopt HTTP/3 without rewriting its API.
 
 ## A worked example of a page load
 
@@ -54,7 +60,11 @@ Two observations follow.
 
 First, **the handshake matters**. On a high-latency link, a round trip dominates a page's perceived speed, which is why connection reuse and HTTP/3's lower-latency establishment are significant. The improvement is in the transport, not in the application code.
 
-Second, **an uncached DNS lookup can exceed server processing time**. A team that optimises a 40 ms handler while ignoring cache TTLs and connection behaviour is working on the wrong part of the budget.
+Second, **an uncached DNS lookup can exceed server processing time**.
+
+<Trap>
+A team that optimises a 40 ms handler while ignoring cache TTLs and connection behaviour is working on the wrong part of the budget.
+</Trap>
 
 A migration example shows the layers interacting. Moving a service to a new address requires: lowering the DNS TTL in advance, ensuring the new endpoint accepts the same HTTP semantics, confirming the transport supports the expected connection behaviour, and verifying that clients do not pin an old address. A failure at any layer produces a symptom at the surface that looks like "the site is down".
 
@@ -76,13 +86,17 @@ This is why the worked latency budget is more than an illustration: it tells you
 
 Three limitations matter.
 
-**The RFCs define protocols, not deployments.** RFC 9114 specifies HTTP/3; your CDN, browser, and network may or may not support it in the way the specification allows. Always distinguish what a protocol permits from what a particular stack does.
+**The RFCs define protocols, not deployments.** RFC 9114 specifies HTTP/3; your CDN, browser, and network may or may not support it in the way the specification allows. <Mark>Always distinguish what a protocol permits from what a particular stack does.</Mark>
 
 **Latency budgets are not additive in practice.** Connections are reused, requests are parallel, and caches interact. The worked example is a teaching device, not a prediction of a real page load.
 
 **The stack has policy layers.** Censorship, corporate proxies, and firewall rules can change behaviour without changing any protocol. A model that includes only the standards will miss them.
 
-The counterargument to caring about these details — that abstractions exist so developers need not understand them — is true until the abstraction leaks. It leaks precisely during incidents, which is when understanding is most valuable.
+The counterargument to caring about these details — that abstractions exist so developers need not understand them — is true until the abstraction leaks.
+
+<PullQuote>
+It leaks precisely during incidents, which is when understanding is most valuable.
+</PullQuote>
 
 ## A decision test
 

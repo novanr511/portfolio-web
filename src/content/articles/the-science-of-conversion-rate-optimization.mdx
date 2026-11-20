@@ -9,15 +9,25 @@ tags:
   - Analytics
 ---
 
+<Lead>
 Conversion rate optimisation has a reputation problem, and it is mostly deserved. The field is full of checklists — add a badge, shorten the form, change the button colour — and a HBR-style belief that every friction can be removed with a plugin. The problem is not that these changes never work. It is that a programme built around them cannot tell which ones worked, so it optimises the metric it can see rather than the business it is supposed to improve.
+</Lead>
 
-**Direct answer:** CRO is an experimentation discipline applied to the conversion funnel, and it only works when the conversion metric is tied to downstream value and the tests are designed with enough power to detect a real effect. The two practical tools are variance reduction — CUPED uses pre-period data and reported a roughly 50% variance reduction at Bing — and proper attribution of the customer journey, because a conversion today that produces a refund tomorrow is not a win. The output of a good CRO programme is a ranked list of things you learned about your customers' decisions, not a list of changes you shipped.
+**Direct answer:** CRO is an experimentation discipline applied to the conversion funnel, and it only works when <Mark>the conversion metric is tied to downstream value</Mark> and the tests are designed with enough power to detect a real effect. The two practical tools are variance reduction — CUPED uses pre-period data and reported a roughly 50% variance reduction at Bing — and proper attribution of the customer journey, because a conversion today that produces a refund tomorrow is not a win.
+
+<KeyPoint>
+The output of a good CRO programme is a ranked list of things you learned about your customers' decisions, not a list of changes you shipped.
+</KeyPoint>
 
 ## The metric is the programme
 
 Most CRO programmes choose the easiest metric: form submissions, button clicks, checkout starts. It is measurable, it is the thing the team can see, and it is often the wrong objective.
 
-The first discipline is to connect the conversion event to the outcome the business actually wants. A landing-page signup that brings unqualified leads raises conversion and lowers revenue. A checkout step that removes friction by hiding the delivery cost raises conversion and increases refunds. A discount that lifts this month's orders trains customers to wait for the next discount.
+The first discipline is to connect the conversion event to the outcome the business actually wants. A landing-page signup that brings unqualified leads raises conversion and lowers revenue. A checkout step that removes friction by hiding the delivery cost raises conversion and increases refunds.
+
+<Trap>
+A discount that lifts this month's orders trains customers to wait for the next discount.
+</Trap>
 
 This is more than a measurement problem; it is a definition problem. Google Analytics describes the underlying unit clearly: "An event allows you to measure a specific interaction or occurrence on your website or app", including a purchase or a form completion. What you choose to record as an event determines which funnel steps exist in your data, and what you choose to call a conversion determines what the team optimises. If the event model records a click but not whether the order was kept, no amount of statistical sophistication will recover the missing information.
 
@@ -27,13 +37,17 @@ The practical test is a simple one: could the team increase the headline convers
 
 Teams rarely run out of things to test; they run out of ability to tell whether a test worked. CUPED is the clearest demonstration. The method "utilizes data from the pre-experiment period to reduce metric variability and hence achieve better sensitivity", with a reported result of reducing variance by about 50% on Bing's experimentation system — "effectively achieving the same statistical power with only half of the users, or half the duration".
 
-The strategic implication for CRO is large. It means the constraint on a small site is not necessarily traffic. A high-variance conversion metric can make a real effect undetectable, and reducing that variance is worth more than another month of data. It also means that teams running many simultaneous tests on a low-traffic site should expect to be underpowered unless they deliberately reduce variability and prioritise which changes to test.
+<KeyFigures items={[
+  { value: "roughly 50%", label: "variance reduction at Bing", source: "Kohavi, Tang, and Xu, 2013" },
+]} />
+
+The strategic implication for CRO is large. It means <Mark>the constraint on a small site is not necessarily traffic</Mark>. A high-variance conversion metric can make a real effect undetectable, and reducing that variance is worth more than another month of data. It also means that teams running many simultaneous tests on a low-traffic site should expect to be underpowered unless they deliberately reduce variability and prioritise which changes to test.
 
 ## Attribution is the other half of the problem
 
 Conversion optimisation happens inside a marketing system, and the system decides how credit is assigned when a customer touches several channels. Google Ads documents the mechanics: "Attribution models let you choose how much credit each ad interaction gets for your conversions", and conversion actions that used deprecated models have been "upgraded to use data-driven attribution", with the last-click model still available.
 
-The relevance to CRO is that the conversion you optimise is itself an attributed number. If you improve a page that the model gives credit for conversions it did not cause, the test result will be flattering and the revenue will not follow. This is why incrementality matters more than attribution: geo experiments exist precisely because "one approach that Google has successfully employed to measure advertising effectiveness is geo experiments", and they measure what would not have happened otherwise.
+The relevance to CRO is that the conversion you optimise is itself an attributed number. If you improve a page that the model gives credit for conversions it did not cause, the test result will be flattering and the revenue will not follow. This is why <Mark>incrementality matters more than attribution</Mark>: geo experiments exist precisely because "one approach that Google has successfully employed to measure advertising effectiveness is geo experiments", and they measure what would not have happened otherwise.
 
 A useful discipline is to treat attribution as a model with assumptions, not as a measurement — and to ask whether the thing you just optimised actually changed total outcomes, not only the attributed share.
 
@@ -55,7 +69,11 @@ The following is hypothetical and illustrative. A subscription site with modest 
 
 ## A counterargument
 
-A reasonable critic would say the article sets a standard its own sources cannot fully clear. The roughly 50% variance reduction from CUPED is a Bing result; the article generalises it into a claim that the constraint on a small site is not necessarily traffic, yet the method needs reliable pre-period covariates that a small or new site may not have. Geo experiments, as Vaver and Koehler describe them, measure channel-level incrementality, not the page-level changes CRO actually makes, so the call to ask whether the thing optimised changed total outcomes borrows a method at the wrong scale. Google's attribution documentation describes models with assumptions, which the article acknowledges even as it leans on the attributed-versus-incremental distinction. The discipline it recommends is sound; the complaint is that the cited methods do not deliver the clean downstream answer it promises for the low-traffic sites it explicitly discusses.
+A reasonable critic would say the article sets a standard its own sources cannot fully clear. The roughly 50% variance reduction from CUPED is a Bing result; the article generalises it into a claim that the constraint on a small site is not necessarily traffic, yet the method needs reliable pre-period covariates that a small or new site may not have. Geo experiments, as Vaver and Koehler describe them, measure channel-level incrementality, not the page-level changes CRO actually makes, so the call to ask whether the thing optimised changed total outcomes borrows a method at the wrong scale. Google's attribution documentation describes models with assumptions, which the article acknowledges even as it leans on the attributed-versus-incremental distinction.
+
+<PullQuote>
+The discipline it recommends is sound; the complaint is that the cited methods do not deliver the clean downstream answer it promises for the low-traffic sites it explicitly discusses.
+</PullQuote>
 
 ## References & Further Reading
 

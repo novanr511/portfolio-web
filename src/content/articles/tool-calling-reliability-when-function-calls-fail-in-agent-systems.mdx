@@ -9,19 +9,33 @@ tags:
   - Reliability
 ---
 
+<Lead>
 Tool calling is the moment an agent stops describing an action and performs one. That is also where most agent incidents happen: the wrong tool is chosen, the arguments are malformed, the call succeeds but the effect is wrong, or the model retries an action that already completed. A demo that calls one tool once does not exercise any of those cases.
+</Lead>
 
-**Direct answer:** Tool-calling reliability comes from tight tool definitions, validation at the tool boundary, idempotency for retried actions, and logging that records which arguments were used. Anthropic's tool-use documentation covers how tools are defined and called, and the Toolformer paper is the origin point for models learning when to call an API. The boundary: the model chooses a call, but the tool must authorise and validate it — reliability cannot depend on the model always deciding correctly.
+**Direct answer:**
+
+<KeyPoint>
+Tool-calling reliability comes from tight tool definitions, validation at the tool boundary, idempotency for retried actions, and logging that records which arguments were used.
+</KeyPoint>
+
+Anthropic's tool-use documentation covers how tools are defined and called, and the Toolformer paper is the origin point for models learning when to call an API. The boundary: the model chooses a call, but the tool must authorise and validate it — reliability cannot depend on the model always deciding correctly.
 
 ## Four failure modes
 
-**Wrong tool.** The model calls the search tool when it should call the account lookup. Clear, distinct descriptions reduce this; overlapping tools increase it.
+**Wrong tool.**
+
+<Trap>
+The model calls the search tool when it should call the account lookup.
+</Trap>
+
+Clear, distinct descriptions reduce this; <Mark>overlapping tools increase it</Mark>.
 
 **Malformed arguments.** A required field is missing or a value has the wrong type. A schema and validation on receipt catch this, as the structured-output article explains.
 
 **Wrong effect.** The call is well-formed but the decision behind it is wrong — a refund issued without policy grounds. Authorisation rules inside the tool are the control, not the prompt.
 
-**Duplicate execution.** The first call succeeded, the response was lost, and the model retries. The action happens twice. Idempotency keys are the standard remedy, which the idempotency article covers in an API context.
+**Duplicate execution.** The first call succeeded, the response was lost, and the model retries. The action happens twice. <Mark>Idempotency keys are the standard remedy</Mark>, which the idempotency article covers in an API context.
 
 ## A worked retry design
 
@@ -59,7 +73,11 @@ Three lessons follow:
 
 **It cannot remove monitoring.** A sudden spike in a tool's use is a signal that something has changed in the inputs or the model. The observability article covers the alerting discipline.
 
-The counterargument — that a careful prompt prevents bad calls — is wrong in direction. A prompt reduces the frequency; a tool boundary limits the damage when it fails.
+<PullQuote>
+The counterargument — that a careful prompt prevents bad calls — is wrong in direction.
+</PullQuote>
+
+A prompt reduces the frequency; <Mark>a tool boundary limits the damage when it fails</Mark>.
 
 ## A decision test
 

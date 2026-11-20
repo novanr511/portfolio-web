@@ -9,7 +9,9 @@ tags:
   - Architecture
 ---
 
-Threat modeling is often reduced to a brainstorm about what could go wrong, which produces a list of fears rather than a set of decisions. A useful session has a defined system boundary, a method for identifying threats, and an output that changes the design or the controls. Without those, it is a meeting that satisfies a checklist.
+<Lead>
+Threat modeling is often reduced to a brainstorm about what could go wrong, which produces a list of fears rather than a set of decisions. A useful session has <Mark>a defined system boundary</Mark>, a method for identifying threats, and <Mark>an output that changes the design or the controls</Mark>. Without those, it is a meeting that satisfies a checklist.
+</Lead>
 
 **Direct answer:** Model threats by defining the system, identifying assets and trust boundaries, enumerating threats with a recognised framework such as MITRE ATT&CK, and assigning a control and owner to each material risk. Zero-trust principles apply where implicit trust based on location is assumed. The boundary: a threat model covers what can be anticipated; novel attacks require red teaming and monitoring, as [AI Red Teaming: A Practical Methodology](/articles/ai-red-teaming-a-practical-methodology) explains.
 
@@ -29,13 +31,25 @@ The following is hypothetical and illustrative. A team models a service that acc
 
 With the boundary defined, three threats emerge. An attacker uploads a malicious file that is executed on the server; the control is to store files outside the execution path and validate type, with validation at the tool boundary as the tool-calling article recommends. A user guesses another user's file identifier; the control is object-level authorisation, which the OWASP-based security checklist treats as a design failure when missing. A poisoned file is served and executed in a user's browser; the control is content-type enforcement and a download disposition, as the output-handling guidance in the security checklist describes.
 
-Three checks decide whether the model worked. First, did any threat change the design, such as moving storage outside the web root, which the architecture article treats as a structural decision? Second, are the controls testable, as the evaluation-rubric article requires for concrete criteria? Third, is there an owner for each, as the governance checklist requires for accountability? A model that produces no design change and no owners is a document, not a control.
+Three checks decide whether the model worked. First, did any threat change the design, such as moving storage outside the web root, which the architecture article treats as a structural decision? Second, are the controls testable, as the evaluation-rubric article requires for concrete criteria? Third, is there an owner for each, as the governance checklist requires for accountability?
+
+<KeyPoint>
+A model that produces no design change and no owners is a document, not a control.
+</KeyPoint>
 
 ## Making the model a living artefact
 
-A threat model produced once and filed away decays as the system changes. New endpoints, new integrations, and new dependencies create paths the original session never considered, which the monitoring article treats as a change trigger for any control. The model should therefore carry a date and an owner, and it should be revisited when the architecture changes rather than on a fixed calendar alone, as the pre-deployment checklist recommends for evidence that stays current.
+<Trap>
+A threat model produced once and filed away decays as the system changes.
+</Trap>
 
-The most useful teams treat the model as a conversation starter rather than a final document. When a new feature is designed, the question is not whether the old model is complete but which of its assumptions still hold, which the design-brief article frames as specifying boundaries before work begins. This keeps threat modeling close to engineering decisions, where it changes outcomes, instead of in a separate security review that happens after the design is fixed.
+New endpoints, new integrations, and new dependencies create paths the original session never considered, which the monitoring article treats as a change trigger for any control. The model should therefore carry a date and an owner, and it should be revisited when the architecture changes rather than on a fixed calendar alone, as the pre-deployment checklist recommends for evidence that stays current.
+
+<PullQuote>
+The most useful teams treat the model as a conversation starter rather than a final document.
+</PullQuote>
+
+When a new feature is designed, the question is not whether the old model is complete but which of its assumptions still hold, which the design-brief article frames as specifying boundaries before work begins. This keeps threat modeling close to engineering decisions, where it changes outcomes, instead of in a separate security review that happens after the design is fixed.
 
 Finally, the output should be prioritised. Not every threat deserves a control at the same time, which the risk-assessment article treats as a question of impact and likelihood. A short list of material risks with owners is more actionable than an exhaustive catalogue, and it is the form most likely to be read when a decision has to be made quickly, as the decision-memo article argues for records that change behaviour.
 
@@ -43,7 +57,7 @@ Finally, the output should be prioritised. Not every threat deserves a control a
 
 It cannot anticipate every attack, which the red-teaming article treats as the reason for adversarial testing. It cannot fix an insecure architecture by listing controls; some designs need to change, as the microservices article explains for distributed failure modes. And it goes stale when the system changes, which the monitoring article treats as a review trigger.
 
-The counterargument that threat modeling is too heavy for a small team is fair when applied to every change. The response is proportionality: model the consequential boundaries, and revisit after material changes, as the risk-assessment article recommends.
+The counterargument that threat modeling is too heavy for a small team is fair when applied to every change. The response is proportionality: <Mark>model the consequential boundaries</Mark>, and revisit after material changes, as the risk-assessment article recommends.
 
 ## A decision test
 

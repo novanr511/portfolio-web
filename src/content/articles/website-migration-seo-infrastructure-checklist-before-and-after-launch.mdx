@@ -9,13 +9,21 @@ tags:
   - Operations
 ---
 
+<Lead>
 A website migration changes one or more properties of a site—domain, URL structure, CMS, hosting, rendering stack, or CDN. The risk comes from changing several dependencies at once: a correct URL map cannot compensate for a blocked production site, and a healthy server cannot preserve old URLs if redirects are missing.
+</Lead>
 
-**Direct answer:** Treat a migration as a controlled infrastructure release. Before launch, inventory important source URLs, map each to its closest relevant destination, test redirects and production-like rendering, and record a baseline. At launch, verify DNS/TLS, HTTP status, robots directives, canonicals, sitemap, and representative page templates. After launch, monitor server errors, redirect targets, crawl/indexing reports, and user-facing behavior; keep a documented rollback decision tied to specific failure conditions. A checklist reduces avoidable mistakes but cannot guarantee unchanged rankings or traffic.
+**Direct answer:**
+
+<KeyPoint>
+Treat a migration as a controlled infrastructure release.
+</KeyPoint>
+
+Before launch, inventory important source URLs, map each to its closest relevant destination, test redirects and production-like rendering, and record a baseline. At launch, verify DNS/TLS, HTTP status, robots directives, canonicals, sitemap, and representative page templates. After launch, monitor server errors, redirect targets, crawl/indexing reports, and user-facing behavior; keep <Mark>a documented rollback decision tied to specific failure conditions</Mark>. A checklist reduces avoidable mistakes but cannot guarantee unchanged rankings or traffic.
 
 ## 1. Define the migration and establish a baseline
 
-First record exactly what is changing. A domain move, a path redesign, a CMS switch, and a hosting move have different failure modes; bundling all of them makes diagnosis harder.
+First record exactly what is changing. A domain move, a path redesign, a CMS switch, and a hosting move have different failure modes; <Mark>bundling all of them makes diagnosis harder</Mark>.
 
 Capture a pre-migration baseline that the team can reproduce:
 
@@ -28,7 +36,11 @@ Keep sensitive analytics exports and logs private. The baseline is for compariso
 
 ## 2. Build and validate the URL map
 
-Create one explicit mapping from each valuable old URL to its best new destination. Avoid blanket redirects to the new homepage: a redirect should preserve the intent of the old URL where an equivalent page exists.
+Create one explicit mapping from each valuable old URL to its best new destination.
+
+<Trap>
+Avoid blanket redirects to the new homepage: a redirect should preserve the intent of the old URL where an equivalent page exists.
+</Trap>
 
 | Source URL | Destination | Expected response | Validation |
 | :--- | :--- | :--- | :--- |
@@ -96,7 +108,7 @@ Keep redirects in place according to the migration plan and platform constraints
 
 ## Summary
 
-Successful migration work is a sequence: baseline, map, rehearse, switch, verify, and monitor. The highest-value safeguards are precise URL mapping, production-specific crawl controls, direct-to-final internal links, representative launch tests, and a clear rollback owner. These controls improve diagnosability; they do not guarantee a particular search outcome.
+Successful migration work is a sequence: baseline, map, rehearse, switch, verify, and monitor. The highest-value safeguards are <Mark>precise URL mapping</Mark>, production-specific crawl controls, direct-to-final internal links, representative launch tests, and a clear rollback owner. These controls improve diagnosability; they do not guarantee a particular search outcome.
 
 ## A worked example
 
@@ -104,7 +116,11 @@ The following is hypothetical and illustrative. Picture a migration that changes
 
 ## A counterargument
 
-A reasonable critic would object that a checklist framework overstates how much a team can actually verify: the article concedes that rankings are not guaranteed and that Search Console reports lag and aggregate, so a migration can pass every smoke test and still leave the team unable to attribute a later traffic change to the migration rather than to the simultaneous changes it merely asks you to annotate. The baseline it recommends is reproducible for HTTP-level facts (status codes, canonicals, directives), which the cited RFC 9110 and Google canonical and sitemap documents support, but those sources say nothing about causal attribution in search performance. Rollback thresholds are deliberately delegated to the service owner, leaving the checklist's most consequential decision unspecified.
+A reasonable critic would object that a checklist framework overstates how much a team can actually verify: the article concedes that rankings are not guaranteed and that Search Console reports lag and aggregate, so a migration can pass every smoke test and still leave the team unable to attribute a later traffic change to the migration rather than to the simultaneous changes it merely asks you to annotate. The baseline it recommends is reproducible for HTTP-level facts (status codes, canonicals, directives), which the cited RFC 9110 and Google canonical and sitemap documents support, but those sources say nothing about causal attribution in search performance.
+
+<PullQuote>
+Rollback thresholds are deliberately delegated to the service owner, leaving the checklist's most consequential decision unspecified.
+</PullQuote>
 
 ## References & Further Reading
 

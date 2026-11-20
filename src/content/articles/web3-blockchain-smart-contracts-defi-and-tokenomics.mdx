@@ -9,7 +9,9 @@ tags:
   - Cryptography
 ---
 
+<Lead>
 Web3 is usually described in terms of what it will change, which makes it hard to evaluate. The useful approach is to describe what the technology actually is — a replicated state machine with defined trust assumptions — and then ask which of those properties a given application needs. Many applications need none of them, and many claims about the technology depend on properties the system does not have.
+</Lead>
 
 **Direct answer:** A public blockchain provides a shared ledger whose state transitions are validated by participants rather than by a single operator, and smart contracts are programs whose execution is part of that state machine. Ethereum's whitepaper is the primary technical description of the general-purpose version. Decentralised finance uses these programs to replace specific financial intermediaries — an automated market maker replaces an order book and its matching engine — and tokenomics is the design of the incentives and supply rules around a token. The limits are structural: code can be correct and still produce a bad economic outcome, external data requires oracles that reintroduce trust, and "decentralised" is a property that has to be measured rather than asserted.
 
@@ -25,13 +27,15 @@ Three properties matter in practice:
 - **Immutability in deployment:** code, once deployed, is hard or impossible to change, which is why upgrade patterns and proxies exist — and why they reintroduce a form of trust.
 - **External data dependence:** a contract cannot read the world directly. It needs an oracle, and the oracle becomes a trusted component whose failure propagates into the contract's behaviour.
 
+<KeyPoint>
 The correct mental model is therefore not "trustless application" but "application with a different, and often narrower, set of trusted components".
+</KeyPoint>
 
 ## What DeFi replaces, and what it does not
 
 The clearest case is the automated market maker. Uniswap's whitepaper describes a constant-product design in which liquidity providers deposit assets into a pool and traders swap against the pool according to a pricing rule, rather than being matched with a counterparty's resting order.
 
-What this removes is the need for a central matching engine and a continuously present market maker. What it does not remove is the need for liquidity providers, who bear the risk of losses relative to simply holding the assets, or the need for price discovery, which is now driven by arbitrageurs trading against external markets. The mechanism is a different allocation of work and risk, not the elimination of either.
+What this removes is the need for a central matching engine and a continuously present market maker. What it does not remove is the need for liquidity providers, who bear the risk of losses relative to simply holding the assets, or the need for price discovery, which is now driven by arbitrageurs trading against external markets. The mechanism is <Mark>a different allocation of work and risk</Mark>, not the elimination of either.
 
 This is the right way to evaluate a DeFi claim: name the intermediary being replaced, then name the function it performed and check who performs it now. If the answer is "the user", the technology has shifted a cost rather than removed it.
 
@@ -68,7 +72,7 @@ Two consequences follow directly:
 
 **Arbitrage is the price-discovery mechanism.** If the external market price of A is 1.00 B and the pool quotes 1.11 after the trade, an arbitrageur will sell A into the pool until the quoted price returns to 1.00. The profit is the mechanism that corrects the price, and it is paid by the trader's price impact and by liquidity providers' losses.
 
-That last point is where much of DeFi's economic complexity lives. A liquidity provider earns fees from trades and loses value when the price moves, because the pool automatically holds more of the falling asset and less of the rising one. A provider who would have been better off simply holding the two assets has suffered an impermanent loss. The design is a transfer of risk from traders to providers in exchange for fees, not a source of free liquidity.
+That last point is where much of DeFi's economic complexity lives. A liquidity provider earns fees from trades and loses value when the price moves, because the pool automatically holds more of the falling asset and less of the rising one. A provider who would have been better off simply holding the two assets has suffered an impermanent loss. The design is a transfer of risk from traders to providers in exchange for fees, not <Mark>a source of free liquidity</Mark>.
 
 ## The energy and hardware question
 
@@ -80,9 +84,13 @@ For a designer, the relevant question is whether the trust property being purcha
 
 ## What anycast, storage, and identity claims get wrong
 
-The broader Web3 stack often inherits properties from different layers and attributes them to the whole. Content-addressed storage such as IPFS changes how data is located and verified, which is useful; it does not make a distributed application's state machine trustless. Decentralised identifiers change who controls an identity record, which is useful; they do not guarantee that the entity behind the identifier is who it claims.
+<Trap>
+The broader Web3 stack often inherits properties from different layers and attributes them to the whole.
+</Trap>
 
-This is the same error that appears in other domains: treating a property of one component as a property of the system. A careful evaluation decomposes the system into its trust assumptions and asks which ones have actually changed.
+Content-addressed storage such as IPFS changes how data is located and verified, which is useful; it does not make a distributed application's state machine trustless. Decentralised identifiers change who controls an identity record, which is useful; they do not guarantee that the entity behind the identifier is who it claims.
+
+This is the same error that appears in other domains: <Mark>treating a property of one component as a property of the system</Mark>. A careful evaluation decomposes the system into its trust assumptions and asks which ones have actually changed.
 
 ## A decision sequence
 
@@ -98,7 +106,11 @@ For the regulatory side, see [Cryptocurrency and the Future of Money](/articles/
 
 ## A counterargument
 
-A reasonable critic would argue that the article's 'name the displaced intermediary' test assumes every blockchain function has a traditional counterpart, when censorship-resistant shared state among parties who do not trust one another is precisely the case with no clean analogue; the Bitcoin whitepaper's original premise is about that coordination problem, not about reallocating an existing intermediary's duties. The framework also inherits the framing of its primary sources: Ethereum's and Uniswap v3's whitepapers are design documents written by their builders, so an analysis built on them can reproduce the designers' own categories. The piece calls for measuring decentralisation rather than asserting it, yet cites no measurement data, leaving that central recommendation as a principle rather than a demonstrated result.
+A reasonable critic would argue that the article's 'name the displaced intermediary' test assumes every blockchain function has a traditional counterpart, when censorship-resistant shared state among parties who do not trust one another is precisely the case with no clean analogue; the Bitcoin whitepaper's original premise is about that coordination problem, not about reallocating an existing intermediary's duties. The framework also inherits the framing of its primary sources: Ethereum's and Uniswap v3's whitepapers are design documents written by their builders, so an analysis built on them can reproduce the designers' own categories.
+
+<PullQuote>
+The piece calls for measuring decentralisation rather than asserting it, yet cites no measurement data, leaving that central recommendation as a principle rather than a demonstrated result.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,9 +9,11 @@ tags:
   - Cost
 ---
 
-For years, better performance meant a bigger model. A recent line of work shows that spending more compute *at inference* — searching, sampling, or refining before answering — can be more effective than adding parameters, at least on some tasks. That shifts part of the cost from training to every request.
+<Lead>
+For years, better performance meant a bigger model. A recent line of work shows that spending more compute *at inference* — searching, sampling, or refining before answering — can be more effective than adding parameters, at least on some tasks. That shifts <Mark>part of the cost from training to every request</Mark>.
+</Lead>
 
-**Direct answer:** Test-time compute uses additional inference-time work — longer chains of thought, parallel samples, or search over candidate answers — to improve a response. The paper *Scaling LLM Test-Time Compute Optimally* reports that on certain tasks this outperforms parameter scaling. The boundary: the gain is task-dependent and the cost is per request, so a method that is economical for a rare hard question may be wasteful for high-volume simple ones.
+**Direct answer:** Test-time compute uses additional inference-time work — longer chains of thought, parallel samples, or search over candidate answers — to improve a response. The paper *Scaling LLM Test-Time Compute Optimally* reports that on certain tasks this outperforms parameter scaling. The boundary: <Mark>the gain is task-dependent and the cost is per request</Mark>, so a method that is economical for a rare hard question may be wasteful for high-volume simple ones.
 
 ## What counts as test-time compute
 
@@ -23,7 +25,9 @@ Three forms are common:
 
 **Search.** Explore a tree of possible reasoning paths, scoring and backtracking. This is the most expensive and most structured form.
 
+<KeyPoint>
 They share a principle: use computation at answer time to compensate for a model that is not certain.
+</KeyPoint>
 
 ## A worked budget comparison
 
@@ -53,11 +57,17 @@ Three lessons follow:
 
 **High-volume, simple requests.** Classification and extraction do not benefit from more thinking, as the task taxonomy explains.
 
+<Trap>
 **Tasks without a verifier.** If you cannot tell which of four answers is best, sampling adds cost without a selection method.
+</Trap>
 
 **Latency-critical interfaces.** A user waiting for a chat reply experiences the extra work as a slower product.
 
-The counterargument — that models will get better and make test-time compute unnecessary — is plausible and misses the current decision. The method is available now, and the choice is whether it fits this workload and budget.
+The method is available now, and the choice is whether it fits this workload and budget.
+
+<PullQuote>
+The counterargument — that models will get better and make test-time compute unnecessary — is plausible and misses the current decision.
+</PullQuote>
 
 ## Measuring whether it works
 
@@ -65,7 +75,7 @@ The only reliable evidence is a comparison on your own workload. Three measureme
 
 **Accuracy per unit of compute.** Compare accuracy at a fixed budget — say, the cost of one answer — across strategies. A method that raises accuracy but costs five times as much may lose on this measure, as the cost-estimator article explains.
 
-**Cost per correct answer.** Divide the total spend by the number of correct answers, not the number of requests. This metric makes the trade-off visible when error rates differ.
+**Cost per correct answer.** Divide the total spend by <Mark>the number of correct answers, not the number of requests</Mark>. This metric makes the trade-off visible when error rates differ.
 
 **Latency distribution.** Report the tail, not the average. A method that makes 95% of requests fast and 5% very slow may still break a user interface that waits for the slow ones, which the observability article covers.
 

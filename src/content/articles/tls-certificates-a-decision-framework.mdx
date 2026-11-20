@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 TLS certificates are often reduced to a green padlock, which hides the decisions behind them. The TLS entry describes the protocol, and the public-key certificate entry explains how certificates bind keys to identities. The framework starts from what a certificate is meant to prove.
+</Lead>
 
-**Direct answer:** Decide what identity a certificate must establish, verify the chain and the name, then monitor expiry and revocation. The sources describe the mechanism; the decision rule is a synthesis.
+**Direct answer:** Decide what identity a certificate must establish, <Mark>verify the chain and the name</Mark>, then monitor expiry and revocation. The sources describe the mechanism; the decision rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked check, separating documented protocol facts from the local choices about names and renewal.
 
@@ -37,7 +39,7 @@ The outcome is a specific fix rather than a general "check the certificate" resp
 
 ## Why the name is the first check
 
-A certificate that is valid but issued for a different hostname will produce a warning, and the cause is not the certificate's age or issuer. Checking the exact name, including subdomains and the www variant, is the cheapest first step in a diagnosis. It is also the step most often skipped when the symptom is described as a certificate problem.
+A certificate that is valid but issued for a different hostname will produce a warning, and <Mark>the cause is not the certificate's age or issuer</Mark>. Checking the exact name, including subdomains and the www variant, is <Mark>the cheapest first step in a diagnosis</Mark>. It is also the step most often skipped when the symptom is described as a certificate problem.
 
 The chain is the second check. Browsers rely on a path to a trusted root, and a server that omits an intermediate certificate can leave the path incomplete even though the certificate itself is valid. Serving the full chain is a configuration detail with a user-visible effect.
 
@@ -55,7 +57,15 @@ A certificate that expires is a predictable failure, which makes it a design pro
 
 ## Why validity is not trust
 
-A certificate can be within its validity period and still fail to establish the right identity, because the name does not match or the chain is incomplete. Checking only the expiry date misses both. The full check is short, but it has to cover all three conditions.
+<KeyPoint>
+A certificate can be within its validity period and still fail to establish the right identity, because the name does not match or the chain is incomplete.
+</KeyPoint>
+
+<Trap>
+Checking only the expiry date misses both.
+</Trap>
+
+The full check is short, but it has to cover all three conditions.
 
 A final consideration is revocation. A certificate can be valid by date and name and still have been revoked, which is why browsers consult revocation information. Checking that behaviour is part of a complete diagnostic, even though it is rarely the cause of an everyday warning.
 
@@ -71,7 +81,9 @@ It should also state which issuer was expected to validate it.
 
 It cannot guarantee that the site is safe, only that the connection is encrypted to a verified identity. It does not replace application security. And it cannot remove the need to monitor renewal.
 
+<PullQuote>
 The counterargument that a padlock means safety is fair for transport encryption and incomplete for the content served.
+</PullQuote>
 
 ## A decision test
 

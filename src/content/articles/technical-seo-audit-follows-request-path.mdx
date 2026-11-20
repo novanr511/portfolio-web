@@ -9,7 +9,9 @@ tags:
   - Web Infrastructure
 ---
 
+<Lead>
 A technical SEO audit can produce hundreds of warnings without telling a developer what to fix first. A more useful approach follows a URL through the systems that deliver and interpret it: resolution, connection, response, document rendering, discovery, and indexing. This sequence helps distinguish a broken page from a page that is reachable but not selected for indexing.
+</Lead>
 
 **Direct answer:** Scope the audit, select representative URLs, and trace each through DNS/TLS, HTTP response, HTML and rendered output, crawl directives, internal discovery, and indexation evidence. Prioritize failures that block access to important content or create broad template-level defects. Record each finding as symptom, evidence, likely layer, owner, action, and a regression test. Do not present warnings as confirmed search impact, and do not claim to audit a site comprehensively from a small sample.
 
@@ -28,7 +30,7 @@ Label the sample by template and purpose (home, category, article, product, pagi
 
 ## 2. Follow the request path
 
-For each sample, record observations layer by layer. Keep observations separate from hypotheses and recommendations.
+For each sample, record observations layer by layer. Keep observations <Mark>separate from hypotheses and recommendations</Mark>.
 
 | Layer | Check | Evidence to record | Example question |
 | :--- | :--- | :--- | :--- |
@@ -51,7 +53,7 @@ curl -sS -L -o /dev/null \
   https://example.com/articles/sample
 ```
 
-Check DNS and TLS separately when connection problems are suspected. For HTTP behavior, include both the initial response and final destination; a successful final status can hide an unnecessary redirect chain. Compare results across templates and environments, and note that a single test from one network location is not a global availability measurement.
+Check DNS and TLS separately when connection problems are suspected. For HTTP behavior, include both the initial response and final destination; a successful final status can hide an unnecessary redirect chain. Compare results across templates and environments, and note that a single test from one network location is <Mark>not a global availability measurement</Mark>.
 
 For status interpretation, consult [HTTP Status Codes for SEO: Diagnose 200, Redirects, 404, and 5xx](/articles/http-status-codes-for-seo-diagnose-200-redirects-404-5xx) and [HTTPS, TLS, and SEO: Diagnose Certificates and Redirects](/articles/https-tls-and-seo-diagnose-certificates-and-redirects).
 
@@ -65,7 +67,11 @@ For each sample, inspect the response HTML and, where JavaScript materially chan
 * Required assets and API calls do not fail in the rendered page.
 * Structured data, if present, corresponds to visible page content and the correct URL.
 
-Do not equate “present in the DOM” with “guaranteed to be indexed.” Rendering output is a diagnostic observation. See [Raw HTML vs Rendered DOM: What Can a Crawler Read?](/articles/raw-html-vs-rendered-dom-what-can-a-crawler-read) for the boundary between source and rendered output.
+<Trap>
+Do not equate “present in the DOM” with “guaranteed to be indexed.”
+</Trap>
+
+Rendering output is a diagnostic observation. See [Raw HTML vs Rendered DOM: What Can a Crawler Read?](/articles/raw-html-vs-rendered-dom-what-can-a-crawler-read) for the boundary between source and rendered output.
 
 ## 5. Check discovery and indexation evidence
 
@@ -102,11 +108,19 @@ After fixes, repeat the same checks against the same sample and record the relea
 
 ## Summary
 
-A request-path audit replaces an undifferentiated warning list with a traceable diagnosis. Scope the work, test representative URLs at each system layer, separate observations from interpretations, prioritize by risk and confidence, and verify fixes with repeatable checks. The result is a decision-oriented audit—not a promise of rankings or a claim that a sample represents every page.
+<KeyPoint>
+A request-path audit replaces an undifferentiated warning list with a traceable diagnosis.
+</KeyPoint>
+
+Scope the work, test representative URLs at each system layer, separate observations from interpretations, prioritize by risk and confidence, and verify fixes with repeatable checks. The result is a decision-oriented audit—<Mark>not a promise of rankings</Mark> or a claim that a sample represents every page.
 
 ## A counterargument
 
-A critic would argue that the request-path metaphor promises a completeness the method cannot deliver. The sample is deliberately small - the article says a handful of URLs can reveal template defects but cannot prove every URL behaves alike - and the P0/P1/P2 labels are admitted to be operational conventions, not Google's classifications. Chrome DevTools shows one render from one environment, and the article itself notes that a single test from one network location is not a global availability measurement. RFC 9110 defines what a status code means, not whether a search engine will select the URL; the text is careful to distinguish presence in the DOM from guaranteed indexing. The audit is a better way to organise evidence and assign owners, but a clean trace is still a diagnosis, not proof of search impact, as the summary concedes.
+A critic would argue that the request-path metaphor promises a completeness the method cannot deliver. The sample is deliberately small - the article says a handful of URLs can reveal template defects but cannot prove every URL behaves alike - and the P0/P1/P2 labels are admitted to be operational conventions, not Google's classifications. Chrome DevTools shows one render from one environment, and the article itself notes that a single test from one network location is not a global availability measurement. RFC 9110 defines what a status code means, not whether a search engine will select the URL; the text is careful to distinguish presence in the DOM from guaranteed indexing.
+
+<PullQuote>
+The audit is a better way to organise evidence and assign owners, but a clean trace is still a diagnosis, not proof of search impact, as the summary concedes.
+</PullQuote>
 
 ## References & Further Reading
 

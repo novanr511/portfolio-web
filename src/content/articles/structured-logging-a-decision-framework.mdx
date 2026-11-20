@@ -9,9 +9,11 @@ tags:
   - Decision Making
 ---
 
-Structured logging is often treated as a formatting choice, which misses the decision: what will be queried later. The logging entry describes what logs record, as [Server Log Analysis Metrics that Matter](/articles/server-log-analysis-metrics-that-matter) covers what is captured in requests, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) treats logs as one signal, as the data-governance article requires provenance, as the decision-memo article requires for a recorded judgement, as the publication standard forbids guaranteed outcomes.
+<Lead>
+Structured logging is often treated as a formatting choice, which misses the decision: <Mark>what will be queried later</Mark>. The logging entry describes what logs record, as [Server Log Analysis Metrics that Matter](/articles/server-log-analysis-metrics-that-matter) covers what is captured in requests, as [Observability: Logging, Metrics, Tracing, Alerting](/articles/observability-logging-metrics-tracing-alerting) treats logs as one signal, as the data-governance article requires provenance, as the decision-memo article requires for a recorded judgement, as the publication standard forbids guaranteed outcomes.
+</Lead>
 
-**Direct answer:** Decide which fields you will query, then emit them consistently with a defined meaning. Wikipedia's logging entry provides the context, and the server-log article covers captured requests. The boundary: a field is not a fact if its meaning is undefined, which the data-governance article warns, as the risk article requires residual risk.
+**Direct answer:** Decide which fields you will query, then emit them consistently with a defined meaning. Wikipedia's logging entry provides the context, and the server-log article covers captured requests. The boundary: <Mark>a field is not a fact</Mark> if its meaning is undefined, which the data-governance article warns, as the risk article requires residual risk.
 
 ## The framework
 
@@ -27,17 +29,29 @@ Three consequences follow. The query comes before the field, as the observabilit
 
 ## A worked example
 
-The following is hypothetical and illustrative. A team emits JSON logs but cannot answer which requests failed by customer.
+The following is hypothetical and illustrative. A team emits JSON logs but cannot answer <Mark>which requests failed by customer</Mark>.
 
 Three checks decide. First, what question needs answering, as the observability and dashboard articles advise, with a criterion, as the rubric article requires? Second, is there a stable field for customer identity with a defined meaning, as the data-modeling entry and data-governance article require, as the comparables article requires consistent definitions? Third, what are the storage and privacy costs, as the cost estimator and privacy articles require, with an owner, as the governance checklist requires, as the risk article requires residual risk, as the decision-memo article requires for a record?
 
-Three conclusions follow. Structure without defined fields is unhelpful, which the checks reveal. Meaning matters more than format, as the data-governance and comparables articles advise. And the decision should be recorded, as the decision-memo article requires.
+Three conclusions follow.
+
+<Trap>
+Structure without defined fields is unhelpful, which the checks reveal.
+</Trap>
+
+<KeyPoint>
+Meaning matters more than format, as the data-governance and comparables articles advise.
+</KeyPoint>
+
+And the decision should be recorded, as the decision-memo article requires.
 
 ## What structured logging cannot do
 
 It cannot create facts, which the data-quality and data-governance articles warn, as the publication standard forbids guaranteed outcomes, as the risk article requires residual risk. It does not replace metrics and traces, which the observability article treats as separate signals, as [Server Log Analysis Metrics that Matter](/articles/server-log-analysis-metrics-that-matter) advises, as the dashboard article argues, as the rubric article requires criteria, as the monitoring article advises for review. And it cannot remove privacy duties, which the privacy article makes jurisdiction-specific, as the governance checklist requires an owner, as the data-governance article requires provenance, as the risk article requires residual risk.
 
+<PullQuote>
 The counterargument that plain text is enough is fair for small systems and incomplete when the same question must be answered repeatedly, which the worked example shows, as the observability and data-modeling articles advise, as the dashboard article argues, as the risk article requires residual risk.
+</PullQuote>
 
 ## A decision test
 

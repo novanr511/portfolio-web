@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Terraform is often introduced as a tool that replaces clicking in a console, which understates what actually changes. The Wikipedia entry describes Terraform as infrastructure as code using declarative configuration and a state file, and the AWS cost optimization pillar describes practices for controlling spend. The real problem for a beginner is understanding how declared configuration and saved state turn into a cost decision.
+</Lead>
 
 **Direct answer:** Terraform declares the desired infrastructure, plans the changes, and applies them while tracking state. It does not automatically optimise cost. The sources describe the tool and cost practices; connecting declarations to cost control is a synthesis.
 
@@ -21,9 +23,9 @@ The Terraform entry describes a tool that manages infrastructure through declara
 
 <Figure src="/images/articles/inline/terraform-for-beginners-1.png" alt="A loop of declaring desired infrastructure, reviewing the plan, applying changes, and keeping the state file accurate." caption="Conceptual: cost is caught at declaration and plan, not after apply." />
 
-The same entry describes a state file that records the currently managed infrastructure, and a plan step that shows proposed changes before they are applied. The practical consequence is that state is the tool memory, so losing or corrupting it creates real risk, while the plan step is the place where an unintended resource or a cost surprise can be caught before it is committed.
+The same entry describes a state file that records the currently managed infrastructure, and a plan step that shows proposed changes before they are applied. The practical consequence is that state is <Mark>the tool memory</Mark>, so losing or corrupting it creates real risk, while the plan step is the place where an unintended resource or a cost surprise can be caught before it is committed.
 
-The AWS cost optimization pillar describes practices such as matching capacity to demand, gaining visibility into spend, and removing unused resources. The practical consequence is that these practices become enforceable when expressed as configuration. Tagging resources, defining environment sizes, and writing teardown rules in code make cost control repeatable rather than a one-time cleanup that depends on memory.
+The AWS cost optimization pillar describes practices such as matching capacity to demand, gaining visibility into spend, and removing unused resources. The practical consequence is that these practices become enforceable when expressed as configuration. Tagging resources, defining environment sizes, and writing teardown rules in code make cost control repeatable rather than <Mark>a one-time cleanup that depends on memory</Mark>.
 
 Together, the concepts form a loop: declare desired infrastructure, review the plan, apply it, and keep state accurate. Cost practices plug into that loop at the declaration and plan stages. Because the sources describe the tool and the cost principles separately, the link between them is an inference a beginner must make explicitly rather than something the tool provides on its own.
 
@@ -43,17 +45,29 @@ The first two rows report documented facts about the tool and about cost practic
 
 ## What it cannot do
 
-Terraform cannot decide the right size or number of resources for a workload. It applies the configuration it is given, so an oversized definition is reproduced faithfully. The tool enforces consistency, not wisdom, and a plan that looks clean can still describe an expensive design. Judgement about demand remains a human responsibility that the plan output cannot supply.
+Terraform cannot decide the right size or number of resources for a workload. It applies the configuration it is given, so an oversized definition is reproduced faithfully.
+
+<KeyPoint>
+The tool enforces consistency, not wisdom, and a plan that looks clean can still describe an expensive design.
+</KeyPoint>
+
+Judgement about demand remains a human responsibility that the plan output cannot supply.
 
 A hidden cost is state management. The state file must be stored, protected, and kept consistent with reality. If it is lost, corrupted, or edited by hand, the tool can plan incorrect changes. A beginner who treats state as an incidental file rather than a critical artifact will eventually face a recovery problem at the worst possible moment, often during a time-sensitive change.
 
-A common failure mode is configuration drift, where resources are changed directly in the console and no longer match the declared state. The next plan may then propose destructive changes to bring reality back in line. Drift turns the convenience of declarative management into a surprise at the next apply, and the surprise is larger when the difference has accumulated over many manual edits.
+<Trap>
+A common failure mode is configuration drift, where resources are changed directly in the console and no longer match the declared state.
+</Trap>
+
+The next plan may then propose destructive changes to bring reality back in line. Drift turns the convenience of declarative management into a surprise at the next apply, and the surprise is larger when the difference has accumulated over many manual edits.
 
 The boundary is provider coverage and platform support. Terraform can only manage what a provider exposes, and a setting outside the provider model must be handled elsewhere. Cost practices that depend on data the provider cannot see, such as nuanced billing signals, remain outside the tool view, so code alone cannot guarantee an optimised result.
 
 The configuration and state need review whenever the platform changes or team needs shift. Provider updates, new resource types, and changed pricing can make a once-correct definition costly or wrong. Keeping plans, state, and cost observations dated together lets a reader see whether a change came from the code or the environment. Without that record, the cause of a cost movement stays ambiguous.
 
+<PullQuote>
 The counterargument that a beginner can start by clicking in a console is fair for one-off experiments and incomplete for anything repeatable, because manual steps cannot be reviewed or reproduced reliably.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +79,7 @@ The counterargument that a beginner can start by clicking in a console is fair f
 6. Define teardown rules for temporary environments.
 7. Record plans and state changes with dates before comparing cost over time.
 
-These steps turn a tool into a repeatable practice. They will not choose the right architecture, but they prevent the most common beginner error: treating applied configuration as a substitute for reviewing what it costs. The result is infrastructure that can be explained as well as recreated.
+These steps turn a tool into a repeatable practice. They will not choose the right architecture, but they prevent the most common beginner error: <Mark>treating applied configuration as a substitute for reviewing what it costs</Mark>. The result is infrastructure that can be explained as well as recreated.
 For further reading, see [data governance managing data as an asset](/articles/data-governance-managing-data-as-an-asset).
 
 ## References & Further Reading

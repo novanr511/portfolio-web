@@ -9,7 +9,9 @@ tags:
   - MLOps
 ---
 
-Technical debt is one of the most used and least examined metaphors in software. It is often invoked to justify a rewrite, which misses the point of a financial analogy: debt can be prudent or reckless, and the question is whether the interest is being paid knowingly. A codebase with "debt" is not automatically in crisis; a team that does not know its interest rate is.
+<Lead>
+Technical debt is one of the most used and least examined metaphors in software. It is often invoked to justify a rewrite, which misses the point of a financial analogy: debt can be <Mark>prudent or reckless</Mark>, and the question is whether the interest is being paid knowingly. A codebase with "debt" is not automatically in crisis; a team that does not know its interest rate is.
+</Lead>
 
 **Direct answer:** Martin Fowler describes technical debt as "a metaphor, coined by Ward Cunningham, that frames how to think about dealing with this cruft, thinking of it like a financial debt". The central mechanism is interest: "The extra effort that it takes to add new features is the interest paid on the debt." The boundary is that the metaphor has limits — software debt has no maturity date or market price, so the discipline lies in measuring the interest, not in assigning a notional principal.
 
@@ -23,7 +25,11 @@ Fowler's usage distinguishes deficiencies in internal quality that make future c
 
 **Reckless.** The team knowingly created a dangerous condition with no plan to fix it. This is the case the metaphor is meant to condemn, and it is not the same as the first two.
 
-The distinction matters because "remove all technical debt" is not a coherent goal. A startup that spends a year perfecting internals before learning whether anyone wants the product has avoided debt by choosing a different failure.
+<KeyPoint>
+The distinction matters because "remove all technical debt" is not a coherent goal.
+</KeyPoint>
+
+A startup that spends a year perfecting internals before learning whether anyone wants the product has avoided debt by choosing a different failure.
 
 ## Where ML systems concentrate it
 
@@ -31,11 +37,11 @@ Sculley et al.'s paper "Hidden Technical Debt in Machine Learning Systems" is a 
 
 Two of these are especially easy to miss:
 
-**Undeclared consumers.** Another system reads a model's output without the model team knowing. A change that seems local breaks a downstream process — the debt is the invisible dependency, not the code.
+**Undeclared consumers.** Another system reads a model's output without the model team knowing. A change that seems local breaks a downstream process — the debt is <Mark>the invisible dependency, not the code</Mark>.
 
 **Hidden feedback loops.** A model's output influences the data it later trains on. A recommendation changes what users click, and the click data trains the next version. The system is now part of its own environment, and a past evaluation no longer describes the present.
 
-This is why "the model is only 5% of the system" is more than a slogan in ML: the surrounding plumbing is where the debt accrues.
+This is why "the model is only 5% of the system" is more than a slogan in ML: <Mark>the surrounding plumbing is where the debt accrues</Mark>.
 
 ## A worked example of interest
 
@@ -69,7 +75,11 @@ Three conditions make a shortcut rational:
 
 **There is a repayment plan.** The team records the debt, knows what would trigger repayment, and has a place in the backlog where it competes on equal terms with features.
 
-The counterargument — that all debt should be repaid immediately — is a recipe for perpetual refactoring. A system with zero debt is usually a system that stopped changing.
+The counterargument — that all debt should be repaid immediately — is a recipe for perpetual refactoring.
+
+<PullQuote>
+A system with zero debt is usually a system that stopped changing.
+</PullQuote>
 
 ## What the metaphor hides
 
@@ -77,7 +87,13 @@ The counterargument — that all debt should be repaid immediately — is a reci
 
 **Some "debt" is just unfamiliarity.** Code a team does not understand feels like debt, but it may be correct and well-designed. The distinction matters: rewriting understood code because it is unfamiliar destroys value.
 
-**Repayment can be misallocated.** Teams sometimes choose the ugliest file rather than the highest-interest one. The visible mess is not necessarily the expensive one.
+**Repayment can be misallocated.**
+
+<Trap>
+Teams sometimes choose the ugliest file rather than the highest-interest one.
+</Trap>
+
+The visible mess is not necessarily the expensive one.
 
 ## A decision test
 

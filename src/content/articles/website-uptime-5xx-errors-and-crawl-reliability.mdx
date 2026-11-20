@@ -9,11 +9,13 @@ tags:
   - Web Infrastructure
 ---
 
+<Lead>
 Every web system experiences downtime. Whether caused by an unexpected database deadlock, a memory leak during a traffic surge, an edge CDN network failure, or scheduled maintenance, servers will occasionally fail to return content.
+</Lead>
 
-In technical SEO, downtime is frequently discussed with disproportionate panic: marketing teams fear that a 15-minute outage will permanently erase rankings, while developers sometimes overlook days of intermittent 5xx errors that silently cripple crawl capacity.
+In technical SEO, downtime is frequently discussed with <Mark>disproportionate panic</Mark>: marketing teams fear that a 15-minute outage will permanently erase rankings, while developers sometimes overlook days of intermittent 5xx errors that <Mark>silently cripple crawl capacity</Mark>.
 
-**Direct Answer:** Uptime is an absolute prerequisite for web crawling, but search engines are engineered for resilience. Googlebot responds to transient outages (under 24 hours) with exponential back-off, temporarily slowing request rates to avoid overloading distressed servers while preserving existing search rankings. However, sustained server outages exceeding 48 to 72 hours force search engines to temporarily drop unreachable URLs from search results to protect users from broken links. Utilizing HTTP `503 Service Unavailable` with a `Retry-After` header signals planned downtime, preventing de-indexing during scheduled maintenance.
+**Direct Answer:** Uptime is an absolute prerequisite for web crawling, but search engines are engineered for resilience. Googlebot responds to transient outages (under 24 hours) with <Mark>exponential back-off</Mark>, temporarily slowing request rates to avoid overloading distressed servers while preserving existing search rankings. However, sustained server outages exceeding 48 to 72 hours force search engines to temporarily drop unreachable URLs from search results to protect users from broken links. Utilizing HTTP `503 Service Unavailable` with a `Retry-After` header signals planned downtime, preventing de-indexing during scheduled maintenance.
 
 Understanding how crawlers respond to server errors allows engineering teams to manage outages methodically and verify post-incident recovery.
 
@@ -153,7 +155,11 @@ Once your engineering team resolves the root cause and restores production servi
 
 ## Summary & Next Steps
 
-Short-term website outages are an inevitable reality of distributed systems and do not destroy search rankings. By configuring explicit `503 Service Unavailable` responses with `Retry-After` headers during maintenance, preventing soft 404 maintenance layouts, and monitoring crawl rate recovery in real time, engineering teams can protect their site's organic search equity during any infrastructure incident.
+<KeyPoint>
+Short-term website outages are an inevitable reality of distributed systems and do not destroy search rankings.
+</KeyPoint>
+
+By configuring explicit `503 Service Unavailable` responses with `Retry-After` headers during maintenance, preventing soft 404 maintenance layouts, and monitoring crawl rate recovery in real time, engineering teams can protect their site's organic search equity during any infrastructure incident.
 
 Continue exploring infrastructure and log observability:
 * **[Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests)** — Monitoring live crawler requests and identifying 5xx clusters in access logs.
@@ -162,11 +168,21 @@ Continue exploring infrastructure and log observability:
 
 ## A worked example
 
-The following is hypothetical and illustrative. Imagine a planned two-hour database migration that will make dynamic pages unavailable. The tempting shortcut is to serve a friendly "under maintenance" page with a 200 status, but the article warns that this creates a soft-404 wave. The first check is the response itself: an edge rule returns 503 Service Unavailable with Retry-After set to the window length, the temporary-downtime signal RFC 9110 defines, rather than a 200 body. The second check is the supporting routes: robots.txt and the sitemap remain 200, so Googlebot can still verify crawl permissions instead of pausing on a 5xx. The third check comes after recovery: curl confirms 200 responses, and Crawl Stats shows host status returning to its baseline rather than staying suppressed. The outcome is bounded: compliant crawlers reschedule the window, existing indexed snippets remain in place, and crawl rate climbs back over the following days - with the article's back-off timings treated as illustrations, not measured guarantees, as its SRE reference would counsel.
+The following is hypothetical and illustrative. Imagine a planned two-hour database migration that will make dynamic pages unavailable.
+
+<Trap>
+The tempting shortcut is to serve a friendly "under maintenance" page with a 200 status, but the article warns that this creates a soft-404 wave.
+</Trap>
+
+The first check is the response itself: an edge rule returns 503 Service Unavailable with Retry-After set to the window length, the temporary-downtime signal RFC 9110 defines, rather than a 200 body. The second check is the supporting routes: robots.txt and the sitemap remain 200, so Googlebot can still verify crawl permissions instead of pausing on a 5xx. The third check comes after recovery: curl confirms 200 responses, and Crawl Stats shows host status returning to its baseline rather than staying suppressed. The outcome is bounded: compliant crawlers reschedule the window, existing indexed snippets remain in place, and crawl rate climbs back over the following days - with the article's back-off timings treated as illustrations, not measured guarantees, as its SRE reference would counsel.
 
 ## A counterargument
 
-The article's confidence invites a fair challenge: its countdown of precise thresholds (a 5% error rate, an 80% crawl drop, de-indexing after 72 hours) reads as measured crawler behavior, yet none of the cited sources supplies those numbers. RFC 9110 defines status-code semantics, the SRE book discusses service-level objectives, and the crawler overview describes discovery and indexing in general terms; none is a source for Googlebot's backoff curve. The claim that a `Retry-After` header 'guarantees' snippets and rankings stay intact also overstates an HTTP signal, especially when the article's own SRE reference treats reliability as a matter of objectives and probabilities. The guidance is sensible as operational hygiene, but the numeric certainty outruns the evidence.
+The article's confidence invites a fair challenge: its countdown of precise thresholds (a 5% error rate, an 80% crawl drop, de-indexing after 72 hours) reads as measured crawler behavior, yet none of the cited sources supplies those numbers. RFC 9110 defines status-code semantics, the SRE book discusses service-level objectives, and the crawler overview describes discovery and indexing in general terms; none is a source for Googlebot's backoff curve. The claim that a `Retry-After` header 'guarantees' snippets and rankings stay intact also overstates an HTTP signal, especially when the article's own SRE reference treats reliability as a matter of objectives and probabilities.
+
+<PullQuote>
+The guidance is sensible as operational hygiene, but the numeric certainty outruns the evidence.
+</PullQuote>
 
 ## References & Further Reading
 

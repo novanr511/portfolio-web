@@ -9,9 +9,20 @@ tags:
   - Governance
 ---
 
+<Lead>
 An autonomous business sounds like a company that runs itself. The realistic version is narrower and more useful: specific business processes in which software observes a state, decides an action, and executes it with limited human involvement. The difficulty is not making a single step autonomous — it is making a chain of steps reliable enough that the whole process can be trusted.
+</Lead>
 
-**Direct answer:** Autonomous processes are built from agents that interleave reasoning and tool use. Yao et al.'s ReAct work describes a "reason–act–observe" pattern in which a model reasons about a task, calls a tool, and uses the observation to continue. The boundary is mathematical: if each step has a 95% success rate, a ten-step chain succeeds roughly 60% of the time. Autonomy is therefore a reliability budget, not a switch.
+**Direct answer:** Autonomous processes are built from agents that interleave reasoning and tool use. Yao et al.'s ReAct work describes a "reason–act–observe" pattern in which a model reasons about a task, calls a tool, and uses the observation to continue. The boundary is mathematical: if each step has a 95% success rate, a ten-step chain succeeds roughly 60% of the time.
+
+<KeyPoint>
+Autonomy is therefore a reliability budget, not a switch.
+</KeyPoint>
+
+<KeyFigures items={[
+  { value: "23%", label: "Employed respondents who had used generative AI for work in the previous week as of late 2024", source: "The Rapid Adoption of Generative AI (NBER)" },
+  { value: "9%", label: "Employed respondents who used generative AI every workday", source: "The Rapid Adoption of Generative AI (NBER)" },
+]} />
 
 ## How an agent loop works
 
@@ -23,7 +34,7 @@ Three components form the loop:
 
 **Observe.** The result is fed back into the context, and the loop repeats until the goal is met or a stop condition fires.
 
-ReAct's significance is that it makes the loop explicit and grounded in observations rather than pure generation. Later agent frameworks add state, branching, checkpoints, and human approval gates, but the basic structure remains.
+ReAct's significance is that it <Mark>makes the loop explicit and grounded in observations</Mark> rather than pure generation. Later agent frameworks add state, branching, checkpoints, and human approval gates, but the basic structure remains.
 
 For a business process, the loop maps onto a workflow: read the customer request, check the system of record, decide an action, execute it, verify the result. The interesting questions are what happens when a step fails and who is accountable for the outcome.
 
@@ -41,9 +52,15 @@ Three design responses follow:
 
 1. **Shorten the chain.** Combine steps that do not need separate decisions, or remove confirmations that add a failure point without adding information.
 2. **Add verification.** A step that checks the output of the previous step can convert a silent error into a detected one. Detection is not correction, but it enables a safe fallback.
-3. **Introduce human gates at irreversible points.** Sending a payment is irreversible; drafting a message is not. Put approval before the irreversible action, not before every step.
+3. **Introduce human gates at irreversible points.** Sending a payment is irreversible; drafting a message is not. <Mark>Put approval before the irreversible action, not before every step</Mark>.
 
-The arithmetic also explains why demonstrations are misleading. A demo that succeeds once tells you very little about a ten-step process that must run a thousand times a day. The relevant measurement is the end-to-end success rate and the distribution of failure modes, not the capability shown in a single trace.
+The arithmetic also explains why demonstrations are misleading.
+
+<Trap>
+A demo that succeeds once tells you very little about a ten-step process that must run a thousand times a day.
+</Trap>
+
+The relevant measurement is <Mark>the end-to-end success rate and the distribution of failure modes</Mark>, not the capability shown in a single trace.
 
 ## What adoption data tells us — and does not
 
@@ -87,7 +104,11 @@ The result looks overwhelming, and that is exactly why the arithmetic needs stre
 2. **Monitoring is not free.** Someone must review the exception queue and the failure statistics. If that takes 20 hours a month, add 800.
 3. **Volume changes the answer.** At 500 invoices a month, human cost is 1,000 and the autonomous system costs 300 + 100 + monitoring — the fixed costs dominate and the case weakens.
 
-The point is that autonomy is a capital investment with ongoing operating costs, not a deletion of labour cost. The reliability arithmetic and the cost arithmetic must be done together.
+<PullQuote>
+The point is that autonomy is a capital investment with ongoing operating costs, not a deletion of labour cost.
+</PullQuote>
+
+The reliability arithmetic and the cost arithmetic must be done together.
 
 ## What the future framing cannot support
 

@@ -8,7 +8,10 @@ tags:
   - Test-time Compute
   - Verified
 ---
-A common instinct when a language model fails is to reach for a larger model or another round of training. That instinct overlooks a cheaper lever: spending more computation at inference time. The hard part is knowing when extra test-time compute actually helps and when it simply burns budget.
+
+<Lead>
+A common instinct when a language model fails is to reach for a larger model or another round of training. That instinct overlooks a cheaper lever: <Mark>spending more computation at inference time</Mark>. The hard part is knowing when extra test-time compute actually helps and when it simply burns budget.
+</Lead>
 
 **Direct answer:** Test-time compute means using additional calculation during inference, such as sampling multiple candidate answers or extended reasoning, to improve a response without changing model weights. Research shows it can beat scaling parameters on some reasoning tasks, but only when allocated well. The benefit depends on the task and on a reliable way to choose among candidates.
 
@@ -16,11 +19,15 @@ A common instinct when a language model fails is to reach for a larger model or 
 
 ## The mechanism
 
-The 2024 study by Snell and colleagues, titled "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters," reports that adaptively allocating compute at inference can outperform simply increasing model size on certain reasoning benchmarks. The practical consequence is that there is a tradeoff between searching over many candidate answers and improving the reasoning within a single answer. More compute is not automatically better; how it is spent matters.
+The 2024 study by Snell and colleagues, titled "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters," reports that adaptively allocating compute at inference can outperform simply increasing model size on certain reasoning benchmarks. The practical consequence is that there is a tradeoff between searching over many candidate answers and improving the reasoning within a single answer.
+
+<KeyPoint>
+More compute is not automatically better; how it is spent matters.
+</KeyPoint>
 
 <Figure src="/images/articles/inline/test-time-compute-checklist-1.png" alt="Two scaling strategies compared: a larger model with more parameters versus extra inference compute that samples and verifies candidates." caption="Conceptual: more inference can beat a larger model on hard items." />
 
-One mechanism is generate-and-select. The model produces several candidates and a verifier or reward model scores them, so more samples raise the chance that at least one is correct. That gain saturates and depends heavily on verifier quality. If the verifier cannot tell a correct answer from a plausible wrong one, additional samples mostly multiply noise rather than signal.
+One mechanism is generate-and-select. The model produces several candidates and a verifier or reward model scores them, so more samples raise the chance that at least one is correct. That gain saturates and depends heavily on verifier quality. If the verifier cannot tell a correct answer from a plausible wrong one, additional samples mostly <Mark>multiply noise rather than signal</Mark>.
 
 The 2022 chain-of-thought study by Wei and colleagues, "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models," shows that prompting a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. The practical consequence is that some test-time compute is elicited by prompt structure rather than purchased through extra sampling. A short instruction to reason step by step can unlock capability already present in the weights.
 
@@ -46,13 +53,19 @@ Test-time compute cannot add knowledge the model never learned. More sampling re
 
 There is a real hidden cost in latency and money. Sampling many candidates multiplies token generation, raising both bill and response time, and a verifier adds another model call on top. For user-facing products the delay may outweigh the accuracy gain. A configuration that wins on a benchmark can still be the wrong choice when a customer is waiting for an answer.
 
-A key failure mode is verifier misalignment. A verifier that rewards plausibility over correctness will confidently select wrong answers, and more candidates then make the system more sure of itself while being no more accurate. Longer reasoning chains can also drift or invent intermediate steps, creating a convincing appearance of rigor that does not survive checking.
+<Trap>
+A key failure mode is verifier misalignment.
+</Trap>
+
+A verifier that rewards plausibility over correctness will confidently select wrong answers, and more candidates then make the system more sure of itself while being no more accurate. Longer reasoning chains can also drift or invent intermediate steps, creating a convincing appearance of rigor that does not survive checking.
 
 The method has a boundary around task type. It shines on problems with checkable intermediate steps, such as math or symbolic reasoning, and offers little for simple factual lookups or straightforward retrieval. Applying reasoning chains and candidate sampling indiscriminately spends budget where there is no accuracy headroom to capture.
 
 Finally, published gains are measured on specific suites that may not resemble a production workload. Domain data, answer formats, and difficulty distribution all matter. Any adoption should re-measure locally, and the plan should be revisited whenever the base model, the verifier, or the task mix changes.
 
+<PullQuote>
 Counterargument: the view that bigger models make test-time tricks obsolete is fair for tasks where a single forward pass already succeeds and incomplete where compute budgets or latency caps make parameter scaling impractical.
+</PullQuote>
 
 ## A decision test
 
@@ -64,7 +77,7 @@ Counterargument: the view that bigger models make test-time tricks obsolete is f
 6. Compare total cost and latency against a larger-model baseline.
 7. Ship the smallest configuration that clears the accuracy target.
 
-Followed in sequence, these steps convert a research finding into a budget decision. They favor measurement over assumption, since the value of extra compute is workload-specific. Re-run the comparison whenever the model, verifier, or task distribution shifts, and keep the larger-model fallback available.
+Followed in sequence, these steps convert a research finding into a budget decision. They favor measurement over assumption, since <Mark>the value of extra compute is workload-specific</Mark>. Re-run the comparison whenever the model, verifier, or task distribution shifts, and keep the larger-model fallback available.
 
 For further reading, see [AI risk assessment: a pre-deployment checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 

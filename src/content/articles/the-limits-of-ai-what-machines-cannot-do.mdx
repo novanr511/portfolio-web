@@ -9,9 +9,15 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 Most writing about AI's limits is either a reassurance ("the technology is still early") or a dismissal ("it is just pattern matching"). Neither helps someone deciding where to put a system in a workflow. The useful version of the argument is empirical: there are specific, documented places where AI systems fail, and in several of those places we can point at a measurement rather than an intuition.
+</Lead>
 
-**Direct answer:** Current AI has measurable limits in four places. It can be *net negative* for experienced practitioners on tasks where they already have strong priors. Its measured gains are unevenly distributed, concentrated where the user lacks experience. It breaks at evaluation, because the same machinery that makes models flexible also makes leakage easy. And it does not carry responsibility, which is why deployment context — not model quality — is usually the binding constraint. None of these are permanent laws; they are measurements from 2025-era systems, and they should change as the systems change. What matters now is that they are specific enough to test against your own use case.
+**Direct answer:** Current AI has measurable limits in four places. It can be *net negative* for experienced practitioners on tasks where they already have strong priors. Its measured gains are unevenly distributed, concentrated where the user lacks experience. It breaks at evaluation, because the same machinery that makes models flexible also makes leakage easy. And it does not carry responsibility, which is why deployment context — not model quality — is usually the binding constraint. None of these are permanent laws; they are measurements from 2025-era systems, and they should change as the systems change.
+
+<KeyPoint>
+What matters now is that they are specific enough to test against your own use case.
+</KeyPoint>
 
 ## A measured slowdown, not a hypothetical one
 
@@ -21,7 +27,7 @@ METR gave sixteen experienced developers AI coding tools and measured how long t
 
 Read the caveat as carefully as the number. The authors' own limitation, recorded in the study, is that "You only had 16 developers, so these results will not generalize/replicate." Sixteen developers is a small sample; 246 issues is what gave the study enough statistical power to reject the null of no effect. The honest reading is: *for experienced developers working in unfamiliar-to-their-tools, large codebases they know well, AI assistance made them slower* — and the study does not claim that AI slows everyone down.
 
-That is still a far more useful input than "AI helps developers". A team deciding whether to mandate an AI coding tool for its senior engineers now has a concrete hypothesis to test rather than a vibe to argue about. The cost of the test is a randomised comparison on your own repository, with your own engineers, and your own tasks.
+That is still a far more useful input than "AI helps developers". A team deciding whether to mandate an AI coding tool for its senior engineers now has <Mark>a concrete hypothesis to test rather than a vibe to argue about</Mark>. The cost of the test is a randomised comparison on your own repository, with your own engineers, and your own tasks.
 
 The mechanism is worth forming your own hypothesis about rather than taking one on faith. A plausible account is that with a strong prior, a developer can often write the change directly, while the assistant's output still has to be read, checked, and corrected — so the review cost can exceed the authoring saving. That is an interpretation, not a finding of the trial, and the study does not establish it.
 
@@ -31,7 +37,11 @@ The second limit is that measured gains are not uniform, and averaging them hide
 
 Brynjolfsson, Li and Raymond studied the staggered introduction of an AI-based conversational assistant across 5,179 customer-support agents. Their NBER abstract reports that access to the tool "increases productivity, as measured by issues resolved per hour, by 14% on average, including a 34% improvement for novice and low-skilled workers but with minimal impact on experienced and highly skilled workers". They also find that "AI assistance improves customer sentiment, increases employee retention, and may lead to worker learning", and describe "large heterogeneity in effects across workers".
 
-This is a productivity *gain*, and it still demonstrates a limit: the tool did essentially nothing for the most experienced workers. So the question "is AI useful?" is unanswerable as stated, and the question "is AI useful for the population I actually have, on the tasks they actually do?" is the one with a number attached. A deployment plan that reports the 14% average to a team of senior specialists has quietly overstated what they will see.
+This is a productivity *gain*, and it still demonstrates a limit: the tool did essentially nothing for the most experienced workers. So the question "is AI useful?" <Mark>is unanswerable as stated</Mark>, and the question "is AI useful for the population I actually have, on the tasks they actually do?" is the one with a number attached.
+
+<Trap>
+A deployment plan that reports the 14% average to a team of senior specialists has quietly overstated what they will see.
+</Trap>
 
 ## Evaluation is where models break silently
 
@@ -39,9 +49,13 @@ The third limit is structural, and it is the one that most often turns a promisi
 
 scikit-learn puts it plainly: "Data leakage occurs when information that would not be available at prediction time is used when building the model." The cause is not exotic — it is ordinary convenience. Scaling, imputing, or selecting features on the full dataset before splitting leaks test information into training. The remedy they prescribe is procedural: "Always split the data into train and test subsets first, particularly before any preprocessing steps."
 
-The consequence is a specific failure signature: a validation score that looks excellent, and a production score that does not. Any claimed capability is only as credible as the split behind it.
+The consequence is a specific failure signature: a validation score that looks excellent, and a production score that does not.
 
-The deeper version of this problem is about coverage, not mechanics. Mitchell et al. argue that released models should be accompanied by documentation detailing "their performance characteristics", with benchmarked evaluation "in a variety of conditions, such as across different cultural, demographic, or phenotypic groups (e.g., race, geographic location, sex, Fitzpatrick skin type) and intersectional groups" relevant to the application. Their motivation is that models are already used "in areas such as law enforcement, medicine, education, and employment" — precisely the domains where an aggregate metric can hide a serious problem. The limit, then, is that "accuracy" is a summary statistic over a population you have not necessarily checked.
+<PullQuote>
+Any claimed capability is only as credible as the split behind it.
+</PullQuote>
+
+The deeper version of this problem is about coverage, not mechanics. Mitchell et al. argue that released models should be accompanied by documentation detailing "their performance characteristics", with benchmarked evaluation "in a variety of conditions, such as across different cultural, demographic, or phenotypic groups (e.g., race, geographic location, sex, Fitzpatrick skin type) and intersectional groups" relevant to the application. Their motivation is that models are already used "in areas such as law enforcement, medicine, education, and employment" — precisely the domains where <Mark>an aggregate metric can hide a serious problem</Mark>. The limit, then, is that "accuracy" is a summary statistic over a population you have not necessarily checked.
 
 Gebru et al. make the dataset-side version of the same point: without a standardised process for documenting datasets, "which can lead to severe consequences in high stakes domains". A model inherits the provenance of its data whether or not anyone wrote it down.
 

@@ -9,21 +9,33 @@ tags:
   - Data
 ---
 
-Parsing free-form model output with regular expressions is a fragile way to build software. A stray sentence, a code fence, or a trailing comment breaks the parser. Structured output solves this by constraining generation to a schema, so the result is valid data by construction rather than by hope.
+<Lead>
+Parsing free-form model output with regular expressions is a fragile way to build software. A stray sentence, a code fence, or a trailing comment breaks the parser. Structured output solves this by constraining generation to a schema, so the result is <Mark>valid data by construction rather than by hope</Mark>.
+</Lead>
 
 **Direct answer:** Structured output constrains a model's generation to a defined schema — typically JSON — using constrained decoding or schema-guided sampling. OpenAI's structured-outputs guide is the primary reference for the mechanism. The boundary: a valid shape does not mean a correct value — the model can fill a valid field with a wrong fact — so schema validation and semantic checks are different layers.
 
 ## How constrained decoding works
 
-A language model emits tokens one at a time, each chosen from a probability distribution over the vocabulary. Constrained decoding restricts that distribution at every step to tokens that could still produce a valid instance of the schema. If the schema says the next field is an integer, tokens that would start a string are excluded.
+A language model emits tokens one at a time, each chosen from a probability distribution over the vocabulary.
+
+<KeyPoint>
+Constrained decoding restricts that distribution at every step to tokens that could still produce a valid instance of the schema.
+</KeyPoint>
+
+If the schema says the next field is an integer, tokens that would start a string are excluded.
 
 Three consequences follow:
 
 **Validity is mechanical.** The output conforms to the schema, so parsing cannot fail for format reasons. That removes an entire class of error handling.
 
-**The schema is part of the interface.** Field names, types, required properties, and enums become a contract between the model and your application. Changing them changes the system.
+**The schema is <Mark>part of the interface</Mark>.** Field names, types, required properties, and enums become a contract between the model and your application. Changing them changes the system.
 
-**Constraints cost some freedom.** A tight schema can prevent the model from expressing a legitimate edge case. An enum that omits "unknown" forces a wrong choice.
+**Constraints cost some freedom.** A tight schema can prevent the model from expressing a legitimate edge case.
+
+<Trap>
+An enum that omits "unknown" forces a wrong choice.
+</Trap>
 
 ## A worked example
 
@@ -87,7 +99,11 @@ These habits matter more when several services consume the output. A schema used
 
 **It cannot fix a badly designed schema.** A schema with twenty loosely defined fields produces twenty plausible but untrustworthy values. Start with the decision the output supports and work backwards.
 
-The counterargument — that free text is more expressive — is fair for exploratory tasks. For a production API, expressiveness is less valuable than a contract your code can rely on.
+The counterargument — that free text is more expressive — is fair for exploratory tasks.
+
+<PullQuote>
+For a production API, expressiveness is less valuable than <Mark>a contract your code can rely on</Mark>.
+</PullQuote>
 
 ## A decision test
 

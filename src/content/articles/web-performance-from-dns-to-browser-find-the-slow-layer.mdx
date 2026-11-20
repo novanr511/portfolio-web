@@ -9,11 +9,15 @@ tags:
   - Network
 ---
 
+<Lead>
 When a website feels slow, engineering teams often jump straight to optimizing client-side JavaScript or compressing images. While frontend optimizations are valuable, diagnosing performance bottlenecks without measuring the entire request lifecycle frequently addresses the wrong layer. A page with optimized JavaScript will still load sluggishly if origin database queries choke Time to First Byte (TTFB) or if un-cached DNS lookups stall initial connection negotiation.
+</Lead>
 
 **Direct Answer:** Diagnosing web performance requires deconstructing the network and compute waterfall into discrete layers defined by the W3C Navigation Timing API: DNS resolution, TCP handshake, TLS negotiation, Time to First Byte (TTFB), content download, DOM parsing, and main thread execution. Bottlenecks occurring before the first byte arrives indicate network, CDN, or server-side compute issues; bottlenecks occurring after the first byte indicate render-blocking resources, un-optimized assets, or heavy client-side JavaScript.
 
+<KeyPoint>
 Isolating exactly where latency accumulates prevents wasted engineering effort and directly improves search engine crawl capacity.
+</KeyPoint>
 
 ```text
 [Browser / Crawler Requests URL]
@@ -47,7 +51,7 @@ Standardized under the **W3C Navigation Timing API**, every web transaction cons
 
 ## 2. Isolating the Slow Layer: Network vs Backend vs Frontend
 
-To fix a performance bottleneck, you must assign responsibility to the correct engineering layer:
+To fix a performance bottleneck, you must <Mark>assign responsibility to the correct engineering layer</Mark>:
 
 ```text
 Symptom Observed                       │ Fault Layer         │ Responsible System
@@ -165,7 +169,7 @@ When auditing a slow endpoint, work through these layers in order:
 
 ## Summary & Next Steps
 
-Web performance is an engineering chain: a delay at the network tier cascades into the server compute tier, which delays document delivery and stalls frontend rendering. By measuring the full request waterfall and isolating bottlenecks to their responsible layer, engineering teams can systematically eliminate crawl latency and improve real user responsiveness.
+Web performance is an engineering chain: a delay at the network tier cascades into the server compute tier, which delays document delivery and stalls frontend rendering. By measuring <Mark>the full request waterfall</Mark> and isolating bottlenecks to their responsible layer, engineering teams can systematically eliminate crawl latency and improve real user responsiveness.
 
 Continue exploring user-centric performance metrics:
 * **[Core Web Vitals: Diagnose LCP, INP, and CLS](/articles/core-web-vitals-diagnose-lcp-inp-cls)** — Measuring user-perceived loading, responsiveness, and visual stability.
@@ -174,11 +178,23 @@ Continue exploring user-centric performance metrics:
 
 ## A worked example
 
-The following is hypothetical and illustrative. Imagine a site where pages feel slow and the team's first instinct is to rewrite client-side JavaScript. A staged diagnosis tests that instinct. The first check is the pre-byte timeline: running the curl timing recipe and reading the Navigation Timing milestones shows DNS, TCP, and TLS all completing quickly, so the network layer and the edge are not at fault. The second check isolates Time to First Byte, which the article treats as the server-compute boundary - here TTFB sits above the 600ms threshold, pointing to an uncached database query rather than the browser. The third check examines what happens after the first byte: external scripts in the head are already deferred and critical CSS is inlined, so the frontend execution layer is clean. The outcome is bounded: the team adds edge caching for the slow route, TTFB falls back under the crawler-responsive range, and crawl capacity recovers. The JavaScript stays untouched.
+The following is hypothetical and illustrative.
+
+<Trap>
+Imagine a site where pages feel slow and the team's first instinct is to rewrite client-side JavaScript.
+</Trap>
+
+A staged diagnosis tests that instinct. The first check is the pre-byte timeline: running the curl timing recipe and reading the Navigation Timing milestones shows DNS, TCP, and TLS all completing quickly, so the network layer and the edge are not at fault. The second check isolates Time to First Byte, which the article treats as the server-compute boundary - here TTFB sits above the 600ms threshold, pointing to an uncached database query rather than the browser. The third check examines what happens after the first byte: external scripts in the head are already deferred and critical CSS is inlined, so the frontend execution layer is clean. The outcome is bounded: the team adds edge caching for the slow route, TTFB falls back under the crawler-responsive range, and crawl capacity recovers. The JavaScript stays untouched.
 
 ## A counterargument
 
-The layered waterfall is a clean teaching model, but a reasonable critic would object that it implies the tiers are independent when they are coupled: an edge cache that turns a cache MISS into a fast response can hide an origin TTFB problem until traffic patterns change, and a fast TTFB can coexist with a slow LCP that the article's own Web Vitals reference treats as the user-facing outcome. The thresholds quoted (a 600ms TTFB, a 200ms crawler target) are presented as firm, yet the cited sources define metrics rather than universal pass/fail limits. A single curl timing is a lab sample from one vantage point, not the distribution of real-user experiences the Web Vitals data describes, so isolating a 'slow layer' from one run risks optimizing for the measurement rather than the visitor.
+The layered waterfall is a clean teaching model, but a reasonable critic would object that it implies the tiers are independent when they are coupled: an edge cache that turns a cache MISS into a fast response can hide an origin TTFB problem until traffic patterns change, and a fast TTFB can coexist with a slow LCP that the article's own Web Vitals reference treats as the user-facing outcome.
+
+<PullQuote>
+The thresholds quoted (a 600ms TTFB, a 200ms crawler target) are presented as firm, yet the cited sources define metrics rather than universal pass/fail limits.
+</PullQuote>
+
+A single curl timing is a lab sample from one vantage point, not the distribution of real-user experiences the Web Vitals data describes, so isolating a 'slow layer' from one run risks optimizing for the measurement rather than the visitor.
 
 ## References & Further Reading
 

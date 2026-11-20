@@ -9,7 +9,9 @@ tags:
   - Deep Learning
 ---
 
+<Lead>
 A time series forecast is a claim about which patterns will repeat. ARIMA assumes structure in the series itself; models with regressors assume external variables help; neural forecasters assume there is a learnable mapping from history and covariates to the future. None of these is universally right, and the choice is mostly a question of what you believe is stable.
+</Lead>
 
 **Direct answer:** Classical methods such as exponential smoothing and ARIMA model the series from its own past and work well on short, relatively clean series with clear patterns. Deep models such as N-BEATS and the Temporal Fusion Transformer learn from large collections of series and can incorporate covariates, at the cost of data and complexity. Oreshkin et al. report that N-BEATS improved forecast accuracy by 11% over a statistical benchmark and 3% over the previous M4 competition winner, so the neural approach is genuinely competitive — but that result is on competition datasets, not a guarantee for a single business series.
 
@@ -21,7 +23,11 @@ A row in a time series is not independent of the row before it. This breaks the 
 
 **Non-stationarity.** The statistical properties of the series can change. A model fitted on last year's data may describe a process that no longer exists — the reason a forecast can fail without any bug in the code.
 
-**Leakage from the future.** Randomly splitting a time series lets the model see observations that occur after the ones it is predicting. scikit-learn's `TimeSeriesSplit` exists for this reason: it builds expanding folds that respect chronology, and its `gap` parameter handles cases where labels arrive late. A random split on time-ordered data is a methodological error, not a stylistic choice.
+**Leakage from the future.** Randomly splitting a time series lets the model see observations that occur after the ones it is predicting. scikit-learn's `TimeSeriesSplit` exists for this reason: it builds expanding folds that respect chronology, and its `gap` parameter handles cases where labels arrive late.
+
+<Trap>
+A random split on time-ordered data is a methodological error, not a stylistic choice.
+</Trap>
 
 The forecasting textbook *Forecasting: Principles and Practice* by Hyndman and Athanasopoulos is the clearest reference for the classical toolkit — exponential smoothing, ARIMA, and the discipline of evaluating on a holdout that mimics the deployment horizon.
 
@@ -31,7 +37,7 @@ ARIMA models a series as a function of its own past values and past errors. The 
 
 The appeal is transparency and low data requirements. On a single series with a few hundred observations and a stable pattern, an ARIMA or exponential-smoothing model is often hard to beat, and its assumptions can be checked.
 
-The limitation is that a univariate model ignores everything else. If promotions, holidays, or price changes drive demand, the series alone is an incomplete description, and no amount of tuning recovers information that was never in the inputs.
+The limitation is that a univariate model ignores everything else. If promotions, holidays, or price changes drive demand, <Mark>the series alone is an incomplete description</Mark>, and no amount of tuning recovers information that was never in the inputs.
 
 ## The deep learning approach
 
@@ -39,9 +45,14 @@ Deep forecasters address two weaknesses at once: they can share information acro
 
 N-BEATS, from Oreshkin et al., is built from "backward and forward residual links and a very deep stack of fully-connected layers". Its basis-expansion design makes the output decomposable — the forecast can be expressed as trend and seasonality components — which is what the authors mean by interpretable. The paper tested it on M3, M4, and TOURISM datasets and reported state-of-the-art results, with an 11% improvement over a statistical benchmark and 3% over the previous M4 winner, a hand-crafted hybrid model.
 
+<KeyFigures items={[
+  { value: "11%", label: "improvement over a statistical benchmark on M3, M4, and TOURISM datasets", source: "Oreshkin et al., 2020" },
+  { value: "3%", label: "improvement over the previous M4 competition winner", source: "Oreshkin et al., 2020" },
+]} />
+
 The Temporal Fusion Transformer, from Lim et al., targets multi-horizon forecasting with a "complex mix of inputs — including static covariates, known future inputs, and other exogenous time series that are only observed historically". It combines "recurrent layers for local processing and interpretable self-attention layers for learning long-term dependencies" and produces variable-importance measures, which matter when a human needs to trust a forecast.
 
-The distinction between covariate types is practically important. A known future input — a planned promotion, a holiday calendar — can be used directly. A covariate observed only historically — yesterday's actual traffic — must be forecast or lagged, and treating it as known is a subtle form of leakage.
+The distinction between covariate types is practically important. A known future input — a planned promotion, a holiday calendar — can be used directly. A covariate observed only historically — yesterday's actual traffic — must be forecast or lagged, and treating it as known is <Mark>a subtle form of leakage</Mark>.
 
 ## A worked example of horizon and validation
 
@@ -63,7 +74,11 @@ Three caveats change the practical conclusion.
 
 **Accuracy is not the only criterion.** N-BEATS and TFT are described as interpretable relative to earlier neural models, but an ARIMA coefficient or an exponential-smoothing component is still easier to explain to a stakeholder. In a setting where a human must act on the forecast, a small accuracy gain may not justify the loss of transparency.
 
-**The world moves.** Any model assumes the future resembles the past in relevant ways. A structural break — a new competitor, a policy change — invalidates the historical relationship regardless of architecture. Monitoring forecast error and retraining on a schedule is part of the method, not an afterthought.
+<KeyPoint>
+Any model assumes the future resembles the past in relevant ways.
+</KeyPoint>
+
+**The world moves.** A structural break — a new competitor, a policy change — invalidates the historical relationship regardless of architecture. <Mark>Monitoring forecast error and retraining on a schedule is part of the method, not an afterthought</Mark>.
 
 ## A decision test
 
@@ -80,7 +95,11 @@ For a worked example that treats the prediction moment as a variable and compare
 
 ## A counterargument
 
-A reasonable critic would say the article's balanced framing still flatters the deep models. It cites N-BEATS's 11% and 3% gains as evidence the neural approach is "genuinely competitive," then notes these come from competition datasets with thousands of series - which is the article's own explanation for why the advantage disappears on a single series. The headline number is the one readers remember; the caveat is the one they skip. The classical toolkit is defended with Hyndman's text, while the deep models are defended with competition win rates, and those are different kinds of evidence. scikit-learn's TimeSeriesSplit validates a backtest design, not a choice of model. The decision test is sensible, but the framing invites an inference - that deep models win on benchmarks - that the article's own caveats are meant to retract.
+A reasonable critic would say the article's balanced framing still flatters the deep models. It cites N-BEATS's 11% and 3% gains as evidence the neural approach is "genuinely competitive," then notes these come from competition datasets with thousands of series - which is the article's own explanation for why the advantage disappears on a single series. The classical toolkit is defended with Hyndman's text, while the deep models are defended with competition win rates, and those are different kinds of evidence. scikit-learn's TimeSeriesSplit validates a backtest design, not a choice of model. The decision test is sensible, but the framing invites an inference - that deep models win on benchmarks - that the article's own caveats are meant to retract.
+
+<PullQuote>
+The headline number is the one readers remember; the caveat is the one they skip.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,9 +9,11 @@ tags:
   - Search Engines
 ---
 
+<Lead>
 Search engines are distributed data ingestion engines operating at planet scale. When a web crawler encounters your website, it does not evaluate your content through the lens of marketing metrics. It evaluates your site as a set of network endpoints governed by protocols, socket connections, server runtimes, rendering queues, and data extraction pipelines.
+</Lead>
 
-**Direct Answer:** Technical SEO as web infrastructure engineering views visibility not as an afterthought, but as an emergent property of website reliability, architectural correctness, and protocol compliance. If DNS fails, crawling halts. If the reverse proxy misconfigures headers, canonical signals fracture. If client-side JavaScript execution times out in the rendering service, indexation fails. Understanding the journey of a URL from initial lookup to document indexation provides the foundation for systematic, root-cause diagnosis.
+**Direct Answer:** Technical SEO as web infrastructure engineering views visibility not as an afterthought, but as <Mark>an emergent property of website reliability, architectural correctness, and protocol compliance</Mark>. If DNS fails, crawling halts. If the reverse proxy misconfigures headers, canonical signals fracture. If client-side JavaScript execution times out in the rendering service, indexation fails. Understanding the journey of a URL from initial lookup to document indexation provides the foundation for <Mark>systematic, root-cause diagnosis</Mark>.
 
 This knowledge hub serves as the architectural blueprint for the 32-chapter technical series, mapping each layer of web infrastructure to its direct search engine impact.
 
@@ -36,7 +38,11 @@ This knowledge hub serves as the architectural blueprint for the 32-chapter tech
 
 ## The 5 Layers of the Request-to-Index Hierarchy
 
-Every interaction between a search crawler (like Googlebot) and your site traverses five distinct layers. A failure at any lower layer invalidates all optimizations made at the layers above it.
+Every interaction between a search crawler (like Googlebot) and your site traverses five distinct layers.
+
+<KeyPoint>
+A failure at any lower layer invalidates all optimizations made at the layers above it.
+</KeyPoint>
 
 ### Layer 1: Network & Security (DNS, TCP, TLS)
 Before an HTTP request can be initiated, the crawler must discover and connect to your host.
@@ -67,7 +73,11 @@ The final stage is document comprehension and integration into the inverted sear
 
 ## Systematic Diagnostic Path: From Symptom to Root Cause
 
-When a search visibility problem arises—such as a critical section dropping from search results—avoid guessing or modifying meta tags at random. Follow the request hierarchy from bottom to top:
+<Trap>
+When a search visibility problem arises—such as a critical section dropping from search results—avoid guessing or modifying meta tags at random.
+</Trap>
+
+Follow the request hierarchy from bottom to top:
 
 ```text
 Symptom: URLs dropped from index or not appearing in search
@@ -159,7 +169,11 @@ The following is hypothetical and illustrative. A site's documentation section d
 
 ## A counterargument
 
-A critic would object that the five-layer hierarchy is cleaner than the system it describes. The article's own layer 5 says crawl capacity responds to server health and URL inventory freshness, which is a feedback loop, not the one-way stack the diagram implies; rendering and indexing decisions can change what gets fetched next. The cited RFCs (9110, 9114, 9293) define protocol behaviour but say nothing about how a search engine processes a document, and the Google crawler overview supports a staged description without guaranteeing that every failure maps to a single layer. The claim that a failure at any lower layer invalidates all work above it is therefore too strong: content and information-architecture defects can persist independently of protocol correctness. The hierarchy is a useful teaching device, not an accurate model of a distributed ingestion pipeline.
+A critic would object that the five-layer hierarchy is cleaner than the system it describes. The article's own layer 5 says crawl capacity responds to server health and URL inventory freshness, which is a feedback loop, not the one-way stack the diagram implies; rendering and indexing decisions can change what gets fetched next. The cited RFCs (9110, 9114, 9293) define protocol behaviour but say nothing about how a search engine processes a document, and the Google crawler overview supports a staged description without guaranteeing that every failure maps to a single layer. The hierarchy is a useful teaching device, <Mark>not an accurate model of a distributed ingestion pipeline</Mark>.
+
+<PullQuote>
+The claim that a failure at any lower layer invalidates all work above it is therefore too strong: content and information-architecture defects can persist independently of protocol correctness.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Structured outputs are often treated as a guarantee of correctness, which confuses format with meaning. The OpenAI structured-output guide describes schema enforcement, and the Anthropic use-case guides cover production patterns. The common questions concern what a schema can and cannot do.
+<Lead>
+Structured outputs are often treated as a guarantee of correctness, which <Mark>confuses format with meaning</Mark>. The OpenAI structured-output guide describes schema enforcement, and the Anthropic use-case guides cover production patterns. The common questions concern what a schema can and cannot do.
+</Lead>
 
 **Direct answer:** Use a schema to make output machine-readable, then validate the values against the task. The sources describe the mechanism; the rule is a synthesis.
 
@@ -17,13 +19,13 @@ Structured outputs are often treated as a guarantee of correctness, which confus
 
 ## The mechanism
 
-The first point is what a schema enforces. The structured-output guide describes constraining generation to a format, which means the result can be parsed. It does not mean the values are true, complete, or appropriate, and the difference matters when the output drives a decision.
+The first point is what a schema enforces. The structured-output guide describes constraining generation to a format, which means the result can be parsed. It does not mean <Mark>the values are true, complete, or appropriate</Mark>, and the difference matters when the output drives a decision.
 
 <Figure src="/images/articles/inline/structured-outputs-common-questions-1.png" alt="A four-step flow: define the consumer, write the schema, validate values against the source, then evaluate on real cases." caption="Conceptual: valid JSON is evidence about format, not correctness." />
 
 The second point is schema design. The use-case guides describe models in production, where the output is consumed by another system. A schema that is too loose produces values that need interpretation, while one that is too strict omits uncertainty, which is a design decision rather than a technical detail.
 
-The third point is validation. A field that must be an integer can still contain the wrong integer, and a required field can be filled with a guess. Checking the output against the task, with a sample of real cases, is the step that turns a format into a reliable interface.
+The third point is validation. A field that must be an integer can still contain the wrong integer, and a required field can be filled with a guess. Checking the output against the task, with a sample of real cases, is the step that turns <Mark>a format into a reliable interface</Mark>.
 
 The sequence is: define the consumer, write the schema, add validation, then evaluate on real cases. The choices are local, so the conclusions are `inferred`; the mechanism is `source-reported`.
 
@@ -45,9 +47,19 @@ The outcome is an interface with a validation rule. The scenario is hypothetical
 
 ## Why valid JSON can be wrong
 
-A format check passes when the shape is correct, which is independent of whether the content is right. Treating a parseable response as a correct one is the error this article exists to correct, and the remedy is a value check against the source.
+A format check passes when the shape is correct, which is independent of whether the content is right.
 
-A further consideration is how uncertainty is represented. A schema with no field for "unknown" forces the model to guess, and a guess that looks like a value is harder to catch than an explicit gap. Allowing a missing value is a design choice that preserves honesty.
+<KeyPoint>
+Treating a parseable response as a correct one is the error this article exists to correct, and the remedy is a value check against the source.
+</KeyPoint>
+
+A further consideration is how uncertainty is represented.
+
+<Trap>
+A schema with no field for "unknown" forces the model to guess, and a guess that looks like a value is harder to catch than an explicit gap.
+</Trap>
+
+Allowing a missing value is a design choice that preserves honesty.
 
 The schema also has to evolve with the consumer. A new field added downstream can break an old parser, and an old field that nobody reads still costs tokens. Reviewing the schema when the consumer changes is part of maintaining the interface, not an optional cleanup.
 
@@ -57,7 +69,9 @@ A schema that cannot express uncertainty forces a guess, and a guess looks like 
 
 The consumer of the output should be defined before the schema, since a field nobody reads still costs tokens.
 
+<PullQuote>
 A parseable response is evidence about format, not about whether the model understood the input.
+</PullQuote>
 
 The schema should be reviewed when the consuming system changes, since an old field can become an error.
 

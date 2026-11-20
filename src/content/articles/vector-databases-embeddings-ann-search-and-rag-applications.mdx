@@ -9,9 +9,23 @@ tags:
   - RAG
 ---
 
+<Lead>
 "Vector database" is a category name rather than a technical one, and it hides a specific engineering decision: you are choosing how to spend memory in exchange for how often a nearest-neighbour search returns the true nearest neighbour. Every design in this space is a position on that trade-off, and the published systems differ mainly in where they put the pressure.
+</Lead>
 
-**Direct answer:** A vector store embeds your data as vectors and serves approximate nearest-neighbour queries. The interesting part is the index, and the useful way to read the literature is by what each index spends. HNSW spends memory to get logarithmic search complexity. FAISS spends compute on GPUs and gives you exact search when you can afford it. SPANN spends memory-disk hierarchy and keeps most of the data out of RAM. None of them removes the trade-off; they relocate it, and the relocation determines which one fits your corpus.
+**Direct answer:**
+
+<KeyPoint>
+A vector store embeds your data as vectors and serves approximate nearest-neighbour queries.
+</KeyPoint>
+
+The interesting part is the index, and the useful way to read the literature is by what each index spends. HNSW spends memory to get logarithmic search complexity. FAISS spends compute on GPUs and gives you exact search when you can afford it. SPANN spends memory-disk hierarchy and keeps most of the data out of RAM. None of them removes the trade-off; they relocate it, and the relocation determines which one fits your corpus.
+
+<KeyFigures items={[
+  { value: "less than 12 hours", label: "to build a graph connecting 1 billion vectors on 4 Maxwell Titan X GPUs", source: "Johnson, Douze and Jégou, 2017" },
+  { value: "2×", label: "faster than DiskANN to reach the same recall quality 90% with the same memory cost in three billion-scale datasets", source: "Chen et al., 2021" },
+  { value: "about 5 seconds", label: "to find the most similar pair with SBERT, down from 65 hours with BERT", source: "Reimers and Gurevych, 2019" },
+]} />
 
 ## The problem underneath the category
 
@@ -21,7 +35,7 @@ First, the curse of dimensionality: in high dimensions, distance concentration m
 
 Second, brute force is linear in corpus size, and it is also *exact*. That combination is the whole trade-off: exact search over a billion vectors means a billion distance computations per query; approximate search means you can often find the right answer after examining a tiny fraction of the data, at the price of sometimes missing it.
 
-The second property is the one that makes the engineering choice interesting. Approximate search is not a compromise you are forced into at scale — it is a deliberate trade of recall for latency, and it can be traded back if you have the compute.
+The second property is the one that makes the engineering choice interesting. Approximate search is not a compromise you are forced into at scale — it is <Mark>a deliberate trade of recall for latency</Mark>, and it can be traded back if you have the compute.
 
 ## HNSW: spending memory for logarithmic search
 
@@ -41,7 +55,7 @@ The numbers define the contribution. Their implementation "enables the construct
 
 The architecturally interesting decision is that FAISS is a *library of methods* rather than one index. It contains both exact algorithms — brute-force and refinement-based — and approximate ones, and the practical consequence is that the exactness/approximation choice becomes a runtime parameter rather than an architectural commitment. For a corpus where you cannot tolerate a wrong answer, or where the corpus is small enough that exact search is affordable, that is a real option, and it is why "FAISS" and "vector database" are not synonyms.
 
-The lesson for a practitioner: the index is not the product. The product is the ability to choose your recall/latency point at query time, or to run exact and approximate side by side and measure the gap.
+The lesson for a practitioner: <Mark>the index is not the product</Mark>. The product is the ability to choose your recall/latency point at query time, or to run exact and approximate side by side and measure the gap.
 
 ## SPANN: spending memory hierarchy
 
@@ -63,7 +77,7 @@ Their fix is the bi-encoder: Sentence-BERT uses "siamese and triplet network str
 
 That is the prerequisite for the entire category. A vector store is only fast if embedding is a one-time cost per document and per query. The moment you need to run the model against the query *and* every candidate, the index stops being the bottleneck and becomes irrelevant.
 
-This is also the trade-off to know about: a bi-encoder embeds each item independently, so its vector cannot depend on what it will be compared against. A cross-encoder can attend across both texts and rank better. You are choosing between a better ranking and a searchable corpus, and the SBERT numbers are the cost of that choice, quantified.
+This is also the trade-off to know about: a bi-encoder embeds each item independently, so its vector cannot depend on what it will be compared against. A cross-encoder can attend across both texts and rank better. You are choosing between <Mark>a better ranking and a searchable corpus</Mark>, and the SBERT numbers are the cost of that choice, quantified.
 
 ## What this has to do with RAG
 
@@ -71,7 +85,11 @@ Retrieval-augmented generation inherits both halves. The RAG pipeline embeds you
 
 The failure modes follow directly. A low-recall index produces a generator that never saw the answer. A cross-encoder at query time makes retrieval too slow to be interactive. An embedding model trained on a domain that does not match your corpus produces a nearest neighbour that is topically near and semantically wrong. And a hybrid system that mixes dense and sparse retrieval inherits the failure modes of both plus the tuning burden of combining their scores.
 
-That is why the sensible order is: fix the embedding and the evaluation set first, and only then choose an index. An index tuned against a bad embedding is a very efficient way to return the wrong document quickly.
+That is why the sensible order is: fix the embedding and the evaluation set first, and only then choose an index.
+
+<PullQuote>
+An index tuned against a bad embedding is a very efficient way to return the wrong document quickly.
+</PullQuote>
 
 ## A checklist before you pick an index
 
@@ -79,8 +97,12 @@ That is why the sensible order is: fix the embedding and the evaluation set firs
 2. **How much recall do you need, and how much latency can you spend?** These are the two ends of the same dial. Write both numbers down, because every index decision follows from the pair.
 3. **Does the corpus fit in RAM?** If not, the memory-disk designs are not an optimisation, they are the plan.
 4. **Can you embed each document once?** If the scoring function requires the query and the document together, an index will not save you.
-5. **How will you measure recall?** Approximate search without a recall measurement is a guess. Keep an exact-search subset as ground truth, and measure against it whenever the index changes.
+5. **How will you measure recall?** Keep an exact-search subset as ground truth, and measure against it whenever the index changes.
 6. **What happens when the corpus changes?** Rebuild cost, index versioning, and partial updates are operational costs that dominate the query cost in practice.
+
+<Trap>
+Approximate search without a recall measurement is a guess.
+</Trap>
 
 For the retrieval layer's role in a generation system, see [Retrieval-Augmented Generation, Explained From the Inside Out](/articles/rag-explained); for the embedding and language stack underneath, see [NLP Fundamentals](/articles/nlp-fundamentals-tokenization-embeddings-and-transformers).
 

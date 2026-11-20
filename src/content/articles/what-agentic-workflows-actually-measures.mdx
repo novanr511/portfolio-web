@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 Agentic workflows are often evaluated by whether the final answer was correct, which hides how the result was produced. The Anthropic agent guidance describes checkpoints and escalation, and the decision-making entry covers the structure of a choice. The measurement question is whether the path was sound.
+</Lead>
 
-**Direct answer:** Evaluate an agentic workflow on the trajectory — tool choices, intermediate states, recovery, and the final result — against a fixed task set. The sources describe the mechanism; the measurement rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Evaluate an agentic workflow on the trajectory — tool choices, intermediate states, recovery, and the final result — against a fixed task set.
+</KeyPoint>
+
+The sources describe the mechanism; the measurement rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked evaluation, separating documented agent patterns from the local choice of what to score.
 
@@ -21,7 +29,7 @@ Three points matter:
 
 <Figure src="/images/articles/inline/what-agentic-workflows-actually-measures-1.png" alt="A four-step flow: build a task set, score the trajectory, count recoveries, then check the result." caption="Conceptual: score the trajectory, not only the final answer." />
 
-- **The path is observable.** The agent guidance describes checkpoints. A correct final answer can come from a lucky path that will not repeat.
+- **The path is observable.** The agent guidance describes checkpoints. A correct final answer can come from <Mark>a lucky path that will not repeat</Mark>.
 - **Recovery matters.** A tool failure is a normal event. The useful question is whether the agent detected it and took a fallback.
 - **Decisions need criteria.** The decision-making entry describes an owner and evidence. An agent that acts without a stated criterion is hard to evaluate.
 
@@ -43,7 +51,13 @@ Scoring the trajectory requires deciding what counts as a good step. The agent g
 
 ## Why escalation belongs in the score
 
-An agent that hands a task to a person is not necessarily failing. In many designs it is the correct behaviour. A task set that treats every handoff as an error will reward agents that guess, which is the opposite of the intended design. Recording expected escalation alongside the expected answer is the fix.
+An agent that hands a task to a person is not necessarily failing. In many designs it is the correct behaviour.
+
+<Trap>
+A task set that treats every handoff as an error will reward agents that guess, which is the opposite of the intended design.
+</Trap>
+
+Recording <Mark>expected escalation alongside the expected answer</Mark> is the fix.
 
 ## Evidence status
 
@@ -55,7 +69,7 @@ An agent that hands a task to a person is not necessarily failing. In many desig
 
 ## Why a lucky success is weak evidence
 
-A final answer that is correct despite a wrong tool call teaches the wrong lesson. On the next task, with different tools, the same behaviour may fail. Trajectory scoring catches this because it records the steps, not just the endpoint.
+A final answer that is correct despite a wrong tool call teaches the wrong lesson. On the next task, with different tools, the same behaviour may fail. Trajectory scoring catches this because it records <Mark>the steps, not just the endpoint</Mark>.
 
 A final consideration is cost. A workflow that reaches the right answer by trying many tools is correct and expensive, and a score that ignores cost will favour it. Recording token spend and tool calls alongside the trajectory gives a fuller picture of what deployment would require.
 
@@ -67,7 +81,9 @@ The score should also distinguish a failure of the model from a failure of the s
 
 It cannot cover every future task. It does not guarantee deployment behaviour when tools change. And it cannot prove safety from a passing test set.
 
+<PullQuote>
 The counterargument that a final-answer score is enough is fair for a single task and incomplete for a system that acts repeatedly.
+</PullQuote>
 
 ## A decision test
 

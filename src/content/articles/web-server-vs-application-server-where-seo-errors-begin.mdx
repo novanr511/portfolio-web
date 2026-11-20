@@ -9,11 +9,15 @@ tags:
   - Server Architecture
 ---
 
+<Lead>
 When a search engine crawler reports a crawl failure—such as a `502 Bad Gateway` or a `504 Gateway Timeout`—engineering and SEO teams often waste hours inspecting application code before realizing the failure occurred at the reverse proxy. Conversely, teams often tweak web server timeouts when an unhandled database lock is crashing application worker threads.
+</Lead>
 
-**Direct Answer:** A web server (e.g., Nginx, Apache, Caddy) handles network socket connections, TLS termination, static asset delivery, and reverse proxy routing. An application server (e.g., Node.js, Gunicorn, PHP-FPM) executes business logic, queries databases, and compiles dynamic HTML. Isolating SEO errors requires identifying the fault boundary: `502 Bad Gateway` indicates the application runtime crashed or was unreachable; `504 Gateway Timeout` indicates the application took too long to respond; and truncated responses often stem from proxy buffer exhaustion.
+**Direct Answer:** A web server (e.g., Nginx, Apache, Caddy) handles network socket connections, TLS termination, static asset delivery, and reverse proxy routing. An application server (e.g., Node.js, Gunicorn, PHP-FPM) executes business logic, queries databases, and compiles dynamic HTML. Isolating SEO errors requires identifying <Mark>the fault boundary</Mark>: `502 Bad Gateway` indicates the application runtime crashed or was unreachable; `504 Gateway Timeout` indicates the application took too long to respond; and truncated responses often stem from <Mark>proxy buffer exhaustion</Mark>.
 
+<KeyPoint>
 Understanding how requests traverse the boundary between the web server and the application server is essential for pinpointing the root cause of crawl failures.
+</KeyPoint>
 
 ```text
 Googlebot Request
@@ -71,7 +75,7 @@ Status Code  │ Originating Tier            │ Underlying Engineering Defect
 A `502 Bad Gateway` status is emitted by the **web server**, not the application server. It means Nginx attempted to pass the request to the upstream application (e.g., `http://127.0.0.1:3000`), but the upstream socket refused the connection or closed abruptly.
 
 * **Typical Causes:** The Node.js process ran out of memory (OOM) and was killed by the OS; PHP-FPM workers crashed; or the application is restarting during a deployment without zero-downtime clustering.
-* **Crawler Impact:** Crawlers treat 502s as transient server instability. If 502s occur across more than 5% of requests, Googlebot enters an exponential backoff state, reducing crawl velocity host-wide.
+* **Crawler Impact:** Crawlers treat 502s as transient server instability. If 502s occur across more than 5% of requests, Googlebot enters an <Mark>exponential backoff state</Mark>, reducing crawl velocity host-wide.
 
 ### 2. 504 Gateway Timeout: The Bottleneck Delay
 A `504 Gateway Timeout` is also emitted by the **web server**. It means Nginx successfully connected to the application server, but the application failed to return data within the configured timeout window (e.g., `proxy_read_timeout 60s;`).
@@ -188,11 +192,21 @@ Continue through the Technical SEO infrastructure series:
 
 ## A worked example
 
-The following is hypothetical and illustrative. Suppose a crawler reports intermittent 502 Bad Gateway responses on a site's most metadata-heavy pages while light pages return 200. The team initially suspects application code. The first check is the fault boundary: the status catalog assigns a 502 to the reverse proxy, not the runtime, whereas a 500 would point into application logic, so the investigation stays at the web server. The second check is the Nginx error log, which shows "upstream sent too big header while reading response header from upstream" on exactly those heavy pages - the signature of proxy_buffer_size exhaustion described in the buffer-trap section. The third check is the comparison case: lighter pages on the same host still return 200, ruling out a host-wide upstream crash or a saturated worker pool. The outcome is bounded: the team raises proxy_buffer_size to 16k, the 502s disappear on the heavy templates, and the application code is left unchanged.
+The following is hypothetical and illustrative. Suppose a crawler reports intermittent 502 Bad Gateway responses on a site's most metadata-heavy pages while light pages return 200.
+
+<Trap>
+The team initially suspects application code.
+</Trap>
+
+The first check is the fault boundary: the status catalog assigns a 502 to the reverse proxy, not the runtime, whereas a 500 would point into application logic, so the investigation stays at the web server. The second check is the Nginx error log, which shows "upstream sent too big header while reading response header from upstream" on exactly those heavy pages - the signature of proxy_buffer_size exhaustion described in the buffer-trap section. The third check is the comparison case: lighter pages on the same host still return 200, ruling out a host-wide upstream crash or a saturated worker pool. The outcome is bounded: the team raises proxy_buffer_size to 16k, the 502s disappear on the heavy templates, and the application code is left unchanged.
 
 ## A counterargument
 
-The two-tier model is tidy, but a reasonable critic would note that the article's own diagram includes an edge and firewall layer that its status-code catalog then ignores: a CDN or load balancer can emit a 502 or 504 before any request reaches Nginx, so the 'web server emitted the 502' rule can send an engineer to the wrong box. The cited RFC 9112 and RFC 9293 define HTTP and TCP syntax and transport, not crawler policy, so the asserted thresholds (a 5% error rate triggering backoff, a 60s proxy timeout) are operational heuristics the references do not establish. The framework is a useful starting hypothesis, not the deterministic map the status table implies.
+The two-tier model is tidy, but a reasonable critic would note that the article's own diagram includes an edge and firewall layer that its status-code catalog then ignores: a CDN or load balancer can emit a 502 or 504 before any request reaches Nginx, so the 'web server emitted the 502' rule can send an engineer to the wrong box. The cited RFC 9112 and RFC 9293 define HTTP and TCP syntax and transport, not crawler policy, so the asserted thresholds (a 5% error rate triggering backoff, a 60s proxy timeout) are operational heuristics the references do not establish.
+
+<PullQuote>
+The framework is a useful starting hypothesis, not the deterministic map the status table implies.
+</PullQuote>
 
 ## References & Further Reading
 

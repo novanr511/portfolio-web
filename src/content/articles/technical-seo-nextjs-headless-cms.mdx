@@ -9,11 +9,19 @@ tags:
   - Web Infrastructure
 ---
 
+<Lead>
 Decoupling content management from frontend presentation using a headless CMS (such as Keystatic, Sanity, or Strapi) and a modern meta-framework like Next.js gives engineering teams unparalleled developer velocity and content flexibility. However, architectural decoupling shifts the entire burden of technical SEO—URL canonicalization, metadata generation, XML sitemap synthesis, and crawlable HTML rendering—onto frontend developers.
+</Lead>
 
-**Direct Answer:** In a headless Next.js architecture, the Next.js App Router owns the public URL lifecycle. To ensure optimal search crawlability, applications must generate complete HTML at build time using `generateStaticParams` (SSG) or incremental regeneration (ISR), emit deterministic head tags via the `generateMetadata` API, dynamically synthesize `sitemap.ts` and `robots.ts` directly from the CMS data layer, and verify raw server output before deployment.
+**Direct Answer:**
 
-When properly configured, a headless Next.js application delivers sub-100ms Time to First Byte (TTFB), guaranteed Wave 1 crawler indexability, and automated sitemap synchronization.
+<KeyPoint>
+In a headless Next.js architecture, the Next.js App Router owns the public URL lifecycle.
+</KeyPoint>
+
+To ensure optimal search crawlability, applications must generate complete HTML at build time using `generateStaticParams` (SSG) or incremental regeneration (ISR), emit deterministic head tags via the `generateMetadata` API, dynamically synthesize `sitemap.ts` and `robots.ts` directly from the CMS data layer, and verify raw server output before deployment.
+
+When properly configured, a headless Next.js application delivers sub-100ms Time to First Byte (TTFB), guaranteed Wave 1 crawler indexability, and <Mark>automated sitemap synchronization</Mark>.
 
 ```text
 [Headless CMS Data Layer] (e.g., Keystatic MDX / Headless API)
@@ -42,7 +50,7 @@ In a headless stack, **the CMS is merely a database of content entities**. The N
 2. **HTTP Signaling:** Emitting correct `200 OK`, `301 Moved Permanently`, and `404 Not Found` response codes.
 3. **Document Assembly:** Merging CMS fields (title, body, tags, timestamps) into valid HTML `<head>` and `<body>` tags.
 
-If your Next.js application fails to map a CMS field to a canonical tag or forgets to catch deleted content with a true 404, the headless CMS cannot fix it. Search engines never see the CMS; they only see the HTTP response delivered by Next.js.
+If your Next.js application fails to map a CMS field to a canonical tag or forgets to catch deleted content with a true 404, the headless CMS cannot fix it. <Mark>Search engines never see the CMS; they only see the HTTP response delivered by Next.js.</Mark>
 
 ---
 
@@ -201,7 +209,11 @@ As established in [HTTP Status Codes for SEO](/articles/http-status-codes-for-se
 
 ## 5. Build Verification and Static HTML Smoke Testing
 
-Never assume your Next.js build rendered crawlable HTML without verifying the output. Before deploying to production, execute a terminal-based smoke test:
+<Trap>
+Never assume your Next.js build rendered crawlable HTML without verifying the output.
+</Trap>
+
+Before deploying to production, execute a terminal-based smoke test:
 
 ### 1. Build Verification
 Run the build script to ensure static route compilation completes without errors:
@@ -249,11 +261,15 @@ Continue through the Technical SEO series to master rendering models and discove
 
 ## A worked example
 
-The following is hypothetical and illustrative. A team moves a documentation site from a monolithic CMS to a headless setup with a Next.js App Router frontend and wants confidence that crawlers receive complete HTML. Check one runs a production build and inspects the route table, confirming that article paths are prerendered as static output, then pipes a curl request through a grep for the title and canonical link so the first byte stream contains the real head tags. Check two verifies that sitemap.ts and robots.ts are generated from the CMS data layer, so a newly published slug appears in the sitemap and the robots file advertises that sitemap without hand edits. Check three requests a deleted slug and confirms a true 404 from notFound rather than a soft 404, while noting that these build-time and byte-level checks cannot prove a search engine later rendered or indexed the page. The outcome is bounded: a passing smoke test licenses deployment, and the team treats indexation as a separate question to watch after release rather than a guaranteed Wave 1 result.
+The following is hypothetical and illustrative. A team moves a documentation site from a monolithic CMS to a headless setup with a Next.js App Router frontend and wants confidence that crawlers receive complete HTML. Check one runs a production build and inspects the route table, confirming that article paths are prerendered as static output, then pipes a curl request through a grep for the title and canonical link so <Mark>the first byte stream contains the real head tags</Mark>. Check two verifies that sitemap.ts and robots.ts are generated from the CMS data layer, so a newly published slug appears in the sitemap and the robots file advertises that sitemap without hand edits. Check three requests a deleted slug and confirms a true 404 from notFound rather than a soft 404, while noting that these build-time and byte-level checks cannot prove a search engine later rendered or indexed the page. The outcome is bounded: a passing smoke test licenses deployment, and the team treats indexation as a separate question to watch after release rather than a guaranteed Wave 1 result.
 
 ## A counterargument
 
-A reasonable critic would argue that the article overstates what build-time checks prove. Its own sources describe a process the build cannot close: the Google JavaScript SEO guidance treats crawling and rendering as stages that happen after a page is served, and the GitHub Actions material only establishes that a pipeline passed, not that a search engine revisited, rendered, or indexed anything. A `curl` smoke test confirms the bytes emitted at one moment; it says nothing about whether the canonical is honoured once competing URLs exist or whether an article updated in the CMS between builds is served stale. The claim of guaranteed Wave 1 indexability reads a deployment gate as an indexation outcome. The framing is strongest for stable, build-time content and weakest wherever freshness or duplicate-URL resolution is decided after deployment.
+A reasonable critic would argue that the article overstates what build-time checks prove. Its own sources describe a process the build cannot close: the Google JavaScript SEO guidance treats crawling and rendering as stages that happen after a page is served, and the GitHub Actions material only establishes that a pipeline passed, not that a search engine revisited, rendered, or indexed anything. A `curl` smoke test confirms the bytes emitted at one moment; it says nothing about whether the canonical is honoured once competing URLs exist or whether an article updated in the CMS between builds is served stale. The framing is strongest for stable, build-time content and weakest wherever freshness or duplicate-URL resolution is decided after deployment.
+
+<PullQuote>
+The claim of guaranteed Wave 1 indexability reads a deployment gate as an indexation outcome.
+</PullQuote>
 
 ## References & Further Reading
 

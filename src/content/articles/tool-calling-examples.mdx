@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 Tool calling is often described as giving a model functions to use, which hides the boundary: the model requests, and the system decides whether to execute. Anthropic's tool-use documentation describes the request format, and OpenAI's structured-output guide covers schema enforcement. The examples show where the boundary matters.
+</Lead>
 
-**Direct answer:** Treat a tool call as a request with a schema, an authorisation check, and a verified result — not as an instruction the system must obey. The sources describe the format; the boundary rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Treat a tool call as a request with a schema, an authorisation check, and a verified result — not as an instruction the system must obey.
+</KeyPoint>
+
+The sources describe the format; the boundary rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked failure, separating documented formats from local authorisation decisions.
 
@@ -21,11 +29,11 @@ Three points matter:
 
 <Figure src="/images/articles/inline/tool-calling-examples-1.png" alt="A four-step flow: define the schema, check authorisation, execute the call, then verify the result." caption="Conceptual: a valid schema is not a safe call without authorisation." />
 
-- **Schema defines shape.** The structured-output guide describes enforced formats. A valid call can still be the wrong call.
+- **Schema defines shape.** The structured-output guide describes enforced formats. <Mark>A valid call can still be the wrong call</Mark>.
 - **Authorisation is separate.** The tool-use documentation describes how models request tools. Whether the request is permitted is a system decision.
 - **Results need verification.** A call can succeed technically and return stale or wrong data. The agent guidance treats checkpoints as controls.
 
-The sequence is: define the schema, check authorisation, execute, then verify the result. Authorisation is local policy, so it is `inferred`; the format is `source-reported`.
+The sequence is: <Mark>define the schema, check authorisation, execute, then verify the result</Mark>. Authorisation is local policy, so it is `inferred`; the format is `source-reported`.
 
 ## Worked examples
 
@@ -37,7 +45,7 @@ The outcome is a boundary design with recorded controls. The scenarios are hypot
 
 ## Why results need checking
 
-A tool can return a well-formed result that is stale, incomplete, or from the wrong record. The model has no way to know this from the schema, which is why a verification step belongs in the design. For consequential actions, the check should happen before execution, not after.
+A tool can return a well-formed result that is stale, incomplete, or from the wrong record. The model has no way to know this from the schema, which is why <Mark>a verification step belongs in the design</Mark>. For consequential actions, the check should happen before execution, not after.
 
 ## What changes with state
 
@@ -53,7 +61,11 @@ Read-only tools and state-changing tools share a format and deserve different co
 
 ## Why a valid schema is not a safe call
 
-A schema answers the question of whether a request is well-formed. It does not answer whether the request should be carried out. Conflating the two is the most common failure in tool-calling systems, because the technical check passes just before a consequential action.
+A schema answers the question of whether a request is well-formed. It does not answer whether the request should be carried out.
+
+<Trap>
+Conflating the two is the most common failure in tool-calling systems, because the technical check passes just before a consequential action.
+</Trap>
 
 A final constraint is that a tool call is only as good as the descriptions the model reads. A vague description of what a tool does will produce plausible but incorrect calls, and no schema can fix that. Writing tool descriptions is therefore part of the engineering work, not a documentation afterthought.
 
@@ -71,7 +83,9 @@ The result belongs in the failure record alongside the call that produced it.
 
 It cannot guarantee that a model chooses the right tool. It does not replace verification of the result. And it cannot remove the need for a human check on high-impact actions.
 
+<PullQuote>
 The counterargument that a valid call is enough is fair for read-only tools and incomplete for tools that change state.
+</PullQuote>
 
 ## A decision test
 

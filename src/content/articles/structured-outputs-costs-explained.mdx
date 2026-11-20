@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Structured outputs are often adopted as a free reliability upgrade, but every constrained response carries a cost. The OpenAI guide documents structured model outputs, and the Anthropic documentation describes tool use with a defined input schema. The real problem is that teams see the cleaner data and miss the token overhead, latency, and schema upkeep behind it.
+<Lead>
+Structured outputs are often adopted as <Mark>a free reliability upgrade</Mark>, but every constrained response carries a cost. The OpenAI guide documents structured model outputs, and the Anthropic documentation describes tool use with a defined input schema. The real problem is that teams see the cleaner data and miss <Mark>the token overhead, latency, and schema upkeep</Mark> behind it.
+</Lead>
 
 **Direct answer:** Structured outputs force a model to return data that matches a supplied schema, which raises reliability for downstream code. The sources document the two mechanisms. The bounded answer is that this reliability is paid for with schema tokens, added latency, and maintenance, so it should be applied selectively.
 
@@ -23,7 +25,7 @@ The OpenAI guide describes structured model outputs as responses constrained to 
 
 The Anthropic documentation describes tool use, where a model is given tools with defined input schemas and returns arguments that fit those definitions. The mechanism is similar: the tool definition tells the model what valid input looks like, and the response is meant to match it. The practical consequence is that an agent can call software with structured arguments rather than free text. Again, the definitions consume context, and a mismatch can trigger a retry.
 
-A team that adopts structure everywhere pays for it on every call. A simple classification that could return one word may carry a large schema, a longer prompt, and a validation step. The mechanism that makes the trade-off manageable is to match the strictness to the consumer: strict schemas where code must parse the result, loose formats where a human reads it. Each layer of constraint has a price in tokens and latency, and each layer buys a specific kind of reliability.
+A team that adopts structure everywhere pays for it on every call. A simple classification that could return one word may carry a large schema, a longer prompt, and a validation step. The mechanism that makes the trade-off manageable is to <Mark>match the strictness to the consumer</Mark>: strict schemas where code must parse the result, loose formats where a human reads it. Each layer of constraint has a price in tokens and latency, and each layer buys a specific kind of reliability.
 
 The output is a decision about where structure is worth its cost. The sources document the mechanisms; they do not set a budget or a threshold. Those are local choices. The discipline is to record why a schema exists, what it costs, and when it should be revisited, so a reviewer can tell whether the constraint is earning its keep.
 
@@ -45,7 +47,13 @@ The first two rows report the mechanisms as documented by each provider. The thi
 
 Structured outputs do not make a model correct. They constrain the shape of a response, not its truth. A field can be perfectly formed and still contain a wrong value, because the schema says nothing about the facts. The sources document format constraints, not accuracy guarantees. Treating a valid JSON object as a verified answer is a category error. The reliability gained is syntactic: downstream code stops breaking on malformed text, but the content still needs independent checking.
 
-The hidden cost is schema maintenance. A schema that mirrors a changing business object must be updated whenever that object changes, and every change can ripple through prompts, validators, and tests. There is also a retry cost: when a model fails to satisfy a strict schema, the call is repeated, and repeated calls multiply token spend. Teams often count only the successful call and miss the retries. The expense is paid in engineering time and in quiet token waste.
+The hidden cost is schema maintenance. A schema that mirrors a changing business object must be updated whenever that object changes, and every change can ripple through prompts, validators, and tests. There is also a retry cost: when a model fails to satisfy a strict schema, the call is repeated, and repeated calls multiply token spend.
+
+<Trap>
+Teams often count only the successful call and miss the retries.
+</Trap>
+
+The expense is paid in engineering time and in quiet token waste.
 
 A common failure mode is over-constraint. A schema that is too strict for the task can cause the model to refuse, truncate, or invent values to satisfy the format. The result is clean-looking data that is worse than a loose answer. A related failure is applying structure to a task where a human reads the output, so the constraint buys nothing that matters. Both failures come from treating the schema as free rather than as a design choice with a cost.
 
@@ -53,7 +61,9 @@ There is a boundary around the approach. It covers the format of a response, not
 
 Because models and pricing change, the cost decision needs revisiting. A schema that was expensive under one model may be cheap under another, and a format that once needed retries may become stable. Each schema should carry a recheck condition tied to a model or pricing change, and the retry rate should be watched as a live signal. Without that review, a team keeps paying for constraints that no longer buy reliability.
 
+<PullQuote>
 The counterargument that strict schemas are fair for machine-parsed pipelines is incomplete when the added tokens and retries dominate a low-value call.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +75,11 @@ The counterargument that strict schemas are fair for machine-parsed pipelines is
 6. Set a recheck condition tied to a model or pricing change.
 7. Record why each constraint exists and who owns it.
 
-Structure is worth paying for only when the consumer needs it. The test turns a default choice into a reviewable trade-off between reliability and cost, so a reviewer can see which constraint earns its tokens.
+<KeyPoint>
+Structure is worth paying for only when the consumer needs it.
+</KeyPoint>
+
+The test turns a default choice into a reviewable trade-off between reliability and cost, so a reviewer can see which constraint earns its tokens.
 For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
 
 ## References & Further Reading
