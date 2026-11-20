@@ -9,9 +9,15 @@ tags:
   - Reliability
 ---
 
-The standard picture of MLOps is a pipeline: data goes in, training runs, a model comes out, it is deployed, and someone watches it. That picture is the reason so many ML systems work in a notebook and fail in production. A pipeline diagram shows what happens when everything succeeds. It says nothing about what must be true for the results to mean anything.
+<Lead>
+The standard picture of MLOps is a pipeline: data goes in, training runs, a model comes out, it is deployed, and someone watches it. That picture is the reason so many ML systems work in a notebook and fail in production. A pipeline diagram shows what happens when everything succeeds. It says nothing about <Mark>what must be true for the results to mean anything</Mark>.
+</Lead>
 
 **Direct answer:** A production ML system is a set of contracts, and each one has to be enforced mechanically. The training/evaluation split must be immutable and must precede every fitted step. The evaluation must be organised so that it resembles the conditions the model will meet, including time. The model must be treated as a small component inside a much larger system whose failure modes are mostly not about modelling. The pipeline itself must be reproducible, versioned, and running before the model is trusted — and after it, the real work is knowing when the system has degraded and rolling it back.
+
+<KeyPoint>
+A production ML system is a set of contracts, and each one has to be enforced mechanically.
+</KeyPoint>
 
 ## Contract one: the split comes first and never moves
 
@@ -21,11 +27,15 @@ scikit-learn states the failure mode precisely: "Data leakage occurs when inform
 
 The ordering is the whole point. It is not that scaling is dangerous; it is that scaling fitted on the full dataset has already seen the evaluation fold, and no later correction repairs it. The symptom is a validation score that looks excellent and a production score that does not, and because the number was never wrong in any step you can point at, the debugging session is long.
 
-The enforcement is a code-review rule with no exceptions: the split happens in one place, before anything is fitted, and every subsequent transform is an object with `fit`/`transform` that lives inside the pipeline. If a preprocessing step cannot be expressed as an object with a fit method, it does not belong in the pipeline.
+The enforcement is a code-review rule with no exceptions: <Mark>the split happens in one place, before anything is fitted</Mark>, and every subsequent transform is an object with `fit`/`transform` that lives inside the pipeline. If a preprocessing step cannot be expressed as an object with a fit method, it does not belong in the pipeline.
 
 ## Contract two: the evaluation must resemble production time
 
-Random splits are the default in most tutorials and the wrong default whenever the data has a time dimension. A random split lets the model learn from the future.
+<Trap>
+Random splits are the default in most tutorials and the wrong default whenever the data has a time dimension.
+</Trap>
+
+A random split lets the model learn from the future.
 
 scikit-learn's `TimeSeriesSplit` makes the alternative explicit. It is a cross-validator for time-ordered data, and its signature shows the two controls that matter: `TimeSeriesSplit(n_splits=5, *, max_train_size=None, test_size=None, gap=0)`. The default behaviour is expanding-window: the documented example shows fold 0 training on index `[0 1 2 3 4 5]` and testing on `[6 7]`, fold 1 training on `[0 1 2 3 4 5 6 7]` and testing on `[8 9]`, fold 2 training on `[0 1 2 3 4 5 6 7 8 9]` and testing on `[10 11]`. Two properties fall out of that. Every training fold contains only the past relative to its test fold, so no future leaks backwards. And the training set grows, so the model is re-evaluated at multiple points in its own lifecycle rather than one arbitrary cut.
 
@@ -39,7 +49,7 @@ Sculley et al. examined real-world ML systems using "the software engineering fr
 
 Read that list against the pipeline diagram. Only one item — data dependencies — is about modelling. The rest describe a system whose boundaries erode as features get computed in more places, whose configuration drifts, and whose consumers appear without being declared. A pipeline that trains and deploys a model perfectly can still fail every one of these debts.
 
-Two consequences follow for how you build the pipeline. First, the pipeline has to capture more than the training step: the data lineage, the configuration, the environment, and the deployment target all belong to the artefact. Second, the real test of whether you have an MLOps system is not "can we retrain" but "can we explain, six months later, exactly which data and which configuration produced the model currently serving traffic".
+Two consequences follow for how you build the pipeline. First, the pipeline has to capture more than the training step: the data lineage, the configuration, the environment, and the deployment target all belong to the artefact. Second, the real test of whether you have an MLOps system is not "can we retrain" but "can we explain, six months later, <Mark>exactly which data and which configuration produced the model currently serving traffic</Mark>".
 
 ## Contract four: the pipeline is a software artefact before the model is
 
@@ -82,7 +92,11 @@ For an end-to-end example where scaling, imputation, and selection stay inside t
 
 ## A counterargument
 
-The article's confidence that contracts can be "enforced mechanically" runs against its strongest source. Sculley et al. locate the recurring debts in "hidden feedback loops, undeclared consumers" and "changes in the external world" - failures a versioned split or a CI trigger does not remove; no contract reveals an undeclared consumer or a moving world. A critic would push back that the four contracts are hygiene, not the hard part: they make a model reproducible, but the article's own checklist concedes reproducibility is not operability, and the later obligations - monitoring, rollback, retraining triggers - are goals rather than mechanisms. The claim that satisfying all six makes a system "operable" is asserted without a source. The objection is that the piece presents a solvable diagram for a problem its own evidence calls largely organisational.
+The article's confidence that contracts can be "enforced mechanically" runs against its strongest source. Sculley et al. locate the recurring debts in "hidden feedback loops, undeclared consumers" and "changes in the external world" - failures a versioned split or a CI trigger does not remove; no contract reveals an undeclared consumer or a moving world. A critic would push back that the four contracts are hygiene, not the hard part: they make a model reproducible, but the article's own checklist concedes reproducibility is not operability, and the later obligations - monitoring, rollback, retraining triggers - are goals rather than mechanisms. The claim that satisfying all six makes a system "operable" is asserted without a source.
+
+<PullQuote>
+The objection is that the piece presents a solvable diagram for a problem its own evidence calls largely organisational.
+</PullQuote>
 
 ## References & Further Reading
 

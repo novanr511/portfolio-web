@@ -9,15 +9,21 @@ tags:
   - Verified
 ---
 
-Monte Carlo simulation is often treated as a way to produce an authoritative-looking range from a spreadsheet. The real problem is that it will generate thousands of plausible-looking paths from a model whose inputs were never examined, and the resulting fan chart can look more certain than the evidence supports. The method amplifies the quality of its assumptions rather than compensating for weak ones.
+<Lead>
+Monte Carlo simulation is often treated as a way to produce an authoritative-looking range from a spreadsheet. The real problem is that it will generate thousands of plausible-looking paths from a model whose inputs were never examined, and the resulting fan chart can look more certain than the evidence supports. The method <Mark>amplifies the quality of its assumptions rather than compensating for weak ones</Mark>.
+</Lead>
 
 **Direct answer:** A Monte Carlo simulation is a computation that repeatedly samples from specified input distributions to build a distribution of outcomes, so its value lies in representing uncertainty rather than in predicting a single future. Its reliability is bounded by the input distributions, the dependence between them, and the convergence of the sampling, not by the number of paths alone. Use it when many uncertain inputs interact and a distribution informs a decision; ground every input in data and label the output as conditional on those assumptions.
 
 **Delta:** This article adds a design discipline beyond the sources: it maps input-distribution choices and convergence checks to the specific decision of whether a simulated range can be used, with claim status made explicit.
 
+<KeyPoint>
+A simulation earns trust through its design, not through its volume of output.
+</KeyPoint>
+
 ## The mechanism
 
-The Wikipedia entry defines the Monte Carlo method as a broad class of computational algorithms that rely on repeated random sampling to obtain numerical results, using randomness to solve problems that may be deterministic in principle. The practical consequence is a shift in what a model is asked to deliver: instead of one number, it returns a distribution of possible outcomes and the frequency with which each occurs. That shift is useful only when the model generating the randomness is itself defensible. The method does not discover structure in the data; it propagates whatever structure the analyst encodes, so the quality of the design sits entirely upstream of the computation.
+The Wikipedia entry defines the Monte Carlo method as a broad class of computational algorithms that rely on repeated random sampling to obtain numerical results, using randomness to solve problems that may be deterministic in principle. The practical consequence is a shift in what a model is asked to deliver: instead of one number, it returns a distribution of possible outcomes and the frequency with which each occurs. That shift is useful only when the model generating the randomness is itself defensible. The method does not discover structure in the data; it propagates whatever structure the analyst encodes, so <Mark>the quality of the design sits entirely upstream of the computation</Mark>.
 
 <Figure src="/images/articles/inline/monte-carlo-simulation-best-practices-1.png" alt="A five-step flow: ground input distributions, specify dependence, seed and sample paths, check convergence, then report ranges with assumptions." caption="Conceptual: quality is set upstream by inputs and dependence; paths only reduce sampling noise." />
 
@@ -43,11 +49,21 @@ The table separates what the sources state from what is reasoned from them. The 
 
 ## What it cannot do
 
-A simulation cannot rescue weak inputs. This is the most important limitation and the easiest to ignore, because a large number of attractive paths creates an impression of rigour. If the input distributions are guesses, the output is a precise statement of the analyst's assumptions, not a finding about the world. There is no statistical test inside the simulation that will reveal a wrong distribution; the error sits upstream, in the choice of what to sample and how widely. The only defence is provenance: every distribution should be traceable to data or to a clearly labelled judgement, and that judgement should be challenged by someone who did not make it.
+A simulation cannot rescue weak inputs. This is the most important limitation and the easiest to ignore, because a large number of attractive paths creates an impression of rigour.
+
+<PullQuote>
+If the input distributions are guesses, the output is a precise statement of the analyst's assumptions, not a finding about the world.
+</PullQuote>
+
+There is no statistical test inside the simulation that will reveal a wrong distribution; the error sits upstream, in the choice of what to sample and how widely. The only defence is provenance: every distribution should be traceable to data or to a clearly labelled judgement, and that judgement should be challenged by someone who did not make it.
 
 There is a hidden cost in computation and attention. Enough paths for stable tail estimates, repeated runs for convergence checks, and sensitivity analysis across alternative distributions all consume time and expertise. Variance-reduction techniques can lower the number of draws needed, but they add assumptions of their own and require care to implement correctly. The scarce resource is usually not machine time but the analyst's ability to specify a defensible model and to explain it. A simulation that cannot be explained to the person making the decision has hidden the very uncertainty it was meant to reveal.
 
-A common failure mode is false precision. Percentile bands and smooth density curves invite readers to treat the middle of the distribution as a target and the tails as remote. In practice the tails are where the decision risk lives, and they are the least reliable part of the output because they depend on assumptions that are hardest to validate. A model of normal-looking inputs will systematically understate extreme events. If the decision is sensitive to a small probability of a large loss, the simulation should be supplemented with explicit stress scenarios rather than trusted to produce the tail on its own.
+<Trap>
+A common failure mode is false precision.
+</Trap>
+
+Percentile bands and smooth density curves invite readers to treat the middle of the distribution as a target and the tails as remote. In practice <Mark>the tails are where the decision risk lives</Mark>, and they are the least reliable part of the output because they depend on assumptions that are hardest to validate. A model of normal-looking inputs will systematically understate extreme events. If the decision is sensitive to a small probability of a large loss, the simulation should be supplemented with explicit stress scenarios rather than trusted to produce the tail on its own.
 
 There are boundaries where the method should not be applied at all. When a decision can be described by a few named states with distinguishable consequences, a small set of scenarios is clearer and easier to defend than a distribution. When the probabilities themselves are unknown, which is often true of genuinely new situations, a simulation manufactures numbers where honesty would leave a gap. It is also the wrong tool when the underlying mechanism is not understood: sampling cannot substitute for a model of how the inputs actually combine.
 
@@ -65,7 +81,7 @@ The counterargument that any simulation is better than a single point estimate i
 6. Report ranges and percentiles with the assumptions that produced them.
 7. Assign an owner and a recheck condition to the model.
 
-A simulation earns trust through its design, not through its volume of output. When the inputs are sourced, the dependence is explicit, and the sampling is reproducible, the range becomes a usable input to a decision. When those conditions fail, the same output is a liability, because it looks rigorous while encoding unverified assumptions. The checklist above is a way of deciding which case you are in before the chart is shown.
+When the inputs are sourced, the dependence is explicit, and the sampling is reproducible, the range becomes a usable input to a decision. When those conditions fail, the same output is a liability, because it looks rigorous while encoding unverified assumptions. The checklist above is a way of deciding which case you are in before the chart is shown.
 
 For further reading, see [Cash Flow Forecasting: A 13-Week Operating Model](/articles/cash-flow-forecasting-a-13-week-operating-model).
 

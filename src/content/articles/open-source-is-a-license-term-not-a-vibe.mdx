@@ -9,13 +9,19 @@ tags:
   - Technology
 ---
 
-"Open source" is used in vendor pages, conference slides, and funding rounds as though it were a single, checkable property. It is not — it is a family of licence terms with specific obligations, and the interesting engineering and business questions live in the gaps between them. When a project changes licence, the gap becomes a matter of public record and considerable consequence.
+<Lead>
+"Open source" is used in vendor pages, conference slides, and funding rounds as though it were a single, checkable property. It is not — <Mark>it is a family of licence terms with specific obligations</Mark>, and the interesting engineering and business questions live in the gaps between them. When a project changes licence, the gap becomes a matter of public record and considerable consequence.
+</Lead>
 
 **Direct Answer:** OSI's Open Source Definition (OSD) is a ten-criterion checklist that any licence must satisfy to be described as "open source" — the current version is 1.9, last modified 2007-03-22, derived from the Debian Free Software Guidelines. OSI's Open Source AI Definition (OSAID, version 1.0) extends the idea to AI systems by requiring, as the "preferred form" for modification, three things: detailed information about training data, the complete source code used to train and run the system, and the model parameters. The Business Source License (BSL) is deliberately *outside* both: it grants non-production use plus a time-limited production use, converting to an open licence on a stated Change Date. OSI's criteria and BUSL's mechanism are not in conflict — BUSL was written to fail the definition's test on purpose.
 
+<KeyFigures items={[
+  { value: "ten", label: "criteria in OSI's Open Source Definition that a licence must satisfy", source: "Open Source Initiative, The Open Source Definition" },
+]} />
+
 ## The ten criteria, and why they exist
 
-The OSD is not a vibe. Its opening line is categorical: "Open source doesn't just mean access to the source code. The distribution terms of open source software must comply with the following criteria."
+<Mark>The OSD is not a vibe.</Mark> Its opening line is categorical: "Open source doesn't just mean access to the source code. The distribution terms of open source software must comply with the following criteria."
 
 The criteria that most often decide real-world cases:
 
@@ -32,7 +38,11 @@ The criteria that most often decide real-world cases:
 
 Criteria 6 and 9 are the ones that do the quiet work. Criterion 6 is what forbids a "non-commercial use only" restriction, and criterion 9 is what forbids copyleft contagion into adjacent components — the reason the MIT licence (which grants use, copying, modification, merging, publication, distribution, sublicensing and selling, with no warranty) satisfies the definition while a share-alike licence that reaches outside the work would not.
 
-Because the criteria are about *distribution terms*, they are testable. That testability is the entire point: "open source" is a claim about a licence that anyone can check against a published checklist.
+Because the criteria are about *distribution terms*, they are testable.
+
+<KeyPoint>
+That testability is the entire point: "open source" is a claim about a licence that anyone can check against a published checklist.
+</KeyPoint>
 
 ## What OSAID adds for AI
 
@@ -46,7 +56,11 @@ The substantive addition is the **preferred form to make modifications**, which 
 - **Code** — "The complete source code used to train and run the system," including code for data processing and filtering, "arguments and settings used," validation and testing, "supporting libraries like tokenizers and hyperparameters search code, inference code, and model architecture."
 - **Parameters** — "The model parameters, such as weights or other configuration settings," potentially including "checkpoints from key intermediate stages of training as well as the final optimizer state."
 
-The asymmetry in that definition is the interesting part, and it is easy to miss. The data requirement is *not* an obligation to release the training data. It is an obligation to release enough **information about** the data that a skilled person could rebuild a substantially equivalent system — while the data itself may remain unshareable. So "we open-sourced our data" is neither necessary nor sufficient under OSAID, and "we released the weights" is also not sufficient.
+<Mark>The asymmetry in that definition is the interesting part, and it is easy to miss.</Mark> The data requirement is *not* an obligation to release the training data. It is an obligation to release enough **information about** the data that a skilled person could rebuild a substantially equivalent system — while the data itself may remain unshareable.
+
+<Trap>
+So "we open-sourced our data" is neither necessary nor sufficient under OSAID, and "we released the weights" is also not sufficient.
+</Trap>
 
 ## BSL: the deliberate exit from the definition
 
@@ -70,7 +84,11 @@ The clearest recent example of licence change as a business event is Terraform. 
 
 The response was the fastest possible form of governance: the manifesto says the community asked HashiCorp to switch back, received no response by August 25, 2023, and created a fork, "now public." The fork's own repository carries the Mozilla Public License, version 2.0, with a copyright line naming both "The OpenTofu Authors" and "HashiCorp, Inc." — the standard MPL-2.0 file-header pattern for a fork. The project announced general availability on January 10, 2024, describing itself as "a community-driven open source fork of Terraform" and "a drop-in replacement for Terraform."
 
-Two things are worth reading carefully here, because they are the durable lessons rather than the drama. First, the outcome was determined by *prior* licensing choices — MPL-2.0's file-level copyleft left the code licensable by others under the same terms, so a fork was legally available. Had the code been under a non-copyleft proprietary licence, the community would have had no exit. Second, the risk that materialised was not "the code stopped working"; it was "the licence a business depends on can change with little notice," which is a risk that propagates into procurement, vendor review, and internal policy.
+Two things are worth reading carefully here, because they are the durable lessons rather than the drama. First, the outcome was determined by *prior* licensing choices — MPL-2.0's file-level copyleft left the code licensable by others under the same terms, so a fork was legally available. Had the code been under a non-copyleft proprietary licence, the community would have had no exit.
+
+<PullQuote>
+Second, the risk that materialised was not "the code stopped working"; it was "the licence a business depends on can change with little notice," which is a risk that propagates into procurement, vendor review, and internal policy.
+</PullQuote>
 
 ## How to evaluate a licence claim yourself
 

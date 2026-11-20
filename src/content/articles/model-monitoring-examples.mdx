@@ -9,11 +9,17 @@ tags:
   - Verified
 ---
 
-Model monitoring is often reduced to watching accuracy, which misses the changes that matter first. The model-card literature describes what should be documented about a model, and the data-curation entry covers changing inputs. The examples show what to watch and why.
+<Lead>
+Model monitoring is often reduced to watching accuracy, which <Mark>misses the changes that matter first</Mark>. The model-card literature describes what should be documented about a model, and the data-curation entry covers changing inputs. The examples show what to watch and why.
+</Lead>
 
 **Direct answer:** Monitor inputs, outputs, and outcomes against a documented baseline, with a clear trigger for investigation. The sources describe documentation and data; the monitoring rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and worked examples, separating documented concepts from local choices about thresholds.
+
+<KeyPoint>
+Monitoring cannot tell you that a model is correct, only that something has changed.
+</KeyPoint>
 
 ## The mechanism
 
@@ -22,7 +28,7 @@ Three points matter:
 <Figure src="/images/articles/inline/model-monitoring-examples-1.png" alt="A four-step flow: document a baseline, monitor input distributions, monitor outcomes when labels arrive, then investigate on a trigger." caption="Conceptual: document a baseline, watch inputs before late labels, and investigate only on a trigger." />
 
 - **Documentation is the baseline.** Model cards record capabilities and limits. A model cannot be monitored against what was never stated.
-- **Inputs change first.** The data-curation entry describes ongoing management. A shift in inputs often precedes a change in outcomes.
+- **Inputs change first.** The data-curation entry describes ongoing management. <Mark>A shift in inputs often precedes a change in outcomes</Mark>.
 - **Labels arrive late.** Outcome metrics may be delayed, which makes input monitoring the earlier signal.
 
 The sequence is: document the baseline, monitor inputs, then outcomes, then investigate on a trigger. The trigger is local, so it is `inferred`; the concepts are `source-reported`.
@@ -41,7 +47,11 @@ A prediction can be made immediately, but the outcome that judges it may take da
 
 ## Why a trigger is necessary
 
-A chart that changes without a rule for acting on it is decoration. Setting a trigger in advance removes the debate during an incident and makes the response consistent. The trigger should be tied to a decision, not to a number chosen for its neatness.
+<Trap>
+A chart that changes without a rule for acting on it is decoration.
+</Trap>
+
+Setting a trigger in advance removes the debate during an incident and makes the response consistent. The trigger should be tied to a decision, not to a number chosen for its neatness.
 
 ## Evidence status
 
@@ -55,13 +65,13 @@ A chart that changes without a rule for acting on it is decoration. Setting a tr
 
 An average can stay the same while the distribution shifts underneath it. That is why monitoring should include the shape of the data, not only a headline score. A change in inputs is the earliest warning that the model's assumptions may no longer hold.
 
-Monitoring cannot tell you that a model is correct, only that something has changed. A drift alert starts an investigation; it does not end one.
+A drift alert starts an investigation; it does not end one.
 
 The baseline should be revisited when the model is retrained, because a new version legitimately behaves differently. Comparing against an old baseline will produce alerts that look like problems but are expected.
 
 A further difficulty is that monitoring needs a baseline that is itself trustworthy. If the baseline was recorded during an unusual period, normal variation will look like drift and the team will spend time investigating a non-problem. Choosing a representative period requires judgement, and recording why that period was chosen is what makes later comparisons meaningful.
 
-There is also a distinction between a change and a problem. A shift in input distribution may be harmless, while a small shift in a sensitive segment may be serious. A monitoring system that treats every change as an alert will train the team to ignore alerts, which is worse than having none. The trigger should therefore reflect the cost of the decision the model supports, not the size of the change alone.
+There is also a distinction between a change and a problem. A shift in input distribution may be harmless, while a small shift in a sensitive segment may be serious. A monitoring system that treats every change as an alert will <Mark>train the team to ignore alerts, which is worse than having none</Mark>. The trigger should therefore reflect the cost of the decision the model supports, not the size of the change alone.
 
 Finally, monitoring consumes engineering time. The number of signals worth watching is smaller than the number that can be collected, and choosing the few that matter is the real design work. A short list that someone reads is more valuable than a dashboard that nobody opens.
 
@@ -73,7 +83,9 @@ The baseline should be recorded with the data period it came from, so a later co
 
 It cannot guarantee that a model remains correct. It does not replace investigation. And it cannot make a bad baseline useful.
 
+<PullQuote>
 The counterargument that accuracy is enough is fair for stable inputs and incomplete when the data changes.
+</PullQuote>
 
 ## A decision test
 

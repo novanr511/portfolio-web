@@ -9,9 +9,15 @@ tags:
   - Systems
 ---
 
-The idea behind multi-agent systems is appealing: give each agent a role — researcher, writer, reviewer — and let them collaborate. The reality is that coordination consumes tokens, introduces miscommunication, and can produce worse results than one well-prompted agent. A survey of LLM-based multi-agent systems documents both the progress and the challenges.
+<Lead>
+The idea behind multi-agent systems is appealing: give each agent a role — researcher, writer, reviewer — and let them collaborate. The reality is that <Mark>coordination consumes tokens, introduces miscommunication, and can produce worse results than one well-prompted agent</Mark>. A survey of LLM-based multi-agent systems documents both the progress and the challenges.
+</Lead>
 
-**Direct answer:** Multi-agent systems help when tasks can be genuinely decomposed and the sub-agents have distinct information or tools. They hurt when the task is a single coherent problem, because the agents must re-establish context at every handoff and errors compound. The survey and the AgentVerse work are the primary references. The boundary: the benefit is task-dependent — there is no general reason that more agents means better answers.
+**Direct answer:** They hurt when the task is a single coherent problem, because the agents must re-establish context at every handoff and errors compound. The survey and the AgentVerse work are the primary references. The boundary: the benefit is task-dependent — there is no general reason that more agents means better answers.
+
+<KeyPoint>
+Multi-agent systems help when tasks can be genuinely decomposed and the sub-agents have distinct information or tools.
+</KeyPoint>
 
 ## What coordination costs
 
@@ -21,7 +27,7 @@ Three costs appear as soon as more than one agent is involved:
 
 **Handoff loss.** The output of one agent becomes the input of the next. If the first agent omits a detail, the second cannot recover it. This is the same failure as a broken tool response, which the tool-calling article covers.
 
-**Error compounding.** Each agent has a probability of being wrong. A chain of four agents with 90% reliability each succeeds about 66% of the time, before considering miscommunication — the arithmetic the autonomous-business article shows.
+**Error compounding.** Each agent has a probability of being wrong. <Mark>A chain of four agents with 90% reliability each succeeds about 66% of the time</Mark>, before considering miscommunication — the arithmetic the autonomous-business article shows.
 
 ## A worked comparison
 
@@ -36,7 +42,7 @@ Three questions decide:
 
 1. **Does decomposition improve quality?** If the analyst can use a different model or a stricter verifier than the writer, specialisation may help. If all three use the same model and prompt style, the extra structure adds cost without a new capability.
 2. **Where do errors enter?** If the researcher misses a source, the analyst and writer produce a confident but incomplete report. Check the handoff content, not only the final output, which the evaluation article recommends.
-3. **Is the cost justified?** The three-agent design costs more than twice as much. It wins only if the quality gain is material and the task is infrequent enough to absorb it.
+3. **Is the cost justified?** The three-agent design costs more than twice as much. <Mark>It wins only if the quality gain is material and the task is infrequent enough to absorb it</Mark>.
 
 Three conclusions follow:
 
@@ -60,7 +66,11 @@ Three conclusions follow:
 
 **Tasks without a clear decomposition** — forcing sub-agents to split an indivisible problem produces fragmentation, not parallelism.
 
-The counterargument — that multi-agent systems mirror human teams — is an analogy, not evidence. Human teams share persistent context and have mechanisms for resolving disagreement that agent handoffs do not automatically replicate.
+<PullQuote>
+The counterargument — that multi-agent systems mirror human teams — is an analogy, not evidence.
+</PullQuote>
+
+Human teams share persistent context and have mechanisms for resolving disagreement that agent handoffs do not automatically replicate.
 
 ## Reducing coordination cost
 
@@ -70,7 +80,11 @@ When multiple agents are justified, three mechanisms reduce the cost:
 
 **Share read-only context.** If all agents need the same background, provide it from a common source rather than asking one to summarise it for the others. The context-engineering article explains why repeated context consumes the budget.
 
-**Bound the conversation.** A supervisor that routes tasks to specialists should limit the number of turns and the depth of the chain. Unbounded agent conversations are a cost generator, as the autonomous-business article warns.
+**Bound the conversation.** A supervisor that routes tasks to specialists should limit the number of turns and the depth of the chain.
+
+<Trap>
+Unbounded agent conversations are a cost generator, as the autonomous-business article warns.
+</Trap>
 
 These mechanisms do not remove the fundamental trade-off — coordination is still work — but they keep it from dominating the task.
 

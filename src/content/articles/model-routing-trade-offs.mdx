@@ -9,15 +9,21 @@ tags:
   - Verified
 ---
 
-Model routing is often presented as a way to cut inference cost, which hides the trade between price, quality, and latency. The RouteLLM paper describes learned routing between models, and the PagedAttention paper covers the cost of serving them. The decision is what the router optimises.
+<Lead>
+Model routing is often presented as a way to cut inference cost, which <Mark>hides the trade between price, quality, and latency</Mark>. The RouteLLM paper describes learned routing between models, and the PagedAttention paper covers the cost of serving them. The decision is what the router optimises.
+</Lead>
 
 **Direct answer:** Choose a routing objective, measure each route on real requests, and count escalations and tail cost before claiming a saving. The sources describe the mechanism; the rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented routing methods from local judgements about cost.
 
+<KeyPoint>
+Cost per successful answer is the measure that includes retries and failures.
+</KeyPoint>
+
 ## The mechanism
 
-The first trade is cost against quality. The routing paper describes selecting a model per request, which can save money when a smaller model suffices. The saving disappears when the smaller model fails and the request is retried on a larger one, so the measure is cost per successful answer rather than cost per call.
+The first trade is cost against quality. The routing paper describes selecting a model per request, which can save money when a smaller model suffices. The saving disappears when the smaller model fails and the request is retried on a larger one, so the measure is <Mark>cost per successful answer rather than cost per call</Mark>.
 
 <Figure src="/images/articles/inline/model-routing-trade-offs-1.png" alt="Two boxes compared: cost per call, which ignores retries, versus cost per successful answer, which includes escalations." caption="Conceptual: judge a route by cost per successful answer, not its sticker price per call." />
 
@@ -26,6 +32,10 @@ The second trade is latency. A router that inspects a request before choosing ad
 The third trade is complexity. A learned router needs training data and evaluation, while a simple rule is easier to understand. The extra complexity should be justified by a measurable improvement, which is a comparison that belongs in the design.
 
 The sequence is: define the objective, measure quality by route, count escalations, then inspect the cost tail. The choices are local, so the conclusions are `inferred`; the methods are `source-reported`.
+
+<KeyFigures items={[
+  { value: "over 2x", label: "cost reductions reported in some cases without quality loss", source: "RouteLLM (Ong et al., 2024)" },
+]} />
 
 ## A worked example
 
@@ -45,7 +55,7 @@ The outcome is a routing adjustment with a recorded objective. The scenario is h
 
 ## Why a cheap route can be expensive
 
-A route that fails and retries pays twice, and a route that produces a wrong answer shifts the cost to a human. Counting only the model price hides both effects, which is why the measure has to include the whole path.
+A route that fails and retries pays twice, and a route that produces a wrong answer shifts the cost to a human. <Mark>Counting only the model price hides both effects</Mark>, which is why the measure has to include the whole path.
 
 ## What it cannot do
 
@@ -61,9 +71,9 @@ The objective should be written down, since a router measured on cost alone will
 
 Escalations are part of the cost, and a route that fails often is more expensive than its price suggests.
 
+<Trap>
 A router that is never measured on real traffic will optimise the wrong metric.
-
-Cost per successful answer is the measure that includes retries and failures.
+</Trap>
 
 ## A decision test
 
@@ -78,7 +88,11 @@ For the method, see [Model Routing Metrics](/articles/model-routing-metrics-that
 
 ## A counterargument
 
-A reasonable critic could argue that the article lets its own synthesis overshadow what the sources report. RouteLLM reports cost reductions of over 2x in some cases without quality loss, while the warnings about escalations and failure-driven retries are `inferred` judgements rather than documented outcomes from that work. The PagedAttention paper concerns serving memory and throughput, a different unit of analysis from per-request routing quality, so the two sources do not by themselves establish that a cost tail or retry path dominates the economics. 'Cost per successful answer' is a defensible design choice, but it is presented as the measure when the evidence supports it as a hypothesis to test.
+A reasonable critic could argue that the article lets its own synthesis overshadow what the sources report. RouteLLM reports cost reductions of over 2x in some cases without quality loss, while the warnings about escalations and failure-driven retries are `inferred` judgements rather than documented outcomes from that work. The PagedAttention paper concerns serving memory and throughput, a different unit of analysis from per-request routing quality, so the two sources do not by themselves establish that a cost tail or retry path dominates the economics.
+
+<PullQuote>
+'Cost per successful answer' is a defensible design choice, but it is presented as the measure when the evidence supports it as a hypothesis to test.
+</PullQuote>
 
 ## References & Further Reading
 

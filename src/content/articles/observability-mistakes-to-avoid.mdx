@@ -9,19 +9,31 @@ tags:
   - Verified
 ---
 
-Observability is often treated as a collection of tools, which hides that it is a property of the questions a system can answer. The observability entry describes inferring internal state from external signals, and the SRE alerting workbook relates signals to objectives. The mistakes concern the gap between data and answers.
+<Lead>
+Observability is often treated as a collection of tools, which hides that it is <Mark>a property of the questions a system can answer</Mark>. The observability entry describes inferring internal state from external signals, and the SRE alerting workbook relates signals to objectives. The mistakes concern <Mark>the gap between data and answers</Mark>.
+</Lead>
 
-**Direct answer:** Design signals around the questions you will need to answer, with a baseline and a clear trigger, then verify that a question can actually be answered. The sources describe the concepts; the method is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Design signals around the questions you will need to answer, with a baseline and a clear trigger, then verify that a question can actually be answered.
+</KeyPoint>
+
+The sources describe the concepts; the method is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented concepts from local choices about what to measure.
 
 ## The mechanism
 
-The first mistake is collecting without a question. The observability entry describes signals, which are useful only when they bear on a decision. A dashboard added because it was available produces data nobody reads, and the cost is in storage and attention.
+<Trap>
+The first mistake is collecting without a question.
+</Trap>
+
+The observability entry describes signals, which are useful only when they bear on a decision. A dashboard added because it was available produces data nobody reads, and the cost is in storage and attention.
 
   <Figure src="/images/articles/inline/observability-mistakes-to-avoid-1.png" alt="Flow diagram: list the questions, choose signals, set a baseline and trigger, then test that the question can be answered" caption="Conceptual: observability designs signals around questions that must be answerable later" />
 
-The second mistake is ignoring the baseline. The SRE alerting workbook relates signals to objectives, which requires knowing what normal looks like. A number without a baseline cannot tell you whether anything changed, and a alert threshold chosen without one is a guess.
+The second mistake is ignoring the baseline. The SRE alerting workbook relates signals to objectives, which requires knowing what normal looks like. <Mark>A number without a baseline cannot tell you whether anything changed</Mark>, and a alert threshold chosen without one is a guess.
 
 The third mistake is treating logs as a complete account. The observability entry describes inference from external signals, which is limited by what was emitted. A log that lacks a key field cannot answer a question later, and no tool can recover it.
 
@@ -59,7 +71,9 @@ A log that lacks a key field cannot answer a later question, and no tool can rec
 
 An alert is a pointer to a change, not an answer, and a response path is part of the system.
 
+<PullQuote>
 A dashboard that changes no decision is a cost, not an insight.
+</PullQuote>
 
 The questions a system must answer should be defined before the signals are chosen.
 

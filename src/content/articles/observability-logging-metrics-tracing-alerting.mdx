@@ -9,7 +9,9 @@ tags:
   - DevOps
 ---
 
-Monitoring tells you when a known thing breaks. Observability is the stronger property: being able to investigate a problem you did not predict, using evidence the system emitted before anyone knew it mattered. The difference is not a product category. It is whether the data you kept is sufficient to reconstruct an unfamiliar failure.
+<Lead>
+Monitoring tells you when a known thing breaks. Observability is the stronger property: being able to investigate <Mark>a problem you did not predict</Mark>, using evidence the system emitted before anyone knew it mattered. The difference is not a product category. It is whether the data you kept is sufficient to reconstruct an unfamiliar failure.
+</Lead>
 
 **Direct answer:** OpenTelemetry organises telemetry into three signals — traces, metrics, and logs — each answering a different question. Alerting should be derived from service-level objectives rather than raw thresholds: the Google SRE workbook says the goal is "to be notified for a significant event: an event that consumes a large fraction of the error budget", so that teams "respond to problems before [they] consume too much of your error budget". The boundary is that signals and alerts only help if someone owns the response.
 
@@ -17,7 +19,7 @@ Monitoring tells you when a known thing breaks. Observability is the stronger pr
 
 **Traces** follow a request through the services it touches. They answer "where did the time go?" and "which call failed?" A trace is a tree of spans, and its value is the causal structure: a 2-second request is unhelpful until you see that 1.8 seconds were spent in one database call.
 
-**Metrics** are numeric measurements over time — request rate, error rate, latency distributions. They are cheap to store and excellent for detecting that something changed. They are weaker at explaining why, because aggregation discards the individual events that carried the cause.
+**Metrics** are numeric measurements over time — request rate, error rate, latency distributions. They are cheap to store and excellent for detecting that something changed. They are weaker at explaining why, because <Mark>aggregation discards the individual events that carried the cause</Mark>.
 
 **Logs** are discrete records of events. They carry the detail that metrics lack, but an unstructured log line is hard to query at scale. The practical discipline is to make logs structured and to include the identifiers that let them be correlated with traces.
 
@@ -54,7 +56,7 @@ For a web service, a reasonable starting set includes:
 4. **SLOs derived from user experience**, with alerts from the error budget rather than fixed thresholds.
 5. **A retention policy** that keeps high-value data long enough to investigate slow-burn problems.
 
-The fifth item is where observability programmes usually fail. Detailed traces are expensive, so teams sample aggressively — and then cannot find the one request that explains an incident, because it was discarded. Sampling should be decided with the failure modes in mind, not only the storage bill.
+The fifth item is where observability programmes usually fail. Detailed traces are expensive, so teams sample aggressively — and then cannot find the one request that explains an incident, because it was discarded. <Mark>Sampling should be decided with the failure modes in mind</Mark>, not only the storage bill.
 
 ## The debugging loop
 
@@ -68,7 +70,11 @@ Observability pays off in a specific rhythm, and it is worth making that rhythm 
 
 **Confirm and act.** If the data supports the hypothesis, mitigate first and investigate the root cause later. If it does not, discard the hypothesis and form another — but write down what was ruled out, so the next responder does not repeat the work.
 
-This loop is why the three signals must be correlated. A trace without the relevant log line tells you where the time went but not why; a log without the trace context tells you something happened but not to which request. OpenTelemetry's common identifiers are the mechanism that makes the loop possible.
+<KeyPoint>
+This loop is why the three signals must be correlated.
+</KeyPoint>
+
+A trace without the relevant log line tells you where the time went but not why; a log without the trace context tells you something happened but not to which request. OpenTelemetry's common identifiers are the mechanism that makes the loop possible.
 
 A game day — deliberately injecting a fault and running this loop — is the only reliable way to find out whether your instrumentation is sufficient. An incident is a poor time to discover that the attribute you needed was never emitted.
 
@@ -78,9 +84,21 @@ Three limitations are structural.
 
 **Unobservable states stay unobservable.** If the system never emits a particular attribute, no backend can reconstruct it after the fact. Instrumentation has to anticipate the questions you will want to ask, which is partly a matter of humility about what can go wrong.
 
-**More data is not more understanding.** A team that adds dashboards without a model of the system will produce noise. Observability requires hypotheses — "if the cache is cold, latency should rise in this segment" — that the data can confirm or refute.
+**More data is not more understanding.**
 
-**Alerts require ownership.** An alert with no named responder is an email. The hardest part of alerting is organisational: deciding who is on call, what counts as significant, and when to escalate.
+<Trap>
+A team that adds dashboards without a model of the system will produce noise.
+</Trap>
+
+Observability requires hypotheses — "if the cache is cold, latency should rise in this segment" — that the data can confirm or refute.
+
+**Alerts require ownership.**
+
+<PullQuote>
+An alert with no named responder is an email.
+</PullQuote>
+
+The hardest part of alerting is organisational: deciding who is on call, what counts as significant, and when to escalate.
 
 The counterargument to a heavy observability investment — that it is expensive and most incidents are simple — is fair for small systems. But the cost is a function of scale and criticality, and a team should increase instrumentation as the cost of an undiagnosed incident rises, not when a vendor recommends it.
 

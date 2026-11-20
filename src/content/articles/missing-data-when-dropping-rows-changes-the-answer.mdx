@@ -9,9 +9,15 @@ tags:
   - MLOps
 ---
 
-A model can look excellent in validation and fail in production because the training pipeline quietly deleted every row with a missing field. The validation set had the same deletions, so both measurements described a cleaner population than the one the model now serves. Nothing in the code was wrong; the decision to drop rows was just invisible.
+<Lead>
+A model can look excellent in validation and fail in production because the training pipeline <Mark>quietly deleted every row with a missing field</Mark>. The validation set had the same deletions, so both measurements described a cleaner population than the one the model now serves. Nothing in the code was wrong; the decision to drop rows was just invisible.
+</Lead>
 
-**Direct answer:** Missing values are represented by sentinels such as `NaN`, `NaT`, `None`, or blanks, and each representation needs detection before anything else. scikit-learn notes that discarding incomplete rows "comes at the price of losing data which may be valuable (even though incomplete)" and that "a better strategy is to impute the missing values, i.e., to infer them from the known part of the data". The boundary: imputation creates values that were never observed, and no method can recover information that is absent — so the choice must match the reason the data is missing and the decision the analysis supports.
+**Direct answer:** Missing values are represented by sentinels such as `NaN`, `NaT`, `None`, or blanks, and each representation needs detection before anything else. scikit-learn notes that discarding incomplete rows "comes at the price of losing data which may be valuable (even though incomplete)" and that "a better strategy is to impute the missing values, i.e., to infer them from the known part of the data". The boundary: imputation creates values that were never observed, and <Mark>no method can recover information that is absent</Mark> — so the choice must match the reason the data is missing and the decision the analysis supports.
+
+<KeyPoint>
+If higher earners were less willing to disclose, the missing rows are systematically different from the observed ones, and dropping them changes the population.
+</KeyPoint>
 
 ## Step one is detection, not repair
 
@@ -57,7 +63,11 @@ The correct response depends on the question. If the goal is the mean income of 
 
 ## The leakage trap in pipelines
 
-scikit-learn's guidance on data leakage says a leak occurs when "information that would not be available at prediction time is used when building the model". Imputation is a fitted transformation: the mean or median is computed from data. Fitting the imputer on the full dataset before splitting passes information from the validation or test set into training.
+scikit-learn's guidance on data leakage says a leak occurs when "information that would not be available at prediction time is used when building the model". Imputation is a fitted transformation: the mean or median is computed from data.
+
+<Trap>
+Fitting the imputer on the full dataset before splitting passes information from the validation or test set into training.
+</Trap>
 
 The remedy is mechanical: split first, then fit the imputer on training data only, and apply the same fitted transformation to validation and test data. A `Pipeline` that bundles imputation with the estimator enforces this ordering and makes it hard to apply the wrong transform to the wrong subset. The same rule applies to the missing-indicator: which columns are flagged should be decided from training data.
 
@@ -73,7 +83,11 @@ Three limits should be explicit.
 
 **A clean-looking dataset can hide the problem.** After imputation, downstream users see no gaps and may assume every value was measured. Keeping the indicator and documenting the missing rates is part of the deliverable, not optional cleanup.
 
-The counterargument to careful handling — that a simple median fill worked well enough in practice — is sometimes true. It is defensible when the missing rate is low, the field is not central to the decision, and the missingness is plausibly unrelated to the outcome. It is not defensible as an invisible default.
+The counterargument to careful handling — that a simple median fill worked well enough in practice — is sometimes true. It is defensible when the missing rate is low, the field is not central to the decision, and the missingness is plausibly unrelated to the outcome.
+
+<PullQuote>
+It is not defensible as an invisible default.
+</PullQuote>
 
 ## A decision test
 
@@ -83,7 +97,7 @@ The counterargument to careful handling — that a simple median fill worked wel
 4. **Split before fitting** any imputer, and keep it inside a pipeline.
 5. **Compare at least two strategies** — complete cases and one imputation method — and report whether the conclusion changes.
 6. **Keep a missingness indicator** when absence may be informative.
-7. **Document the rates and the method** alongside the result, so a reader knows which values were never observed.
+7. **Document the rates and the method** alongside the result, so a reader knows <Mark>which values were never observed</Mark>.
 
 For the pipeline discipline, see [Python for Data Analytics](/articles/python-for-data-analytics-pandas-numpy-and-visualization-workflows); for the broader data context, see [Why Data Quality Matters More Than Model Complexity](/articles/why-data-quality-matters-more-than-model-complexity).
 

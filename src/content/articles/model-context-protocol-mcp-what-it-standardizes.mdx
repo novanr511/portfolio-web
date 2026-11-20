@@ -9,9 +9,15 @@ tags:
   - Integration
 ---
 
-Every AI application that connects to external systems faces the same problem: how does the model discover what tools exist, what arguments they take, and what data is available? Most teams solve this separately for each model and each tool. MCP is an open standard that defines a common way to describe and expose those capabilities.
+<Lead>
+Every AI application that connects to external systems faces the same problem: how does the model discover what tools exist, what arguments they take, and what data is available? Most teams solve this separately for each model and each tool. MCP is an open standard that defines <Mark>a common way to describe and expose those capabilities</Mark>.
+</Lead>
 
 **Direct answer:** The Model Context Protocol is an open standard connecting AI applications to tools and data sources through a consistent interface. The official introduction defines its purpose, and Anthropic's tool-use documentation provides the model-side context. The boundary: MCP standardises the *interface* between an application and its tools — it does not guarantee that a tool is safe, that its outputs are correct, or that permissions are appropriate.
+
+<KeyPoint>
+The Model Context Protocol is an open standard connecting AI applications to tools and data sources through a consistent interface.
+</KeyPoint>
 
 ## What gets standardized
 
@@ -23,7 +29,7 @@ Three things:
 
 **Transport and lifecycle.** A defined way for a client and server to exchange messages, so the same tool server can work with different applications.
 
-The value is similar to what an API specification provides in software: a contract that reduces bespoke integration work. It does not make the underlying tool better.
+The value is similar to what an API specification provides in software: <Mark>a contract that reduces bespoke integration work</Mark>. It does not make the underlying tool better.
 
 ## A worked integration
 
@@ -59,15 +65,23 @@ The quality of an MCP integration depends on the interface the server declares. 
 
 A standard interface makes these practices visible and checkable, which is its value. It does not perform them for you.
 
+<Trap>
+If the assistant can call every tool with full privileges, the standard has made over-privilege easier to deploy.
+</Trap>
+
 ## What MCP does not do
 
 **It does not make tools trustworthy.** A tool exposed through a standard can still return wrong data or perform the wrong action.
 
-**It does not solve prompt injection.** A malicious document can still instruct the model to misuse a tool. The prompt-injection article explains why the tool boundary is the control.
+**It does not solve prompt injection.** A malicious document can still instruct the model to misuse a tool. The prompt-injection article explains why <Mark>the tool boundary is the control</Mark>.
 
 **It does not guarantee portability in practice.** A common interface helps, but model behaviour, authentication, and operational policies still differ between applications.
 
-The counterargument — that a standard is unnecessary overhead for one tool — is fair. The benefit grows with the number of tools and applications, which is why the pattern matters in organisations with many systems.
+The counterargument — that a standard is unnecessary overhead for one tool — is fair.
+
+<PullQuote>
+The benefit grows with the number of tools and applications, which is why the pattern matters in organisations with many systems.
+</PullQuote>
 
 ## A decision test
 

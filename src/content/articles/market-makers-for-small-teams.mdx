@@ -9,21 +9,29 @@ tags:
   - Verified
 ---
 
+<Lead>
 A small team building a marketplace or a thin trading venue often assumes that listing an asset creates a market. It does not. If no one stands ready to buy and sell, participants cannot trade at a fair price when they want to, and the venue stays empty. The two sources frame the problem: a market maker supplies the two-sided quote, and a secondary market is where existing assets change hands.
+</Lead>
 
-**Direct answer:** Treat liquidity as something that must be supplied, not assumed: identify who will quote both sides, how their inventory risk is compensated, and whether users face an acceptable spread. Listings alone do not create a market; a standing two-sided quote does.
+**Direct answer:**
+
+<KeyPoint>
+Treat liquidity as something that must be supplied, not assumed: identify who will quote both sides, how their inventory risk is compensated, and whether users face an acceptable spread.
+</KeyPoint>
+
+Listings alone do not create a market; a standing two-sided quote does.
 
 **Delta:** This article adds a claim-status table beyond the sources: it maps the market-maker and secondary-market concepts to a small team's build-or-seed decision, with claim status explicit.
 
 ## The mechanism
 
-A market maker quotes both a buy (bid) and a sell (ask) price in an instrument and earns the spread between them. That quote is what makes a market actionable: without a standing bid and ask, a participant has no price at which to trade immediately. The practical consequence is that liquidity is supplied by someone willing to hold inventory, not created by the mere existence of a venue. A list of assets is a catalog, not a market.
+A market maker quotes both a buy (bid) and a sell (ask) price in an instrument and earns the spread between them. That quote is what makes a market actionable: without a standing bid and ask, a participant has no price at which to trade immediately. The practical consequence is that liquidity is supplied by someone willing to hold inventory, not created by the mere existence of a venue. A list of assets is <Mark>a catalog, not a market</Mark>.
 
   <Figure src="/images/articles/inline/market-makers-for-small-teams-1.png" alt="A design sequence: confirm a secondary market, find two-sided quotes, compensate inventory risk, test the spread." caption="Conceptual: liquidity must be supplied, not assumed from a list of assets." />
 
 The secondary market is where investors buy and sell assets they already own, as distinct from the primary market where new assets are issued. Its value lies in liquidity and price discovery: a stream of trades reveals a price that participants can rely on. A small team running a marketplace is usually operating a secondary venue whether or not it uses that name, so the design question is how to get enough trading for a credible price to emerge.
 
-The maker's reward is the spread, but the cost is inventory risk. Holding a position exposes the maker to adverse price movement, so a rational maker widens spreads or reduces quoted size when volatility rises. The practical consequence for a small team is that liquidity is never free: if the team relies on outside makers, it must make their risk tolerable through fees, rebates, or market design. A maker that cannot manage risk simply stops quoting.
+The maker's reward is the spread, but the cost is inventory risk. Holding a position exposes the maker to adverse price movement, so a rational maker widens spreads or reduces quoted size when volatility rises. The practical consequence for a small team is that <Mark>liquidity is never free</Mark>: if the team relies on outside makers, it must make their risk tolerable through fees, rebates, or market design. A maker that cannot manage risk simply stops quoting.
 
 The sequence is: define what asset trades and confirm it is a secondary market, identify who will quote both sides, decide how their inventory risk is compensated, and test whether the spread is acceptable to users. These design choices are `inferred`; the definitions of a market maker and a secondary market are `source-reported`. Stating the choices openly is what lets a reviewer judge whether the liquidity plan is sustainable.
 
@@ -45,15 +53,23 @@ The first two rows restate what the sources define and are `source-reported`, so
 
 The definitions of a market maker and a secondary market do not tell a small team whether a specific venue will attract makers. Attractiveness depends on volume, volatility, the mix of informed and uninformed traders, and the cost of holding inventory, none of which is settled by a definition. A team can quote the sources correctly and still build a venue that no maker wants to support. The concepts describe the pieces; they do not guarantee that the pieces assemble into a working market in a particular niche.
 
-The cost of liquidity is easy to hide. A maker is compensated either through a wider spread that users pay or through rebates and fee waivers that the operator funds. There is no version in which liquidity is free; the expense simply appears in different places. A small team that advertises zero fees may be pushing the cost into a spread that makes its venue uncompetitive, while a team that pays rebates may find the subsidy unsustainable once volume does not grow as expected. Either way, the cost should be counted explicitly.
+The cost of liquidity is easy to hide. A maker is compensated either through a wider spread that users pay or through rebates and fee waivers that the operator funds. There is no version in which liquidity is free; the expense simply appears in different places.
+
+<Trap>
+A small team that advertises zero fees may be pushing the cost into a spread that makes its venue uncompetitive, while a team that pays rebates may find the subsidy unsustainable once volume does not grow as expected.
+</Trap>
+
+Either way, the cost should be counted explicitly.
 
 A central failure mode is adverse selection. Informed traders can pick off a maker's stale quotes, profiting from information the maker does not have. The maker responds by widening spreads, quoting smaller size, or leaving entirely, so liquidity disappears at exactly the moment the venue needs it. Thin markets are the most exposed because a single informed order can move the price and because there is little offsetting flow. Designing around this requires speed, pricing discipline, or limits, not just recruiting a maker.
 
-A market maker does not guarantee a fair price. A spread can be wide and still be the best quote available, so the existence of a maker is not evidence of a good deal for users. Likewise, a secondary market provides price discovery only if trades actually occur; a listed but untraded asset has an asking price, not a discovered one. A small team should not read the presence of quotes as proof that the market is healthy or that the price is trustworthy.
+A market maker does not guarantee a fair price. A spread can be wide and still be the best quote available, so <Mark>the existence of a maker is not evidence of a good deal for users</Mark>. Likewise, a secondary market provides price discovery only if trades actually occur; a listed but untraded asset has an asking price, not a discovered one. A small team should not read the presence of quotes as proof that the market is healthy or that the price is trustworthy.
 
 Finally, the arrangement needs review. Designated makers in regulated venues can carry obligations, and a venue that depends on a single maker has concentration risk: if that maker withdraws, liquidity vanishes. The plan should be rechecked when trading volume, volatility, participant mix, or applicable rules change, and the spread users actually face should be measured, not assumed. A quiet market is not self-sustaining proof.
 
+<PullQuote>
 The counterargument that a venue can bootstrap without makers is fair for small, patient communities and incomplete for time-sensitive assets where a standing quote is the whole product.
+</PullQuote>
 
 ## A decision test
 

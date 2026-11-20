@@ -9,9 +9,11 @@ tags:
   - Systems
 ---
 
+<Lead>
 A NoSQL store is often chosen because a relational database became slow, which skips the real design question: what queries must be served and at what consistency, as the NoSQL entry describes non-relational models, as the CAP theorem describes the trade-off between consistency, availability, and partition tolerance, as [Database Replication in Practice](/articles/database-replication-in-practice) treats the operational mechanism, as [Database Indexes and Query Plans: Why the Same Query Gets Slow](/articles/database-indexes-and-query-plans) treats access paths.
+</Lead>
 
-**Direct answer:** Design a NoSQL store from the access patterns, then choose the model and consistency that serve them, with measured trade-offs. The NoSQL entry provides the models, and the CAP theorem provides the constraint. The boundary: a distributed store does not remove trade-offs, which the CAP theorem states, as the risk-assessment article requires residual risk, as the publication standard forbids guaranteed outcomes.
+**Direct answer:** Design a NoSQL store <Mark>from the access patterns</Mark>, then choose the model and consistency that serve them, with measured trade-offs. The NoSQL entry provides the models, and the CAP theorem provides the constraint. The boundary: a distributed store does not remove trade-offs, which the CAP theorem states, as the risk-assessment article requires residual risk, as the publication standard forbids guaranteed outcomes.
 
 ## The method
 
@@ -23,7 +25,7 @@ A NoSQL store is often chosen because a relational database became slow, which s
 
 **Design for growth.** How data is distributed, which the sharding discussion in the NoSQL entry treats, as the capacity-planning article advises, as the cost estimator requires for spend, as [Database Replication in Practice](/articles/database-replication-in-practice) describes, as the observability article treats signals as evidence.
 
-Three consequences follow. The access patterns come first, as the NoSQL entry advises, as [Database Indexes and Query Plans: Why the Same Query Gets Slow](/articles/database-indexes-and-query-plans) advises, as the rubric article requires. Consistency is a decision, as the CAP theorem requires, as [Database Replication in Practice](/articles/database-replication-in-practice) explains, as the risk article requires residual risk. And the result should be measured, as the observability article advises, as the monitoring article advises for change.
+Three consequences follow. The access patterns come first, as the NoSQL entry advises, as [Database Indexes and Query Plans: Why the Same Query Gets Slow](/articles/database-indexes-and-query-plans) advises, as the rubric article requires. <Mark>Consistency is a decision</Mark>, as the CAP theorem requires, as [Database Replication in Practice](/articles/database-replication-in-practice) explains, as the risk article requires residual risk. And the result should be measured, as the observability article advises, as the monitoring article advises for change.
 
 ## A worked example
 
@@ -31,13 +33,27 @@ The following is hypothetical and illustrative. A team considers a document stor
 
 Three checks decide. First, what are the access patterns, as the NoSQL entry and database-index article require, with concrete criteria, as the rubric article requires? Second, what consistency is needed when a write and a read are near-simultaneous, as the CAP theorem requires, with the mechanism explained by the replication article, as the risk article requires residual risk? Third, how is data distributed as it grows, as the sharding discussion requires, with capacity reviewed, as the capacity-planning article advises, as the cost estimator requires?
 
-Three conclusions follow. The access pattern drives the model, which the checks reveal. Consistency must be chosen, as the CAP theorem requires. And the decision should be recorded with residual risk, as the decision-memo and risk articles require.
+Three conclusions follow.
+
+<KeyPoint>
+The access pattern drives the model, which the checks reveal.
+</KeyPoint>
+
+Consistency must be chosen, as the CAP theorem requires. And the decision should be recorded with residual risk, as the decision-memo and risk articles require.
 
 ## What NoSQL design cannot do
 
-It cannot remove trade-offs, which the CAP theorem states, as [Database Replication in Practice](/articles/database-replication-in-practice) explains, as the risk article requires residual risk. It does not guarantee performance, which the publication standard forbids claiming, as the benchmarks article warns about broad results, as the observability article advises for evidence. And it cannot fix an unclear access pattern, which the database-index article treats as prior, as the rubric article requires for concrete criteria.
+It cannot remove trade-offs, which the CAP theorem states, as [Database Replication in Practice](/articles/database-replication-in-practice) explains, as the risk article requires residual risk.
 
+<Trap>
+It does not guarantee performance, which the publication standard forbids claiming, as the benchmarks article warns about broad results, as the observability article advises for evidence.
+</Trap>
+
+And it cannot fix an unclear access pattern, which the database-index article treats as prior, as the rubric article requires for concrete criteria.
+
+<PullQuote>
 The counterargument that a NoSQL store scales automatically is fair about some systems and wrong about the design decisions, which the CAP theorem and worked example show, as the capacity-planning article advises.
+</PullQuote>
 
 ## A decision test
 
@@ -47,7 +63,7 @@ The counterargument that a NoSQL store scales automatically is fair about some s
 4. Plan distribution and capacity, as the sharding discussion and capacity-planning article advise.
 5. Check cost, as the cost estimator requires.
 6. Verify with signals, as the observability article advises.
-7. Record the decision and residual risk, as the decision-memo and risk articles require.
+7. Record the decision and <Mark>residual risk</Mark>, as the decision-memo and risk articles require.
 
 For the trade-off, see [Database Replication in Practice](/articles/database-replication-in-practice); for the access path, see [Database Indexes](/articles/database-indexes-and-query-plans).
 

@@ -9,9 +9,17 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 Most introductions to NLP present the stack as a menu: tokenisation, embeddings, transformers, and a large language model at the end. Each layer is usually described by what it is. The more useful description is what each layer *fixes* about the layer below it, because the history of this field is a series of problems being solved in order.
+</Lead>
 
-**Direct answer:** Text has to become numbers, and each step solves a specific failure of the previous one. Subword tokenisation solves the open-vocabulary problem — a fixed word vocabulary cannot represent every word, and splitting rare words into smaller units can. Embeddings solve the discreteness problem — vectors can be compared by arithmetic rather than equality. The transformer solves the sequencing problem — earlier architectures processed tokens in order, so each one waited for the previous one. And the large-scale pretraining-plus-fine-tuning pipeline solves the labelling problem — it starts from raw text and needs labelled examples only at the end.
+**Direct answer:** Text has to become numbers, and each step solves a specific failure of the previous one. Subword tokenisation solves the <Mark>open-vocabulary problem</Mark> — a fixed word vocabulary cannot represent every word, and splitting rare words into smaller units can. Embeddings solve the discreteness problem — vectors can be compared by arithmetic rather than equality. The transformer solves the sequencing problem — earlier architectures processed tokens in order, so each one waited for the previous one. And the large-scale pretraining-plus-fine-tuning pipeline solves the labelling problem — it starts from raw text and needs labelled examples only at the end.
+
+<KeyFigures items={[
+  { value: "28.4 BLEU", label: "on WMT 2014 English-to-German, improving over the existing best results by over 2 BLEU", source: "Vaswani et al., 2017" },
+  { value: "80.5%", label: "GLUE score after BERT fine-tuning, a 7.7 point absolute improvement", source: "Devlin et al., 2019" },
+  { value: "about 5 seconds", label: "to find the most similar pair with SBERT, down from 65 hours with BERT", source: "Reimers and Gurevych, 2019" },
+]} />
 
 ## Layer one: tokenisation, and the open-vocabulary problem
 
@@ -23,7 +31,13 @@ Their method was byte pair encoding, and they discuss "the suitability of differ
 
 Kudo and Richardson built the tooling that made this practical and, importantly, language-independent. Their SentencePiece is "a language-independent subword tokenizer and detokenizer designed for Neural-based text processing". The limitation it removes is stated precisely: "existing subword segmentation tools assume that the input is pre-tokenized into word sequences", whereas SentencePiece "can train subword models directly from raw sentences, which allows us to make a purely end-to-end and language independent system". They validated it on English-Japanese machine translation and "find that it is possible to achieve comparable accuracy to direct subword training from raw sentences".
 
-That last point is the one to keep. Tokenisation is often treated as plumbing that a practitioner inherits. It is a modelling decision, and a language without whitespace or with rich morphology changes the result.
+That last point is the one to keep.
+
+<Trap>
+Tokenisation is often treated as plumbing that a practitioner inherits.
+</Trap>
+
+It is a modelling decision, and a language without whitespace or with rich morphology changes the result.
 
 ## Layer two: embeddings, and the discreteness problem
 
@@ -31,7 +45,7 @@ A token id is a label, not a meaning. Two tokens never compare, and the distance
 
 The first generation of embeddings were static: one vector per word type, learned from co-occurrence. Their weakness was polysemy — the same vector for "bank" in "river bank" and "bank account", because the model had no way to know which sense was meant.
 
-Contextual embeddings fix this by making the vector depend on the sentence. BERT, the model that made the approach standard, was designed to "pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers". The word "bidirectional" is the mechanism and the source of the gain: an earlier left-to-right model could only use context before the token, so the representation of a token was necessarily incomplete.
+<Mark>Contextual embeddings</Mark> fix this by making the vector depend on the sentence. BERT, the model that made the approach standard, was designed to "pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers". The word "bidirectional" is the mechanism and the source of the gain: an earlier left-to-right model could only use context before the token, so the representation of a token was necessarily incomplete.
 
 The other thing BERT changed was the shape of the downstream work. The pre-trained BERT model "can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications". The reported results were "new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7%".
 
@@ -43,7 +57,7 @@ Before 2017, the dominant sequence models were recurrent or convolutional, "base
 
 Vaswani et al. removed the recurrence: a network "based solely on attention mechanisms, dispensing with recurrence and convolutions entirely". The benefit they measured was both quality and cost: 28.4 BLEU on WMT 2014 English-to-German, "improving over the existing best results, including ensembles by over 2 BLEU", and a single-model state-of-the-art 41.8 BLEU on English-to-French "after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature".
 
-The important engineering consequence is not the benchmark. It is that removing the sequential dependency made training parallelisable, and parallelisability is what made scale affordable — and scale is what made the rest of this stack possible.
+The important engineering consequence is not the benchmark. It is that removing the sequential dependency made <Mark>training parallelisable</Mark>, and parallelisability is what made scale affordable — and scale is what made the rest of this stack possible.
 
 ## Layer four: making embeddings usable at scale
 
@@ -59,7 +73,9 @@ That is a 47,000-fold reduction in compute for the same answer, and it is what m
 
 The final step is what made the whole thing usable. GPT-3 is described as "an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model", and its central finding is about labels: scaling "greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches". The contrast drawn in the abstract is that fine-tuning "still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples", whereas "humans can generally perform a new language task from only a few examples or from simple instructions".
 
+<KeyPoint>
 That is the transition from a research model to a tool: a task becomes a prompt rather than a labelled dataset.
+</KeyPoint>
 
 ## How to check a stack you did not build
 
@@ -77,7 +93,11 @@ The following is hypothetical and illustrative. A team is building semantic sear
 
 ## A counterargument
 
-The 'each layer fixes the one below' story is a clean retrospective that the sources themselves complicate. The article cites RoBERTa's finding that BERT was significantly undertrained and that hyperparameter choices have a large impact, which raises the question of how much of the BERT and transformer gain was architecture rather than tuning. It also concedes that SentencePiece is a language-dependent modelling decision and that SBERT trades expressiveness for throughput, both of which break the neat chain. A critic would say the progression is a pedagogical arrangement of independent results, not a dependency the papers assert; tokenisation, embeddings, and attention were developed in parallel, and calling them a single fix-by-fix ladder overstates the coherence of the field.
+The 'each layer fixes the one below' story is a clean retrospective that the sources themselves complicate. The article cites RoBERTa's finding that BERT was significantly undertrained and that hyperparameter choices have a large impact, which raises the question of how much of the BERT and transformer gain was architecture rather than tuning. It also concedes that SentencePiece is a language-dependent modelling decision and that SBERT trades expressiveness for throughput, both of which break the neat chain.
+
+<PullQuote>
+A critic would say the progression is a pedagogical arrangement of independent results, not a dependency the papers assert; tokenisation, embeddings, and attention were developed in parallel, and calling them a single fix-by-fix ladder overstates the coherence of the field.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Teams often price an on-call rotation by adding up stipends and calling it a day. The real problem is that the visible payment is the smallest part of the cost: the rotation also consumes attention, interrupts work, and shapes whether people stay on the team. A rotation that looks cheap on a budget line can be expensive in ways the budget never records.
+<Lead>
+Teams often price an on-call rotation by adding up stipends and calling it a day. The real problem is that <Mark>the visible payment is the smallest part of the cost</Mark>: the rotation also consumes attention, interrupts work, and shapes whether people stay on the team. A rotation that looks cheap on a budget line can be expensive in ways the budget never records.
+</Lead>
 
 **Direct answer:** On-call means staff are available outside normal working hours to respond to incidents, usually organized as a rotation. Google's SRE guidance argues that alerts should fire on user-visible symptoms and error-budget burn rather than on internal causes. The boundary: these sources describe the duty and how to alert well, not a costing formula, so any full cost must be assembled locally from compensation, load, and reliability data.
 
@@ -17,7 +19,13 @@ Teams often price an on-call rotation by adding up stipends and calling it a day
 
 ## The mechanism
 
-The on-call entry describes an arrangement in which employees are required to be available outside their normal schedule to handle problems that arise, typically organized as a rotation that shares the burden across a group. The mechanism is reserved availability: the organization pays for the capacity to respond at any hour, whether or not an incident occurs. The practical consequence is that the cost exists even on a quiet night. The time is not free simply because no page arrived; it is held in readiness and cannot be spent elsewhere without giving up the ability to respond.
+The on-call entry describes an arrangement in which employees are required to be available outside their normal schedule to handle problems that arise, typically organized as a rotation that shares the burden across a group.
+
+<KeyPoint>
+The mechanism is reserved availability: the organization pays for the capacity to respond at any hour, whether or not an incident occurs.
+</KeyPoint>
+
+The practical consequence is that <Mark>the cost exists even on a quiet night</Mark>. The time is not free simply because no page arrived; it is held in readiness and cannot be spent elsewhere without giving up the ability to respond.
 
   <Figure src="/images/articles/inline/on-call-rotations-costs-explained-1.png" alt="Comparison of a budget line showing only a weekly stipend against the full cost of reserved availability, page load and lost sleep" caption="Conceptual: the visible stipend is the smallest part of a rotation's true cost" />
 
@@ -43,11 +51,19 @@ The first two rows report what the sources state and can be checked against them
 
 ## What it cannot do
 
-These sources cannot produce a total cost for a specific rotation. The on-call entry describes what the duty is, and the SRE chapter describes how alerts should be designed. Neither supplies wage rates, page volumes, or a way to value lost sleep and turnover. A manager looking for a number will not find one in them, and treating their guidance as a costing model would be a category error. What they provide is the structure of the problem, not its price.
+These sources cannot produce a total cost for a specific rotation. The on-call entry describes what the duty is, and the SRE chapter describes how alerts should be designed. Neither supplies wage rates, page volumes, or a way to value lost sleep and turnover. A manager looking for a number will not find one in them, and treating their guidance as a costing model would be a category error.
 
-A hidden cost is the attention debt that pages create. An interruption during deep work does not simply pause the task and resume it cleanly; returning to the original problem takes time, and a page late in the day can consume the next morning's focus as well. When pages cluster, the team spends the following shift recovering rather than improving the system that failed. The expense appears nowhere as a line item, yet it is often larger than the stipend, because it reduces the capacity to do the reliability work that would prevent future pages.
+<PullQuote>
+What they provide is the structure of the problem, not its price.
+</PullQuote>
 
-A common failure mode is treating every alert as equally serious. A rotation whose alerts fire on internal causes or marginal thresholds generates a steady stream of pages that require a human to decide that nothing is wrong. This trains responders to treat pages as noise, which is dangerous when a genuine incident eventually arrives among them. The cost is double: wasted attention on the false alarms, and slower response when a real one matters. Symptom-based alerting is the remedy the SRE guidance proposes, but adopting it requires the discipline to delete alerts that no longer represent user harm.
+A hidden cost is <Mark>the attention debt that pages create</Mark>. An interruption during deep work does not simply pause the task and resume it cleanly; returning to the original problem takes time, and a page late in the day can consume the next morning's focus as well. When pages cluster, the team spends the following shift recovering rather than improving the system that failed. The expense appears nowhere as a line item, yet it is often larger than the stipend, because it reduces the capacity to do the reliability work that would prevent future pages.
+
+<Trap>
+A common failure mode is treating every alert as equally serious.
+</Trap>
+
+A rotation whose alerts fire on internal causes or marginal thresholds generates a steady stream of pages that require a human to decide that nothing is wrong. This trains responders to treat pages as noise, which is dangerous when a genuine incident eventually arrives among them. The cost is double: wasted attention on the false alarms, and slower response when a real one matters. Symptom-based alerting is the remedy the SRE guidance proposes, but adopting it requires the discipline to delete alerts that no longer represent user harm.
 
 The boundary is that these are descriptions of practice, not guarantees. The on-call entry explains an arrangement for handling problems outside hours; it does not endorse any particular schedule or compensation level. The SRE guidance explains how to alert on symptoms and burn rate; it does not claim that following it eliminates incidents or operator load. Applying them responsibly means using the availability concept to account for reserved time and the alerting principle to reduce needless pages, while assembling the actual figures from local compensation, incident, and reliability records.
 

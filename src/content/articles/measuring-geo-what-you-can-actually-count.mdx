@@ -9,9 +9,17 @@ tags:
   - Technical SEO
 ---
 
-The measurement problem in generative engine optimisation is unusually well-suited to an honest answer, because almost everything claimed about "GEO metrics" in the wild is either a repackaged SEO metric with a new name or a number produced by a vendor that will not say how it was computed. Meanwhile the platforms themselves have been fairly explicit about what they do and do not expose. This article is about the measurement that survives scrutiny.
+<Lead>
+The measurement problem in generative engine optimisation is unusually well-suited to an honest answer, because almost everything claimed about "GEO metrics" in the wild is either a repackaged SEO metric with a new name or a number produced by a vendor that will not say how it was computed. Meanwhile the platforms themselves have been fairly explicit about what they do and do not expose. This article is about <Mark>the measurement that survives scrutiny</Mark>.
+</Lead>
 
-**Direct Answer:** There is no official "AI visibility score" and no ranking-dashboard equivalent for answer engines. What you can measure today falls into four buckets: **referral traffic** from AI surfaces (measurable, but attribution-shaped and self-reported), **crawler activity** (fully measurable in your own logs, and the most reliable signal you control), **eligibility** (whether your pages are reachable, indexable, and snippet-capable — measurable but not a ranking factor), and **citation presence** (measurable only by manual sampling, which is a sample, not a metric). Search Console does not report AI Overviews or AI Mode as a separate traffic source — they are folded into the "Web" search type — so any claim that Google reports "AI traffic" separately is false.
+**Direct Answer:**
+
+<KeyPoint>
+There is no official "AI visibility score" and no ranking-dashboard equivalent for answer engines.
+</KeyPoint>
+
+What you can measure today falls into four buckets: **referral traffic** from AI surfaces (measurable, but attribution-shaped and self-reported), **crawler activity** (fully measurable in your own logs, and the most reliable signal you control), **eligibility** (whether your pages are reachable, indexable, and snippet-capable — measurable but not a ranking factor), and **citation presence** (measurable only by manual sampling, which is a sample, not a metric). Search Console does not report AI Overviews or AI Mode as a separate traffic source — they are folded into the "Web" search type — so any claim that Google reports "AI traffic" separately is false.
 
 ## What Search Console actually reports
 
@@ -19,7 +27,13 @@ Google's AI features documentation is direct on this: "Just like the rest of the
 
 Two implications follow, and both cut against common advice.
 
-**First, there is no AI-specific filter.** If a team says they are tracking "AI Overview traffic in Search Console" and filtering by a query pattern or a search type called AI, that filter does not exist in the documented interface. The traffic is there, mixed into "Web," and separating it requires query-level inference.
+**First, there is no AI-specific filter.**
+
+<Trap>
+If a team says they are tracking "AI Overview traffic in Search Console" and filtering by a query pattern or a search type called AI, that filter does not exist in the documented interface.
+</Trap>
+
+The traffic is there, mixed into "Web," and separating it requires query-level inference.
 
 **Second, "not reported" is not "not happening."** Google also states: "We've seen that when people click from search results pages with AI Overviews, these clicks are higher quality (meaning, users are more likely to spend more time on the site)." That is a source-reported observation, not a per-site measurement, and it does not come with a number. It is the kind of claim that gets quoted as a finding when it is a vendor statement.
 
@@ -29,7 +43,7 @@ The useful, defensible move is to stop trying to find an AI bucket and instead i
 
 AI surfaces send referrer headers, and those headers land in your analytics as a distinct source. This is the closest thing to a measurable AI traffic channel, and it has one enormous caveat: **the referrer is what the platform chooses to send.** Some send their own domain, some send nothing at all, and a direct click from an in-app browser may arrive with no referrer whatsoever.
 
-That caveat deserves emphasis because it inverts the usual assumption. A referral that is present is attributable; a visit without a referrer is not necessarily direct traffic. That means "AI traffic" measured this way is a floor, not a total — and the floor is set by the platforms' disclosure choices, not by your site's configuration.
+That caveat deserves emphasis because it inverts the usual assumption. A referral that is present is attributable; a visit without a referrer is not necessarily direct traffic. That means "AI traffic" measured this way is <Mark>a floor, not a total</Mark> — and the floor is set by the platforms' disclosure choices, not by your site's configuration.
 
 The practical consequence: referral data can support a *direction* ("referrals from AI surfaces grew"), and it can support a *ranking* of surfaces relative to each other. It cannot support a claim like "AI sent us 12% of our traffic," because the denominator is contaminated by unattributed visits that may or may not have come from AI.
 
@@ -82,7 +96,11 @@ This gives you a genuinely verifiable checklist, and every item is testable:
 
 Note the second row carefully. Google's documentation lists `nosnippet`, `data-nosnippet`, `max-snippet`, and `noindex` as the controls for limiting information shown from pages in Search, and warns that if you implemented preview controls and content still appears, you should check with the URL Inspection tool "to see the HTML that Googlebot received while crawling the page." The failure mode this addresses is concrete: a `noindex` in the head but not in the rendered output, or a preview control applied to a template that does not cover the route.
 
-What eligibility is *not*: a ranking factor, a citation guarantee, or a traffic predictor. Google's documentation is explicit that "just because a page meets all requirements, best practices, and complies with the policies, doesn't mean that Google will crawl, index, or serve its content." Eligibility is a gate, not a score.
+What eligibility is *not*: a ranking factor, a citation guarantee, or a traffic predictor. Google's documentation is explicit that "just because a page meets all requirements, best practices, and complies with the policies, doesn't mean that Google will crawl, index, or serve its content."
+
+<PullQuote>
+Eligibility is a gate, not a score.
+</PullQuote>
 
 ## Citation sampling: a sample, and you should say so
 
@@ -110,7 +128,7 @@ Put together what a defensible GEO measurement setup looks like:
 4. **Sample citations** on a frozen query set at a fixed cadence, reporting rates with the method stated, and never as a single headline number.
 5. **Label every claim** by what produced it: your own logs, the platform's documentation, a manual sample, or a third party. Vendor-reported findings are findings about the vendor's aggregate, not about you.
 
-That structure has one property worth more than any individual metric: every number in it can be traced to a source you control or a statement you can quote. When someone asks "how do you know?", the answer is a command or a document, not a dashboard.
+That structure has one property worth more than any individual metric: <Mark>every number in it can be traced to a source you control or a statement you can quote</Mark>. When someone asks "how do you know?", the answer is a command or a document, not a dashboard.
 
 ## What you cannot measure, stated plainly
 

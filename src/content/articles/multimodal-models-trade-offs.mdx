@@ -9,15 +9,21 @@ tags:
   - Engineering
 ---
 
-A multimodal model can accept images alongside text, which makes applications possible that text-only systems cannot support. The trade-off is that the added modality adds a new surface for error: an image can be misread, or the model can answer from language priors rather than the pixels, as CLIP demonstrates joint image-text representations, as the LLaVA work extends instruction following to images, as the hallucination article warns about confident wrong detail.
+<Lead>
+A multimodal model can accept images alongside text, which makes applications possible that text-only systems cannot support. The trade-off is that <Mark>the added modality adds a new surface for error</Mark>: an image can be misread, or the model can answer from language priors rather than the pixels, as CLIP demonstrates joint image-text representations, as the LLaVA work extends instruction following to images, as the hallucination article warns about confident wrong detail.
+</Lead>
 
-**Direct answer:** Choose a multimodal model when the task truly requires the extra modality, then evaluate it on that task with image-grounded tests and a text-only baseline. CLIP and LLaVA are the primary sources for the mechanisms. The boundary: a multimodal model is not automatically better at a text task, which the embedding-selection article advises for own-data evaluation, as the benchmarks article warns about broad claims, as the publication standard forbids guaranteed outcomes.
+**Direct answer:** CLIP and LLaVA are the primary sources for the mechanisms. The boundary: a multimodal model is not automatically better at a text task, which the embedding-selection article advises for own-data evaluation, as the benchmarks article warns about broad claims, as the publication standard forbids guaranteed outcomes.
+
+<KeyPoint>
+Choose a multimodal model when the task truly requires the extra modality, then evaluate it on that task with image-grounded tests and a text-only baseline.
+</KeyPoint>
 
 ## The trade-offs
 
-**Capability versus grounding.** A model can describe an image plausibly while relying on a language prior, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises for checks, as the LLaVA work treats visual instruction following as a distinct capability.
+**Capability versus grounding.** <Mark>A model can describe an image plausibly while relying on a language prior</Mark>, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises for checks, as the LLaVA work treats visual instruction following as a distinct capability.
 
-**Representation versus task.** Joint image-text training, which CLIP demonstrates, is not the same as accuracy on your task, which the embedding-selection article advises for local evaluation, as the evaluation-rubric article requires for concrete criteria.
+**Representation versus task.** Joint image-text training, which CLIP demonstrates, <Mark>is not the same as accuracy on your task</Mark>, which the embedding-selection article advises for local evaluation, as the evaluation-rubric article requires for concrete criteria.
 
 **Cost versus benefit.** Images add tokens and processing, which the cost estimator requires you to count, as the routing article treats cost per correct answer as the decision metric, as the prompt-caching article explains for repeated content.
 
@@ -31,13 +37,21 @@ The following is hypothetical and illustrative. A team considers a multimodal mo
 
 Three checks decide. First, does the task require the image at all, as the decision-memo article asks, with a text-only baseline, as the embedding-selection article advises? Second, does the model answer from the image rather than a plausible prior, as the hallucination and reduce-hallucinations articles advise, with a fixed test set, as the rubric article requires? Third, what is the cost per correct answer, as the cost estimator requires, with images billed as tokens, as the routing article treats as the decision metric?
 
-Three conclusions follow. If text metadata answers the question, a text-only model may suffice, as the baseline check shows. If the image matters, grounding checks are essential, as the hallucination article advises. And the decision should be recorded with the cost, as the decision-memo article requires.
+Three conclusions follow.
+
+<PullQuote>
+If text metadata answers the question, a text-only model may suffice, as the baseline check shows.
+</PullQuote>
+
+If the image matters, grounding checks are essential, as the hallucination article advises. And the decision should be recorded with the cost, as the decision-memo article requires.
 
 ## What multimodal models cannot do
 
 They cannot guarantee correct reading of an image, which the hallucination article treats as a control problem, as the reduce-hallucinations article advises. They do not replace a text baseline, which the evaluation article advises for comparison, as the benchmarks article warns about broad claims. And they cannot guarantee a saving, which the cost estimator makes explicit, as the publication standard forbids guaranteed outcomes.
 
+<Trap>
 The counterargument that more modalities are always better is fair for tasks that need the extra information and wrong when metadata already answers the question, which the worked example shows, as the cost estimator argues for cost per correct answer.
+</Trap>
 
 ## A decision test
 

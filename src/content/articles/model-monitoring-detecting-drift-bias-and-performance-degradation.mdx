@@ -9,15 +9,21 @@ tags:
   - Reliability
 ---
 
+<Lead>
 "Monitor your model" is advice that sounds like a responsibility and is actually an underspecified instruction. Monitor it for what? There are at least three distinct failures here, and they need different evidence: the inputs have changed, the relationship between inputs and outputs has changed, and the model's output quality has fallen. A signal that detects one will not detect the others, and a dashboard that conflates them gives false confidence in exactly the situations where you need it.
+</Lead>
 
-**Direct answer:** Model monitoring is three separate disciplines. *Drift* monitoring asks whether the input distribution has moved. *Concept* monitoring asks whether the relationship between inputs and the target has moved — the one failure that actually changes the model's correctness, and the one that is hardest to see without labels. *Performance* monitoring asks whether measured quality has fallen. The reliable design is to instrument all three, to be explicit about which signal triggers which action, and — because production labels usually arrive late — to use input-distribution signals as an early warning for a quality signal you cannot yet observe.
+**Direct answer:** *Drift* monitoring asks whether the input distribution has moved. *Concept* monitoring asks whether the relationship between inputs and the target has moved — <Mark>the one failure that actually changes the model's correctness</Mark>, and the one that is hardest to see without labels. *Performance* monitoring asks whether measured quality has fallen. The reliable design is to instrument all three, to be explicit about which signal triggers which action, and — because production labels usually arrive late — to use input-distribution signals as an early warning for a quality signal you cannot yet observe.
+
+<KeyPoint>
+Model monitoring is three separate disciplines.
+</KeyPoint>
 
 ## Three failures, three different pieces of evidence
 
 The confusion is worth naming precisely, because the three failures have different latencies and different consequences.
 
-**Input drift** is a change in the distribution of the features. It is directly observable at serving time, without labels, and it is the earliest signal you will get. It is also the weakest evidence on its own: a shift in the input distribution does not imply the model is wrong. It implies the model is operating in unfamiliar territory.
+**Input drift** is a change in the distribution of the features. It is directly observable at serving time, without labels, and it is the earliest signal you will get. It is also the weakest evidence on its own: <Mark>a shift in the input distribution does not imply the model is wrong</Mark>. It implies the model is operating in unfamiliar territory.
 
 **Concept drift** is a change in the relationship between features and the target. The inputs look the same, the answer changed. This is the failure that makes a model wrong, and it is invisible to input monitoring by construction — by definition, the input distribution did not move.
 
@@ -57,6 +63,10 @@ Google's site reliability guidance introduces burn rate as the core idea: "Burn 
 
 That is the model to copy for model quality. Define an acceptable quality level as an SLO — say, an error rate on a 30-day window. A burn rate of 1 exhausts the allowance exactly at the end of the window; a burn rate of 10 exhausts it in three days. The alerting guidance then applies: alert on the burn rate, so that a slow drift does not page anyone and a fast one pages immediately. The short-window and long-window burn-rate alerts that service teams use map directly onto "short-window drift" and "long-window quality" signals.
 
+<KeyFigures items={[
+  { value: "1%", label: "error rate that uses exactly all of the error budget, a burn rate of 1", source: "Google, Alerting on SLOs" },
+]} />
+
 The benefit is behavioural as much as statistical. A single threshold on a drift statistic produces a stream of alerts that drift slowly across, and the team learns to dismiss them. A burn-rate scheme produces few alerts, each of which means something.
 
 Two rules make the scheme work. First, every alert must have a mapped action — retrain, roll back, fall back to a rules path, or investigate. Second, the action must be possible: a retraining trigger you cannot execute within the burn-rate window is a monitoring system that documents failure rather than preventing it.
@@ -69,7 +79,11 @@ A model can be biased from deployment and never drift. It can also drift from an
 
 The evidence required is the same evidence you would produce for an audit: performance reported by relevant group, including intersectional groups where the application calls for it. Model cards are the format for this, because they "provide benchmarked evaluation in a variety of conditions, such as across different cultural, demographic, or phenotypic groups ... and intersectional groups" relevant to the intended application, and they disclose "the context in which models are intended to be used". Datasheets do the dataset-side equivalent, documenting "its motivation, composition, collection process, recommended uses".
 
-The failure mode to avoid is treating a group disparity as a drift alert that resolves itself. A disparity that is stable is a decision you have to make, not a fluctuation you wait out.
+<Trap>
+The failure mode to avoid is treating a group disparity as a drift alert that resolves itself.
+</Trap>
+
+A disparity that is stable is <Mark>a decision you have to make, not a fluctuation you wait out</Mark>.
 
 ## A monitoring design you can actually run
 
@@ -87,7 +101,11 @@ For an applied example of regression monitoring with a run registry and an inves
 
 ## A counterargument
 
-The article borrows SRE burn rate as "the model to copy for model quality," but the analogy breaks on its own premise. Error budgets assume a signal observable inside the window; here labels arrive late or never, and the piece warns against evaluating on a partially-labelled population, so a 30-day quality SLO can measure an incomplete outcome. The early warning is weaker than presented: input drift "does not imply the model is wrong," and the output proxy "detects unusualness, not error," so it may fire on harmless shifts and miss the concept drift it should catch. The objection is that a framework designed for services is applied to a signal far less observable than the one it was built for.
+The article borrows SRE burn rate as "the model to copy for model quality," but the analogy breaks on its own premise. Error budgets assume a signal observable inside the window; here labels arrive late or never, and the piece warns against evaluating on a partially-labelled population, so a 30-day quality SLO can measure an incomplete outcome. The early warning is weaker than presented: input drift "does not imply the model is wrong," and the output proxy "detects unusualness, not error," so it may fire on harmless shifts and miss the concept drift it should catch.
+
+<PullQuote>
+The objection is that a framework designed for services is applied to a signal far less observable than the one it was built for.
+</PullQuote>
 
 ## References & Further Reading
 

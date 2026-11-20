@@ -9,15 +9,21 @@ tags:
   - Verified
 ---
 
-MLOps is often described as tooling, which hides the practices that determine whether a model keeps working. The Wikipedia entry describes deploying and maintaining machine-learning systems, and the SRE book covers the reliability practices around services. The examples show where those practices matter.
+<Lead>
+MLOps is often described as tooling, which hides <Mark>the practices that determine whether a model keeps working</Mark>. The Wikipedia entry describes deploying and maintaining machine-learning systems, and the SRE book covers the reliability practices around services. The examples show where those practices matter.
+</Lead>
 
 **Direct answer:** Treat a model as a service with versioned data, reproducible training, monitoring, and a rollback path. The sources describe the domain; the method is a synthesis.
+
+<KeyPoint>
+Treat a model as a service with versioned data, reproducible training, monitoring, and a rollback path.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and a worked deployment, separating documented practices from local choices about controls.
 
 ## The mechanism
 
-The first practice is versioning. The MLOps entry describes maintaining systems, which requires knowing which data and code produced a given model. A model that cannot be rebuilt from a record is a one-off result, and a failure cannot be diagnosed properly.
+The first practice is versioning. The MLOps entry describes maintaining systems, which requires knowing which data and code produced a given model. A model that cannot be rebuilt from a record is <Mark>a one-off result</Mark>, and a failure cannot be diagnosed properly.
 
 <Figure src="/images/articles/inline/mlops-examples-1.png" alt="A four-step deployment flow: version the data and code, deploy behind a signal, monitor inputs and outcomes, and keep a rollback path." caption="Conceptual: treat the model as a service with versioning, monitoring and rollback." />
 
@@ -47,9 +53,13 @@ The outcome is a deployment plan with evidence and a reversal path. The scenario
 
 A notebook produces a result once, which is enough for exploration and not enough for a service. The work of keeping a model correct under changing input is the system, and it begins after the training run ends.
 
-A further point is that a rollback path depends on the previous version remaining available. A system that deletes old artefacts cannot revert, and the limitation appears only when a rollback is needed. Keeping the previous version is a small cost that should be planned.
+A further point is that a rollback path depends on the previous version remaining available. A system that deletes old artefacts cannot revert, and the limitation appears only when a rollback is needed. Keeping the previous version is <Mark>a small cost that should be planned</Mark>.
 
-The monitoring also needs a baseline. Without knowing what normal behaviour looked like, a signal cannot be interpreted, and a model card or a recorded period provides that reference. Treating monitoring as a dashboard without a baseline is a common source of false confidence.
+The monitoring also needs a baseline. Without knowing what normal behaviour looked like, a signal cannot be interpreted, and a model card or a recorded period provides that reference.
+
+<Trap>
+Treating monitoring as a dashboard without a baseline is a common source of false confidence.
+</Trap>
 
 Finally, MLOps cannot fix a model that was never fit for purpose. Good deployment makes a model's behaviour visible and reversible, which is valuable only when the underlying model does something worth deploying.
 
@@ -73,7 +83,9 @@ Monitoring without a baseline produces numbers that cannot be interpreted.
 
 It cannot guarantee that a model stays accurate. It does not remove the need for evaluation. And it cannot make a poor model useful through good deployment.
 
+<PullQuote>
 The counterargument that deployment tooling solves the problem is fair for repeatability and incomplete for the decisions about what to monitor.
+</PullQuote>
 
 ## A decision test
 

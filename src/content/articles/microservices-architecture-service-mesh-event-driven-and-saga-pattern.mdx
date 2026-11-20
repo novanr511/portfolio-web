@@ -9,9 +9,17 @@ tags:
   - DevOps
 ---
 
-Microservices are often described as "small services", which misses the point. The size is incidental; the goal is independent change. A team should be able to deploy its service without coordinating a release with every other team. Everything else in the architecture — service mesh, events, sagas — exists to manage the consequences of that independence.
+<Lead>
+Microservices are often described as "small services", which misses the point. The size is incidental; <Mark>the goal is independent change</Mark>. A team should be able to deploy its service without coordinating a release with every other team. Everything else in the architecture — service mesh, events, sagas — exists to manage the consequences of that independence.
+</Lead>
 
-**Direct answer:** Martin Fowler and James Lewis observe that "there is no precise definition" of microservice architecture, but identify common characteristics: "organization around business capability, automated deployment, intelligence in the endpoints, and decentralized control of languages and data". The boundary is explicit in their article's section title, "Synchronous calls considered harmful": splitting a system into services does not make the distributed problems disappear, it makes them visible. The patterns in the title are answers to those problems, not decorations.
+**Direct answer:** Martin Fowler and James Lewis observe that "there is no precise definition" of microservice architecture, but identify common characteristics: "organization around business capability, automated deployment, intelligence in the endpoints, and decentralized control of languages and data".
+
+<KeyPoint>
+The boundary is explicit in their article's section title, "Synchronous calls considered harmful": splitting a system into services does not make the distributed problems disappear, it makes them visible.
+</KeyPoint>
+
+The patterns in the title are answers to those problems, not decorations.
 
 ## What independence costs
 
@@ -29,7 +37,7 @@ Four consequences follow:
 
 ## The three patterns and the problems they solve
 
-**Service mesh** moves cross-cutting communication concerns — service discovery, retries, encryption, telemetry — out of application code into a dedicated infrastructure layer. The benefit is consistency: every service gets the same behaviour without each team implementing it. The cost is another component to operate and a new place for latency to hide.
+**Service mesh** moves cross-cutting communication concerns — service discovery, retries, encryption, telemetry — out of application code into a dedicated infrastructure layer. The benefit is consistency: every service gets the same behaviour without each team implementing it. The cost is <Mark>another component to operate and a new place for latency to hide</Mark>.
 
 **Event-driven communication** replaces a direct call with a published event. The producer does not need to know who consumes it, which decouples teams in time as well as deployment. CloudEvents, the CNCF specification, exists to make event descriptions portable across platforms. The trade-off is that delivery becomes asynchronous and eventually consistent: the consumer may react seconds later, or not at all, and the producer needs a way to detect that.
 
@@ -69,11 +77,13 @@ Three limits are worth stating plainly.
 
 **Events do not remove coupling.** They change its form. A consumer that depends on the exact shape of a producer's event is coupled to that producer, and a schema change becomes a distributed migration. Contract discipline is still required.
 
-**Sagas are not transactions.** A compensation is a new action, not an undo. If the compensating action fails, the system is in an intermediate state that needs a human or a retry policy. The design question is what state is acceptable during a failure, not whether failure can be eliminated.
+**Sagas are not transactions.** <Mark>A compensation is a new action, not an undo</Mark>. If the compensating action fails, the system is in an intermediate state that needs a human or a retry policy. The design question is what state is acceptable during a failure, not whether failure can be eliminated.
 
 **The monolith is a legitimate comparator.** Fowler's article is a description of a style, not a recommendation that every system adopt it. A well-structured monolith can have independent modules and clear boundaries; the decision to distribute should be driven by a real need for independent deployment or scaling, not by fashion.
 
+<Trap>
 The strongest argument against premature decomposition is operational: a small team that splits into ten services inherits ten deployment pipelines, ten dashboards, and ten on-call surfaces before it has the traffic to justify any of them.
+</Trap>
 
 ## A decision test
 
@@ -89,7 +99,11 @@ For the operational prerequisites, see [Observability](/articles/observability-l
 
 ## A counterargument
 
-Its arithmetic is the article's soft spot: it admits the 20 ms hops and 0.5% failure rates are hypothetical, yet the case against splitting rests on them. A reasonable critic would note that a monolith has internal dependencies and database calls that fail too, so counting network hops overstates the reliability gap, and that independent deployment's real payoff is organisational - team autonomy and release cadence - which a hop-counting method cannot price. The article concedes that Fowler's piece is a description, not a recommendation, and that a modular monolith is legitimate, but its decision test enumerates only the costs of distribution - pipelines, dashboards, compensations - and never quantifies the benefit that would justify them. The objection is that a framework measuring only one side of the ledger will favour the status quo.
+Its arithmetic is the article's soft spot: it admits the 20 ms hops and 0.5% failure rates are hypothetical, yet the case against splitting rests on them. A reasonable critic would note that a monolith has internal dependencies and database calls that fail too, so counting network hops overstates the reliability gap, and that independent deployment's real payoff is organisational - team autonomy and release cadence - which a hop-counting method cannot price. The article concedes that Fowler's piece is a description, not a recommendation, and that a modular monolith is legitimate, but its decision test enumerates only the costs of distribution - pipelines, dashboards, compensations - and never quantifies the benefit that would justify them.
+
+<PullQuote>
+The objection is that a framework measuring only one side of the ledger will favour the status quo.
+</PullQuote>
 
 ## References & Further Reading
 

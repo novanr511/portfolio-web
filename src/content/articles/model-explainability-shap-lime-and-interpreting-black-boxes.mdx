@@ -9,9 +9,15 @@ tags:
   - Machine Learning
 ---
 
-"Explainable AI" became a category when practitioners discovered that a black box's output could not be defended to a customer, a regulator, or a colleague. The category filled with methods that produce a plausible-looking attribution for any prediction. The interesting question is not which method is best but what any of them can legitimately claim — and the answer is narrower than the marketing.
+<Lead>
+"Explainable AI" became a category when practitioners discovered that a black box's output could not be defended to a customer, a regulator, or a colleague. The category filled with methods that produce <Mark>a plausible-looking attribution for any prediction</Mark>. The interesting question is not which method is best but what any of them can legitimately claim — and the answer is narrower than the marketing.
+</Lead>
 
 **Direct answer:** Post-hoc explanation methods such as LIME and SHAP estimate how features contributed to a *particular* prediction, under assumptions that are rarely stated and rarely hold. SHAP derives its values from Shapley values, which gives it a principled definition of feature contribution and a well-specified set of conditions under which that definition is the right one. LIME fits a local surrogate, which is fast and flexible but approximate in a way that is easy to under-estimate. And the strongest argument in the literature is not that these methods are unusable — it is that in high-stakes settings, designing an interpretable model should be preferred over explaining an opaque one.
+
+<KeyPoint>
+Post-hoc explanation methods such as LIME and SHAP estimate how features contributed to a *particular* prediction, under assumptions that are rarely stated and rarely hold.
+</KeyPoint>
 
 ## The tension the framework names
 
@@ -21,13 +27,17 @@ Their contribution is to make the field less ad hoc. The stated problem is that 
 
 The Shapley connection is the substantive part, and it is worth understanding what it buys. Shapley values come from cooperative game theory: a prediction is treated as a value produced by a set of features, and each feature's contribution is the average marginal effect of including it across all possible orderings of the coalition. That definition has properties — consistency, missingness, local accuracy — that most ad-hoc attributions do not, and the SHAP paper's contribution is showing that a specific class of additive feature-importance measures can satisfy all of them simultaneously.
 
-That is a real theoretical advance, and it is also exactly where the limitations live: the definition is sound, but computing it is exponential in the number of features. The practical implementations approximate. Every SHAP number you see in production is an approximation of a well-defined quantity, and the approximation quality is not reported in most outputs.
+That is a real theoretical advance, and it is also exactly where the limitations live: the definition is sound, but computing it is exponential in the number of features. The practical implementations approximate.
+
+<Trap>
+Every SHAP number you see in production is an approximation of a well-defined quantity, and the approximation quality is not reported in most outputs.
+</Trap>
 
 ## What LIME actually does, and why it is fast
 
 LIME takes the opposite approach. Ribeiro, Singh and Guestrin describe the problem it solves: to explain a single prediction, "fit a local interpretable model (surrogate) approximating the black-box model's behavior *locally*". The surrogate is weighted so that the points near the prediction of interest dominate, and it is fitted to the model's outputs rather than to the labels.
 
-The advantage is speed and flexibility: LIME works with any black-box model, including ones with no internal structure, and it needs no retraining. The disadvantage is inherent to the approach — a local linear approximation is an approximation, and the quality of the explanation depends on a neighbourhood choice and a sampling procedure that are usually hyperparameters with defaults nobody validated for their data.
+The advantage is speed and flexibility: LIME works with any black-box model, including ones with no internal structure, and it needs no retraining. The disadvantage is inherent to the approach — <Mark>a local linear approximation is an approximation</Mark>, and the quality of the explanation depends on a neighbourhood choice and a sampling procedure that are usually hyperparameters with defaults nobody validated for their data.
 
 The honest way to compare the two is not "SHAP is more principled so use SHAP". It is: SHAP's quantity is defined and the approximation error can be measured; LIME's surrogate is local and the error is harder to bound. If you need a defensible number, that asymmetry matters. If you need an explanation for a model you cannot modify, LIME's flexibility may still win.
 
@@ -50,7 +60,7 @@ A workable decision order:
 5. **Test the explanation against something you can check.** Where possible, perturb the input in the way the explanation says matters and confirm the model's output moves as predicted. An explanation you cannot test is a story.
 6. **For high-stakes decisions, treat the black box itself as the finding.** If the explanation cannot support a defensible decision, the answer is a different model, not a better attribution.
 
-One practical warning about any of these tools: explanations are computed on the data you have, so they inherit its pathologies, and a model that learned a spurious correlation will produce a confident explanation pointing at the spurious feature. An explanation is not a validation.
+One practical warning about any of these tools: explanations are computed on the data you have, so they inherit its pathologies, and a model that learned a spurious correlation will produce a confident explanation pointing at the spurious feature. <Mark>An explanation is not a validation.</Mark>
 
 ## What to do with the explanation
 
@@ -64,7 +74,11 @@ The following is hypothetical and illustrative. Consider a team building a model
 
 ## A counterargument
 
-The article leans on Rudin's call for interpretable models in high-stakes settings, but a critic can note the claim outruns its evidence: the accuracy gap is called "frequently smaller than assumed," yet the source's examples come from specific domains, not a general proof. The piece also recommends testing an explanation by perturbing the input, yet Zhang et al.'s objection - that observational data cannot estimate the effect of altering a feature - applies to that test too, since a perturbation can move the input off the manifold where the explanation held. Having endorsed explanation as a debugging tool at the end, the article never reconciles that use with its warning that explanations inherit the data's pathologies. The objection is that it scrutinises SHAP and LIME but not the interpretable-model alternative it recommends.
+The article leans on Rudin's call for interpretable models in high-stakes settings, but a critic can note the claim outruns its evidence: the accuracy gap is called "frequently smaller than assumed," yet the source's examples come from specific domains, not a general proof. The piece also recommends testing an explanation by perturbing the input, yet Zhang et al.'s objection - that observational data cannot estimate the effect of altering a feature - applies to that test too, since a perturbation can move the input off the manifold where the explanation held. Having endorsed explanation as a debugging tool at the end, the article never reconciles that use with its warning that explanations inherit the data's pathologies.
+
+<PullQuote>
+The objection is that it scrutinises SHAP and LIME but not the interpretable-model alternative it recommends.
+</PullQuote>
 
 ## References & Further Reading
 

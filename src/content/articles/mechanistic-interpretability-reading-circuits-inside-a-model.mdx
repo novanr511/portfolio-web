@@ -9,9 +9,15 @@ tags:
   - Safety
 ---
 
+<Lead>
 A model card can tell you where a system was evaluated and what it is intended for. It cannot tell you *why* the model produced a particular answer. Mechanistic interpretability aims to open the black box and describe the computations inside — not just the outputs — with the ambition of predicting and controlling behaviour from the mechanism.
+</Lead>
 
-**Direct answer:** Mechanistic interpretability studies the internal components of a neural network — individual neurons, attention heads, and the circuits they form — to explain how a computation is performed. *Toy Models of Superposition* shows why this is hard: networks represent more features than they have dimensions, so a single unit rarely corresponds to one concept. The boundary: the field has produced convincing explanations of specific behaviours in specific models, not a general method for understanding arbitrary large systems.
+<KeyPoint>
+Mechanistic interpretability studies the internal components of a neural network — individual neurons, attention heads, and the circuits they form — to explain how a computation is performed.
+</KeyPoint>
+
+**Direct answer:** *Toy Models of Superposition* shows why this is hard: <Mark>networks represent more features than they have dimensions</Mark>, so a single unit rarely corresponds to one concept. The boundary: the field has produced convincing explanations of specific behaviours in specific models, not <Mark>a general method for understanding arbitrary large systems</Mark>.
 
 ## What a circuit is
 
@@ -21,7 +27,11 @@ Three properties make the goal difficult:
 
 **Superposition.** The toy-model paper shows that a network can store more features than it has dimensions by representing them in overlapping directions. A single neuron may respond to several unrelated features, so reading one unit does not reveal one concept.
 
-**Polysemanticity.** For the same reason, a component's apparent meaning depends on context. A neat one-neuron-one-idea story is usually wrong.
+**Polysemanticity.** For the same reason, a component's apparent meaning depends on context.
+
+<Trap>
+A neat one-neuron-one-idea story is usually wrong.
+</Trap>
 
 **Scale.** A small model may be tractable to analyse; a frontier model has billions of parameters and many layers of interaction.
 
@@ -31,7 +41,7 @@ Three properties make the goal difficult:
 
 **Circuits can be partially reverse-engineered.** Specific behaviours — such as copying a token or completing a pattern — have been traced through small models, showing how attention heads and feed-forward components cooperate.
 
-**Interventions can test hypotheses.** If a proposed circuit is correct, ablating it should change the behaviour in the predicted way. This is the causal test that separates an explanation from a story.
+**Interventions can test hypotheses.** If a proposed circuit is correct, ablating it should change the behaviour in the predicted way. This is <Mark>the causal test that separates an explanation from a story</Mark>.
 
 ## A worked example of an interpretability claim
 
@@ -63,7 +73,11 @@ Three lessons follow:
 
 **It does not yet scale.** A convincing analysis of a small model is not a method for a frontier system. The field is honest about this limitation, which is why it is often framed as research rather than a production control.
 
-The counterargument — that black-box evaluation is enough — is fair for many applications. Interpretability becomes valuable when you need to predict behaviour in novel situations or when a high-stakes decision demands more than a statistical test.
+The counterargument — that black-box evaluation is enough — is fair for many applications.
+
+<PullQuote>
+Interpretability becomes valuable when you need to predict behaviour in novel situations or when a high-stakes decision demands more than a statistical test.
+</PullQuote>
 
 ## A decision test
 

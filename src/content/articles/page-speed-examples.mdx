@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Page speed is often discussed as a single score, which hides the fact that loading, interactivity, and visual stability fail in different ways. A site can paint quickly yet ignore taps, or look stable until an image shifts the layout under the user's finger. Core Web Vitals separate these failure modes into distinct metrics, and that separation is what makes the numbers useful for decisions.
+</Lead>
 
 **Direct answer:** Core Web Vitals are a set of metrics that measure real-world loading, interactivity, and visual stability; the key ones are Largest Contentful Paint, Interaction to Next Paint, and Cumulative Layout Shift. The practical decision is which metric to fix first, based on the user action the page actually supports, rather than on which number looks worst in a lab tool.
 
@@ -17,15 +19,19 @@ Page speed is often discussed as a single score, which hides the fact that loadi
 
 ## The mechanism
 
-Web Vitals is an initiative to give site owners a shared set of measures for real user experience. The Core Web Vitals focus on three things: loading, interactivity, and visual stability. Largest Contentful Paint, or LCP, reports when the largest content element finishes rendering; Cumulative Layout Shift, or CLS, captures unexpected movement of visible elements; and Interaction to Next Paint, or INP, reports responsiveness. The practical consequence is that a team can diagnose the kind of problem before choosing a fix, instead of treating every complaint as a generic need to go faster.
+Web Vitals is an initiative to give site owners a shared set of measures for real user experience. The Core Web Vitals focus on three things: loading, interactivity, and visual stability. Largest Contentful Paint, or LCP, reports when the largest content element finishes rendering; Cumulative Layout Shift, or CLS, captures unexpected movement of visible elements; and Interaction to Next Paint, or INP, reports responsiveness. The practical consequence is that a team can <Mark>diagnose the kind of problem before choosing a fix</Mark>, instead of treating every complaint as a generic need to go faster.
 
   <Figure src="/images/articles/inline/page-speed-examples-1.png" alt="Stacked diagram of three Core Web Vitals: LCP for loading, INP for interactivity, and CLS for visual stability" caption="Conceptual: a single speed score hides three distinct failure modes" />
 
-INP deserves specific attention because it changed what responsiveness means in practice. It measures the latency of user interactions such as clicks, taps, and keyboard input, looking at how long the page takes to respond and paint the next frame. It replaced First Input Delay as a Core Web Vital, moving the focus from the start of processing to the full interaction. The practical consequence is that long tasks blocking the main thread now surface as a user-visible number, so work that delays a handler cannot be hidden behind a fast initial load.
+INP deserves specific attention because it changed what responsiveness means in practice. It measures the latency of user interactions such as clicks, taps, and keyboard input, looking at how long the page takes to respond and paint the next frame. It replaced First Input Delay as a Core Web Vital, moving the focus from the start of processing to the full interaction. The practical consequence is that <Mark>long tasks blocking the main thread</Mark> now surface as a user-visible number, so work that delays a handler cannot be hidden behind a fast initial load.
 
 LCP and CLS translate design choices into timing and stability. LCP is sensitive to slow servers, large images, and render-blocking resources, so it responds to changes in how the primary content is delivered. CLS is driven by elements that move after they appear, such as images without reserved space or ads injected late. The practical consequence is that fixes are concrete: size images, reserve layout space, and prioritize the content element that defines the page's main purpose.
 
 The final piece is how the numbers are read. Web Vitals guidance emphasizes field data from real users and uses a percentile, commonly the 75th, so the reported value reflects a slower experience rather than a fast median. The practical consequence is that optimizing for the aggregate hides the users the page serves worst. A healthy target is one that holds across the distribution, which is why a lab run on a fast machine is a poor substitute for measurement taken from real sessions.
+
+<KeyFigures items={[
+  { value: "75th", label: "percentile commonly used for field data", source: "web.dev, Web Vitals" },
+]} />
 
 ## A worked example
 
@@ -47,13 +53,19 @@ A speed metric does not tell a team what users value. A fast page for a task nob
 
 The hidden cost is the instrumentation and the interpretation. Collecting field data requires a measurement setup, and reading it well requires understanding percentiles, device mix, and the difference between a page load and a later interaction. Teams often optimize the metric that is easiest to move rather than the one that constrains users, because the easy one has an obvious fix. That tendency is expensive: it consumes engineering time while the real bottleneck stays in place, and the dashboard looks better even when the experience does not.
 
-A common failure mode is fixing the lab number. A change that improves a score in a controlled run can leave real users unaffected, because lab conditions exclude the slow devices, cold caches, and network variability that field data captures. The reverse also happens: a genuine improvement can look small in a lab because the baseline there was already favorable. The result is a feedback loop that rewards the wrong work, which is why field measurement is the reference point and lab tools are best used for diagnosis rather than verification.
+<Trap>
+A common failure mode is fixing the lab number.
+</Trap>
+
+A change that improves a score in a controlled run can leave real users unaffected, because lab conditions exclude the slow devices, cold caches, and network variability that field data captures. The reverse also happens: a genuine improvement can look small in a lab because the baseline there was already favorable. The result is a feedback loop that rewards the wrong work, which is why <Mark>field measurement is the reference point</Mark> and lab tools are best used for diagnosis rather than verification.
 
 There is a boundary around what these metrics cover. They address loading, responsiveness, and visual stability, not accessibility, not content quality, and not the business outcome of a visit. A page can pass every vital and still be unusable with a keyboard or confusing to navigate. The source material defines a performance slice of experience, not experience as a whole, so the vitals should be read as one input among several rather than a complete quality score.
 
 Because of these limits the numbers need review in context. Thresholds and guidance can change, and a page's primary interaction can change with a redesign, which alters which vital matters most. A team should revisit the measurement setup when the page changes materially and should pair the vitals with direct evidence about whether users complete their tasks. Without that pairing, the risk is a well-measured page that is fast, stable, and unsuccessful.
 
+<PullQuote>
 Counterargument: the claim that Core Web Vitals are the wrong focus is fair when the bottleneck is content or accessibility, and incomplete when slow loading or delayed input is demonstrably blocking users from completing a task.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +77,11 @@ Counterargument: the claim that Core Web Vitals are the wrong focus is fair when
 6. Remeasure after release and compare against the same percentile and device view.
 7. Revisit the choice of vital whenever the page's primary interaction or layout changes.
 
-These steps convert a speed concern into a bounded investigation. If step one is unclear, there is no basis for choosing which vital to improve, because priority depends on what the page is for. The test keeps the team anchored to real-user measurement and to the interaction that matters, so a number only counts when it reflects something a user actually experiences.
+These steps convert a speed concern into a bounded investigation. If step one is unclear, there is no basis for choosing which vital to improve, because priority depends on what the page is for.
+
+<KeyPoint>
+The test keeps the team anchored to real-user measurement and to the interaction that matters, so a number only counts when it reflects something a user actually experiences.
+</KeyPoint>
 
 For further reading, see [Marketing dashboards without the hype](/articles/marketing-dashboards-without-the-hype).
 

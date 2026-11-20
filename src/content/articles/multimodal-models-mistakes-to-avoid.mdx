@@ -9,11 +9,17 @@ tags:
   - Verified
 ---
 
-Teams add image inputs to language models and then assume their text-only evaluation transfers unchanged. The real problem is that visual understanding is not a simple extension of text behavior: it depends on a separate encoder, a connection to the language model, and the data used to align them. Mistakes cluster around what the model actually sees and how its answers get verified.
+<Lead>
+Teams add image inputs to language models and then assume their text-only evaluation transfers unchanged. The real problem is that <Mark>visual understanding is not a simple extension of text behavior</Mark>: it depends on a separate encoder, a connection to the language model, and the data used to align them. Mistakes cluster around what the model actually sees and how its answers get verified.
+</Lead>
 
-**Direct answer:** Visual instruction tuning links an image encoder to a language model through a learned connector so the combined system can follow image-grounded instructions, while contrastive image-text pretraining learns aligned representations that support zero-shot matching. These are different mechanisms with different failure modes. The bounded consequence is that evaluation must exercise the real image input format rather than relying on text-only benchmarks.
+**Direct answer:** Visual instruction tuning links an image encoder to a language model through a learned connector so the combined system can follow image-grounded instructions, while contrastive image-text pretraining learns aligned representations that support zero-shot matching. These are different mechanisms with different failure modes.
 
 **Delta:** This article adds a decision map beyond the sources: it maps connector and alignment concepts to a pre-deployment checklist decision, with claim status explicit.
+
+<KeyPoint>
+The bounded consequence is that evaluation must exercise the real image input format rather than relying on text-only benchmarks.
+</KeyPoint>
 
 ## The mechanism
 
@@ -23,9 +29,13 @@ Visual instruction tuning, described in the source, generates instruction-follow
 
 Contrastive pretraining, as described in the other source, learns by pulling matching image and text pairs together in a shared embedding space. This supports zero-shot classification and retrieval because a label can be scored against an image without task-specific training. The consequence is that this mechanism is fundamentally about similarity scoring, not about composing an explanatory answer. A system that scores well on retrieval may still produce poor grounded descriptions, so the two capabilities should not be conflated in planning.
 
-A recurring mistake is assuming text-only benchmarks predict multimodal behavior. They do not exercise the encoder, the connector, or the image preprocessing path, so they miss the most common failure points. Evaluation needs paired image and question examples in the same format production will use, including the same image resolution and preprocessing.
+<Mark>A recurring mistake is assuming text-only benchmarks predict multimodal behavior</Mark>. They do not exercise the encoder, the connector, or the image preprocessing path, so they miss the most common failure points. Evaluation needs paired image and question examples in the same format production will use, including the same image resolution and preprocessing.
 
-A second mistake is assuming the model sees fine detail. Encoders compress an image into a limited set of features or tokens, so small text, distant objects, and precise counts can be lost before the language model ever sees them. A third mistake is neglecting the role of instruction data: narrow or misleading tuning examples can produce confident answers that are not supported by the image. Grounding and unsupported-claim checks therefore have to be explicit rather than assumed.
+<Trap>
+A second mistake is assuming the model sees fine detail.
+</Trap>
+
+Encoders compress an image into a limited set of features or tokens, so small text, distant objects, and precise counts can be lost before the language model ever sees them. A third mistake is neglecting the role of instruction data: narrow or misleading tuning examples can produce confident answers that are not supported by the image. Grounding and unsupported-claim checks therefore have to be explicit rather than assumed.
 
 ## A worked example
 
@@ -47,13 +57,15 @@ These systems are not general replacements for supervised, task-specific models.
 
 There is a hidden cost in compute and data. Running an image encoder adds inference expense and latency, and instruction tuning requires generating or curating paired data that is convincing enough to teach the desired behavior. The token budget for visual features also competes with text context, so a longer conversation can push useful visual detail out of the effective input. These costs are easy to miss when a demo uses short prompts and curated images.
 
-A central failure mode is hallucination grounded in language priors rather than pixels. When an image is ambiguous or detail is lost, the language model can fill the gap with a plausible but unsupported answer, delivered in the same confident tone as a correct one. Systems are also sensitive to phrasing and to distribution shift: an image style unlike the training data can degrade performance without any obvious warning signal.
+A central failure mode is hallucination grounded in language priors rather than pixels. When an image is ambiguous or detail is lost, <Mark>the language model can fill the gap with a plausible but unsupported answer, delivered in the same confident tone as a correct one</Mark>. Systems are also sensitive to phrasing and to distribution shift: an image style unlike the training data can degrade performance without any obvious warning signal.
 
 The boundary matters for high-stakes use. Multimodal models should not be the sole basis for decisions where an unsupported detail causes harm, and they are weak at precise measurement, fine print, and exact counts. They also depend on preprocessing choices that are invisible to end users, so a change in image resizing can alter outcomes without any model change being made.
 
 Ongoing review is required. Evaluation sets, prompt formats, and preprocessing steps must be rechecked whenever the model or pipeline changes, because earlier results stop being valid. Model cards and usage notes should be read for known limitations, and any claim of improvement should be tested on the team's own image distribution before it is accepted.
 
-Counterargument: "The counterargument that vision-language models are fair for broad image grounding is incomplete for fine-grained reading and high-stakes decisions, where unverified detail can matter more than fluent answers."
+<PullQuote>
+The counterargument that vision-language models are fair for broad image grounding is incomplete for fine-grained reading and high-stakes decisions, where unverified detail can matter more than fluent answers.
+</PullQuote>
 
 ## A decision test
 
