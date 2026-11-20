@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 }
 ?>
-<li <?php post_class( 'product-card' ); ?>>
+<li <?php post_class( 'product-card' ); ?> data-reveal>
 	<a class="product-card__link" href="<?php the_permalink(); ?>">
 		<span class="product-card__image">
 			<?php

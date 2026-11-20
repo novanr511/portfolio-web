@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<article <?php post_class( 'post-card' ); ?>>
+<article <?php post_class( 'post-card' ); ?> data-reveal>
 	<?php if ( has_post_thumbnail() ) : ?>
 		<a class="post-card__thumb" href="<?php the_permalink(); ?>">
 			<?php the_post_thumbnail( 'medium_large', array( 'loading' => 'lazy' ) ); ?>

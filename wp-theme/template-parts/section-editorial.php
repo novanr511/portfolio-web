@@ -12,8 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $novan_editorial = novan_editorial();
 ?>
 <section class="editorial" aria-labelledby="editorial-title">
-	<div class="editorial__media">
+	<div class="editorial__media" data-reveal="zoom">
 		<img
+			data-parallax
 			src="<?php echo novan_image_url( 'editorial_image', 'editorial-story.webp' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"
 			alt="<?php esc_attr_e( 'Editorial portrait of three women in sage and rust outfits', 'novan-base' ); ?>"
 			width="1536"
@@ -23,7 +24,7 @@ $novan_editorial = novan_editorial();
 		>
 	</div>
 
-	<div class="editorial__content">
+	<div class="editorial__content" data-reveal="fade">
 		<p class="eyebrow"><?php echo esc_html( $novan_editorial['eyebrow'] ); ?></p>
 		<h2 id="editorial-title"><?php echo esc_html( $novan_editorial['title'] ); ?></h2>
 		<p><?php echo esc_html( $novan_editorial['text'] ); ?></p>

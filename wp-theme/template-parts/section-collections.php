@@ -13,12 +13,12 @@ $novan_items = novan_collections();
 ?>
 <section class="collections" id="collections" aria-labelledby="collections-title">
 	<div class="section-heading">
-		<div>
+		<div data-reveal>
 			<p class="eyebrow"><?php esc_html_e( 'Curated for you', 'novan-base' ); ?></p>
 			<h2 id="collections-title"><?php esc_html_e( 'Discover signature collections', 'novan-base' ); ?></h2>
 		</div>
 
-		<div class="carousel-controls">
+		<div class="carousel-controls" data-reveal data-reveal-delay="120ms">
 			<button class="carousel-button" type="button" data-carousel="prev" aria-label="<?php esc_attr_e( 'Previous collections', 'novan-base' ); ?>">
 				<?php echo novan_arrow_icon( 'left' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</button>
@@ -36,7 +36,7 @@ $novan_items = novan_collections();
 		tabindex="0"
 	>
 		<?php foreach ( $novan_items as $novan_item ) : ?>
-			<article class="collection-card">
+			<article class="collection-card" data-reveal>
 				<a class="collection-card__link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>">
 					<img
 						class="collection-card__image"

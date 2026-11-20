@@ -13,11 +13,11 @@ $novan_hero = novan_hero();
 ?>
 <section class="hero" aria-labelledby="hero-title">
 	<div class="hero__content">
-		<p class="eyebrow"><?php echo esc_html( $novan_hero['eyebrow'] ); ?></p>
-		<h1 id="hero-title"><?php echo esc_html( $novan_hero['title'] ); ?></h1>
-		<p class="hero__text"><?php echo esc_html( $novan_hero['text'] ); ?></p>
+		<p class="eyebrow" data-reveal data-reveal-delay="80ms"><?php echo esc_html( $novan_hero['eyebrow'] ); ?></p>
+		<h1 id="hero-title" data-reveal data-reveal-delay="160ms"><?php echo esc_html( $novan_hero['title'] ); ?></h1>
+		<p class="hero__text" data-reveal data-reveal-delay="240ms"><?php echo esc_html( $novan_hero['text'] ); ?></p>
 
-		<div class="hero__actions">
+		<div class="hero__actions" data-reveal data-reveal-delay="320ms">
 			<a class="button button--solid" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ) ); ?>">
 				<?php esc_html_e( 'Shop now', 'novan-base' ); ?>
 				<?php echo novan_arrow_icon( 'up-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

@@ -18,7 +18,7 @@ while ( have_posts() ) :
 	$novan_category   = ! empty( $novan_categories ) ? $novan_categories[0]->name : __( 'Journal', 'novan-base' );
 	?>
 	<article <?php post_class( 'article' ); ?>>
-		<header class="article__header">
+		<header class="article__header" data-reveal>
 			<p class="eyebrow"><?php echo esc_html( $novan_category ); ?></p>
 			<h1><?php the_title(); ?></h1>
 			<div class="article__meta">
@@ -29,12 +29,12 @@ while ( have_posts() ) :
 		</header>
 
 		<?php if ( has_post_thumbnail() ) : ?>
-			<div class="article__hero">
+			<div class="article__hero" data-reveal="zoom">
 				<?php the_post_thumbnail( 'novan-article', array( 'fetchpriority' => 'high' ) ); ?>
 			</div>
 		<?php endif; ?>
 
-		<div class="article__body">
+		<div class="article__body" data-reveal="fade">
 			<?php
 			the_content();
 			wp_link_pages(

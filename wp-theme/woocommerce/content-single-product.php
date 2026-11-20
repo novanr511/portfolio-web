@@ -20,7 +20,7 @@ $novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0
 ?>
 
 <div class="product-single">
-	<div class="product-single__gallery">
+	<div class="product-single__gallery" data-reveal="zoom">
 		<?php
 		if ( has_post_thumbnail() ) {
 			the_post_thumbnail( 'woocommerce_single', array( 'fetchpriority' => 'high' ) );
@@ -37,7 +37,7 @@ $novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0
 		<?php endif; ?>
 	</div>
 
-	<div class="product-single__info">
+	<div class="product-single__info" data-reveal="fade">
 		<p class="eyebrow"><?php echo esc_html( $novan_cat ); ?></p>
 		<h1 class="product-single__title"><?php the_title(); ?></h1>
 

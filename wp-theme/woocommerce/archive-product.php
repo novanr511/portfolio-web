@@ -13,7 +13,7 @@ get_header();
 ?>
 
 <section class="shop-hero" aria-labelledby="shop-title">
-	<div class="shop-hero__inner">
+	<div class="shop-hero__inner" data-reveal>
 		<p class="eyebrow"><?php esc_html_e( 'The Collection', 'novan-base' ); ?></p>
 		<h1 id="shop-title"><?php echo esc_html( woocommerce_page_title( false ) ); ?></h1>
 		<p class="shop-hero__text">

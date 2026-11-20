@@ -14,13 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<footer class="site-footer">
 		<section class="newsletter" aria-labelledby="newsletter-title">
 			<div class="newsletter__inner">
-				<div class="newsletter__copy">
+				<div class="newsletter__copy" data-reveal>
 					<p class="eyebrow"><?php esc_html_e( 'Stay in the loop', 'novan-base' ); ?></p>
 					<h2 id="newsletter-title"><?php esc_html_e( 'Join the collective.', 'novan-base' ); ?></h2>
 					<p><?php esc_html_e( 'Be first to know about new collections, stories, and considered essentials.', 'novan-base' ); ?></p>
 				</div>
 
-				<form class="newsletter__form" data-newsletter-form>
+				<form class="newsletter__form" data-newsletter-form data-reveal data-reveal-delay="120ms">
 					<label class="screen-reader-text" for="newsletter-email"><?php esc_html_e( 'Email address', 'novan-base' ); ?></label>
 					<input
 						id="newsletter-email"
@@ -62,6 +62,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 		</div>
 	</footer>
+
+	<button class="back-to-top" type="button" data-back-to-top aria-label="<?php esc_attr_e( 'Back to top', 'novan-base' ); ?>">
+		<?php echo novan_arrow_icon( 'up-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	</button>
 
 	<?php wp_footer(); ?>
 </body>

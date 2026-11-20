@@ -14,7 +14,7 @@ get_header();
 $novan_term = get_queried_object();
 ?>
 
-<section class="archive-hero" aria-labelledby="archive-title">
+<section class="archive-hero" aria-labelledby="archive-title" data-reveal>
 	<p class="eyebrow"><?php esc_html_e( 'The Journal', 'novan-base' ); ?></p>
 	<h1 id="archive-title"><?php single_cat_title(); ?></h1>
 	<?php if ( $novan_term && ! empty( $novan_term->description ) ) : ?>
