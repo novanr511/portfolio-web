@@ -9,13 +9,15 @@ tags:
   - Decision Guide
 ---
 
+<Lead>
 A conventional model answers immediately. A reasoning model produces intermediate steps before its final answer, spending more compute and time on hard problems. That difference is useful on some tasks and wasteful on others, which makes "should we use one?" a question about the task rather than about which model is smarter.
+</Lead>
 
 **Direct answer:** Reasoning models generate a chain of intermediate steps before answering — a behaviour studied in Chain-of-Thought prompting, where generating reasoning steps improved performance on reasoning tasks. Current APIs expose reasoning effort as a control: OpenAI lists levels from low to max for GPT-6 models. The boundary: extra reasoning helps when a task genuinely requires multi-step logic and hurts when the task is simple classification or extraction — it adds latency and token cost without improving the answer.
 
 ## What the extra compute buys
 
-The mechanism is visible in the Chain-of-Thought paper: asking a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. The steps are not decoration; they give the model a place to work through dependencies before committing to an answer.
+The mechanism is visible in the Chain-of-Thought paper: asking a model to produce intermediate reasoning steps improves performance on arithmetic, commonsense, and symbolic tasks. <Mark>The steps are not decoration</Mark>; they give the model a place to work through dependencies before committing to an answer.
 
 Three consequences follow:
 
@@ -35,13 +37,22 @@ Three consequences follow:
 
 ## Where it does not
 
-**Classification and extraction.** Labelling a ticket or pulling a date from a document does not benefit from a long chain of thought. The extra tokens are cost without quality.
+**Classification and extraction.** Labelling a ticket or pulling a date from a document does not benefit from a long chain of thought. The extra tokens are <Mark>cost without quality</Mark>.
 
 **High-volume, low-stakes requests.** At a million requests a month, a small per-request increase in output tokens becomes a large bill, as the cost estimator shows.
 
 **Latency-critical interfaces.** A user waiting for a chat reply experiences the extra seconds as a worse product, even if the answer is marginally better.
 
-A practical rule: use reasoning where the value of a correct answer is high and the volume is low; use a standard model where the task is simple and volume is high. The routing article shows how to combine both.
+<KeyPoint>
+A practical rule: use reasoning where the value of a correct answer is high and the volume is low; use a standard model where the task is simple and volume is high.
+</KeyPoint>
+
+The routing article shows how to combine both.
+
+<KeyFigures items={[
+  { value: "$10", label: "per million input tokens for GPT-6 Astra", source: "OpenAI, Models | OpenAI API" },
+  { value: "$50", label: "per million output tokens for GPT-6 Astra", source: "OpenAI, Models | OpenAI API" },
+]} />
 
 ## A worked example of the trade-off
 
@@ -58,17 +69,27 @@ Three times the cost per request. At 10,000 reviews a month, that is $550 versus
 2. **Can a cheaper tier do the standard mode?** If GPT-6.1 Sol handles the non-reasoning path acceptably, the baseline cost drops further.
 3. **Is latency acceptable?** A reasoning trace may take several seconds longer. In an interactive tool, that changes the product.
 
-The lesson is not that reasoning is worth it or not. It is that the decision has explicit inputs — error cost, volume, latency — and should be made with them.
+The lesson is not that reasoning is worth it or not. It is that the decision has <Mark>explicit inputs</Mark> — error cost, volume, latency — and should be made with them.
 
 ## What reasoning does not guarantee
 
-**More steps are not always better.** A model can reason at length and still reach a wrong answer. The evaluation set, not the length of the trace, is the evidence.
+**More steps are not always better.**
+
+<Trap>
+A model can reason at length and still reach a wrong answer.
+</Trap>
+
+The evaluation set, not the length of the trace, is the evidence.
 
 **Visible steps are not a faithful explanation.** Research on interpretability distinguishes a model's stated reasoning from the process that produced the answer. Treat the trace as an artefact, not a window into certainty.
 
 **Reasoning does not fix missing knowledge.** If the retrieved context lacks the facts, extra reasoning elaborates the gap. Retrieval quality still dominates.
 
-The counterargument — that reasoning models make prompt engineering obsolete — is wrong in direction. Clear instructions still matter; reasoning changes what happens after them.
+The counterargument — that reasoning models make prompt engineering obsolete — is wrong in direction.
+
+<PullQuote>
+Clear instructions still matter; reasoning changes what happens after them.
+</PullQuote>
 
 ## A decision test
 

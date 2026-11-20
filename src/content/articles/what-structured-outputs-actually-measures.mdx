@@ -9,21 +9,29 @@ tags:
   - Verified
 ---
 
+<Lead>
 A response that parses cleanly feels trustworthy, which is why teams treat structured outputs as an accuracy guarantee. The OpenAI guide describes generation constrained to a supplied schema, and the Anthropic guide describes tool calls whose input must match a declared schema. The real problem is that format validity and value correctness are different properties, and only one is guaranteed by the interface.
+</Lead>
 
-**Direct answer:** Structured outputs measure whether a model's response conforms to a declared schema or tool input shape. They do not measure whether the values are true. Evaluate schema validity separately from value correctness, and validate tool inputs at the application boundary before executing them.
+**Direct answer:**
+
+<KeyPoint>
+Structured outputs measure whether a model's response conforms to a declared schema or tool input shape.
+</KeyPoint>
+
+They do not measure whether the values are true. Evaluate schema validity separately from value correctness, and validate tool inputs at the application boundary before executing them.
 
 **Delta:** This article adds a validation boundary beyond the sources: it maps schema conformance to a review decision, with claim status explicit.
 
 ## The mechanism
 
-The OpenAI guide describes structured outputs as generation constrained to a provided JSON schema. Within the supported subset of schema features, the model's output is guaranteed to match the declared structure, which removes a whole class of parsing failures and retry loops. The practical consequence is that an application can rely on types, required fields, and enumerations being present. What the constraint does not do is check meaning. A field can satisfy its type and still carry a wrong value, so a conformant response is a valid shape, not a correct answer.
+The OpenAI guide describes structured outputs as generation constrained to a provided JSON schema. Within the supported subset of schema features, the model's output is guaranteed to match the declared structure, which removes a whole class of parsing failures and retry loops. The practical consequence is that an application can rely on types, required fields, and enumerations being present. What the constraint does not do is check meaning. A field can satisfy its type and still carry a wrong value, so <Mark>a conformant response is a valid shape, not a correct answer</Mark>.
 
 <Figure src="/images/articles/inline/what-structured-outputs-actually-measures-1.png" alt="Two properties compared: schema conformance with types, required fields, and enums versus value correctness covering truth and safe tool input." caption="Conceptual: a guaranteed shape is not a checked value." />
 
 The Anthropic guide describes tool use as the model emitting a tool call whose input matches a schema the caller declared. The model selects a tool and supplies arguments; the client executes the call and returns the result. The guide makes validation the caller's responsibility: a well-formed call is an input to the application, not a command that must be trusted. The practical consequence is that the schema functions as a contract at a boundary. The application owns checking the values, handling errors, and deciding what a tool call is allowed to do.
 
-Both sources therefore define shape, not truth. A guaranteed schema answers whether the output is parseable; it says nothing about whether an extracted date is the date in the document or whether a tool call should be executed at all. The decision a team faces is what to validate beyond the format. Neither source supplies an accuracy metric for the values, and neither claims that valid structure implies correct content. Adding a separate value check is a local design choice.
+<Mark>Both sources therefore define shape, not truth</Mark>. A guaranteed schema answers whether the output is parseable; it says nothing about whether an extracted date is the date in the document or whether a tool call should be executed at all. The decision a team faces is what to validate beyond the format. Neither source supplies an accuracy metric for the values, and neither claims that valid structure implies correct content. Adding a separate value check is a local design choice.
 
 That separation is marked as inferred below because it is a conclusion about how to use the two interfaces, not a statement either makes. It matters because the guarantee is real and easy to over-extend. A team that sees guaranteed schema compliance and removes its content checks has traded a visible validation step for an invisible assumption. Keeping the inference explicit makes the assumption reviewable, and it gives a reviewer a place to ask what would catch a plausible but wrong value.
 
@@ -45,15 +53,21 @@ The first two rows report interface guarantees described in the docs. The third 
 
 Schema conformance is not factual correctness. Constrained decoding can guarantee that a field is a string of the right form and cannot guarantee that the string is true. The OpenAI guide also limits the guarantee to a supported subset of schema features, so a complex schema may be rejected or produce a refusal. The Anthropic guide likewise describes tool input that must match a declared schema, but a syntactically valid argument can still be semantically wrong. The limit is structural: the interface controls the shape of the output, not its relationship to the world.
 
-Schemas are a maintenance obligation. As an application's needs change, the schema must be revised, and every revision can affect how the model fills fields. Strict schemas can force a refusal when the model cannot satisfy a constraint, which turns a formatting win into a failed response. Validation code remains necessary even when structure is guaranteed, because the values still need checking. The hidden cost is that structured outputs remove one guardrail while quietly requiring another, and teams that delete the old one without building the new one end up less protected.
+Schemas are a maintenance obligation. As an application's needs change, the schema must be revised, and every revision can affect how the model fills fields. Strict schemas can force a refusal when the model cannot satisfy a constraint, which turns a formatting win into a failed response. Validation code remains necessary even when structure is guaranteed, because the values still need checking. The hidden cost is that <Mark>structured outputs remove one guardrail while quietly requiring another</Mark>, and teams that delete the old one without building the new one end up less protected.
 
-The main failure mode is treating a valid object as ground truth. Downstream systems consume the parsed record as if it were verified data, and an error propagates silently because nothing in the pipeline expects it. For tool use, the analogous failure is executing a valid-looking call without checking whether it should be executed: a well-formed argument can still request an unsafe action. Prompt injection makes this worse, because an attacker can aim for valid structure with hostile content. The format check passes exactly when the content is most worth inspecting.
+<Trap>
+The main failure mode is treating a valid object as ground truth.
+</Trap>
+
+Downstream systems consume the parsed record as if it were verified data, and an error propagates silently because nothing in the pipeline expects it. For tool use, the analogous failure is executing a valid-looking call without checking whether it should be executed: a well-formed argument can still request an unsafe action. Prompt injection makes this worse, because an attacker can aim for valid structure with hostile content. The format check passes exactly when the content is most worth inspecting.
 
 There is a boundary around what validation can cover. A schema can encode types and constraints, but it cannot encode every business rule, and a rule that is not encoded will not be enforced by generation. Structured outputs do not validate external data, do not confirm that a tool's effect is safe, and do not establish that a response is grounded in the source material. Those checks live in the application. The interface supplies a reliable shape; the application supplies the meaning, and confusing the two is what turns a format guarantee into a false sense of assurance.
 
 Because model behaviour and schema support evolve, the practice needs a review condition. A field that was reliably filled in one model version can fail in another, and a schema feature once unsupported may become available. Recheck the supported subset when the API changes and recheck value fidelity when the model or prompt changes. Record the schema version and the validation date with each evaluation so a future reviewer can tell which guarantee was in force. Without that record, a regression looks like a random error rather than a change with a cause.
 
+<PullQuote>
 Counterargument: "The counterargument that guaranteed schemas remove parsing work is fair for shape and incomplete where correctness and safety depend on the values."
+</PullQuote>
 
 ## A decision test
 

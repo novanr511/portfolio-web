@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Direct preference optimisation is often described as making a model safer, which overstates what the method measures. The DPO paper describes optimising against preference pairs, and the NIST AI RMF frames trustworthiness across governance and measurement. The question is what a preference dataset actually captures.
+<Lead>
+Direct preference optimisation is often described as making a model safer, which overstates what the method measures. The DPO paper describes optimising against preference pairs, and the NIST AI RMF frames trustworthiness across governance and measurement. The question is <Mark>what a preference dataset actually captures</Mark>.
+</Lead>
 
-**Direct answer:** Treat DPO as a method for aligning a model with a specific preference dataset, then evaluate the behaviour that matters outside that dataset. The sources describe the method and the frame; the evaluation rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Treat DPO as a method for aligning a model with a specific preference dataset, then evaluate the behaviour that matters outside that dataset.
+</KeyPoint>
+
+The sources describe the method and the frame; the evaluation rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented method from local judgements about what preferences represent.
 
@@ -45,13 +53,17 @@ The outcome is a qualified assessment rather than a win rate. The scenario is hy
 
 ## Why a better score is not a better assistant
 
-A preference score measures agreement with a set of labels. If the labels encode a narrow view of good behaviour, a higher score means the model has become more narrowly compliant, which is not the same as more useful or safer in general.
+A preference score <Mark>measures agreement with a set of labels</Mark>. If the labels encode a narrow view of good behaviour, a higher score means the model has become more narrowly compliant, which is not the same as more useful or safer in general.
 
 A further issue is that preference data is expensive to refresh, and a model aligned to last year's preferences may not match current expectations. Recording when the data was collected gives a review condition that a score alone cannot provide.
 
-The method also interacts with the base model. A change in the underlying model can alter how a preference dataset affects behaviour, which means an evaluation should be repeated after an upgrade. Assuming that the same training data guarantees the same result is a mistake the record should prevent.
+The method also interacts with the base model. A change in the underlying model can alter how a preference dataset affects behaviour, which means an evaluation should be repeated after an upgrade.
 
-Finally, preference optimisation says little about factual accuracy. A model can be trained to give answers people prefer while being wrong, and the two qualities need separate tests. Treating a preference win as a correctness result is the error this article exists to correct.
+<Trap>
+Assuming that the same training data guarantees the same result is a mistake the record should prevent.
+</Trap>
+
+Finally, preference optimisation says little about factual accuracy. A model can be trained to <Mark>give answers people prefer while being wrong</Mark>, and the two qualities need separate tests. Treating a preference win as a correctness result is the error this article exists to correct.
 
 A preference score should be reported with the dataset it came from, since a different set of labels could produce a different conclusion.
 
@@ -61,7 +73,9 @@ Correctness and preference deserve separate tests, since one does not imply the 
 
 It cannot create values that are absent from the data. It does not guarantee that a preference generalises. And it cannot replace evaluation in real conditions.
 
+<PullQuote>
 The counterargument that a preference-optimised model is aligned is fair relative to the dataset and incomplete beyond it.
+</PullQuote>
 
 ## A decision test
 

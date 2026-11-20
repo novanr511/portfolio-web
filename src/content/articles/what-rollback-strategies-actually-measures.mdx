@@ -9,15 +9,23 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often treat a rollback plan as a safety net and assume that having one means a failed release is harmless. In practice, the word rollback covers several distinct mechanisms that measure different things, from undoing a database transaction to reverting a deployed binary. Conflating them hides which failure is actually being contained and which risk remains open.
+</Lead>
 
-**Direct answer:** A rollback strategy measures the system's capacity to return to a known good state after a change, not the quality of the change itself. It is bounded by what can be reversed: code and configuration are often cheap to revert, while committed data and external side effects are not. The useful question is which state the rollback restores and how quickly it gets there.
+**Direct answer:**
+
+<KeyPoint>
+A rollback strategy measures the system's capacity to return to a known good state after a change, not the quality of the change itself.
+</KeyPoint>
+
+It is bounded by what can be reversed: code and configuration are often cheap to revert, while committed data and external side effects are not. The useful question is which state the rollback restores and how quickly it gets there.
 
 **Delta:** This article adds a decision map beyond the sources: it maps rollback mechanisms to release decisions, with claim status explicit.
 
 ## The mechanism
 
-At the data layer, a rollback is a recovery operation that returns a database to a previously consistent state by undoing the effects of a transaction or a set of transactions. The key idea from the reference treatment of rollback in data management is that a rollback is defined relative to a boundary: it restores a state known to be valid before the problematic change. That boundary matters because it determines what "back" means. A transaction rollback undoes work that has not been committed, while recovering from a committed but harmful change requires a compensating action rather than a simple undo.
+At the data layer, a rollback is a recovery operation that returns a database to a previously consistent state by undoing the effects of a transaction or a set of transactions. The key idea from the reference treatment of rollback in data management is that a rollback is defined relative to a boundary: <Mark>it restores a state known to be valid before the problematic change</Mark>. That boundary matters because it determines what "back" means. A transaction rollback undoes work that has not been committed, while recovering from a committed but harmful change requires a compensating action rather than a simple undo.
 
 <Figure src="/images/articles/inline/what-rollback-strategies-actually-measures-1.png" alt="A stack of rollback layers: a canary bounding the affected population, a feature toggle disabling exposure without redeploy, and a transaction rollback restoring prior state." caption="Conceptual: the least reversible layer sets the effective rollback time." />
 
@@ -25,7 +33,7 @@ At the release layer, the sources on feature toggles and canary releases describ
 
 The practical consequence is that rollback is not one measurement but several. A database rollback measures consistency restoration. A toggle measures the ability to disable exposure without redeploying. A canary measures the size of the affected population before a defect is detected. A team that claims reversibility should be able to name which of these it means, because each carries a different cost and a different failure mode.
 
-Seen this way, a rollback strategy is best understood as a claim about reversibility under specific conditions. The claim is only as strong as the slowest or least reversible layer in the chain. If code can be reverted in minutes but a committed migration cannot, the effective rollback time is governed by the migration, not the code. Mapping the mechanism to the decision means asking what state must be recovered and whether every layer in the path can actually reach it.
+Seen this way, a rollback strategy is best understood as a claim about reversibility under specific conditions. <Mark>The claim is only as strong as the slowest or least reversible layer in the chain</Mark>. If code can be reverted in minutes but a committed migration cannot, the effective rollback time is governed by the migration, not the code. Mapping the mechanism to the decision means asking what state must be recovered and whether every layer in the path can actually reach it.
 
 ## A worked example
 
@@ -43,17 +51,23 @@ The first two claims are reported directly by the reference entries and can be r
 
 ## What it cannot do
 
-A rollback strategy cannot undo consequences that have already escaped the system. Once a message is sent to a customer, an invoice is issued, or a third-party API is called, reverting local state does not retract the external effect. The sources describe rollback as a restoration of a prior state, but a prior state is only meaningful within a boundary the system controls. Anything outside that boundary is a side effect a rollback cannot reach, and treating it as reversible is the most common conceptual error in rollback planning.
+A rollback strategy cannot undo consequences that have already escaped the system. Once a message is sent to a customer, an invoice is issued, or a third-party API is called, reverting local state does not retract the external effect. The sources describe rollback as a restoration of a prior state, but a prior state is only meaningful within a boundary the system controls.
+
+<Trap>
+Anything outside that boundary is a side effect a rollback cannot reach, and treating it as reversible is the most common conceptual error in rollback planning.
+</Trap>
 
 There is also a hidden cost that the word rollback tends to conceal: designing for reversibility is not free. Feature toggles add branches that must be maintained and eventually removed, or they become permanent complexity. Canary releases require traffic splitting, monitoring, and a defined metric that signals when to stop, none of which are automatic. Transaction rollbacks require careful boundaries so that a long unit of work does not hold locks or accumulate effort that must be discarded. The cost is paid continuously, not only when a rollback is executed.
 
-A distinct failure mode is the rollback that succeeds technically but fails operationally. A deployment can be reverted while the data it wrote remains in a newer shape, leaving a mixed state that no single version understands. This is why the least reversible layer governs the real outcome. A team that measures rollback success only by the redeploy command's return code will miss the case where the application is old but the data is new. Detecting that requires checking state, not just process completion.
+A distinct failure mode is the rollback that succeeds technically but fails operationally. A deployment can be reverted while the data it wrote remains in a newer shape, leaving a mixed state that no single version understands. This is why the least reversible layer governs the real outcome. A team that measures rollback success only by the redeploy command's return code will miss the case where the application is old but the data is new. <Mark>Detecting that requires checking state, not just process completion</Mark>.
 
 The boundary of the strategy is also a boundary of the evidence. The reference material describes mechanisms and their purposes; it does not prescribe a particular rollback design for a given system. Any claim about how long a rollback takes in a specific architecture is therefore an inference that must be validated locally. The framework here can tell a team which questions to ask, but it cannot answer them without knowledge of the actual data flows, external integrations, and monitoring in place.
 
 For that reason, a rollback plan needs regular review rather than one-time approval. Toggles accumulate, schemas evolve, and traffic patterns change, each of which can invalidate an earlier assumption about what is reversible. A plan that was accurate at launch may be wrong a quarter later, not because the code changed dramatically but because the surrounding system drifted. Review should focus on the boundary questions: what state is restored, which side effects are unreachable, and which layer now sets the effective rollback time.
 
+<PullQuote>
 Counterargument: "The counterargument that a rollback strategy is still useful when partial is fair for limiting blast radius and incomplete for guaranteeing full recovery: it reduces exposure without restoring every affected state."
+</PullQuote>
 
 ## A decision test
 

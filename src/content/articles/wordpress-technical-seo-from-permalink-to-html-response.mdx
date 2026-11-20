@@ -9,7 +9,9 @@ tags:
   - Performance
 ---
 
+<Lead>
 WordPress powers a massive fraction of the web, but its architectural flexibility can be a double-edged sword. Beneath its user-friendly administrative dashboard lies an intricate chain of web server rewrite rules, PHP execution hooks, database query loops, and template rendering engines.
+</Lead>
 
 When an SEO issue occurs on WordPress—such as unexpected 404 errors on pagination, duplicate meta tags, or slow Time to First Byte (TTFB)—non-technical practitioners often resort to blunt workarounds like randomly toggling plugins.
 
@@ -50,7 +52,9 @@ The WordPress Request & Rendering Flow
      └── Streams HTTP 200 response and HTML document back to client
 ```
 
+<KeyPoint>
 When a request fails, identifying whether the failure occurred at Step 1 (server configuration), Step 3 (rewrite rule parsing), or Step 4 (template hook conflict) immediately cuts debugging time in half.
+</KeyPoint>
 
 For the fundamental separation between proxy servers and application runtimes, see [Web Server vs Application Server: Where SEO Errors Begin](/articles/web-server-vs-application-server-where-seo-errors-begin).
 
@@ -76,7 +80,7 @@ location ~ \.php$ {
 }
 ```
 
-If `$args` is omitted from `/index.php?$args`, internal query parameters (including search queries and pagination parameters) will silently fail to reach WordPress, causing unpredictable redirects or empty archives.
+If `$args` is omitted from `/index.php?$args`, internal query parameters (including search queries and pagination parameters) will <Mark>silently fail to reach WordPress</Mark>, causing unpredictable redirects or empty archives.
 
 ### The Rewrite Rule Option Bloat
 WordPress stores compiled regex patterns for URL routing in a single database record: the `rewrite_rules` option inside the `wp_options` table.
@@ -109,7 +113,11 @@ Action Hook wp_head() Execution Order
 
 ## 4. Database Queries and TTFB Bottlenecks
 
-A frequent cause of crawler throttling on WordPress sites is high Time to First Byte (TTFB). When Googlebot encounters server response times exceeding 1,000ms, it scales down crawl velocity.
+A frequent cause of crawler throttling on WordPress sites is high Time to First Byte (TTFB). When Googlebot encounters server response times exceeding 1,000ms, it <Mark>scales down crawl velocity</Mark>.
+
+<KeyFigures items={[
+  { value: "1,000ms", label: "server response time at which Googlebot scales down crawl velocity", source: "Google" },
+]} />
 
 ### Root Cause 1: Bloated `autoload` Options
 On every single web request, WordPress executes this database query before processing plugins:
@@ -118,7 +126,9 @@ On every single web request, WordPress executes this database query before proce
 SELECT option_name, option_value FROM wp_options WHERE autoload = 'yes';
 ```
 
+<Trap>
 If poorly coded plugins store transient caches, error logs, or massive serialized arrays with `autoload = 'yes'`, this single query can load 20MB+ of data into PHP memory on every execution, causing severe CPU spikes.
+</Trap>
 
 **Inspection Query:**
 ```sql
@@ -178,11 +188,17 @@ To understand how web server architectures influence crawling performance, read 
 
 ## A worked example
 
-The following is hypothetical and illustrative. A content site reports two symptoms: paginated archive URLs returning 404 after a plugin update, and a Time to First Byte that climbs past 1,000ms so crawl velocity drops. First, isolate the web server rewrite tier: inspect the raw status code with curl and confirm the Nginx location block preserves query arguments, since a missing $args silently drops pagination parameters and produces 404s; consult RFC 9110 for what the status code actually means. Second, inspect the wp_head tier in the raw HTML for duplicate canonical tags or a stray noindex, because conflicting head signals are a hook conflict, not a routing fault. Third, profile the database tier using Query Monitor on staging to size autoloaded options in wp_options before blaming a slow query. The bounded outcome is a single controlled reproduction on staging: flush permalinks, reconcile the head hooks, and trim autoloaded options, then recheck. Note that the DevTools network panel shows what the browser sees and Google's crawler documentation describes rendering as a separate queue, so the verification must confirm what the crawler receives, not only what a local browser renders.
+The following is hypothetical and illustrative. A content site reports two symptoms: paginated archive URLs returning 404 after a plugin update, and a Time to First Byte that climbs past 1,000ms so crawl velocity drops. First, isolate the web server rewrite tier: inspect the raw status code with curl and confirm the Nginx location block preserves query arguments, since a missing $args silently drops pagination parameters and produces 404s; consult RFC 9110 for what the status code actually means. Second, inspect the wp_head tier in the raw HTML for duplicate canonical tags or a stray noindex, because conflicting head signals are <Mark>a hook conflict, not a routing fault</Mark>. Third, profile the database tier using Query Monitor on staging to size autoloaded options in wp_options before blaming a slow query. The bounded outcome is a single controlled reproduction on staging: flush permalinks, reconcile the head hooks, and trim autoloaded options, then recheck. Note that the DevTools network panel shows what the browser sees and Google's crawler documentation describes rendering as a separate queue, so the verification must confirm what the crawler receives, not only what a local browser renders.
 
 ## A counterargument
 
-The tiered model turns vague symptoms into locatable faults, but it assumes every anomaly is deterministic and reproducible inside the stack described here. The sources it leans on point outward: Google's crawler documentation covers rendering and indexing as processes outside a site owner's control, and the DevTools network panel reports what the browser sees, not what a search engine's render queue does with the response. A slow TTFB treated as a database fault can equally be a crawl-velocity decision on Google's side, since the 1,000ms threshold is a policy of the consumer, not the server. The dismissal of plugin-by-plugin disabling is not always fair either, since bugs that surface only under a specific plugin combination are exactly what a clean staging run with the default theme will miss.
+The tiered model turns vague symptoms into locatable faults, but it assumes every anomaly is deterministic and reproducible inside the stack described here. The sources it leans on point outward: Google's crawler documentation covers rendering and indexing as processes outside a site owner's control, and the DevTools network panel reports what the browser sees, not what a search engine's render queue does with the response.
+
+<PullQuote>
+A slow TTFB treated as a database fault can equally be a crawl-velocity decision on Google's side, since the 1,000ms threshold is a policy of the consumer, not the server.
+</PullQuote>
+
+The dismissal of plugin-by-plugin disabling is not always fair either, since bugs that surface only under a specific plugin combination are exactly what a clean staging run with the default theme will miss.
 
 ## References & Further Reading
 

@@ -9,15 +9,23 @@ tags:
   - Analytics
 ---
 
+<Lead>
 Teams respond to disappointing model performance by changing the model. Sometimes that is right, and more often the ceiling was set upstream: the target was defined inconsistently, a field means something different in two systems, or the label arrives after the prediction moment. No architecture recovers information that was never correctly recorded.
+</Lead>
 
-**Direct answer:** Model quality is bounded by the quality of the target and features, and the most damaging data problems are semantic rather than technical — a label that does not mean what the team thinks, an identifier that joins the wrong records, a field whose meaning changed without a version bump. The practical response is to audit the target and the joins before tuning anything, to treat preprocessing as part of the evaluated pipeline, and to monitor the data after deployment as carefully as the model.
+**Direct answer:**
+
+<KeyPoint>
+Model quality is bounded by the quality of the target and features, and the most damaging data problems are semantic rather than technical — a label that does not mean what the team thinks, an identifier that joins the wrong records, a field whose meaning changed without a version bump.
+</KeyPoint>
+
+The practical response is to audit the target and the joins before tuning anything, to treat preprocessing as part of the evaluated pipeline, and to <Mark>monitor the data after deployment as carefully as the model</Mark>.
 
 ## The failure modes are mostly invisible
 
 A missing value is a visible problem, and most pipelines handle it. The dangerous failures do not announce themselves:
 
-**A target with a delayed definition.** A "churned customer" label computed from today's data may include customers who have not yet had time to churn. Training on it teaches the model to predict the observation window rather than the behaviour. This is the same issue that target-trial design surfaces in causal work — the time zero has to be defined before the outcome can be measured.
+**A target with a delayed definition.** A "churned customer" label computed from today's data may include customers who have not yet had time to churn. Training on it teaches the model to predict the observation window rather than the behaviour. This is the same issue that target-trial design surfaces in causal work — <Mark>the time zero has to be defined before the outcome can be measured</Mark>.
 
 **A join that duplicates or drops records.** Joining an events table to a many-row dimension table silently multiplies the training set, and the model sees repeated examples that distort its weighting. A left join that fails quietly removes a segment.
 
@@ -27,7 +35,7 @@ A missing value is a visible problem, and most pipelines handle it. The dangerou
 
 ## The leak is a data quality problem
 
-scikit-learn's guidance states that "data leakage occurs when information that would not be available at prediction time is used when building the model", and prescribes splitting before any preprocessing. That rule is about data, not modelling: a scaler or imputer fitted on the full dataset has used validation information, and the resulting score is false.
+scikit-learn's guidance states that "data leakage occurs when information that would not be available at prediction time is used when building the model", and prescribes <Mark>splitting before any preprocessing</Mark>. That rule is about data, not modelling: a scaler or imputer fitted on the full dataset has used validation information, and the resulting score is false.
 
 Target encoding carries the same risk in a more seductive form. A category's mean target value computed over all rows is a powerful feature and a leak, because each row contributed to its own encoding. The fix is out-of-fold computation inside the training split — an operation on data, not a change to the algorithm.
 
@@ -47,7 +55,11 @@ The checks that pay off are mundane, and they should happen before the first mod
 
 ## After deployment, the data is still the problem
 
-Production monitoring that watches only latency and error rate will miss the failure that matters. A model's inputs can change distribution long before its accuracy visibly falls, especially when labels arrive late.
+<Trap>
+Production monitoring that watches only latency and error rate will miss the failure that matters.
+</Trap>
+
+A model's inputs can change distribution long before its accuracy visibly falls, especially when labels arrive late.
 
 Monitoring should therefore include the input features, their ranges and missingness, and the share of rows falling into segments that were rare in training. When a drift signal fires, the response is to inspect the data — a new source version, a changed category, a broken join — before assuming the model needs retraining.
 
@@ -67,7 +79,11 @@ For a case where two independent price feeds disagreed on the label sign and thr
 
 ## A counterargument
 
-A fair objection is that data quality versus model complexity is a false contest, and the article's own sources weaken the binary. Kuhn and Johnson treat feature construction, resampling, and selection as a discipline inseparable from model choice, which makes the boundary between data work and modelling porous rather than hierarchical. Sculley et al. locate failure in the surrounding system - serving, monitoring, configuration - none of which is purely a data-quality problem, so naming data the dominant variable leaves out the operational layer. A critic would add that the audit checklist carries opportunity costs the piece never weighs: once distributions are inspected and joins counted, further cleanup can flatten in return while a deliberate architecture change unlocks a step gain. The article rarely shows the model as the binding constraint, yet in some projects that is exactly where a skeptic would look first.
+A fair objection is that data quality versus model complexity is a false contest, and the article's own sources weaken the binary. Kuhn and Johnson treat feature construction, resampling, and selection as a discipline inseparable from model choice, which makes the boundary between data work and modelling porous rather than hierarchical. Sculley et al. locate failure in the surrounding system - serving, monitoring, configuration - none of which is purely a data-quality problem, so naming data the dominant variable leaves out the operational layer. A critic would add that the audit checklist carries opportunity costs the piece never weighs: once distributions are inspected and joins counted, further cleanup can flatten in return while a deliberate architecture change unlocks a step gain.
+
+<PullQuote>
+The article rarely shows the model as the binding constraint, yet in some projects that is exactly where a skeptic would look first.
+</PullQuote>
 
 ## References & Further Reading
 

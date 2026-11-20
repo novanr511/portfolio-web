@@ -9,9 +9,23 @@ tags:
   - Strategy
 ---
 
+<Lead>
 GPU computing is often described as a hardware trend. The more useful description is a mismatch: the dominant workloads in machine learning do thousands of similar arithmetic operations at once, while a CPU is designed to handle diverse tasks with low latency. A GPU is not a universally faster processor; it is a processor whose design fits a particular shape of work, and that shape has become economically important.
+</Lead>
 
-**Direct answer:** GPUs became strategic because training and inference are dominated by parallel matrix operations and memory bandwidth, and because access to them now constrains what organisations can build. MLCommons states that its benchmarks aim to "deliver a representative benchmark suite for AI/ML that fairly evaluates system performance", with goals including "enable fair comparison of competing systems" and keeping "benchmarking effort affordable so all can participate". The boundary: a benchmark result is a measurement under a defined workload, not proof that your workload will behave the same way.
+**Direct answer:**
+
+<KeyPoint>
+GPUs became strategic because training and inference are dominated by parallel matrix operations and memory bandwidth, and because access to them now constrains what organisations can build.
+</KeyPoint>
+
+MLCommons states that its benchmarks aim to "deliver a representative benchmark suite for AI/ML that fairly evaluates system performance", with goals including "enable fair comparison of competing systems" and keeping "benchmarking effort affordable so all can participate". The boundary: <Mark>a benchmark result is a measurement under a defined workload, not proof that your workload will behave the same way</Mark>.
+
+<KeyFigures items={[
+  { value: "35x to 49x", label: "reduction in storage requirements without affecting accuracy on the models studied", source: "Song Han et al., 2015" },
+  { value: "9x to 13x", label: "reduction in the number of connections through pruning", source: "Song Han et al., 2015" },
+  { value: "from 32 to 5", label: "bits representing each connection after quantization", source: "Song Han et al., 2015" },
+]} />
 
 ## What the hardware actually changes
 
@@ -33,13 +47,13 @@ Three questions make a benchmark result interpretable:
 2. **What was held constant?** Power, software versions, and batch size change results substantially.
 3. **What was the metric?** Throughput matters for training; latency and cost per request matter for serving.
 
-A result that omits these is marketing, not evidence. The affordable-participation goal is also worth noting: a benchmark that only large labs can run produces a narrow evidence base.
+<Mark>A result that omits these is marketing, not evidence.</Mark> The affordable-participation goal is also worth noting: a benchmark that only large labs can run produces a narrow evidence base.
 
 ## Compression changes the requirement
 
 Han et al.'s "Deep Compression" describes a three-stage pipeline — "pruning, trained quantization and Huffman coding" — that reduces storage requirements "by 35x to 49x without affecting their accuracy" on the models studied. Pruning reduces the number of connections by "9x to 13x", and quantization reduces the bits representing each connection from 32 to 5.
 
-The related integer-arithmetic quantization work addresses efficient inference with integer operations. Together, these results show that the hardware requirement is partly a function of how the model is represented, not only of its architecture. A model that fits in memory after quantization can run on cheaper hardware, which changes the economics of deployment.
+The related integer-arithmetic quantization work addresses efficient inference with integer operations. Together, these results show that <Mark>the hardware requirement is partly a function of how the model is represented</Mark>, not only of its architecture. A model that fits in memory after quantization can run on cheaper hardware, which changes the economics of deployment.
 
 The important caveat is that these figures are results on specific models and tasks. They demonstrate the mechanism — compression reduces memory and compute needs — rather than guaranteeing a 35× reduction for your model.
 
@@ -70,7 +84,9 @@ The word "GPU workload" hides two very different problems.
 
 The implication is that an organisation's accelerator strategy cannot be a single number. A team may need high-memory accelerators for training and a different, cheaper profile for serving — or it may compress a model enough to serve on CPUs, which is where the Deep Compression results become commercially meaningful.
 
+<Trap>
 Treating both as "AI compute" leads to the common error of buying for the training profile and paying for it on every inference request.
+</Trap>
 
 ## What the strategic framing misses
 
@@ -82,7 +98,11 @@ Three qualifications matter.
 
 **Compression has limits.** Aggressive quantization can degrade accuracy on some tasks, and pruning changes the model in ways that may affect fairness or robustness. The compression papers report accuracy preservation on their evaluated models; that is a result, not a universal property.
 
-The counterargument to buying into accelerators — that better algorithms reduce the need — is partly right. Algorithmic improvements have historically reduced compute requirements for a given capability. But demand has grown faster than those savings, which is why the resource remains strategic.
+The counterargument to buying into accelerators — that better algorithms reduce the need — is partly right. Algorithmic improvements have historically reduced compute requirements for a given capability.
+
+<PullQuote>
+But demand has grown faster than those savings, which is why the resource remains strategic.
+</PullQuote>
 
 ## A decision test
 

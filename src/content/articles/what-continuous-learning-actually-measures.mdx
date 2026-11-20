@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-"Continuous learning" sounds like a model that keeps getting wiser on its own. In most production systems it is something narrower: a pipeline that watches for change, detects a problem, and retrains. The real problem is that teams report a number from this pipeline as though it measured learning, when it usually measures a proxy that can move for reasons unrelated to genuine improvement.
+<Lead>
+"Continuous learning" sounds like a model that keeps getting wiser on its own. In most production systems it is something narrower: <Mark>a pipeline that watches for change, detects a problem, and retrains</Mark>. The real problem is that teams report a number from this pipeline as though it measured learning, when it usually measures a proxy that can move for reasons unrelated to genuine improvement.
+</Lead>
 
-**Direct answer:** What continuous learning systems actually measure is a signal of drift or performance change that triggers retraining, not learning itself. Wikipedia's concept-drift entry describes change over time in the statistical relationship a model relies on, and its MLOps overview covers the monitoring and retraining practices that keep models usable in production. The boundary is that the measured quantity is a proxy - a distribution distance, a performance metric, or an alert - and it should be labeled as such.
+**Direct answer:**
+
+<KeyPoint>
+What continuous learning systems actually measure is a signal of drift or performance change that triggers retraining, not learning itself.
+</KeyPoint>
+
+Wikipedia's concept-drift entry describes change over time in the statistical relationship a model relies on, and its MLOps overview covers the monitoring and retraining practices that keep models usable in production. The boundary is that <Mark>the measured quantity is a proxy</Mark> - a distribution distance, a performance metric, or an alert - and it should be labeled as such.
 
 **Delta:** This article adds a measurement-focused layer beyond the sources: it maps each drift signal to the decision it can and cannot support, with claim status explicit.
 
@@ -25,7 +33,7 @@ Drift comes in different forms, and the form determines the right signal. The co
 
 MLOps supplies the operational machinery. Wikipedia's MLOps overview describes the practices used to deploy and maintain models reliably, including monitoring, versioning, reproducibility, and managed retraining pipelines. A continuous-learning setup typically watches a metric, compares it to a baseline or threshold, and kicks off a retraining and validation sequence when the signal crosses that line. The practical consequence is that "continuous learning" is better understood as continuous monitoring plus conditional retraining, with the learning event gated by a measured trigger.
 
-That reframing exposes the measurement problem. Labels often arrive late or not at all, so teams substitute input-distribution monitoring for ground-truth performance. The reported number then measures how far inputs have moved, not whether predictions got worse. Even when labels are available, a performance metric is a summary that can hide which subgroup degraded. The practical consequence is that the headline metric is a proxy whose validity must be stated: what it tracks, how it relates to the real objective, and what would make it misleading.
+That reframing exposes the measurement problem. Labels often arrive late or not at all, so teams substitute input-distribution monitoring for ground-truth performance. The reported number then measures <Mark>how far inputs have moved, not whether predictions got worse</Mark>. Even when labels are available, a performance metric is a summary that can hide which subgroup degraded. The practical consequence is that the headline metric is a proxy whose validity must be stated: what it tracks, how it relates to the real objective, and what would make it misleading.
 
 ## A worked example
 
@@ -49,11 +57,19 @@ The second limit is a hidden cost in the feedback loop. A retrained model shapes
 
 A third failure mode is automation bias. When retraining is automatic, teams stop asking whether a retrained model is better on the problem that matters. The validation gate helps, but only if the validation set reflects the current problem definition. The worked example shows the danger: a signal said retrain, and the gate caught that the labels themselves had changed. Without that gate, the pipeline would have promoted a model trained on a redefined task.
 
-There is also a boundary to what drift detection can claim. Detecting that the data has moved is not the same as knowing how to respond, and it is not the same as improvement. A drift alert tells a team where to look; it does not choose the fix, which may be retraining, a data-pipeline repair, or a decision to stop using the model. Treating detection as resolution skips the diagnosis that determines which action is appropriate.
+There is also a boundary to what drift detection can claim. Detecting that the data has moved is not the same as knowing how to respond, and it is not the same as improvement. A drift alert tells a team where to look; it does not choose the fix, which may be retraining, a data-pipeline repair, or a decision to stop using the model.
+
+<Trap>
+Treating detection as resolution skips the diagnosis that determines which action is appropriate.
+</Trap>
 
 Finally, the practice needs review. The relationship between a proxy and the true objective can weaken as systems and users change, so a metric that was a good early warning last year may be noise now. Teams should periodically check whether drift alerts preceded real performance problems and retire signals that do not. Without that check, the monitoring layer accumulates dashboards that are watched but not trusted.
 
-The counterargument that proxy monitoring is the only practical option when labels arrive late is fair for many production systems, where waiting for ground truth is not viable. It is incomplete as a claim that the proxy measures learning, because a convenient signal and a meaningful one are different things.
+The counterargument that proxy monitoring is the only practical option when labels arrive late is fair for many production systems, where waiting for ground truth is not viable.
+
+<PullQuote>
+It is incomplete as a claim that the proxy measures learning, because a convenient signal and a meaningful one are different things.
+</PullQuote>
 
 ## A decision test
 

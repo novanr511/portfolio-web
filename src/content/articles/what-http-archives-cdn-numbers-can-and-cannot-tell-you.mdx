@@ -9,9 +9,20 @@ tags:
   - Statistics
 ---
 
+<Lead>
 CDN adoption figures are easy to turn into a sweeping claim: “most websites use a CDN,” or “CDNs make sites faster.” The 2025 Web Almanac’s CDN chapter offers useful measurements, but its own caveats show why those conclusions need qualification. The data describes observed web pages and requests in a defined crawl—not every website, all internet traffic, or a controlled experiment proving that a CDN caused better performance.
+</Lead>
 
 **Direct answer:** HTTP Archive’s 2025 analysis reports CDN use for 35% of mobile HTML requests, 52% of subdomain requests, and 71% of third-party requests in its dataset. It also reports that CDN adoption varies by site popularity, reaching 71% among the top 1,000 mobile sites and 35% among the top 10 million. These are sample-specific observations, not market-share estimates for all websites. The chapter explicitly cautions that its data shows usage patterns among crawled sites, not true market distribution.
+
+<KeyFigures items={[
+  { value: "35%", label: "of mobile HTML requests served via a CDN", source: "HTTP Archive, Web Almanac 2025" },
+  { value: "71%", label: "of third-party requests served via a CDN", source: "HTTP Archive, Web Almanac 2025" },
+  { value: "71%", label: "CDN use among the top 1,000 mobile sites", source: "HTTP Archive, Web Almanac 2025" },
+  { value: "35%", label: "CDN use among the top 10 million sites", source: "HTTP Archive, Web Almanac 2025" },
+  { value: "29%", label: "of CDN-served requests using HTTP/3 in the mobile HTML dataset", source: "HTTP Archive, Web Almanac 2025" },
+  { value: "21%", label: "global HTTP/3 adoption", source: "Cloudflare, 2025 Year in Review" },
+]} />
 
 ## What was measured
 
@@ -19,7 +30,7 @@ The [2025 Web Almanac CDN chapter](https://almanac.httparchive.org/en/2025/cdn) 
 
 That denominator is not “all websites.” The chapter notes that the analysis focuses on popular sites, and its site selection and detection methods shape which properties appear in the results. Its CDN identification and category definitions also matter: a resource’s hosting and delivery path determine how it is classified. The chapter’s adoption percentages are best quoted with their category and device context attached.
 
-For example, “71% of third-party requests were served via a CDN in the mobile dataset” is more faithful than “71% of websites use a CDN.” The first preserves the measured unit; the second changes requests into websites.
+For example, “71% of third-party requests were served via a CDN in the mobile dataset” is more faithful than “71% of websites use a CDN.” The first preserves <Mark>the measured unit</Mark>; the second changes requests into websites.
 
 ## Popularity changes the picture
 
@@ -27,13 +38,19 @@ The chapter reports different adoption rates by popularity tier. In the mobile a
 
 This pattern is useful as a description of the sampled web, but it does not establish that popularity causes CDN adoption. Larger or more visited sites may differ in many ways—architecture, geography, infrastructure budgets, and traffic composition. The reported association cannot isolate those factors or establish the direction of causality.
 
-It also changes the practical interpretation. A figure drawn from the top 1,000 sites should not be used as a default expectation for a small independent site. Conversely, a low overall share does not mean CDNs are rare in the segment with the highest traffic or most complex delivery needs.
+It also changes the practical interpretation.
+
+<Trap>
+A figure drawn from the top 1,000 sites should not be used as a default expectation for a small independent site.
+</Trap>
+
+Conversely, a low overall share does not mean CDNs are rare in the segment with the highest traffic or most complex delivery needs.
 
 ## Adoption is not the same as performance impact
 
 The chapter includes performance measurements, but it warns that the comparisons are not uniform tests across CDN providers. Its TLS negotiation and DNS timings come from HTTP Archive’s simulated browser connections on controlled infrastructure; real-world results can vary with geography, network conditions, session resumption, and client devices.
 
-That distinction is central: observing a resource served through a CDN and measuring its response time does not by itself reveal the counterfactual—how the same site, resource, and user would have performed without the CDN. Sites using CDNs may also differ from sites that do not. So the data can describe measured performance under the study conditions, but it should not be restated as a universal causal uplift.
+That distinction is central: observing a resource served through a CDN and measuring its response time does not by itself reveal <Mark>the counterfactual</Mark>—how the same site, resource, and user would have performed without the CDN. Sites using CDNs may also differ from sites that do not. So the data can describe measured performance under the study conditions, but it should not be restated as a universal causal uplift.
 
 The chapter itself says website owners should perform their own controlled performance testing. For an individual site, compare the same URLs, response conditions, geography, cache state, and measurement window where possible. Track both user-facing outcomes and operational effects; do not treat the presence of a CDN as a performance result.
 
@@ -52,15 +69,23 @@ Use the figures as evidence about observed implementation patterns and as prompt
 1. Name the edition and year: the 2025 Web Almanac.
 2. Preserve the unit: sites, pages, or requests—do not substitute one for another.
 3. State the segment: mobile or desktop, HTML or subresource, CDN or origin, and popularity tier where relevant.
-4. Describe the source as a crawl/sample, not a census of the internet or total traffic measurement.
+4. Describe the source as <Mark>a crawl/sample, not a census of the internet</Mark> or total traffic measurement.
 5. Separate adoption from outcomes: deployment prevalence is not proof of speed, reliability, or business impact.
 6. Check the chapter’s methodology and caveats before comparing it with vendor reports or later editions.
 
-The chapter is most valuable when treated as a map of what HTTP Archive observed, not as a ranking of providers or a prescription to put every site behind a CDN. For implementation and cache behavior, see [CDN Caching and Googlebot: Avoid Origin Overload](/articles/cdn-caching-and-googlebot-avoid-origin-overload). For a related lesson in interpreting grouped data, see [Simpson’s Paradox in Your Own Data](/articles/simpsons-paradox-why-a-single-correlation-can-reverse-its-sign).
+<KeyPoint>
+The chapter is most valuable when treated as a map of what HTTP Archive observed, not as a ranking of providers or a prescription to put every site behind a CDN.
+</KeyPoint>
+
+For implementation and cache behavior, see [CDN Caching and Googlebot: Avoid Origin Overload](/articles/cdn-caching-and-googlebot-avoid-origin-overload). For a related lesson in interpreting grouped data, see [Simpson’s Paradox in Your Own Data](/articles/simpsons-paradox-why-a-single-correlation-can-reverse-its-sign).
 
 ## A counterargument
 
-A reasonable critic would argue that the article's central caveat - that the figures are sample-specific and non-causal - is repeated until it displaces the more useful question of what the pattern suggests. The chapter's own gradient (71% CDN use among the top 1,000 mobile sites against 35% among the top 10 million) is, the critic would say, informative even without a causal estimate: it tells a small site that a top-tier figure is not its baseline. The piece also warns against treating sample rates as market share, yet builds that warning on the chapter's Cloudflare comparison (about 21% global versus 69% in-dataset), a vendor figure the reader can only accept through the cited sources. The caution is correct, but it functions as a substitute for interpretation rather than a frame for it.
+A reasonable critic would argue that the article's central caveat - that the figures are sample-specific and non-causal - is repeated until it displaces the more useful question of what the pattern suggests. The chapter's own gradient (71% CDN use among the top 1,000 mobile sites against 35% among the top 10 million) is, the critic would say, informative even without a causal estimate: it tells a small site that a top-tier figure is not its baseline. The piece also warns against treating sample rates as market share, yet builds that warning on the chapter's Cloudflare comparison (about 21% global versus 69% in-dataset), a vendor figure the reader can only accept through the cited sources.
+
+<PullQuote>
+The caution is correct, but it functions as a substitute for interpretation rather than a frame for it.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Interaction to Next Paint is widely treated as a single number that certifies a site as responsive, but the number is a summary of real users rather than a property of the code. The web.dev entries on INP and Web Vitals define the metric, its thresholds, and its field-based method. The real problem is that a passing percentile can coexist with interactions that feel slow, so teams often optimize the score without finding the cause.
+</Lead>
 
 **Direct answer:** INP measures the latency from a user interaction to the next visual update, aggregated across interactions and reported as a percentile of field data. It reflects observed responsiveness on real devices and networks. A good score describes the typical experience of measured visitors, not a guarantee about any specific interaction or device.
 
@@ -17,13 +19,23 @@ Interaction to Next Paint is widely treated as a single number that certifies a 
 
 ## The mechanism
 
-The metric times an interaction from input to the paint that follows it. The web.dev article on INP describes how it captures a broad set of interactions and reports roughly the worst or near-worst experience rather than an average, which is why a single sluggish control can move the score. The practical consequence is that improving INP means shortening the slowest common interactions, not polishing the fastest ones. A page that responds instantly to scrolling but stalls on add-to-cart will still be judged by the stall.
+The metric times an interaction from input to the paint that follows it. The web.dev article on INP describes how it captures a broad set of interactions and reports <Mark>roughly the worst or near-worst experience rather than an average</Mark>, which is why a single sluggish control can move the score.
+
+<KeyPoint>
+The practical consequence is that improving INP means shortening the slowest common interactions, not polishing the fastest ones.
+</KeyPoint>
+
+A page that responds instantly to scrolling but stalls on add-to-cart will still be judged by the stall.
 
   <Figure src="/images/articles/inline/what-inp-optimization-actually-measures-1.png" alt="An interaction broken into input delay on the main thread, event handler processing, and presentation delay before paint." caption="Conceptual: INP reflects the near-worst field interaction, split into three delays." />
 
-An interaction breaks into three parts: input delay while the main thread is busy, processing time in event handlers, and presentation delay before the next frame paints. Long JavaScript tasks are the usual culprit, because a task that occupies the main thread postpones both the handler and the render. The practical consequence is that the useful levers are task management and script cost, such as breaking long work into smaller pieces, deferring non-urgent code, and trimming third-party scripts. Network tuning alone rarely moves a metric whose time is spent on the main thread.
+An interaction breaks into three parts: input delay while the main thread is busy, processing time in event handlers, and presentation delay before the next frame paints. Long JavaScript tasks are the usual culprit, because a task that occupies the main thread postpones both the handler and the render. The practical consequence is that the useful levers are <Mark>task management and script cost</Mark>, such as breaking long work into smaller pieces, deferring non-urgent code, and trimming third-party scripts. Network tuning alone rarely moves a metric whose time is spent on the main thread.
 
 Field and lab measurement are different instruments. The Web Vitals article places INP among the Core Web Vitals and emphasizes collection from real sessions, while lab tools reproduce a single controlled load. The practical consequence is that field data tells you which interactions are slow for whom, and lab traces tell you why. Thresholds such as the good and poor bands are distributional judgments about real traffic. A passing result therefore requires enough representative traffic, and it can change as the audience, devices, or scripts change, even with no deployment.
+
+<KeyFigures items={[
+  { value: "75th percentile", label: "field evaluation point for Core Web Vitals", source: "web.dev: Vitals" },
+]} />
 
 ## A worked example
 
@@ -41,13 +53,23 @@ The first two rows report definitions the sources state directly, so they carry 
 
 ## What it cannot do
 
-It cannot identify a cause. A score tells you that responsiveness is weak, not which handler, script, or render step produced the delay. That distinction matters because the remedies are unrelated: a long event handler, an oversized framework bundle, and a layout thrash all land in the same percentile. Teams that treat the number as a diagnosis tend to apply generic fixes and hope the metric moves. The mechanism section separates input delay, processing, and presentation precisely so the investigation can start from evidence rather than from a guess about the network.
+It cannot identify a cause. A score tells you that responsiveness is weak, not which handler, script, or render step produced the delay. That distinction matters because the remedies are unrelated: a long event handler, an oversized framework bundle, and a layout thrash all land in the same percentile.
+
+<Trap>
+Teams that treat the number as a diagnosis tend to apply generic fixes and hope the metric moves.
+</Trap>
+
+The mechanism section separates input delay, processing, and presentation precisely so the investigation can start from evidence rather than from a guess about the network.
 
 It cannot be reproduced reliably in a lab. Field data reflects real devices, connection quality, and the unpredictable order in which people interact, whereas a lab trace exercises one scripted path on one machine. A page can pass locally and fail in the field, or the reverse, because the traffic mix differs. This is why the Web Vitals framing puts real-user measurement at the center and uses lab tools as a complement. A team that optimizes only against a local run is optimizing for a visitor who does not exist, and will be surprised when the percentile fails to budge.
 
-The percentile also hides the tail. Reporting a single high-percentile value compresses many interactions into one figure, so a page can meet the threshold while a specific action remains painful for a small group. If that action is the one tied to revenue, such as checkout, the aggregate score can be technically good and commercially unhelpful. Segmenting field data by device, route, or interaction type is the practical remedy, but it requires enough samples to be meaningful. Low-traffic pages and new features often lack the volume to support a confident read, which is a limit of the evidence rather than a flaw in the product.
+The percentile also <Mark>hides the tail</Mark>. Reporting a single high-percentile value compresses many interactions into one figure, so a page can meet the threshold while a specific action remains painful for a small group. If that action is the one tied to revenue, such as checkout, the aggregate score can be technically good and commercially unhelpful. Segmenting field data by device, route, or interaction type is the practical remedy, but it requires enough samples to be meaningful. Low-traffic pages and new features often lack the volume to support a confident read, which is a limit of the evidence rather than a flaw in the product.
 
-Finally, the metric needs ongoing review. Third-party tags, marketing scripts, and content changes can degrade responsiveness without a code deploy, so a passing score has a shelf life. Dated observations, a named owner, and a known reversal condition keep the number honest. Chasing the score in isolation can even distort priorities, pushing a team to shave milliseconds from a measured interaction while ignoring a slower path that nobody instrumented. The score is a signal to investigate, not a target to optimize in a vacuum.
+Finally, the metric needs ongoing review. Third-party tags, marketing scripts, and content changes can degrade responsiveness without a code deploy, so a passing score has a shelf life. Dated observations, a named owner, and a known reversal condition keep the number honest. Chasing the score in isolation can even distort priorities, pushing a team to shave milliseconds from a measured interaction while ignoring a slower path that nobody instrumented.
+
+<PullQuote>
+The score is a signal to investigate, not a target to optimize in a vacuum.
+</PullQuote>
 
 Counterargument: the claim that a single field score captures user responsiveness is fair for a broad health check, and incomplete when one slow interaction or one device segment drives the business outcome.
 
