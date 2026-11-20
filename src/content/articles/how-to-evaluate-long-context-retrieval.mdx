@@ -9,15 +9,27 @@ tags:
   - AI
 ---
 
-A long context window lets a system hold more material, which makes it tempting to skip retrieval altogether. The decision has a hidden risk: a model can accept a long prompt and still fail to use the passage that matters, especially when it sits in the middle. The Lost in the Middle paper reports exactly that effect, which the long-context article covers for the practical consequence, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains for why selection still matters.
+<Lead>
+A long context window lets a system hold more material, which makes it tempting to skip retrieval altogether. The decision has a hidden risk: <Mark>a model can accept a long prompt and still fail to use the passage that matters</Mark>, especially when it sits in the middle. The Lost in the Middle paper reports exactly that effect, which the long-context article covers for the practical consequence, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains for why selection still matters.
+</Lead>
 
-**Direct answer:** Evaluate long-context retrieval by testing whether the right passage is used across positions, with a fixed question set and a comparison against a shorter retrieved context. The Lost in the Middle paper is the primary source, and the Sentence-BERT paper explains the bi-encoder retrieval that a shorter pipeline uses. The boundary: position behaviour is model-specific, which the benchmarks article warns about applying a result broadly, and the gain must be weighed against token cost, as the cost estimator article requires.
+**Direct answer:**
+
+<KeyPoint>
+Evaluate long-context retrieval by testing whether the right passage is used across positions, with a fixed question set and a comparison against a shorter retrieved context.
+</KeyPoint>
+
+The Lost in the Middle paper is the primary source, and the Sentence-BERT paper explains the bi-encoder retrieval that a shorter pipeline uses. The boundary: <Mark>position behaviour is model-specific</Mark>, which the benchmarks article warns about applying a result broadly, and the gain must be weighed against token cost, as the cost estimator article requires.
 
 ## What to test
 
 **Position sensitivity.** Place the relevant passage at the beginning, middle, and end of otherwise identical prompts and score the answer, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) recommends. A model that fails only in the middle has a position problem, which a better retriever can avoid by shortening the context, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains.
 
-**Distractors.** Real contexts contain similar-looking passages with conflicting details, which the hallucination article treats as a grounding problem. A test with only the correct passage flatters the system, as the evaluation-rubric article warns about easy cases.
+**Distractors.** <Mark>Real contexts contain similar-looking passages with conflicting details</Mark>, which the hallucination article treats as a grounding problem.
+
+<Trap>
+A test with only the correct passage flatters the system, as the evaluation-rubric article warns about easy cases.
+</Trap>
 
 **Citation correctness.** If the system names a source, check that the cited passage supports the claim, as the legal-research article requires for grounded answers, as the reduce-hallucinations article treats citation checks as a core control.
 
@@ -37,7 +49,9 @@ Three conclusions follow. The retrieved pipeline may win on both reliability and
 
 It cannot generalise beyond the tested model and question set, which the benchmarks article warns about, as the embedding-selection article advises for own-data evaluation. It does not remove the need for good retrieval, which the RAG article treats as the upstream stage. And it cannot guarantee a future result after a model update, as the monitoring article advises for change triggers.
 
+<PullQuote>
 The counterargument that larger windows make testing unnecessary is wrong in direction, which the lost-middle finding demonstrates: capacity is not use, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) explains.
+</PullQuote>
 
 ## A decision test
 

@@ -9,21 +9,29 @@ tags:
   - Verified
 ---
 
+<Lead>
 Knowledge graphs are often adopted as a label for a database that already exists, with little clarity about what the graph is meant to decide. The real problem is that entity and relation quality, not the graph format, determines whether the structure is useful. Search marketing goals can make the ambiguity worse by implying a ranking benefit that the source does not promise.
+</Lead>
 
-**Direct answer:** A knowledge graph is a knowledge base that represents entities and their relationships as a graph that machines can query. Wikipedia's knowledge graph entry describes that structure and its use in search, while the search engine marketing entry describes the goal of increasing visibility in search results. The practical move is to build the graph for a defined decision and to treat any search benefit as a hypothesis, not a promise.
+**Direct answer:**
+
+<KeyPoint>
+A knowledge graph is a knowledge base that represents entities and their relationships as a graph that machines can query.
+</KeyPoint>
+
+Wikipedia's knowledge graph entry describes that structure and its use in search, while the search engine marketing entry describes the goal of increasing visibility in search results. The practical move is to build the graph for a defined decision and to treat any search benefit as a hypothesis, not a promise.
 
 **Delta:** This article adds a build framework beyond the sources: it maps entity and relation quality to a search or answer decision, with claim status explicit.
 
 ## The mechanism
 
-The knowledge graph entry describes a knowledge base that uses a graph-structured representation, with entities as nodes and relations as edges. The format is not the value; it is what allows a system to resolve identity and follow connections between things. The practical consequence is that the hard work is deciding what counts as the same entity and which relations are worth storing. A graph built on ambiguous identities produces confident-looking answers that cannot be trusted.
+The knowledge graph entry describes a knowledge base that uses a graph-structured representation, with entities as nodes and relations as edges. The format is not the value; it is what allows a system to resolve identity and follow connections between things. The practical consequence is that the hard work is deciding what counts as the same entity and which relations are worth storing. A graph built on ambiguous identities produces <Mark>confident-looking answers that cannot be trusted</Mark>.
 
 <Figure src="/images/articles/inline/how-to-get-knowledge-graphs-right-1.png" alt="A small graph with an author, an article, a topic, and a source connected by typed relations." caption="Conceptual: nodes are entities; labelled edges are the relationships worth modelling." />
 
 The search engine marketing entry describes the practice of increasing a site's visibility in search engine results, through on-page and off-page work and through paid and organic activity. The practical consequence is that visibility is the outcome, while structured, consistent information about entities is one input among many. A graph can make an organisation's facts easier to interpret, but the source does not frame it as a ranking guarantee, and treating it as one confuses a supporting asset with the result.
 
-The bridge between the two is disambiguation. When a system can tell which entity a mention refers to and how that entity relates to others, it can answer questions and keep facts consistent across surfaces. The practical consequence is that investment should go to canonical identifiers, clear schemas, and provenance for each edge, because those are the parts that determine whether the graph resolves identity correctly. A graph that stores relations without recording where they came from cannot be audited when a fact is challenged.
+The bridge between the two is disambiguation. When a system can tell which entity a mention refers to and how that entity relates to others, it can answer questions and keep facts consistent across surfaces. The practical consequence is that investment should go to canonical identifiers, clear schemas, and provenance for each edge, because those are the parts that determine whether the graph resolves identity correctly. A graph that stores relations without recording where they came from <Mark>cannot be audited when a fact is challenged</Mark>.
 
 The mechanism ends with maintenance. Entities change, relations expire, and sources disagree, so a graph is a living artefact rather than a one-time build. The practical consequence is that a decision test must include an update path and an owner for correctness. Without them, the structure decays quietly, and the longer it is used the more confidently it propagates stale facts into answers and content.
 
@@ -43,17 +51,23 @@ The two source rows are descriptive and stable. The third row is an inference ab
 
 ## What it cannot do
 
-A knowledge graph does not create truth; it encodes what was put into it. If the underlying records are inconsistent or wrong, the graph preserves those errors and makes them easier to query. The practical consequence is that the structure can increase the speed and reach of a mistake, which is worse than a slow mistake in a system nobody trusts. A team that treats the graph as an authority has reversed the relationship between the representation and the source.
+A knowledge graph does not create truth; it encodes what was put into it. If the underlying records are inconsistent or wrong, the graph preserves those errors and makes them easier to query. The practical consequence is that the structure can <Mark>increase the speed and reach of a mistake</Mark>, which is worse than a slow mistake in a system nobody trusts. A team that treats the graph as an authority has reversed the relationship between the representation and the source.
 
 The hidden cost is the work around the graph. Ontology design, entity resolution, deduplication, and ongoing curation consume skilled time that could go to the underlying data. For a modest or static dataset, a well-maintained table often answers the same questions at a fraction of the effort. The practical consequence is that the decision to build a graph should be justified by a query or integration need that simpler structures cannot meet, rather than by the appeal of the format.
 
-The common failure modes are duplicate entities, ambiguous names, and relations with no provenance. Two records that refer to the same thing under different names fragment the graph, while a relation added without a source cannot be checked when it is questioned. Circular sourcing is a quieter version, where a fact is copied from a system that originally took it from the graph. The practical consequence is that confidence in an answer depends on the chain behind it, not on the graph interface, and a clean visualisation hides a broken chain as readily as a sound one.
+<Trap>
+The common failure modes are duplicate entities, ambiguous names, and relations with no provenance.
+</Trap>
+
+Two records that refer to the same thing under different names fragment the graph, while a relation added without a source cannot be checked when it is questioned. Circular sourcing is a quieter version, where a fact is copied from a system that originally took it from the graph. The practical consequence is that confidence in an answer depends on the chain behind it, not on the graph interface, and a clean visualisation hides a broken chain as readily as a sound one.
 
 There are boundaries to its reach. A graph is not a search ranking guarantee, and the search marketing source does not offer one. It is also not a replacement for good content: if the public-facing pages are vague or contradictory, a well-structured internal graph cannot make them persuasive. The honest boundary is that a graph supports identity, consistency, and connected questions. Used as a promise of visibility or as a substitute for content quality, it will disappoint for reasons that have little to do with the technology.
 
 Finally, the graph needs review because its meaning drifts. Schemas change, sources update, and the questions asked of the system evolve. The practical requirement is to name an owner, to record the provenance of relations, and to revisit the entity model on a fixed cadence. Without that discipline, the graph becomes a reflection of past decisions, and users cannot tell whether an answer is current. A maintained graph is useful; an abandoned one is a source of quietly wrong answers.
 
+<PullQuote>
 The counterargument that a graph is over-engineering for most teams is fair for small, static datasets and incomplete where entities must be reconciled across many sources and queried in connected ways.
+</PullQuote>
 
 ## A decision test
 

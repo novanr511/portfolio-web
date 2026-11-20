@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Model cards are often treated as completed paperwork, filed once and rarely read. The model card paper proposes a reporting template for intended use, evaluation, and limitations, while NIST's AI Risk Management Framework frames documentation as part of governing risk. The real problem is knowing whether a card is good enough to support a decision about a model.
+<Lead>
+Model cards are often treated as <Mark>completed paperwork</Mark>, filed once and rarely read. The model card paper proposes a reporting template for intended use, evaluation, and limitations, while NIST's AI Risk Management Framework frames documentation as part of governing risk. The real problem is knowing whether a card is good enough to support a decision about a model.
+</Lead>
 
 **Direct answer:** Evaluate a model card by asking what decision it supports and whether the reported evidence is specific enough to answer that decision. The Mitchell paper defines the reporting fields, and the NIST framework supplies the risk context in which those fields matter. A card that looks complete but reports vague limitations has not done its job.
 
@@ -17,15 +19,19 @@ Model cards are often treated as completed paperwork, filed once and rarely read
 
 ## The mechanism
 
-The model card paper, by Mitchell and colleagues, proposes a short document that accompanies a trained model. Its fields cover intended use, training and evaluation data, metrics, performance across conditions, and ethical considerations. The purpose is transparency: to give a reader enough structured information to understand what a model is for and where it is likely to fail. The practical consequence is that a card is not an end in itself but an input to someone else's decision.
+The model card paper, by Mitchell and colleagues, proposes a short document that accompanies a trained model. Its fields cover intended use, training and evaluation data, metrics, performance across conditions, and ethical considerations. The purpose is transparency: to give a reader enough structured information to understand what a model is for and where it is likely to fail.
+
+<KeyPoint>
+The practical consequence is that a card is not an end in itself but an input to someone else's decision.
+</KeyPoint>
 
   <Figure src="/images/articles/inline/how-to-evaluate-model-cards-1.png" alt="A model card's fields of intended use, metrics and limitations set against NIST risk functions of map, measure and manage." caption="Conceptual: the card reports evidence; the framework supplies the risk questions." />
 
-Evaluating that input starts with specificity. A card that lists intended uses without naming the situations the model was not designed for gives a reader little protection. A card that reports accuracy as a single number without saying which data it was measured on hides the conditions that matter. The mechanism here is simple: the value of documentation lies in the detail that constrains interpretation, so vague fields reduce the card to a formality. A reviewer should treat vagueness as a finding, not as a neutral stylistic choice.
+Evaluating that input starts with specificity. A card that lists intended uses without naming the situations the model was not designed for gives a reader little protection. A card that reports accuracy as a single number without saying which data it was measured on hides the conditions that matter. The mechanism here is simple: the value of documentation lies in the detail that constrains interpretation, so vague fields reduce the card to a formality. A reviewer should treat <Mark>vagueness as a finding</Mark>, not as a neutral stylistic choice.
 
 NIST's AI Risk Management Framework provides the context for those details. Its functions ask an organisation to map the context of use, measure what can go wrong, and manage the residual risk. A model card supplies evidence for those functions, but it does not perform them. The framework does not certify a card as adequate; it defines the risk questions that documentation should help answer. The card and the framework therefore play different roles, and evaluation is where they meet.
 
-The synthesis is to read a card as a decision artefact. Each field is useful to the extent that it answers a question a risk owner actually has. Mapping fields to questions is not something the sources state directly; it is a judgement about how to use the template, and it is marked as inferred below. Keeping that mark visible is what stops a useful reading method from being reported as a result of the paper.
+The synthesis is to read a card as <Mark>a decision artefact</Mark>. Each field is useful to the extent that it answers a question a risk owner actually has. Mapping fields to questions is not something the sources state directly; it is a judgement about how to use the template, and it is marked as inferred below. Keeping that mark visible is what stops a useful reading method from being reported as a result of the paper.
 
 ## A worked example
 
@@ -47,13 +53,19 @@ A model card cannot prove that a model is safe. The Mitchell paper proposes a re
 
 The hidden cost is that a card can become a substitute for investigation. Once a document exists, it is tempting to stop asking questions, especially when the reader is busy and the card looks thorough. This is the opposite of the transparency the template intends. The NIST framework resists this by treating risk work as ongoing: mapping, measuring, and managing do not end because a document was produced. A reviewer who reads a card and then stops has used it badly, mistaking the artefact for the work it was meant to support.
 
-A common failure mode is staleness. A card written for one version of a model, one dataset, or one intended use can remain in circulation after those conditions change. The reported metrics no longer describe the deployed system, but the document still looks authoritative. Because the card does not update itself, someone must own its revision. Without that owner, the card drifts from the artefact it describes and quietly becomes misleading, and a misleading card is worse than no card because it carries an appearance of authority.
+<Trap>
+A common failure mode is staleness.
+</Trap>
+
+A card written for one version of a model, one dataset, or one intended use can remain in circulation after those conditions change. The reported metrics no longer describe the deployed system, but the document still looks authoritative. Because the card does not update itself, someone must own its revision. Without that owner, the card drifts from the artefact it describes and quietly becomes misleading, and a misleading card is worse than no card because it carries an appearance of authority.
 
 The boundary is between reporting and deciding. The model card reports what the authors chose to include; the risk decision belongs to the organisation deploying the model. The two are related but not identical. A complete card does not remove the need for a deployment judgment, and a risk framework cannot fill in missing fields in a card. Evaluation is therefore a dialogue between the document and the decision, and the quality of that dialogue depends on a reader willing to probe the gaps rather than admire the structure.
 
 That probing needs structure and a date. A card should be evaluated against the questions that matter for a specific use, and the evaluation should be revisited when the model, the data, or the use context changes. The sources provide the template and the risk context, but not a schedule. Setting one locally is what keeps the card a living input to governance rather than a file that was completed once and then archived. An owner and a review condition turn the document into a maintained artefact.
 
-Counterargument: "The counterargument that model cards are just bureaucracy is fair for low-risk models with a narrow audience and incomplete where a card is the only record of intended use and limitations."
+<PullQuote>
+The counterargument that model cards are just bureaucracy is fair for low-risk models with a narrow audience and incomplete where a card is the only record of intended use and limitations.
+</PullQuote>
 
 ## A decision test
 

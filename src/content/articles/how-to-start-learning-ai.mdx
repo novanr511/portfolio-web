@@ -9,15 +9,21 @@ tags:
   - Learning Path
 ---
 
-Every year the "get into AI" advice gets longer and less useful. Roadmaps sprawl into dozens of checkboxes, courses stack on courses, and most people who follow them still can't build anything real at the end. The problem isn't lack of content — it's that almost none of it is sequenced for someone who already knows how to build software.
+<Lead>
+Every year the "get into AI" advice gets longer and less useful. Roadmaps sprawl into dozens of checkboxes, courses stack on courses, and most people who follow them still can't build anything real at the end. The problem isn't lack of content — it's that <Mark>almost none of it is sequenced for someone who already knows how to build software</Mark>.
+</Lead>
 
+<KeyPoint>
 This is the roadmap I wish someone had handed me: written for developers, optimized for building early, and honest about what you can skip.
+</KeyPoint>
 
 **Direct answer:** The roadmap argues that developers should enter through AI application engineering - composing pre-trained models into products - before deepening into machine learning engineering. It sequences a short conceptual foundation, early building with APIs, then RAG, agents, and evaluation, and names what can be skipped. The claim is one of sequencing and priorities, not a guarantee of hiring outcomes.
 
 ## What "learning AI" actually means now
 
+<Trap>
 The field has split into two very different jobs, and confusing them is the first mistake.
+</Trap>
 
 **Machine learning engineering** is close to classic ML: you train, fine-tune, and evaluate models — regression, gradient boosting, transformers — and you live in notebooks and metrics. This path rewards statistics depth and is where data science work mostly sits.
 
@@ -45,7 +51,7 @@ Pick a tool you already use and make it smarter. Good first projects:
 - A CLI tool that summarizes GitHub issues and drafts replies
 - A smart search for a website you maintain, where embeddings rank results before the LLM answers
 
-Constraints for this phase: use an API (OpenAI, Anthropic, or a local model via Ollama), use plain Python — no frameworks yet. Frameworks hide the mechanics you're supposed to be learning: how the prompt is assembled, how context windows fill up, where the latency goes, what a tool call actually is.
+Constraints for this phase: use an API (OpenAI, Anthropic, or a local model via Ollama), use plain Python — no frameworks yet. <Mark>Frameworks hide the mechanics you're supposed to be learning</Mark>: how the prompt is assembled, how context windows fill up, where the latency goes, what a tool call actually is.
 
 A working sketch of a tool-using agent, with zero frameworks:
 
@@ -92,7 +98,11 @@ final = client.chat.completions.create(model="gpt-4o-mini", messages=messages)
 print(final.choices[0].message.content)
 ```
 
-If you've only ever called an LLM through a chat UI, this is the moment the abstraction cracks open in a useful way: the model doesn't *do* anything. It requests actions. The reliability of your system is your code, not the model's.
+If you've only ever called an LLM through a chat UI, this is the moment the abstraction cracks open in a useful way: the model doesn't *do* anything. It requests actions.
+
+<PullQuote>
+The reliability of your system is your code, not the model's.
+</PullQuote>
 
 ## Phase 2 — Level up properly (months 2–4)
 
@@ -123,7 +133,7 @@ If there is one habit that separates people who "played with AI" from people who
 - A scoring script that runs your system against it on every change
 - Separation of retrieval quality ("did we fetch the right documents?") from answer quality ("did we answer correctly given them?")
 
-This costs one afternoon and instantly puts you ahead of most tutorial graduates. It is also, quietly, a data science skill — the mindset transfers directly to ML evaluation.
+<Mark>This costs one afternoon and instantly puts you ahead of most tutorial graduates</Mark>. It is also, quietly, a data science skill — the mindset transfers directly to ML evaluation.
 
 ## Portfolio, done right
 

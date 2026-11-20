@@ -12,9 +12,17 @@ tags:
   - Verified
 ---
 
-Teams hear that HTTP/3 is faster and feel pressure to switch it on. The standard changes how bytes move between client and server, not what an application does with them, so the speed claim cannot be evaluated in the abstract. The real problem is deciding whether this transport change helps a specific service, given the clients it serves and the stack that terminates connections. RFC 9114 defines the protocol, and public support tables describe which clients can use it at a point in time.
+<Lead>
+Teams hear that HTTP/3 is faster and feel pressure to switch it on. The standard changes <Mark>how bytes move between client and server, not what an application does with them</Mark>, so the speed claim cannot be evaluated in the abstract. The real problem is deciding whether this transport change helps a specific service, given the clients it serves and the stack that terminates connections. RFC 9114 defines the protocol, and public support tables describe which clients can use it at a point in time.
+</Lead>
 
-**Direct answer:** HTTP/3 is a transport variant specified in RFC 9114 that runs over QUIC, with TLS integrated and independent streams that avoid transport-level head-of-line blocking. Whether to adopt it depends on your traffic mix, client base, and edge stack, not on the protocol in isolation. Check dated client and server support before assuming the change reaches your users.
+**Direct answer:**
+
+<KeyPoint>
+HTTP/3 is a transport variant specified in RFC 9114 that runs over QUIC, with TLS integrated and independent streams that avoid transport-level head-of-line blocking.
+</KeyPoint>
+
+Whether to adopt it depends on your traffic mix, client base, and edge stack, not on the protocol in isolation. Check dated client and server support before assuming the change reaches your users.
 
 **Delta:** This article adds a claim-status table and an adoption decision test beyond the standard and the support tables: it maps transport properties to a deployment decision, with claim status explicit.
 
@@ -46,11 +54,15 @@ The first two rows are reported by the sources and describe the protocol and the
 
 ## What it cannot do
 
-HTTP/3 cannot make a slow application fast. It addresses connection setup and stream-level loss behavior, so an application that spends its time in database queries or expensive rendering will not improve because the transport changed. Treating the protocol as a performance fix confuses two layers. The decision test exists to keep that confusion out of the review.
+HTTP/3 cannot make a slow application fast. It addresses connection setup and stream-level loss behavior, so an application that spends its time in database queries or expensive rendering will not improve because the transport changed. Treating the protocol as a performance fix <Mark>confuses two layers</Mark>. The decision test exists to keep that confusion out of the review.
 
 It also cannot reach every user. Some networks block or throttle UDP traffic on the port QUIC uses, and some managed environments restrict protocols they do not recognize. The fallback to HTTP/2 covers browsers that negotiate it, but a client that cannot reach the UDP endpoint will fall back rather than gain the new behavior. A support table tells you about client capability, not about the networks those clients sit behind, so the two must be treated as separate questions.
 
-There is a hidden operational cost. Running QUIC means terminating TLS at a layer that may differ from your current HTTPS setup, updating load balancer and firewall rules, and learning a different set of metrics. Observability that assumes TCP will not show the same signals for a UDP-based connection. A team that enables the protocol without adjusting dashboards may lose visibility into the very latency it hoped to improve.
+There is a hidden operational cost. Running QUIC means terminating TLS at a layer that may differ from your current HTTPS setup, updating load balancer and firewall rules, and learning a different set of metrics. Observability that assumes TCP will not show the same signals for a UDP-based connection.
+
+<Trap>
+A team that enables the protocol without adjusting dashboards may lose visibility into the very latency it hoped to improve.
+</Trap>
 
 A further boundary concerns security-sensitive features. Early data reduces round trips but carries replay considerations that the standard treats with care. Enabling it is a separate decision from enabling HTTP/3, and it should not be assumed as a default. The same discipline applies to any feature that trades a strict guarantee for lower latency.
 
@@ -58,7 +70,9 @@ Finally, the evidence has a shelf life. Standards are revised, browser support e
 
 There is also a cost to keeping two paths alive. A fallback is not free: both configurations need testing, both sets of metrics need dashboards, and a change to one can silently break the other. Teams that enable the new protocol and then stop watching the old one may discover that the fallback has degraded unnoticed, which is exactly the situation that a careful rollout was meant to avoid. The operational burden belongs in the decision as a recurring cost, not a one-time setup task.
 
+<PullQuote>
 Counterargument: "The counterargument that HTTP/3 is always faster is fair for lossy mobile paths and incomplete on clean datacenter links where TCP already performs well."
+</PullQuote>
 
 ## A decision test
 
@@ -70,7 +84,7 @@ Counterargument: "The counterargument that HTTP/3 is always faster is fair for l
 6. Review UDP reachability and the security choices around early data.
 7. Record the decision with the date of the support data and a review trigger.
 
-The test converts a protocol claim into a local decision. Each step is cheap relative to a rushed rollout, and the recorded date makes the decision revisitable. The goal is not to adopt or reject HTTP/3 on principle but to know which condition would change the answer.
+The test converts a protocol claim into a local decision. Each step is cheap relative to a rushed rollout, and the recorded date makes the decision revisitable. The goal is not to adopt or reject HTTP/3 on principle but to <Mark>know which condition would change the answer</Mark>.
 
 For further reading, see [Decision Memos](/articles/decision-memos-that-survive-review).
 

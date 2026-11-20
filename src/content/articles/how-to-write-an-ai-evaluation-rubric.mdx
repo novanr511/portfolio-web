@@ -9,9 +9,21 @@ tags:
   - Measurement
 ---
 
-Most AI evaluation arguments fail because the participants mean different things by "good". One reviewer values completeness, another values brevity, and neither has written down the rule. A rubric is the instrument that makes the judgement explicit and repeatable.
+<Lead>
+Most AI evaluation arguments fail because the participants mean different things by "good". One reviewer values completeness, another values brevity, and neither has written down the rule. A rubric is the instrument that <Mark>makes the judgement explicit and repeatable</Mark>.
+</Lead>
 
-**Direct answer:** A rubric defines the dimensions being scored, what each score level means, and the evidence required for each level. HELM's multi-metric approach — measuring accuracy, calibration, robustness and other properties separately — is the principle at scale; Anthropic's prompt guidance makes success criteria a prerequisite to any prompt work. The boundary: a rubric makes judgement consistent, not correct — a badly chosen dimension will be measured consistently and still mislead.
+**Direct answer:**
+
+<KeyPoint>
+A rubric defines the dimensions being scored, what each score level means, and the evidence required for each level.
+</KeyPoint>
+
+HELM's multi-metric approach — measuring accuracy, calibration, robustness and other properties separately — is the principle at scale; Anthropic's prompt guidance makes success criteria a prerequisite to any prompt work. The boundary: a rubric makes judgement consistent, not correct — a badly chosen dimension will be measured consistently and still mislead.
+
+<KeyFigures items={[
+  { value: "17.9%", label: "of shared scenarios that models were previously evaluated on", source: "Percy Liang et al., 2022 (HELM)" },
+]} />
 
 ## Four dimensions to score separately
 
@@ -35,7 +47,7 @@ Each dimension needs anchor descriptions for the score levels. A three-point sca
 - **1 — partially meets.** One claim is unsupported or ambiguous.
 - **0 — fails.** A core claim is contradicted by the source, or no source is provided.
 
-The anchors matter more than the number of levels. A five-point scale with vague anchors produces more noise, not more precision.
+The anchors matter more than the number of levels. A five-point scale with vague anchors produces <Mark>more noise, not more precision</Mark>.
 
 ## A worked rubric for a support answer
 
@@ -66,17 +78,25 @@ Two reviewers using the same rubric will still diverge until they calibrate. Thr
 
 **Keep the rubric with the test set.** Anchors that live in a document nobody opens will drift. Put them next to the examples they score.
 
-**Distinguish the judge from the system.** If an LLM scores answers, validate it against human scores on a sample. A judge that rewards length will inflate presentation and penalise concise correct answers. HELM's point about measuring beyond accuracy applies to judges too.
+**Distinguish the judge from the system.** If an LLM scores answers, validate it against human scores on a sample. <Mark>A judge that rewards length</Mark> will inflate presentation and penalise concise correct answers. HELM's point about measuring beyond accuracy applies to judges too.
 
 ## What a rubric cannot do
 
-**It cannot define what matters.** Choosing dimensions is a product decision. A rubric that omits groundedness will happily reward fluent fabrication.
+**It cannot define what matters.** Choosing dimensions is a product decision.
+
+<Trap>
+A rubric that omits groundedness will happily reward fluent fabrication.
+</Trap>
 
 **It cannot remove subjectivity.** Anchors reduce disagreement; they do not eliminate judgement. A human should still review the cases near the threshold.
 
 **It stays valid only for one task.** A rubric for support answers is wrong for code generation. Reuse the structure, not the dimensions.
 
-The counterargument — that a rubric is bureaucratic overhead — is fair for a single experiment. It earns its cost when a team evaluates after every change, because reproducibility is otherwise impossible.
+The counterargument — that a rubric is bureaucratic overhead — is fair for a single experiment.
+
+<PullQuote>
+It earns its cost when a team evaluates after every change, because reproducibility is otherwise impossible.
+</PullQuote>
 
 ## A decision test
 

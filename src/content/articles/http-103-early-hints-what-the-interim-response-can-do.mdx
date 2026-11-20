@@ -9,9 +9,15 @@ tags:
   - Infrastructure
 ---
 
-HTTP 103 Early Hints gives a server a way to send selected hints before it is ready to send the final response. A browser may use those hints to prepare for resources it expects the final page to need. That can create an opportunity to start work earlier, but it does not guarantee a faster page: the hint must be correct, the client must act on it, and the eventual response still determines the resource and document behavior.
+<Lead>
+HTTP 103 Early Hints gives a server a way to send selected hints before it is ready to send the final response. A browser may use those hints to prepare for resources it expects the final page to need. That can create an opportunity to start work earlier, but it <Mark>does not guarantee a faster page</Mark>: the hint must be correct, the client must act on it, and the eventual response still determines the resource and document behavior.
+</Lead>
 
-**Direct answer:** RFC 8297 defines status code 103 as an informational response that can carry header fields—particularly `Link` fields—before a final response. A client can use those hints to prepare for processing the final response, such as initiating a connection or fetching a likely critical resource. RFC 8297 is an **Experimental** RFC, not an Internet Standards Track specification. Early Hints should be tested with the relevant server, intermediary, and browser path; its presence alone is not evidence of a performance improvement.
+**Direct answer:** RFC 8297 defines status code 103 as an informational response that can carry header fields—particularly `Link` fields—before a final response. A client can use those hints to prepare for processing the final response, such as initiating a connection or fetching a likely critical resource. RFC 8297 is an **Experimental** RFC, not an Internet Standards Track specification.
+
+<KeyPoint>
+Early Hints should be tested with the relevant server, intermediary, and browser path; its presence alone is not evidence of a performance improvement.
+</KeyPoint>
 
 ## What “early” means in the HTTP exchange
 
@@ -34,13 +40,19 @@ The `Link` value is a hint about a resource, not the final HTML document itself.
 
 Early Hints is most relevant when the server knows likely critical resources before it has completed generating or retrieving the final response. The `Link` header can describe such resources using relations such as `preload` or `preconnect`, subject to the semantics defined for those relations and client support.
 
-The hint should be based on a reliable expectation. If it names a resource the final page does not use, the client may spend bandwidth and connection capacity on unnecessary work. If the final response uses a different URL, or the resource’s `as`, credentials, or other relevant attributes do not match, early fetching may not be reusable as intended. The server should therefore prefer stable, well-understood dependencies over speculative lists.
+The hint should be based on a reliable expectation.
+
+<Trap>
+If it names a resource the final page does not use, the client may spend bandwidth and connection capacity on unnecessary work.
+</Trap>
+
+If the final response uses a different URL, or the resource’s `as`, credentials, or other relevant attributes do not match, early fetching may not be reusable as intended. The server should therefore prefer stable, well-understood dependencies over speculative lists.
 
 Early Hints is not a way to send arbitrary HTML early, and it does not tell a browser that the final response is guaranteed to succeed. A subsequent response may redirect, fail, or produce a page that does not use the hinted resource. The client must continue to handle the final response according to ordinary HTTP and browser behavior.
 
 ## Intermediaries and browser behavior matter
 
-The protocol mechanism is only one part of the path. A reverse proxy, CDN, or other intermediary may affect whether an interim response is forwarded and when it reaches the browser. Browser behavior also varies by implementation and version. Consequently, a server log showing that it emitted a 103 does not prove that a browser received or acted on it.
+The protocol mechanism is only one part of the path. A reverse proxy, CDN, or other intermediary may affect whether an interim response is forwarded and when it reaches the browser. Browser behavior also varies by implementation and version. Consequently, <Mark>a server log showing that it emitted a 103 does not prove that a browser received or acted on it</Mark>.
 
 Test the actual delivery path: origin, intermediary configuration, protocol version, and target browsers. Capture the response sequence at the client or use browser tooling that can show the relevant network requests and timing. Compare a representative baseline with a controlled Early Hints configuration rather than attributing a page-level change to 103 based on timing coincidence alone.
 
@@ -55,7 +67,7 @@ Start with a small set of pages and a short list of resources whose criticality 
 5. Watch for wasted downloads, duplicate requests, connection contention, and changes in other resources’ timing.
 6. Remove or revise hints that are inaccurate or do not improve the measured outcome.
 
-Do not promise a fixed time saving from the status code itself. The effect depends on when the server can send the hint, how long the final response takes, the client’s network and cache state, and whether the hinted resources are needed. A hint may have little opportunity to help when the final response is already ready, or when the client already has the resource cached.
+Do not promise <Mark>a fixed time saving from the status code itself</Mark>. The effect depends on when the server can send the hint, how long the final response takes, the client’s network and cache state, and whether the hinted resources are needed. A hint may have little opportunity to help when the final response is already ready, or when the client already has the resource cached.
 
 ## Early Hints is a protocol feature, not an SEO signal
 
@@ -69,7 +81,11 @@ The following is hypothetical and illustrative. An origin emits a 103 with a `Li
 
 ## A counterargument
 
-A reasonable critic can argue that the article applies its own evidentiary standard unevenly. It correctly insists that emitting a 103 is not proof of a performance gain, but the parallel claim that RFC 8297 does not define 103 as a ranking signal is then treated as proof it has no SEO relevance; absence of a definition is not the same as evidence of no effect. The warning that intermediaries may strip interim responses and that browser support varies is sensible, yet none of the cited sources establishes how often that happens: RFC 8297 defines the experimental status code, RFC 8288 defines `Link` fields, and MDN gives a browser overview. The evaluation checklist is prudent, but the article's confidence about what 103 cannot do outruns the sources as much as the speed claims it rejects.
+A reasonable critic can argue that the article applies its own evidentiary standard unevenly. It correctly insists that emitting a 103 is not proof of a performance gain, but the parallel claim that RFC 8297 does not define 103 as a ranking signal is then treated as proof it has no SEO relevance; absence of a definition is not the same as evidence of no effect. The warning that intermediaries may strip interim responses and that browser support varies is sensible, yet none of the cited sources establishes how often that happens: RFC 8297 defines the experimental status code, RFC 8288 defines `Link` fields, and MDN gives a browser overview.
+
+<PullQuote>
+The evaluation checklist is prudent, but the article's confidence about what 103 cannot do outruns the sources as much as the speed claims it rejects.
+</PullQuote>
 
 ## References & Further Reading
 

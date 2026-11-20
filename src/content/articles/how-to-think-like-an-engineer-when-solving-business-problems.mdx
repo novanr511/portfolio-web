@@ -9,7 +9,9 @@ tags:
   - Business
 ---
 
-"Think like an engineer" is often used to mean being logical. That is too vague to be useful. The distinctive thing engineers do is make assumptions explicit, decompose a system into parts with defined interfaces, and measure whether the result behaves as predicted. Applied to a business problem, the same habits turn a vague complaint into a testable claim.
+<Lead>
+"Think like an engineer" is often used to mean being logical. That is too vague to be useful. The distinctive thing engineers do is <Mark>make assumptions explicit, decompose a system into parts with defined interfaces, and measure whether the result behaves as predicted</Mark>. Applied to a business problem, the same habits turn a vague complaint into a testable claim.
+</Lead>
 
 **Direct answer:** The method is to define the system boundary, decompose the problem, state assumptions with their uncertainty, build the smallest model that can be wrong, and measure the outcome against a baseline. Kuhn and Johnson's *Feature Engineering and Selection* is a good methodological reference because it insists that a variable's value depends on the prediction context, while scikit-learn's validation guidance supplies the discipline for testing. The boundary: the method produces clarity, not certainty, and a model is a tool for reasoning rather than a substitute for judgement.
 
@@ -19,9 +21,13 @@ tags:
 
 **2. Decompose.** Split the system into stages with measurable flows. If each stage has an input count, an output count, and a conversion rate, the stage causing a change becomes visible.
 
-**3. State assumptions.** Write down what you believe about each stage and how confident you are. This is the step that separates engineering reasoning from storytelling, because a written assumption can be falsified.
+**3. State assumptions.** Write down what you believe about each stage and how confident you are.
 
-**4. Build the smallest useful model.** A spreadsheet with explicit inputs beats a complex model whose workings nobody can inspect. The purpose is to see which assumption matters most, not to impress.
+<KeyPoint>
+This is the step that separates engineering reasoning from storytelling, because a written assumption can be falsified.
+</KeyPoint>
+
+**4. Build the smallest useful model.** <Mark>A spreadsheet with explicit inputs beats a complex model whose workings nobody can inspect</Mark>. The purpose is to see which assumption matters most, not to impress.
 
 **5. Measure against a baseline.** Without a counterfactual, you cannot tell whether an intervention worked. scikit-learn's warning about leakage applies in spirit: using information that would not have been available at the decision time produces a flattering but useless evaluation.
 
@@ -55,7 +61,11 @@ Three caveats keep this honest:
 
 ## Define the problem before decomposing it
 
-The most expensive error in this method is solving the wrong problem well. A team that decomposes "conversion is down" into a funnel is already committed to a view of the cause; the key question may be whether the traffic changed quality.
+<Trap>
+The most expensive error in this method is solving the wrong problem well.
+</Trap>
+
+A team that decomposes "conversion is down" into a funnel is already committed to a view of the cause; the key question may be whether the traffic changed quality.
 
 A useful discipline is to write three versions of the problem before choosing one:
 
@@ -65,7 +75,7 @@ A useful discipline is to write three versions of the problem before choosing on
 
 These are different claims. The first invites a broad search, the second defines what to measure, and the third sets a budget for the investigation. A team that jumps from the first to a solution has skipped the two steps that make the work useful.
 
-Kuhn and Johnson's context principle applies here too: the same metric can mean different things under different populations and time windows. A 15% conversion rate is a crisis if the visitors are qualified buyers and unremarkable if a campaign changed the traffic mix. The decomposition cannot tell you which, because the explanation lies outside the funnel — in the data definition and the channel history.
+Kuhn and Johnson's context principle applies here too: <Mark>the same metric can mean different things under different populations and time windows</Mark>. A 15% conversion rate is a crisis if the visitors are qualified buyers and unremarkable if a campaign changed the traffic mix. The decomposition cannot tell you which, because the explanation lies outside the funnel — in the data definition and the channel history.
 
 ## When the method becomes over-engineering
 
@@ -77,7 +87,11 @@ Three failure modes are worth naming.
 
 **Treating the map as the territory.** The funnel table is a representation of a business, not the business. A team can spend weeks refining the model while the actual cause — a pricing page change, a competitor, a support issue — sits outside its boundary.
 
-This is the point where the engineering mindset meets its counterargument. Business decisions often arrive with incomplete data, political constraints, and time pressure, and an insistence on perfect measurement can be a way of avoiding a decision. The disciplined version of the method says: state the assumption, make the smallest test, and decide with the evidence you can get.
+This is the point where the engineering mindset meets its counterargument. Business decisions often arrive with incomplete data, political constraints, and time pressure, and an insistence on perfect measurement can be a way of avoiding a decision.
+
+<PullQuote>
+The disciplined version of the method says: state the assumption, make the smallest test, and decide with the evidence you can get.
+</PullQuote>
 
 Damodaran's valuation work is a useful counterweight here. It is explicitly a framework for making decisions under uncertainty, where the output is a range and the value lies in the assumptions being visible — not in a number that pretends to be certain.
 

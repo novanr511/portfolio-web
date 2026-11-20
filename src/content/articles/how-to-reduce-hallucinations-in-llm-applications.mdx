@@ -9,7 +9,9 @@ tags:
   - Reliability
 ---
 
-A hallucination is a confident answer that is not supported by the evidence available to the system. The usual response is to change the prompt, which addresses one cause and leaves the others. A survey of hallucination in natural language generation distinguishes multiple sources — data, model, and process — and each needs a different control.
+<Lead>
+A hallucination is <Mark>a confident answer that is not supported by the evidence available to the system</Mark>. The usual response is to change the prompt, which addresses one cause and leaves the others. A survey of hallucination in natural language generation distinguishes multiple sources — data, model, and process — and each needs a different control.
+</Lead>
 
 **Direct answer:** Reduce hallucinations by grounding answers in supplied sources, requiring citations that can be checked, constraining the model to say "not found" when evidence is absent, and evaluating the full system on a labelled set. Anthropic's prompt-engineering guidance lists reducing hallucinations as a distinct task with its own approach. The boundary: no control eliminates the possibility of a wrong answer — the goal is to make unsupported claims detectable and less likely to reach the user.
 
@@ -21,7 +23,11 @@ A hallucination is a confident answer that is not supported by the evidence avai
 
 **Process causes.** A long conversation can drift; a tool can return a stale result; a retry can produce a different answer. The control is verification at the point where the answer is used — a schema check, a citation check, or a human review.
 
-The practical implication is that hallucination reduction is a system design task. A prompt-only approach is the least reliable of the three controls.
+<KeyPoint>
+The practical implication is that hallucination reduction is a system design task.
+</KeyPoint>
+
+A prompt-only approach is the least reliable of the three controls.
 
 ## The controls that work
 
@@ -31,7 +37,7 @@ The practical implication is that hallucination reduction is a system design tas
 
 **Define the refusal.** Give exact wording for "I don't have that information". Without an explicit refusal path, the model will fill gaps with plausible text.
 
-**Verify structured output.** If the answer is data — a date, an amount, a code — validate it against a schema or a second source. A model's confidence is not evidence.
+**Verify structured output.** If the answer is data — a date, an amount, a code — validate it against a schema or a second source. <Mark>A model's confidence is not evidence</Mark>.
 
 **Keep a human in the loop for high-impact answers.** The human-in-the-loop article covers the design: the reviewer needs time, information, and authority to override.
 
@@ -56,17 +62,25 @@ A grounded answer should say 14 days and cite Section 7. Three checks make this 
 2. **Refusal rate on out-of-scope questions.** Ask "Do you offer lifetime warranties?" — the correct behaviour is the exact refusal. A low refusal rate means the model is guessing.
 3. **Coverage of the retrieval step.** If Section 7 was not retrieved, the failure happened before the model saw it. No prompt fixes a missing passage.
 
-The lesson is that a hallucination incident has a stage: retrieval, generation, or verification. Diagnosing the stage decides the fix.
+The lesson is that <Mark>a hallucination incident has a stage: retrieval, generation, or verification</Mark>. Diagnosing the stage decides the fix.
 
 ## What does not work
 
-**"Do not hallucinate" as an instruction.** It restates the goal without changing the mechanism. A model that is about to fabricate does not gain information from the warning.
+**"Do not hallucinate" as an instruction.** It restates the goal without changing the mechanism.
+
+<Trap>
+A model that is about to fabricate does not gain information from the warning.
+</Trap>
 
 **Longer system prompts without a failure to prevent.** Each instruction should map to an observed error. Unbounded instructions dilute priority, as the system-prompt article explains.
 
 **Relying on confidence scores.** A model's stated confidence is a generated number, not a calibrated probability unless it has been measured as such. HELM's inclusion of calibration as a metric exists because accuracy alone hides this.
 
-The counterargument — that newer models hallucinate less, so the problem is shrinking — is true at the margin and irrelevant to system design. A lower error rate at high volume still produces errors, and the cost of an unsupported claim in a regulated domain is not linear.
+<PullQuote>
+The counterargument — that newer models hallucinate less, so the problem is shrinking — is true at the margin and irrelevant to system design.
+</PullQuote>
+
+A lower error rate at high volume still produces errors, and the cost of an unsupported claim in a regulated domain is not linear.
 
 ## A decision test
 

@@ -9,19 +9,25 @@ tags:
   - Web
 ---
 
-A robots.txt file looks like a simple list of rules, which is why teams assume that any validator can tell them whether it is correct. The specification defines how a crawler parses the file — which groups apply, how wildcards match, how rules are combined — and the behaviour is subtler than the syntax suggests, as the robots.txt parsing article explains for the rules a crawler actually follows.
+<Lead>
+A robots.txt file looks like a simple list of rules, which is why teams assume that <Mark>any validator can tell them whether it is correct</Mark>. The specification defines how a crawler parses the file — which groups apply, how wildcards match, how rules are combined — and the behaviour is subtler than the syntax suggests, as the robots.txt parsing article explains for the rules a crawler actually follows.
+</Lead>
 
 **Direct answer:** Evaluate robots.txt parsing by testing representative URLs against the rules a specific crawler applies, using server logs to confirm what was requested. RFC 9110 provides the HTTP context, and Search Console guidance covers diagnosis. The boundary: a file that parses correctly does not guarantee a page is indexed, which the robots-versus-noindex article distinguishes, and no technical setting guarantees a ranking, as the publication standard states.
 
 ## What to test
 
-**Group matching.** A crawler chooses the most specific matching user-agent group, which the parsing specification defines, as the robots.txt article explains. A file that looks correct to a human can be interpreted differently, which is why testing against representative URLs matters, as [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests) recommends for observing actual requests.
+**Group matching.** A crawler chooses the most specific matching user-agent group, which the parsing specification defines, as the robots.txt article explains. A file that <Mark>looks correct to a human can be interpreted differently</Mark>, which is why testing against representative URLs matters, as [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests) recommends for observing actual requests.
 
 **Path matching.** Wildcards and trailing slashes change what a rule covers, which the specification defines, as the URL-structure article advises for normalising paths. A rule intended for one directory may cover more, as the faceted-navigation article warns about parameter variations.
 
 **Order and specificity.** Multiple matching rules are combined by the parser, not simply applied in order, which the parsing article treats as a key distinction, as the technical-SEO-engineering article explains for the request path.
 
-**Verification against logs.** The only reliable evidence of what a crawler did is the request itself, which the server-logs article describes, as the crawler-request article explains for the stages of access and crawling. A validator checks syntax, not behaviour, as the diagnostics article warns about trusting a tool over evidence.
+**Verification against logs.** The only reliable evidence of what a crawler did is the request itself, which the server-logs article describes, as the crawler-request article explains for the stages of access and crawling.
+
+<KeyPoint>
+A validator checks syntax, not behaviour, as the diagnostics article warns about trusting a tool over evidence.
+</KeyPoint>
 
 Three consequences follow. The test set should include URLs that should be allowed and disallowed, which the crawl-budget article advises for a diagnostic. The results should be checked after a file change, as the monitoring article treats as a review trigger. And the distinction between access, crawling, and indexing should be kept, as the discovered-crawled-rendered article explains.
 
@@ -31,13 +37,21 @@ The following is hypothetical and illustrative. A site adds a rule to disallow a
 
 Three checks decide the response. First, parse the file against representative URLs, including the product path, as the robots.txt article advises. Second, check server logs for what the crawler actually requested after the change, as [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests) recommends. Third, confirm whether the product page is still indexed, which the Search Console guide covers, as the robots-versus-noindex article distinguishes a crawl rule from an index directive.
 
-Three conclusions follow. The intent of the file and its effect differ, which the parsing article explains. A syntax validator would not have caught the overbroad match, as the diagnostics article warns. And the change should be recorded with the URLs tested, as the decision-memo article requires.
+Three conclusions follow. <Mark>The intent of the file and its effect differ</Mark>, which the parsing article explains.
+
+<Trap>
+A syntax validator would not have caught the overbroad match, as the diagnostics article warns.
+</Trap>
+
+And the change should be recorded with the URLs tested, as the decision-memo article requires.
 
 ## What parsing evaluation cannot do
 
 It cannot guarantee indexing, which the robots-versus-noindex article distinguishes, as the publication standard forbids ranking promises. It does not cover rendering or other crawl constraints, which the technical-SEO-engineering article treats as separate stages, as the crawl-budget article advises for capacity. And it cannot prove that every crawler interprets the file identically, which the parsing article treats as implementation-specific, as the browser-evolution article explains for differing behaviour.
 
+<PullQuote>
 The counterargument that a validator is sufficient is wrong about what it checks, which the worked example shows: syntax and effect are different, as the diagnostics article advises for verification.
+</PullQuote>
 
 ## A decision test
 

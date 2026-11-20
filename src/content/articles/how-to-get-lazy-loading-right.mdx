@@ -9,23 +9,31 @@ tags:
   - Verified
 ---
 
+<Lead>
 Lazy loading is often described as a free performance win: defer an image or a script until it is needed, and the page gets faster. In practice the technique moves work in time rather than removing it, and badly timed deferral can make the metrics it is meant to improve worse. The real problem is deciding which resources to defer, when to load them, and how to prove the change helped.
+</Lead>
 
-**Direct answer:** Lazy loading is a design pattern that postpones loading a resource until the moment it is needed, commonly applied to below-the-fold images and iframes. It reduces initial payload and bandwidth, but it must be reconciled with Core Web Vitals, because deferring the largest contentful paint or shifting layout to insert a deferred image can damage LCP and CLS.
+**Direct answer:**
+
+<KeyPoint>
+Lazy loading is a design pattern that postpones loading a resource until the moment it is needed, commonly applied to below-the-fold images and iframes.
+</KeyPoint>
+
+It reduces initial payload and bandwidth, but it must be reconciled with Core Web Vitals, because deferring the largest contentful paint or shifting layout to insert a deferred image can damage LCP and CLS.
 
 **Delta:** This article adds a decision framing beyond the sources: it maps lazy-loading placement to Core Web Vitals risk, with claim status explicit.
 
 ## The mechanism
 
-Lazy loading is a design pattern that delays initialization of a resource until the point at which it is actually needed. In web pages the usual targets are images, iframes, and scripts that sit below the fold or behind an interaction. The native loading="lazy" attribute on image and iframe elements gives the browser the signal to defer, while JavaScript observers can implement the same idea for other resources. The practical consequence is that the browser spends its early bandwidth on what the user can see first, which is why the pattern is associated with smaller initial page weight and lower data use.
+Lazy loading is a design pattern that delays initialization of a resource until the point at which it is actually needed. In web pages the usual targets are images, iframes, and scripts that sit below the fold or behind an interaction. The native loading="lazy" attribute on image and iframe elements gives the browser the signal to defer, while JavaScript observers can implement the same idea for other resources. The practical consequence is that the browser <Mark>spends its early bandwidth on what the user can see first</Mark>, which is why the pattern is associated with smaller initial page weight and lower data use.
 
 <Figure src="/images/articles/inline/how-to-get-lazy-loading-right-1.png" alt="A five-step flow: find deferral candidates, exclude a likely LCP element, reserve image dimensions, measure LCP and CLS, then keep deferral where it helps." caption="Conceptual: deferral is a hypothesis validated against LCP and CLS, not a free win." />
 
 Web Vitals define what "faster" should mean for a page. Largest Contentful Paint measures when the main content appears, Interaction to Next Paint measures responsiveness to input, and Cumulative Layout Shift measures visual stability. These three outcomes bound the benefit: a deferral is only a win if it improves or leaves intact the metric the user actually feels. Lazy loading interacts most directly with LCP and CLS, so those are the two that deserve scrutiny before a change ships.
 
-The interaction with LCP is the central trade-off. If the element that becomes the largest contentful paint is itself deferred, the browser waits for the scroll or the observer before fetching it, and LCP is pushed later. That is the failure mode most often seen when teams lazy load a hero image. The practical rule that follows is to exclude above-the-fold and likely-LCP candidates from deferral, even when a generic rule would otherwise catch them. A blanket rule is simpler to write but harder to defend once LCP is measured.
+The interaction with LCP is the central trade-off. If the element that becomes the largest contentful paint is itself deferred, the browser waits for the scroll or the observer before fetching it, and LCP is pushed later. That is the failure mode most often seen when teams lazy load a hero image. The practical rule that follows is to <Mark>exclude above-the-fold and likely-LCP candidates from deferral</Mark>, even when a generic rule would otherwise catch them. A blanket rule is simpler to write but harder to defend once LCP is measured.
 
-The interaction with CLS is quieter but equally real. An image that loads late without reserved dimensions collapses the space it occupies, then expands it when the bytes arrive, producing a layout shift. Reserving intrinsic size with width and height attributes prevents that shift. The broader consequence is measurement: because deferral changes when bytes are requested, the only reliable way to know whether a change helped is to measure field or lab Core Web Vitals before and after, rather than assuming that a smaller initial request is always better.
+The interaction with CLS is quieter but equally real. An image that loads late without reserved dimensions collapses the space it occupies, then expands it when the bytes arrive, producing a layout shift. Reserving intrinsic size with width and height attributes prevents that shift. The broader consequence is measurement: because deferral changes when bytes are requested, the only reliable way to know whether a change helped is to <Mark>measure field or lab Core Web Vitals before and after</Mark>, rather than assuming that a smaller initial request is always better.
 
 ## A worked example
 
@@ -47,13 +55,19 @@ Lazy loading cannot reduce the total amount of data a page eventually needs. It 
 
 The hidden cost is complexity and observer overhead. Implementing deferral with JavaScript adds a script, an IntersectionObserver or equivalent, and logic for thresholds and fallbacks where native lazy loading is unavailable. That code runs on the main thread and must be maintained as the page evolves. A page that defers too aggressively can also feel fragmented, with images appearing in visible bursts as the user scrolls, trading a bandwidth saving for a perception of incompleteness that no metric captures cleanly.
 
-A specific failure mode is deferring the element that becomes the largest contentful paint. Because LCP is driven by the largest visible element, a lazy-loaded hero delays the metric rather than improving it. A related failure is inserting deferred media without reserved space, which produces layout shift as the image arrives. Both failures are invisible in a synthetic test that only checks initial request size, which is why metric-level verification matters more than the pattern itself. A green build tells you nothing about the experience.
+<Trap>
+A specific failure mode is deferring the element that becomes the largest contentful paint.
+</Trap>
+
+Because LCP is driven by the largest visible element, a lazy-loaded hero delays the metric rather than improving it. A related failure is inserting deferred media without reserved space, which produces layout shift as the image arrives. Both failures are invisible in a synthetic test that only checks initial request size, which is why metric-level verification matters more than the pattern itself. A green build tells you nothing about the experience.
 
 The boundary of the technique is that it is a loading strategy, not a substitute for correct sizing, compression, or caching. A large image served in the wrong format is still large when it finally loads, and it still costs the user bandwidth. Lazy loading also cannot rescue a page whose server is slow, because it does not change time to first byte. The decision to defer belongs alongside responsive images and modern formats, not in place of them, and it should be credited only for the effect it can actually produce.
 
 Finally, the choice needs periodic review. Browsers change their native loading heuristics, the thresholds behind Core Web Vitals are maintained by the vendor, and page layouts change as content evolves. A rule that was correct when it was introduced can quietly become wrong when a new hero is added or a template is reflowed. The discipline is to recheck the decision metrics whenever the page structure changes, not once at launch, so that deferral remains a deliberate choice rather than an inherited assumption.
 
+<PullQuote>
 The counterargument that lazy loading is a pure win is fair for off-screen media and incomplete for above-the-fold content, because it ignores the timing of the largest paint and the layout stability that the sources treat as user-facing.
+</PullQuote>
 
 ## A decision test
 

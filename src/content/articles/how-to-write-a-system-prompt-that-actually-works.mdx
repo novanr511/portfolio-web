@@ -9,9 +9,11 @@ tags:
   - Implementation
 ---
 
+<Lead>
 Most system prompts fail for the same reason: they are written as a paragraph of hopes. "Be helpful, accurate, concise, friendly, and never make mistakes" gives the model no priority order and no way to resolve a conflict between goals. A working system prompt is a short specification of what to do when the goals disagree.
+</Lead>
 
-**Direct answer:** Anthropic's prompt-engineering guidance says that before prompt work you need "a clear definition of the success criteria for your use case", "some ways to empirically test against those criteria", and "a first draft prompt you want to improve". OpenAI publishes parallel guidance for its models. The boundary: a system prompt can constrain behaviour and format, but it cannot supply knowledge the model does not have or guarantee correctness — for that you need retrieval, tools, and evaluation.
+**Direct answer:** Anthropic's prompt-engineering guidance says that before prompt work you need "a clear definition of the success criteria for your use case", "some ways to empirically test against those criteria", and "a first draft prompt you want to improve". OpenAI publishes parallel guidance for its models. The boundary: a system prompt can <Mark>constrain behaviour and format</Mark>, but it cannot supply knowledge the model does not have or guarantee correctness — for that you need retrieval, tools, and evaluation.
 
 ## What the system prompt is for
 
@@ -19,7 +21,11 @@ A system prompt sits above the user's message and sets the frame: role, scope, o
 
 **Define the boundary.** What is in scope, what is out, and what the model should do when asked to leave its scope. An assistant that answers every question badly is less useful than one that declines clearly.
 
-**Set priorities.** When "be concise" and "be complete" conflict, which wins? A prompt that does not say leaves the model to guess, and it will guess differently across requests.
+**Set priorities.** When "be concise" and "be complete" conflict, which wins?
+
+<Trap>
+A prompt that does not say leaves the model to guess, and it will guess differently across requests.
+</Trap>
 
 **Specify the output.** Format, length, and the handling of uncertainty. A structured output is far easier to test than free prose.
 
@@ -60,11 +66,15 @@ Three changes follow:
 2. **Conflicts have explicit outcomes.** The "don't know" case has an exact response, which makes it checkable in an evaluation set.
 3. **The scope has a consequence for out-of-scope requests.** The model does not improvise an answer about unrelated products.
 
-The rewrite is longer, but every line corresponds to a testable behaviour. That is the criterion, not brevity.
+The rewrite is longer, but <Mark>every line corresponds to a testable behaviour</Mark>. That is the criterion, not brevity.
 
 ## Test before polishing
 
-A system prompt without an evaluation set is a collection of opinions. A minimal test has three parts:
+<KeyPoint>
+A system prompt without an evaluation set is a collection of opinions.
+</KeyPoint>
+
+A minimal test has three parts:
 
 - **In-scope questions** with known answers from the context.
 - **Out-of-scope questions** where the correct behaviour is a specific refusal.
@@ -72,7 +82,7 @@ A system prompt without an evaluation set is a collection of opinions. A minimal
 
 Score each against the stated rules, then change one instruction at a time. If a change improves one case and breaks another, the prompt is revealing a genuine trade-off that needs a business decision — not a wording fix.
 
-Anthropic's guides on reducing hallucinations, increasing output consistency, and strengthening guardrails exist because these are separate properties. A prompt that improves one can worsen another, which is why the evaluation set must cover all of them.
+Anthropic's guides on reducing hallucinations, increasing output consistency, and strengthening guardrails exist because these are separate properties. <Mark>A prompt that improves one can worsen another</Mark>, which is why the evaluation set must cover all of them.
 
 ## What a system prompt cannot do
 
@@ -82,7 +92,11 @@ Anthropic's guides on reducing hallucinations, increasing output consistency, an
 
 **It cannot replace evaluation.** A prompt that looks good in a demo may fail on real phrasing. The test set is the evidence.
 
-The counterargument — that models following instructions well makes careful prompting unnecessary — misses the point. Clear instructions reduce variance across requests. That is valuable even when the model is capable.
+The counterargument — that models following instructions well makes careful prompting unnecessary — misses the point.
+
+<PullQuote>
+Clear instructions reduce variance across requests. That is valuable even when the model is capable.
+</PullQuote>
 
 ## A decision test
 
