@@ -1,6 +1,13 @@
 import type { MDXComponents } from "mdx/types";
 import Link from "next/link";
 import { Figure } from "@/components/figure";
+import {
+  Lead,
+  KeyPoint,
+  PullQuote,
+  Trap,
+  Mark,
+} from "@/components/article-emphasis";
 
 const components: MDXComponents = {
   a: ({ href = "", children, ...props }) => {
@@ -31,6 +38,11 @@ const components: MDXComponents = {
   Figure: ({ src, alt, caption }) => (
     <Figure src={String(src ?? "")} alt={String(alt ?? "")} caption={caption ? String(caption) : undefined} />
   ),
+  Lead,
+  KeyPoint,
+  PullQuote,
+  Trap,
+  Mark,
 };
 
 export function useMDXComponents(): MDXComponents {
