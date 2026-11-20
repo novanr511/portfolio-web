@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI content moderation is often sold as a way to handle volume, which hides the decisions it cannot make. The Wikipedia entry describes moderation as reviewing and filtering content, and the NIST AI RMF provides a risk frame. The practice is about where automation is safe and where a person must decide.
+</Lead>
 
 **Direct answer:** Use AI to route and prioritise content against a defined policy, with human review for consequential decisions and measured accuracy for the rest. The sources describe the practice; the boundary rule is a synthesis.
 
@@ -21,11 +23,15 @@ Three points matter:
 
 <Figure src="/images/articles/inline/ai-content-moderation-without-the-hype-1.png" alt="A loop: define policy, route and prioritise content, use human review at the boundary, then feed appeals by cause back into the policy and model." caption="Conceptual: appeals feed back into the policy, so moderation is a correction loop." />
 
-- **Policy comes first.** The moderation entry describes filtering content. A system cannot be accurate against a policy nobody defined.
+- **Policy comes first.** The moderation entry describes filtering content. A system cannot be accurate against <Mark>a policy nobody defined</Mark>.
 - **Errors are asymmetric.** The NIST RMF asks for risk to be measured and managed. Removing legitimate content and leaving harmful content have different costs.
 - **Appeals are part of the system.** A moderation decision that cannot be challenged will be wrong without a correction path.
 
-The sequence is: define the policy, measure error by category, route uncertain cases to people, then review appeals. The policy is local judgement, so it is `inferred`; the practice is `source-reported`.
+<KeyPoint>
+The sequence is: define the policy, measure error by category, route uncertain cases to people, then review appeals.
+</KeyPoint>
+
+The policy is local judgement, so it is `inferred`; the practice is `source-reported`.
 
 ## A worked example
 
@@ -37,11 +43,11 @@ The outcome is a moderation design with recorded limits. The scenario is hypothe
 
 ## Why policy disagreement is a signal
 
-If two reviewers would decide the same case differently, the policy is not clear enough to automate. That disagreement is useful information: it identifies where a rule needs to be written down before a model is trained on inconsistent labels. Automating an ambiguous policy scales the ambiguity.
+If two reviewers would decide the same case differently, the policy is not clear enough to automate. That disagreement is useful information: it identifies where a rule needs to be written down before a model is trained on inconsistent labels. Automating an ambiguous policy <Mark>scales the ambiguity</Mark>.
 
 ## Why appeals improve the system
 
-An appeal is not only a correction for one user. It is evidence about where the model or the policy is wrong. Grouping appeals by cause reveals patterns that an aggregate accuracy figure hides, which makes the review loop more useful than a periodic score.
+An appeal is not only a correction for one user. It is evidence about where the model or the policy is wrong. <Mark>Grouping appeals by cause</Mark> reveals patterns that an aggregate accuracy figure hides, which makes the review loop more useful than a periodic score.
 
 ## Evidence status
 
@@ -57,7 +63,13 @@ A system that filters quickly can still make the wrong decision at scale. The us
 
 A final limit is context. A model can classify a piece of text but cannot know the conversation around it, and the same phrase can be harmless or harmful depending on context. Systems that treat content in isolation will make predictable errors, which is another reason to keep human review for borderline cases.
 
-Moderation also has a cost on legitimate expression. A system tuned to remove everything risky will remove valid content, and the effect falls unevenly across communities. Measuring that cost is part of the policy decision, not an optional refinement. A system that reports only removals is reporting only half of its impact.
+Moderation also has a cost on legitimate expression.
+
+<Trap>
+A system tuned to remove everything risky will remove valid content, and the effect falls unevenly across communities.
+</Trap>
+
+Measuring that cost is part of the policy decision, not an optional refinement. A system that reports only removals is reporting only half of its impact.
 
 The system should record which policy version produced each decision, since a rule that changes over time makes older decisions impossible to interpret.
 
@@ -73,7 +85,9 @@ The threshold for escalation should be reviewed when the content mix changes.
 
 It cannot define what is acceptable. It does not remove the need for human review. And it cannot guarantee that a policy is fair.
 
+<PullQuote>
 The counterargument that automation removes the backlog is fair for volume and incomplete for judgement.
+</PullQuote>
 
 ## A decision test
 

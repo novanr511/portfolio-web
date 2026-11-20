@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Most procurement AI advice treats the technology as a blanket upgrade to the whole function. Procurement is not one task but a chain of stages with different risks, and "use AI to improve procurement" gives no guidance on where a tool helps and where a person must stay accountable. The real problem is placing language-model assistance at the right stages without losing control of the commitments that follow.
+</Lead>
 
 **Direct answer:** AI for procurement means applying language models to the text-heavy work in the buying process: summarizing proposals, extracting contract terms, drafting requests, and comparing bids. Wikipedia describes procurement as the multi-stage acquisition of goods and services, and Anthropic's use-case guide lists summarization, extraction, drafting, and analysis as tasks models handle well. The boundary is that these tools accelerate reading and comparison; they do not negotiate, authorize spend, or own supplier decisions.
 
@@ -17,15 +19,19 @@ Most procurement AI advice treats the technology as a blanket upgrade to the who
 
 ## The mechanism
 
-Procurement is a structured, document-heavy process. Wikipedia characterizes it as the acquisition of goods and services through stages such as identifying a need, sourcing suppliers, soliciting and comparing offers, negotiating terms, placing an order, and receiving and paying for the delivery. Much of the daily work is reading and reconciling documents: requests for quotation, supplier qualifications, contracts, and invoices. The practical consequence is a natural fit for language-model assistance, because the inputs are text, but also a clear exposure: an error made in an early document can propagate through every later stage.
+Procurement is a structured, document-heavy process. Wikipedia characterizes it as the acquisition of goods and services through stages such as identifying a need, sourcing suppliers, soliciting and comparing offers, negotiating terms, placing an order, and receiving and paying for the delivery. Much of the daily work is reading and reconciling documents: requests for quotation, supplier qualifications, contracts, and invoices. The practical consequence is <Mark>a natural fit for language-model assistance</Mark>, because the inputs are text, but also a clear exposure: <Mark>an error made in an early document can propagate through every later stage</Mark>.
 
 <Figure src="/images/articles/inline/ai-for-procurement-best-practices-1.png" alt="A four-step procurement flow: documents arrive, AI extracts and compares, a human verifies against source, and an owner selects and signs." caption="Conceptual: AI handles the document stages while a named person owns the commitment." />
 
 The use-case guide from Anthropic describes the categories of work language models handle: summarization, extraction of structured data from text, drafting, and analysis. Mapped onto procurement, these become summarizing long supplier proposals, pulling clause terms out of contracts, drafting request-for-proposal text, and comparing bids against a common set of criteria. The practical consequence is that the reading and comparison stages compress, while the stages that create obligations - selection and negotiation - remain human decisions that the tool can inform but not make.
 
-A useful best practice follows: keep accountability anchored at the decision points. The model processes language; it does not sign a contract or accept a delivery. A procurement team should state explicitly where the tool's output is advisory and where a named person signs off, especially for supplier selection and contract terms. This is not a limitation to apologize for but a design choice, because the party that owns the risk should be the party that makes the call.
+<KeyPoint>
+A useful best practice follows: keep accountability anchored at the decision points.
+</KeyPoint>
 
-A second best practice concerns input quality. The guide emphasizes clear instructions and relevant context, and procurement data is frequently inconsistent: supplier documents vary in format, descriptions use different units, and terms are buried in prose. The practical consequence is that automation reliability is bounded by the documents fed into it. Standardizing templates and defining the fields to extract often does more for output quality than changing the model, and it should come before any attempt to scale the tool across categories.
+The model processes language; it does not sign a contract or accept a delivery. A procurement team should state explicitly where the tool's output is advisory and where a named person signs off, especially for supplier selection and contract terms. This is not a limitation to apologize for but a design choice, because the party that owns the risk should be the party that makes the call.
+
+A second best practice concerns input quality. The guide emphasizes clear instructions and relevant context, and procurement data is frequently inconsistent: supplier documents vary in format, descriptions use different units, and terms are buried in prose. The practical consequence is that <Mark>automation reliability is bounded by the documents fed into it</Mark>. Standardizing templates and defining the fields to extract often does more for output quality than changing the model, and it should come before any attempt to scale the tool across categories.
 
 ## A worked example
 
@@ -45,7 +51,13 @@ The table separates the sources from the conclusion drawn here. The first two ro
 
 The first limit is that these tools do not own accountability. A model can summarize a bid and extract a clause, but it cannot authorize spend or accept legal terms. Treating a fluent summary as a decision is a category error: the output is a representation of a document, not the document, and the obligations attach to the original contract. Any workflow that lets a generated summary stand in for the signed source has removed the very artifact that defines the agreement.
 
-The second limit is a hidden cost. Automation does not eliminate review; it moves it. If a model extracts fifty clause values, someone must still confirm that they are right, and the check is only as good as the reviewer's attention. Teams often discover that the time saved on reading is spent on verification, and that a reviewer who trusts the output stops checking carefully. The result can be a faster process with the same risk, or with more risk because scrutiny has quietly atrophied.
+The second limit is a hidden cost. Automation does not eliminate review; it moves it. If a model extracts fifty clause values, someone must still confirm that they are right, and the check is only as good as the reviewer's attention.
+
+<Trap>
+Teams often discover that the time saved on reading is spent on verification, and that a reviewer who trusts the output stops checking carefully.
+</Trap>
+
+The result can be a faster process with the same risk, or with more risk because scrutiny has quietly atrophied.
 
 A third failure mode is confident error in extracted terms. A language model can produce a plausible clause value that is wrong, especially when a document is poorly structured or a term is stated indirectly. In procurement, a single wrong figure - a liability cap, a renewal date, a price escalation - can change which supplier wins. This is why the worked example keeps the source paragraph in the loop. Verification against the original text is not bureaucracy here; it is the control that makes extraction usable.
 
@@ -65,7 +77,13 @@ The counterargument that procurement AI primarily saves time is fair for high-vo
 6. Has a sample of outputs been verified for accuracy on real documents?
 7. Is there a schedule to recheck accuracy as documents and suppliers change?
 
-The steps convert a broad ambition into a bounded deployment. The point is not to resist automation but to place it where text handling is the bottleneck and to keep human judgment where commitments are made. For the governance side of introducing a model into a workflow, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+The steps convert a broad ambition into a bounded deployment.
+
+<PullQuote>
+The point is not to resist automation but to place it where text handling is the bottleneck and to keep human judgment where commitments are made.
+</PullQuote>
+
+For the governance side of introducing a model into a workflow, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 
 ## References & Further Reading
 

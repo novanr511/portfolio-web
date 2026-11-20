@@ -9,17 +9,19 @@ tags:
   - Automation
 ---
 
+<Lead>
 Support is where AI assistance is most visible and most easily measured. Three points matter: routing the ticket to the right queue, drafting a reply from the knowledge base, and deciding when a person must take over. Each has a different failure mode and a different metric, which is why treating them as one "AI support" feature produces confusing results.
+</Lead>
 
 **Direct answer:** Use AI to classify and route tickets, draft replies grounded in the knowledge base, and flag cases for human handoff — with a distinct metric for each stage. Anthropic's customer-support agent guide is the primary use-case reference, and the O*NET task descriptions help identify what the work actually involves. The boundary: a fluent reply is not a correct one, and a handoff that loses context is worse than no automation, as [How to Build an AI Chatbot That Does Not Fail](/articles/how-to-build-an-ai-chatbot-that-does-not-fail) explains.
 
 ## Three points
 
-**Routing.** Classify the ticket into a queue with a confidence score. Errors are recoverable — the ticket can be rerouted — but they cost time, as the classification-pattern article explains.
+**Routing.** Classify the ticket into a queue with a <Mark>confidence score</Mark>. Errors are recoverable — the ticket can be rerouted — but they cost time, as the classification-pattern article explains.
 
 **Drafting.** Produce a reply from the knowledge base with a citation, so an agent can check it quickly. The reduce-hallucinations article covers the grounding mechanism. A draft sent without review is a different risk category.
 
-**Handoff.** Decide when a person must take over — low confidence, an angry customer, a money-related decision — and pass the structured state, not just the transcript, as [How to Build an AI Chatbot That Does Not Fail](/articles/how-to-build-an-ai-chatbot-that-does-not-fail) recommends.
+**Handoff.** Decide when a person must take over — low confidence, an angry customer, a money-related decision — and pass the <Mark>structured state</Mark>, not just the transcript, as [How to Build an AI Chatbot That Does Not Fail](/articles/how-to-build-an-ai-chatbot-that-does-not-fail) recommends.
 
 ## A worked workflow
 
@@ -51,15 +53,25 @@ Three conclusions follow:
 
 ## What to instrument
 
-A support AI system needs metrics at each stage, and the right ones differ from generic model scores. Four are worth tracking:
+<KeyPoint>
+A support AI system needs metrics at each stage, and the right ones differ from generic model scores.
+</KeyPoint>
+
+Four are worth tracking:
 
 **Routing accuracy by queue.** Aggregate accuracy hides a queue that consistently receives the wrong tickets, which the funnel article warns about for blended rates.
 
-**Draft acceptance with edit distance.** A draft marked accepted after heavy rewriting is not a saving. Measure how much text actually changed, as the evaluation-rubric article explains for proxy metrics.
+**Draft acceptance with edit distance.**
+
+<Trap>
+A draft marked accepted after heavy rewriting is not a saving.
+</Trap>
+
+Measure how much text actually changed, as the evaluation-rubric article explains for proxy metrics.
 
 **Handoff completeness.** Does the escalated ticket carry the structured state — issue, attempts, sentiment — or just the chat log? The chatbot article explains why context loss is the failure to watch.
 
-**Customer effort.** Track repeat contacts on the same issue, which the retention article identifies as a leading indicator of a problem that was closed but not solved.
+**Customer effort.** Track <Mark>repeat contacts</Mark> on the same issue, which the retention article identifies as a leading indicator of a problem that was closed but not solved.
 
 These metrics make the combined system visible, which the evaluation article argues is the only meaningful unit of analysis.
 
@@ -71,7 +83,11 @@ These metrics make the combined system visible, which the evaluation article arg
 
 **It cannot handle every customer.** Some conversations need empathy and judgement that a system should not simulate, as the humanizer guidance on voice would caution in a different context — here the point is simply that escalation is legitimate.
 
-The counterargument — that support AI reduces headcount — is a business framing that ignores the shift in work. Agents move from writing routine replies to handling harder cases, which may require more skill and better tools, as the future-of-work article discusses.
+The counterargument — that support AI reduces headcount — is a business framing that ignores the shift in work.
+
+<PullQuote>
+Agents move from writing routine replies to handling harder cases, which may require more skill and better tools, as the future-of-work article discusses.
+</PullQuote>
 
 ## A decision test
 

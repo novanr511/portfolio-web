@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Agent observability is often treated as capturing everything, which produces large volumes of data that are hard to use. The Anthropic agent guidance describes checkpoints, and the SRE alerting workbook relates signals to objectives. The trade-off is between detail and usefulness.
+</Lead>
 
 **Direct answer:** Observe the steps that change a decision — tool calls, escalations, and outputs — with a clear purpose for each signal. The sources describe checkpoints and objectives; the selection rule is a synthesis.
 
@@ -21,11 +23,15 @@ The first consideration is what the trace is for. The agent guidance describes c
 
 <Figure src="/images/articles/inline/agent-observability-trade-offs-1.png" alt="A flow: define the decision, choose signals that bear on it, record at checkpoints, then review against an outcome." caption="Conceptual: collect only the signals that change a decision." />
 
-The second consideration is the signal-to-objective link. The alerting workbook relates signals to objectives, and the same discipline applies here. A signal that does not correspond to a decision should be questioned, because collecting it has a cost in storage and attention.
+The second consideration is the <Mark>signal-to-objective link</Mark>. The alerting workbook relates signals to objectives, and the same discipline applies here. A signal that does not correspond to a decision should be questioned, because collecting it has a cost in storage and attention.
 
 The third consideration is interpretation. An agent's internal reasoning is not a reliable explanation of what happened, which is a limitation of the system. Observing the tools called, the data retrieved, and the actions taken is more verifiable than reading a narrative the model produced about itself.
 
-The sequence is: define the decision, choose the signals that bear on it, record them at checkpoints, then review against an outcome. The choices are local, so the conclusions are `inferred`; the patterns are `source-reported`.
+<KeyPoint>
+The sequence is: define the decision, choose the signals that bear on it, record them at checkpoints, then review against an outcome.
+</KeyPoint>
+
+The choices are local, so the conclusions are `inferred`; the patterns are `source-reported`.
 
 ## A worked example
 
@@ -45,19 +51,25 @@ The outcome is a small set of useful signals. The scenario is hypothetical; the 
 
 ## Why more traces can help less
 
-A large trace can hide the few events that matter, which is the opposite of observability's purpose. A smaller set of signals tied to decisions is more useful, because a reviewer can act on it without further analysis.
+<Mark>A large trace can hide the few events that matter</Mark>, which is the opposite of observability's purpose. A smaller set of signals tied to decisions is more useful, because a reviewer can act on it without further analysis.
 
 A further constraint is that recorded signals can be misleading. An agent may call the right tool with the right arguments and still produce a wrong answer, which a trace of tool calls alone will not show. The output has to be evaluated separately, and the trace supports that evaluation rather than replacing it.
 
 There is also a cost to retention. Storing detailed traces for long periods consumes resources and raises questions about the data they contain, which may include user content. A retention rule should be set deliberately, with a reason for the chosen period rather than an default.
 
-Finally, observability does not create accountability. Someone has to review the signals and decide what to change. A system that records everything and has no owner for the review has produced data without learning, which is a common outcome when instrumentation is treated as the goal.
+Finally, observability does not create accountability. Someone has to review the signals and decide what to change.
 
-A trace is evidence of what was recorded, not a complete account of what the system did.
+<Trap>
+A system that records everything and has no owner for the review has produced data without learning, which is a common outcome when instrumentation is treated as the goal.
+</Trap>
+
+A trace is <Mark>evidence of what was recorded</Mark>, not a complete account of what the system did.
 
 A retention rule should reflect the sensitivity of the data recorded, not a default setting.
 
+<PullQuote>
 The value of a signal is measured by the decision it enables, not by the volume of data it produces.
+</PullQuote>
 
 The signals worth keeping are those a reviewer will actually consult after an incident.
 

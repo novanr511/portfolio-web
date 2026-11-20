@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI support is usually introduced by listing tasks a model can perform. The real problem is that these tasks are judged in isolation, while a customer experiences a single journey across many touchpoints. A faster answer can still leave the overall experience worse if the handoff, the accuracy, or the tone is wrong.
+</Lead>
 
 **Direct answer:** Anthropic's use-case guides organize common applications for assistants, including support work such as drafting replies, summarizing conversations, and finding answers from a knowledge base; Wikipedia's customer experience entry describes the overall perception a customer forms across all interactions. The boundary is that an assistant performing a support task well is not the same as improving the experience as a whole.
 
@@ -17,11 +19,17 @@ AI support is usually introduced by listing tasks a model can perform. The real 
 
 ## The mechanism
 
-Anthropic's documentation groups guidance around common use cases for a Claude assistant, and customer support appears among them. The recurring pattern is that the model contributes to a workflow rather than replacing it: it can draft a reply for an agent to review, summarize a long conversation, classify an incoming request, or retrieve an answer from an approved knowledge base. The practical consequence is that output quality depends on the surrounding system. A good draft is useless if the agent must rewrite it entirely, and a retrieved answer is only as reliable as the source it draws from.
+Anthropic's documentation groups guidance around common use cases for a Claude assistant, and customer support appears among them. The recurring pattern is that <Mark>the model contributes to a workflow rather than replacing it</Mark>: it can draft a reply for an agent to review, summarize a long conversation, classify an incoming request, or retrieve an answer from an approved knowledge base. The practical consequence is that output quality depends on the surrounding system. A good draft is useless if the agent must rewrite it entirely, and a retrieved answer is only as reliable as the source it draws from.
 
 <Figure src="/images/articles/inline/ai-customer-support-examples-1.png" alt="A flow from drafting and summarizing, through classification and routing and retrieval of approved answers, into the single customer experience those touchpoints form." caption="Conceptual: each support example changes one touchpoint, and touchpoints accumulate into one experience." />
 
-Wikipedia's customer experience entry describes the overall perception and response that results from a customer's interactions with a company. The mechanism here is accumulation: every touchpoint contributes to a single impression, so a strong moment does not erase a weak one. The practical consequence is that support cannot be evaluated only by the speed of a reply. A quick answer that sends a customer into a transfer loop, or that states something confidently and wrongly, can damage the total experience even while a task-level timer shows improvement.
+Wikipedia's customer experience entry describes the overall perception and response that results from a customer's interactions with a company.
+
+<KeyPoint>
+The mechanism here is accumulation: every touchpoint contributes to a single impression, so a strong moment does not erase a weak one.
+</KeyPoint>
+
+The practical consequence is that support cannot be evaluated only by the speed of a reply. A quick answer that sends a customer into a transfer loop, or that states something confidently and wrongly, can damage the total experience even while a task-level timer shows improvement.
 
 Combining the sources means mapping each example to the touchpoint it changes. Drafting and summarization affect how fast and how consistently an agent responds. Routing affects how long a customer waits before reaching the right person. Self-serve answers affect whether a question is resolved without a human at all. Each of these has a distinct failure mode and a distinct measure, so bundling them under one label of support hides where a problem actually sits.
 
@@ -47,13 +55,21 @@ An assistant cannot repair a product that is the real source of dissatisfaction.
 
 The hidden cost sits in the system around the model. Knowledge bases must be maintained, suggested answers need review, and agents require training on when to trust or override a draft. Integration into existing tools takes work that does not appear in a list of use cases. A model is only as reliable as the content it draws from, so an out-of-date knowledge base turns a fast answer into a fast error. The expense is not the model call but the ongoing discipline that keeps its output grounded.
 
-A characteristic failure mode is confident incorrectness. A fluent, wrong answer is more persuasive than a hesitant correct one, and a customer may act on it before anyone notices. Related failures include the loss of empathy on sensitive issues and a handoff loop in which the customer repeats information to each new channel. Each of these can raise a task-level success rate while lowering satisfaction, which is why task metrics alone are a misleading guide.
+A characteristic failure mode is <Mark>confident incorrectness</Mark>.
+
+<Trap>
+A fluent, wrong answer is more persuasive than a hesitant correct one, and a customer may act on it before anyone notices.
+</Trap>
+
+Related failures include the loss of empathy on sensitive issues and a handoff loop in which the customer repeats information to each new channel. Each of these can raise a task-level success rate while lowering satisfaction, which is why task metrics alone are a misleading guide.
 
 The boundary of the sources is worth stating plainly. They offer a set of documented applications and a definition of customer experience; they do not provide validated performance figures, a guarantee of improved satisfaction, or a rule for deployment. Any specific claim about how much an assistant will improve support would be an invention. What the sources support is a way of mapping tasks to touchpoints, not a promise about outcomes.
 
 Because content, models, and expectations all move, the setup needs scheduled review. A knowledge base drifts as products change, model behavior shifts with updates, and customers grow used to a new baseline of speed. A practical cadence is to revisit the approved sources, the review rules, and the experience measures together, recording which change prompted each adjustment. Without that review, the assistant keeps producing answers that were correct for an earlier version of the product.
 
+<PullQuote>
 The counterargument that AI support devalues the human touch is fair for emotionally sensitive cases and incomplete for routine, high-volume questions where speed and consistency dominate the customer's judgment.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +81,7 @@ The counterargument that AI support devalues the human touch is fair for emotion
 6. Check that escalation works without repeating the customer's information.
 7. Schedule review of sources, review rules, and measures together.
 
-These steps connect a list of examples to the experience they are meant to improve. The mapping from support tasks to customer touchpoints is what makes the choice reviewable rather than a matter of enthusiasm. A passed test leaves a defined touchpoint, a grounded answer source, a working escalation path, and a measure that reflects the whole journey.
+These steps connect a list of examples to the experience they are meant to improve. <Mark>The mapping from support tasks to customer touchpoints</Mark> is what makes the choice reviewable rather than a matter of enthusiasm. A passed test leaves a defined touchpoint, a grounded answer source, a working escalation path, and a measure that reflects the whole journey.
 
 For further reading, see [Voice of Customer: Turning Feedback Into Decisions](/articles/voice-of-customer-turning-feedback-into-decisions).
 

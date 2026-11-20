@@ -9,9 +9,11 @@ tags:
   - Memory
 ---
 
+<Lead>
 A model's context window resets between sessions, which means an agent has no memory unless the system provides one. The tempting response is to store everything and retrieve it later. That produces an agent which recalls irrelevant details and occasionally confuses an old task with the current one. Memory is a design problem about what to keep.
+</Lead>
 
-**Direct answer:** Agent memory is usually divided into short-term working state, long-term semantic knowledge, and episodic records of past events. The Generative Agents paper describes an architecture with stored observations, reflection, and retrieval. The boundary: memory is only useful if retrieval surfaces the right item at the right time — an unbounded store becomes noise, as the context-engineering article explains.
+**Direct answer:** Agent memory is usually divided into short-term working state, long-term semantic knowledge, and episodic records of past events. The Generative Agents paper describes an architecture with stored observations, reflection, and retrieval. The boundary: memory is only useful if retrieval surfaces the right item at the right time — <Mark>an unbounded store becomes noise</Mark>, as the context-engineering article explains.
 
 ## Three types of memory
 
@@ -47,7 +49,11 @@ Three cautions apply: retrieval from episodic memory can surface a similar-looki
 
 ## Retrieval quality is memory quality
 
-A memory store is only as good as the retrieval that surfaces it. Three factors decide whether the right memory appears:
+<KeyPoint>
+A memory store is only as good as the retrieval that surfaces it.
+</KeyPoint>
+
+Three factors decide whether the right memory appears:
 
 **The retrieval key.** Semantic similarity is a reasonable default, but episodic memories often need recency and outcome as additional signals. A failure from last year and one from yesterday should not rank the same way, which the reranking article explains for documents.
 
@@ -61,9 +67,21 @@ These factors are measurable: on a labelled set of past cases, did the right mem
 
 **It cannot replace retrieval from authoritative sources.** A customer's plan in memory is a copy; the billing system is the source. The RAG article explains why grounding matters.
 
-**It cannot be assumed correct.** Memory is a record of what the system believed, not what is true. Provenance and dates are part of the design, as the datasheets paper argues for data generally.
+**It cannot be assumed correct.**
 
-**It is not the same as context.** A larger memory store does not help if the right item is not surfaced. The context-engineering article explains why selection beats capacity.
+<PullQuote>
+Memory is a record of what the system believed, not what is true.
+</PullQuote>
+
+<Mark>Provenance and dates</Mark> are part of the design, as the datasheets paper argues for data generally.
+
+**It is not the same as context.**
+
+<Trap>
+A larger memory store does not help if the right item is not surfaced.
+</Trap>
+
+The context-engineering article explains why <Mark>selection beats capacity</Mark>.
 
 The counterargument — that an agent should simply keep the full conversation — is wrong at scale. Full transcripts consume the context budget and bury the current task, which the long-context article shows affects reliability.
 

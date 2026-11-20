@@ -9,9 +9,11 @@ tags:
   - Software Architecture
 ---
 
+<Lead>
 The distinction that matters is not that an agent uses a language model. Plenty of language-model applications are not agents, and plenty of agents use no language model at all. The distinction is about where the decision loop sits: in traditional automation, the programmer writes the sequence of steps and the machine executes it; in an agentic system, the model chooses the next step at runtime from the situation it observes.
+</Lead>
 
-**Direct answer:** Traditional automation executes a path written in advance; an agent selects the next action at runtime, decides what arguments to pass, and decides how to use the result. The published evidence for agentic architectures describes exactly this selection capability, and it comes with a specific benefit — the ability to update a plan and handle exceptions — and a specific cost: the loop now depends on a probabilistic component whose failure modes are not compile-time errors. The honest way to choose between them is to ask whether the path can be specified in advance, not whether the task sounds sophisticated.
+**Direct answer:** Traditional automation executes a path written in advance; an agent selects the next action at runtime, decides what arguments to pass, and decides how to use the result. The published evidence for agentic architectures describes exactly this selection capability, and it comes with a specific benefit — the ability to update a plan and handle exceptions — and a specific cost: the loop now depends on a probabilistic component whose failure modes are not compile-time errors. The honest way to choose between them is to ask <Mark>whether the path can be specified in advance</Mark>, not whether the task sounds sophisticated.
 
 ## What traditional automation actually is
 
@@ -29,15 +31,27 @@ Schick et al. describe Toolformer as "a model trained to decide which APIs to ca
 
 Yao et al. describe ReAct as generating "both reasoning traces and task-specific actions in an interleaved manner", and explain the division of labour: "reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information."
 
-That is the real difference, and it is narrower than the marketing suggests. The agent is not "autonomous" in the sense of acting without feedback. It maintains a plan in text, revises it when an action returns something unexpected, and continues. Traditional automation cannot revise a plan, because it has no representation of one.
+That is the real difference, and it is narrower than the marketing suggests. The agent is not "autonomous" in the sense of acting without feedback. It maintains a plan in text, revises it when an action returns something unexpected, and continues.
 
-The measured benefit follows from exactly that. On question answering and fact verification, Yao et al. report that ReAct "overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API". The gain is not that the model knows more; it is that a checkable external source interrupts the chain where it would otherwise have compounded its own error.
+<PullQuote>
+Traditional automation cannot revise a plan, because it has no representation of one.
+</PullQuote>
+
+The measured benefit follows from exactly that. On question answering and fact verification, Yao et al. report that ReAct "overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API".
+
+<KeyPoint>
+The gain is not that the model knows more; it is that a checkable external source interrupts the chain where it would otherwise have compounded its own error.
+</KeyPoint>
 
 ## The two things an agent is genuinely bad at
 
 Two properties follow from the architecture, and both are documented rather than inferred.
 
-**The agent cannot do what the tools do.** Schick et al. describe the paradox that motivates the whole approach: language models "paradoxically, struggle with basic functionality, such as arithmetic or factual lookup, where much simpler and smaller models excel". A calculator exists precisely because a language model is worse at arithmetic than a calculator. Any design that asks a model to do the thing a tool does well is wasting accuracy, latency, and money.
+**The agent cannot do what the tools do.** Schick et al. describe the paradox that motivates the whole approach: language models "paradoxically, struggle with basic functionality, such as arithmetic or factual lookup, where much simpler and smaller models excel". A calculator exists precisely because a language model is worse at arithmetic than a calculator.
+
+<Trap>
+Any design that asks a model to do the thing a tool does well is wasting accuracy, latency, and money.
+</Trap>
 
 **The failure mode is not a crash.** A traditional program that meets an unexpected input takes a defined branch, logs, and stops. An agent that meets an unexpected input reasons, acts, and acts again — plausibly, expensively, and possibly in a direction that is hard to predict from the outside. This is why agentic systems need the governance scaffolding that the rest of this publication covers: the accountability cannot be assigned to the model, so it has to be assigned to a person with a documented boundary of permitted actions.
 
@@ -45,7 +59,7 @@ Two properties follow from the architecture, and both are documented rather than
 
 The decision is not "automation or agents". It is where in a workflow the decision loop belongs, and there are three useful placements.
 
-**Keep the loop in code.** If the path can be enumerated — eight document types, six report formats, a fixed reconciliation — write the program. You get inspectability, deterministic cost, and testable behaviour for a fraction of the engineering effort. Reach for an agent only when the enumeration itself is the problem.
+**Keep the loop in code.** If the path can be enumerated — eight document types, six report formats, a fixed reconciliation — write the program. You get <Mark>inspectability, deterministic cost, and testable behaviour</Mark> for a fraction of the engineering effort. Reach for an agent only when the enumeration itself is the problem.
 
 **Let the agent plan, keep the execution deterministic.** This is the pattern ReAct's evaluation demonstrates: the model decides *what* to look up and the tool performs a fixed operation. The model's uncertainty is confined to a decision that is cheap to check and easy to abandon.
 
@@ -58,7 +72,7 @@ A useful discipline for the third pattern is to keep the action set small and ea
 1. **Can a competent person enumerate the steps?** If yes, write the program. The agent version costs more and is harder to verify.
 2. **Where exactly is the uncertainty?** Name it. If it is in one step, put the model there and leave the rest as code.
 3. **What can the agent actually do?** List the tools. If the list is long, the compounding risk is real and you need tighter boundaries, not a better prompt.
-4. **What happens when it is wrong?** A refusal, a fallback, a page, a wrong-but-plausible action. The last of these is the one that needs a control.
+4. **What happens when it is wrong?** A refusal, a fallback, a page, <Mark>a wrong-but-plausible action</Mark>. The last of these is the one that needs a control.
 5. **What does it cost per run?** Token spend, latency, and the human review time are all part of the price, and the review time is usually the largest term.
 
 None of this argues against agents. It argues for using them where the deciding — not the doing — is genuinely hard, and keeping the machinery around them as ordinary, inspectable software.

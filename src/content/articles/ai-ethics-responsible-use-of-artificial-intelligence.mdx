@@ -9,7 +9,9 @@ tags:
   - Policy
 ---
 
+<Lead>
 Ethics in AI tends to arrive as a list of principles — fairness, transparency, accountability, privacy — which everyone endorses and which change nothing about the system. Principles matter only when they alter the artefact: the dataset that gets collected, the metric that gets optimised, the rule written into a prompt, the escalation path that a user can actually reach.
+</Lead>
 
 **Direct answer:** Responsible use of AI is a set of engineering constraints, not a statement of intent. Four of them do most of the work: know what your data is and what it was collected for; know how your model performs on the groups it actually affects; decide who is accountable when it fails; and be honest about what the law can and cannot settle. The hard part is not agreeing that these matter. It is that each one requires someone to make a choice that other people might reasonably have made differently — and to write that choice down where it can be reviewed.
 
@@ -17,7 +19,7 @@ Ethics in AI tends to arrive as a list of principles — fairness, transparency,
 
 Gebru et al. start from an absence: "The machine learning community currently has no standardized process for documenting datasets, which can lead to severe consequences in high stakes domains." Their remedy is an analogy everyone already accepts — electronics. "Every component, no matter how simple or complex, is accompanied with a datasheet that describes its operating characteristics, test results, recommended uses, and other information." By that analogy, a dataset should ship with a datasheet documenting "its motivation, composition, collection process, recommended uses, and so on".
 
-The ethical weight of this is easy to miss. A dataset collected for one purpose and reused for another has a story that nobody wrote down — and the reuse is where the harm appears. Who was in the collection, who was not, what was collected under what conditions, and what was the collection *for*? Those answers determine whether the reuse is legitimate, and they are recoverable only if someone recorded them at collection time. A datasheet written after the model is trained is a reconstruction; the ethics were decided at collection.
+The ethical weight of this is easy to miss. A dataset collected for one purpose and reused for another has a story that nobody wrote down — and the reuse is where the harm appears. Who was in the collection, who was not, what was collected under what conditions, and what was the collection *for*? Those answers determine whether the reuse is legitimate, and they are recoverable only if someone recorded them at collection time. A datasheet written after the model is trained is a reconstruction; <Mark>the ethics were decided at collection</Mark>.
 
 There is a second reason this matters that is less about harm and more about honesty: without a datasheet, an organisation cannot accurately describe what its own system was trained on. Claims about representativeness, about coverage, about "our data is diverse" — all unverifiable without the record.
 
@@ -33,7 +35,9 @@ Note also what the framework does *not* ask for. It does not ask you to make the
 
 ## Constraint three: "harmless" is a design choice, and someone writes the rules
 
+<PullQuote>
 The most interesting ethical question in modern AI is not whether models can be aligned, but who decides what alignment means.
+</PullQuote>
 
 Bai et al. answer it with a mechanism rather than a mandate. Their *Constitutional AI* method trains "a harmless AI assistant through self-improvement, without any human labels identifying harmful outputs", and they are explicit about where the human contribution sits: "The only human oversight is provided through a list of rules or principles, and so we refer to the method as Constitutional AI."
 
@@ -41,11 +45,15 @@ The method has two phases. In the supervised phase, the system samples from an i
 
 Read the ethics inside the engineering. The principles list is a governance artefact in the fullest sense: it is where the values of the organisation become machine-enforceable. There is no way to write a constitution without making contested choices — about which harms count, how a refusal should sound, whether explanation is required or merely permitted. The method does not remove those choices; it makes them explicit, versioned, and reviewable, and then applies them at scale without a human in the loop for every case.
 
-The counterargument deserves a hearing. A rules-based refusal system inherits every flaw in its rules and can be rigid in exactly the situations where judgement matters. "Non-evasive" is a design goal with a cost: a system that always explains its objection will sometimes object where an exception was appropriate. The honest conclusion is not that constitutions beat humans, but that a written, owned, versioned set of principles is often a better governance instrument than an unwritten convention — and that an organisation using this approach still owes the review that the constitution itself does not provide.
+The counterargument deserves a hearing. A rules-based refusal system inherits every flaw in its rules and can be rigid in exactly the situations where judgement matters. "Non-evasive" is a design goal with a cost: a system that always explains its objection will sometimes object where an exception was appropriate. The honest conclusion is not that constitutions beat humans, but that <Mark>a written, owned, versioned set of principles</Mark> is often a better governance instrument than an unwritten convention — and that an organisation using this approach still owes the review that the constitution itself does not provide.
 
 ## Constraint four: the law sets limits, not answers
 
-The temptation in an ethics discussion is to reach for a single criterion and call it the answer. The legal reality is more constrained and more useful.
+<Trap>
+The temptation in an ethics discussion is to reach for a single criterion and call it the answer.
+</Trap>
+
+The legal reality is more constrained and more useful.
 
 The *Fairness and Machine Learning* textbook includes a chapter on United States anti-discrimination law that states plainly what it "is and isn't, how it navigates tradeoffs, its limits, and how it applies to machine learning". Two things follow. First, the law does not supply a technical criterion you can implement directly; it navigates trade-offs and has limits. Second, it does apply to machine learning, which means an engineering decision about a classifier can be a legal decision about who is treated how.
 
@@ -53,13 +61,15 @@ The practical implication is that "we are compliant" is a statement about a juri
 
 ## Who is accountable, and what that means operationally
 
+<KeyPoint>
 Every framework above converges on the same structural point: accountability cannot be delegated to the model.
+</KeyPoint>
 
 The governance frameworks make this concrete by treating risk management as continuous and by extending into sector-specific profiles, where the unacceptable outcomes are written down for a specific context. NIST's AI RMF is described as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems" — note that evaluation is in the list, and that the framework's own status as voluntary is why organisations have to do the work themselves.
 
 The international measurement effort, run through the OECD's AI Policy Observatory, exists because the ethical claims need to be comparable across jurisdictions and across vendors. Where there is no shared vocabulary of adoption, effect, and risk, every organisation asserts its own, and the assertion is unfalsifiable.
 
-So the answer to "who is accountable" is a person or an institution, named, with a decision right and a duty to review. That is not a slogan — it is a design constraint on the org chart, and it is the one that most reliably distinguishes organisations that use AI responsibly from those that have a policy document.
+So the answer to "who is accountable" is a person or an institution, named, with a decision right and a duty to review. That is not a slogan — it is <Mark>a design constraint on the org chart</Mark>, and it is the one that most reliably distinguishes organisations that use AI responsibly from those that have a policy document.
 
 ## A test to run on your own system
 

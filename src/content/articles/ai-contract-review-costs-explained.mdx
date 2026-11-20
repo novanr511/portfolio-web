@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI contract review is often priced as a per-document fee, which hides the factors that actually drive cost. Anthropic's use-case guides describe tasks such as legal summarization and document processing, and the customer-review entry describes how reviews form a public reputation record. The real problem is that cost depends on volume, document length, and the amount of human verification required, none of which a headline rate reveals.
+</Lead>
 
 **Direct answer:** The cost of AI contract review is driven by the number and length of documents, the complexity of the task, and the human time needed to verify output. The sources describe the available use cases and how public reviews form, not a priced contract-review workflow. Any figure is therefore a local estimate, not a source-reported fact.
 
@@ -17,13 +19,19 @@ AI contract review is often priced as a per-document fee, which hides the factor
 
 ## The mechanism
 
-Anthropic's guides to common use cases describe tasks that include summarization, legal document handling, and customer support. These are the building blocks of an AI contract review workflow: the model reads text, extracts or summarizes clauses, and produces a structured output that a person checks. The practical consequence is that the model's work scales with the text it processes. A longer contract consumes more processing than a short one, and a batch of many contracts consumes more than a single document. Cost therefore begins with volume and length, which are measurable before any contract is reviewed.
+Anthropic's guides to common use cases describe tasks that include summarization, legal document handling, and customer support. These are the building blocks of an AI contract review workflow: the model reads text, extracts or summarizes clauses, and produces a structured output that a person checks. The practical consequence is that <Mark>the model's work scales with the text it processes</Mark>. A longer contract consumes more processing than a short one, and a batch of many contracts consumes more than a single document. Cost therefore begins with volume and length, which are measurable before any contract is reviewed.
 
 <Figure src="/images/articles/inline/ai-contract-review-costs-explained-1.png" alt="Two cost drivers compared: processing, which scales with volume and document length, versus verification, which scales with the human time spent checking output." caption="Conceptual: a per-document rate hides processing and verification costs." />
 
-The customer-review source describes how individual reviews accumulate into a public reputation record. This matters for contract review because the output of an automated review can itself become a record that others rely on, and because customer feedback about a review service is not evidence of its accuracy. The practical consequence is that a review, whether of a product or of a clause, is an opinion or observation stored in a system, not a verified judgment. An AI contract review system that treats its own output as authoritative, or that takes user ratings as proof of correctness, confuses a record with a fact.
+The customer-review source describes how individual reviews accumulate into a public reputation record. This matters for contract review because the output of an automated review can itself become a record that others rely on, and because customer feedback about a review service is not evidence of its accuracy. The practical consequence is that a review, whether of a product or of a clause, is an opinion or observation stored in a system, not a verified judgment. An AI contract review system that treats its own output as authoritative, or that takes user ratings as proof of correctness, <Mark>confuses a record with a fact</Mark>.
 
-The sources describe use cases and reputation records; they do not publish a price for contract review. Cost modeling is therefore inferred, not source-reported. A useful discipline is to separate the costs that scale with processing from the costs that do not. Processing cost rises with document volume and length, while verification cost rises with how much output a human must check. A workflow that produces confident but unreliable extractions shifts cost from processing to verification, often increasing the total.
+The sources describe use cases and reputation records; they do not publish a price for contract review. Cost modeling is therefore inferred, not source-reported. A useful discipline is to separate the costs that scale with processing from the costs that do not.
+
+<KeyPoint>
+Processing cost rises with document volume and length, while verification cost rises with how much output a human must check.
+</KeyPoint>
+
+A workflow that produces confident but unreliable extractions shifts cost from processing to verification, often increasing the total.
 
 The consequence for practice is that a budgeting decision should start from the review workflow, not from a rate card. A team that needs every clause verified will budget mostly for human time, while a team that needs a first-pass summary will budget mostly for processing. The same tool serves both, but the cost structure differs. Each driver should have an owner and a measured quantity, so the estimate can be revised when volume or document mix changes. A rate with no volume and no verification assumption is not an estimate.
 
@@ -45,7 +53,13 @@ The first two rows restate what the sources describe. The third row is a synthes
 
 AI contract review cannot establish legal correctness. The use-case guides describe summarization and document processing, not legal judgment. A model can extract a clause and summarize it, but whether the clause is enforceable or desirable is a decision that requires authority the sources do not grant the tool. A team that reads a fluent summary as a legal conclusion has confused an output with an opinion. The tool produces text; a qualified person still decides what the text means.
 
-The hidden cost is verification and error handling. A review system that gets most clauses right but is wrong on the few that matter can be more expensive than a slower manual process, because the errors are found late and require rework. The guides do not quantify this cost, so it must be estimated locally. Uncertain output should be routed to a person, and that routing takes time. When volume rises, verification time can grow faster than processing cost, and a budget built only on processing will be wrong.
+The hidden cost is verification and error handling.
+
+<Trap>
+A review system that gets most clauses right but is wrong on the few that matter can be more expensive than a slower manual process, because the errors are found late and require rework.
+</Trap>
+
+The guides do not quantify this cost, so it must be estimated locally. Uncertain output should be routed to a person, and that routing takes time. When volume rises, verification time can grow faster than processing cost, and a budget built only on processing will be wrong.
 
 The main failure mode is treating a reputation signal as a quality measure. The customer-review source explains that reviews form a public record of opinions, not a verified measure of accuracy. A review service with high ratings may still produce unreliable clause summaries, and ratings can be shaped by factors unrelated to correctness. Using user ratings as evidence that a review workflow is sound substitutes a social signal for a test. Because the sources describe reputation formation rather than evaluation, this risk is an inference.
 
@@ -53,7 +67,9 @@ There is a boundary around what an automated review covers. It covers text that 
 
 Because document mix and law change, the cost model and the workflow need periodic review. Each driver should be rechecked against measured volume and verification time, and the sharing rule between model and person should be revised when errors cluster. Recheck dates and owners belong with the estimate, so a reviewer can see which figures were assumptions. Without that record, a budget can look precise while resting on a rate and a verification rule nobody revisits.
 
+<PullQuote>
 The counterargument that a per-document rate is fair for budgeting is incomplete when verification time is the larger and more variable cost.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +81,7 @@ The counterargument that a per-document rate is fair for budgeting is incomplete
 6. Route uncertain output to a person and estimate the rework cost.
 7. Record owners, assumptions, and recheck dates with the estimate.
 
-A cost estimate is useful only when it separates what scales with processing from what scales with verification. The test ties each driver to a budgeting decision and makes the assumptions visible, so a reviewer can see which numbers are measured and which are local choices. For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+A cost estimate is useful only when it separates <Mark>what scales with processing from what scales with verification</Mark>. The test ties each driver to a budgeting decision and makes the assumptions visible, so a reviewer can see which numbers are measured and which are local choices. For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 
 ## References & Further Reading
 

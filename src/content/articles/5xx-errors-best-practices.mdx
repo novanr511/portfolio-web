@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 A 5xx response tells a client that the server failed to fulfil a valid request. RFC 9110 defines the class, and the SRE alerting workbook ties error signals to service objectives. The useful work begins after the status is observed.
+</Lead>
 
-**Direct answer:** Treat 5xx as a symptom: tie the rate to an objective, locate the failing layer with logs and traces, contain the impact, then fix and verify. The RFC defines the signal; the response sequence is a synthesis.
+**Direct answer:** Treat 5xx as a symptom: tie the rate to an objective, locate <Mark>the failing layer</Mark> with logs and traces, contain the impact, then fix and verify. The RFC defines the signal; the response sequence is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked response, separating the protocol definition from the operational choices made during an incident.
 
@@ -22,10 +24,14 @@ Three distinctions matter:
 <Figure src="/images/articles/inline/5xx-errors-best-practices-1.png" alt="A response flow: confirm the status class, measure against an objective, inspect logs and traces, contain with a tested path, then fix and verify." caption="Conceptual: treat 5xx as a symptom that starts a response sequence." />
 
 - **Protocol feedback.** RFC 9110 defines 5xx as server-side failure. It does not say which component failed.
-- **Signal versus objective.** The SRE workbook argues for alerting tied to service objectives. A single error is noise; a sustained rate against an objective is a signal.
+- **Signal versus objective.** The SRE workbook argues for alerting tied to service objectives. A single error is noise; <Mark>a sustained rate</Mark> against an objective is a signal.
 - **Containment before cause.** The incident-handling lifecycle treats containment as an early step. A fix that waits for full understanding can be too late.
 
-The sequence is: confirm the status class, measure against an objective, inspect logs and traces, contain, then fix and verify. The first is `source-reported`; the rest are operational practice, so they are `inferred`.
+<KeyPoint>
+The sequence is: confirm the status class, measure against an objective, inspect logs and traces, contain, then fix and verify.
+</KeyPoint>
+
+The first is `source-reported`; the rest are operational practice, so they are `inferred`.
 
 ## A worked response
 
@@ -55,7 +61,13 @@ The incident record should contain the signal that fired, the layer identified, 
 
 ## Why a status is not an explanation
 
-A status code is the server's answer to the client. It says that something failed, not what failed. Treating the code as a cause leads to fixes aimed at the response rather than the system producing it. The layer that returned the error has to be identified from logs, traces, and recent changes.
+A status code is the server's answer to the client. It says that something failed, not what failed.
+
+<Trap>
+Treating the code as a cause leads to fixes aimed at the response rather than the system producing it.
+</Trap>
+
+The layer that returned the error has to be identified from logs, traces, and recent changes.
 
 The rate matters as much as the code. A single failure is expected in most systems. A sustained rate above an objective is a different event, and it deserves a response. This is why the signal should be defined before the incident, when the team can agree on a threshold without pressure.
 
@@ -67,7 +79,9 @@ The same reasoning applies to dependencies: a dependency that fails for one regi
 
 It cannot identify the failing component. It does not guarantee a clean recovery. And it cannot replace monitoring, which must observe the system after the fix.
 
+<PullQuote>
 The counterargument that a low error rate is harmless is fair for a snapshot and incomplete for a sustained trend.
+</PullQuote>
 
 ## A decision test
 
@@ -77,7 +91,7 @@ The counterargument that a low error rate is harmless is fair for a snapshot and
 4. Check recent changes.
 5. Contain with a tested path.
 6. Fix the cause and verify.
-7. Record the decision and residual risk.
+7. Record the decision and <Mark>residual risk</Mark>.
 
 For the symptom view, see [5xx Errors: Common Questions](/articles/5xx-errors-common-questions).
 

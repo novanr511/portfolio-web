@@ -9,15 +9,23 @@ tags:
   - Forecasting
 ---
 
+<Lead>
 Supply chains generate the data that ML methods like: long time series, repeated patterns, and clear outcomes. They also punish errors with empty shelves or excess inventory. AI is useful here for forecasting demand, flagging exceptions, and assembling the documentation planners need — with people making the calls that balance risk.
+</Lead>
 
-**Direct answer:** Use AI for demand forecasting, exception detection, and summarising the context behind a planning decision. Anthropic's use-case guides cover analysis patterns, and the time-series article explains the forecasting methods. The boundary: a forecast is a conditional estimate, not an order, and a flagged exception is a prompt to investigate — the planner owns the decision, as the human-in-the-loop article argues.
+**Direct answer:**
+
+<KeyPoint>
+Use AI for demand forecasting, exception detection, and summarising the context behind a planning decision.
+</KeyPoint>
+
+Anthropic's use-case guides cover analysis patterns, and the time-series article explains the forecasting methods. The boundary: a forecast is a <Mark>conditional estimate</Mark>, not an order, and a flagged exception is a prompt to investigate — the planner owns the decision, as the human-in-the-loop article argues.
 
 ## Three uses
 
 **Forecasting.** Predict demand at a level useful for planning, with uncertainty rather than a single number. The time-series article covers ARIMA and deep methods and the importance of a time-ordered split, which the cross-validation article explains.
 
-**Exception detection.** Flag a shipment likely to be late, a supplier whose lead time is drifting, or an item whose forecast is unreliable. This is anomaly detection, which the anomaly-detection article covers, and the metric is alert quality, not model accuracy.
+**Exception detection.** Flag a shipment likely to be late, a supplier whose lead time is drifting, or an item whose forecast is unreliable. This is anomaly detection, which the anomaly-detection article covers, and the metric is <Mark>alert quality</Mark>, not model accuracy.
 
 **Documentation.** Assemble the context behind a planning decision — the forecast, the constraints, the rationale — into a short record, as the decision-memo article recommends.
 
@@ -27,7 +35,7 @@ The following is hypothetical and illustrative.
 
 A retailer plans stock for 500 products. The AI workflow:
 
-1. Produce a 12-week demand forecast per product with a prediction interval.
+1. Produce a 12-week demand forecast per product with a <Mark>prediction interval</Mark>.
 2. Flag products where the interval is unusually wide or demand has shifted from the forecast.
 3. Draft a planning note for the flagged products summarising the evidence.
 
@@ -53,13 +61,19 @@ Three conclusions follow:
 
 A forecast is only as good as the data feeding it. Three checks matter more than model choice:
 
-**Demand history must be comparable.** A promotion, a stockout, or a change in product definition changes what historical demand means, which the time-series article covers under non-stationarity. A model trained on a stockout period learns zero demand, which is wrong.
+**Demand history must be comparable.** A promotion, a stockout, or a change in product definition changes what historical demand means, which the time-series article covers under non-stationarity.
+
+<Trap>
+A model trained on a stockout period learns zero demand, which is wrong.
+</Trap>
 
 **Lead times need dates.** Supplier lead times drift, and averaging them over a year hides a recent change. The monitoring article recommends tracking distributions and change points, not just averages.
 
 **External signals need provenance.** Holidays, competitor actions, and weather can improve a forecast, but each source needs a date and a definition, as the data-governance article requires for any relied-upon input.
 
+<PullQuote>
 These checks are the work of a planner, not a model setting, which is why the human role remains central.
+</PullQuote>
 
 ## What supply chain AI cannot do
 

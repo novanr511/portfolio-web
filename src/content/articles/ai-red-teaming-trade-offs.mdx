@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Red teaming is often reported by the number of findings, which rewards breadth over relevance. The NIST adversarial-ML taxonomy describes categories of attack, and the OWASP LLM list identifies risks for language-model applications. The trade-off is how much of each category a team can test well.
+</Lead>
 
 **Direct answer:** Choose depth in the categories that matter to the deployment, record the conditions of each finding, and retest after mitigation. The sources provide the categories; the choice is a synthesis.
 
@@ -17,7 +19,11 @@ Red teaming is often reported by the number of findings, which rewards breadth o
 
 ## The mechanism
 
-The first trade-off is coverage versus depth. The NIST taxonomy provides categories, but a team with limited time cannot probe each one deeply. Choosing a few categories based on the system's actual use produces better evidence than a shallow pass over all of them.
+The first trade-off is <Mark>coverage versus depth</Mark>. The NIST taxonomy provides categories, but a team with limited time cannot probe each one deeply.
+
+<KeyPoint>
+Choosing a few categories based on the system's actual use produces better evidence than a shallow pass over all of them.
+</KeyPoint>
 
 <Figure src="/images/articles/inline/ai-red-teaming-trade-offs-1.png" alt="Three stacked trade-offs: coverage versus depth, discovery versus reproduction, and count versus severity." caption="Conceptual: limited time forces a red team to choose depth, records and scoring deliberately." />
 
@@ -33,7 +39,7 @@ The sequence is: choose categories, define severity, record conditions, then ret
 
 Three checks decide. First, which categories matter most — untrusted input, unauthorised actions, or data leakage? Second, can each confirmed failure be reproduced from a recorded condition? Third, after a mitigation, was the same probe run again with the same result?
 
-The outcome is a small set of verified findings. The scenario is hypothetical; the method is the contribution.
+The outcome is <Mark>a small set of verified findings</Mark>. The scenario is hypothetical; the method is the contribution.
 
 ## Evidence status
 
@@ -45,7 +51,11 @@ The outcome is a small set of verified findings. The scenario is hypothetical; t
 
 ## Why a finding count is weak
 
-A count depends on how hard the team looked and how broadly it defined a finding. Two exercises on the same system can produce different counts without any difference in safety, which is why severity and reproduction are more useful measures.
+<Trap>
+A count depends on how hard the team looked and how broadly it defined a finding.
+</Trap>
+
+Two exercises on the same system can produce different counts without any difference in safety, which is why severity and reproduction are more useful measures.
 
 A further consideration is that the team running the exercise knows the system, which shapes what it tries. An outside perspective often finds different failures, and a program that never changes its testers will converge on the same findings. Rotating the people or the method is part of keeping the exercise useful.
 
@@ -57,11 +67,13 @@ The exercise should be repeated after material changes, since a finding from an 
 
 A finding that cannot be reproduced cannot be verified as fixed, which is why conditions belong in the record.
 
-Depth in a relevant category is more useful than shallow coverage of many, given limited time.
+Depth in a relevant category is more useful than <Mark>shallow coverage of many</Mark>, given limited time.
 
 The test set should reflect the system's actual use, not a generic list of attacks.
 
+<PullQuote>
 A clean exercise says more about the probes that were tried than about the system's overall safety.
+</PullQuote>
 
 The scope of an exercise should be stated alongside its findings.
 

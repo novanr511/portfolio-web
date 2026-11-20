@@ -9,7 +9,9 @@ tags:
   - Verification
 ---
 
+<Lead>
 An analyst asking "what was our churn last quarter?" in plain language and receiving a chart feels like progress. The danger is that the answer is a number computed by a model with a plausible-looking query behind it, and nobody checked the definition of churn or the denominator. The value of natural-language analytics depends entirely on verification.
+</Lead>
 
 **Direct answer:** AI data analysis works as a four-stage pipeline — interpret the question, generate a query, execute it against a defined source, and verify the result before presenting it. Anthropic's use-case guides cover analysis patterns, and the financial-statement overview illustrates why definitions and denominators matter. The boundary: a fluent answer is not a correct one, and the model's confidence is not evidence — the verification layer is the control.
 
@@ -17,9 +19,9 @@ An analyst asking "what was our churn last quarter?" in plain language and recei
 
 **1. Interpret the question.** Clarify ambiguous terms — which time period, which definition of the metric, which population? A model that guesses here will compute the wrong thing confidently.
 
-**2. Generate the query.** Translate the clarified question into SQL or a dataframe operation. The query should be readable and stored, not hidden.
+**2. Generate the query.** Translate the clarified question into SQL or a dataframe operation. The query should be <Mark>readable and stored, not hidden</Mark>.
 
-**3. Execute against a defined source.** The source must be the authoritative one, with known freshness and definitions, as [Data Governance: Managing Data as an Asset](/articles/data-governance-managing-data-as-an-asset) explains.
+**3. Execute against a defined source.** The source must be <Mark>the authoritative one, with known freshness and definitions</Mark>, as [Data Governance: Managing Data as an Asset](/articles/data-governance-managing-data-as-an-asset) explains.
 
 **4. Verify.** Check the result against a known baseline, a second query, or a stated expectation before presenting it. This is the stage most tools skip.
 
@@ -44,12 +46,16 @@ A user asks: "What was customer churn in Q3?"
 Three decisions follow:
 
 - **Show the query with the answer**, so a reviewer can see the definition that was used, as the reporting-automation article recommends.
-- **Show the checks**, not just the result. A number with its verification is evidence; a number alone is a claim.
+- **Show the checks**, not just the result. A number with its verification is evidence; <Mark>a number alone is a claim</Mark>.
 - **Stop when checks disagree.** A 0.4-point discrepancy is a signal to resolve, not to average.
 
 ## Designing the verification layer
 
-Verification is a feature that must be built, not a habit users are asked to remember. Three design choices make it effective:
+<KeyPoint>
+Verification is a feature that must be built, not a habit users are asked to remember.
+</KeyPoint>
+
+Three design choices make it effective:
 
 **Show the query and the source.** A result with its SQL and the table's last-updated time lets a reader check the definition and the freshness, which the data-governance article requires for any analysis people rely on.
 
@@ -67,11 +73,19 @@ These choices slow the answer slightly and make it defensible, which is the whol
 
 **It cannot establish causation.** A chart showing churn rose after a price change is a correlation. The causal-inference article covers what a genuine causal question requires.
 
-The counterargument — that analysts will spend less time writing SQL — is fair and incomplete. The time saved on query writing is partly spent on verification, which is work the analyst should be doing anyway.
+<PullQuote>
+The counterargument — that analysts will spend less time writing SQL — is fair and incomplete.
+</PullQuote>
+
+The time saved on query writing is partly spent on verification, which is work the analyst should be doing anyway.
 
 ## Where the interpretation fails
 
-Most wrong answers in natural-language analytics originate in stage one, not in the generated query. Three examples:
+<Trap>
+Most wrong answers in natural-language analytics originate in stage one, not in the generated query.
+</Trap>
+
+Three examples:
 
 **Ambiguous time terms.** "This quarter" may mean the calendar quarter or the company's fiscal quarter. If the system does not know which, it will pick one silently.
 

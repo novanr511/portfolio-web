@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Approval gates are often added to AI systems as a general precaution, which produces rubber stamps and delay. The Wikipedia entry describes formal approval as authorisation, and the Anthropic agent guidance discusses checkpoints in agent workflows. The practices concern where a gate belongs.
+</Lead>
 
 **Direct answer:** Place a gate where an action is consequential or hard to reverse, give the reviewer authority and evidence, and review whether the gate changes anything. The sources describe authorisation and checkpoints; the rule is a synthesis.
 
@@ -17,7 +19,7 @@ Approval gates are often added to AI systems as a general precaution, which prod
 
 ## The mechanism
 
-The first practice is selecting actions. The approval entry describes formal authorisation, which implies a decision with consequences. A gate on a low-risk read operation slows work without reducing risk, while a missing gate on a consequential write is a gap. Classifying actions is the first work.
+The first practice is selecting actions. The approval entry describes formal authorisation, which implies a decision with consequences. A gate on a low-risk read operation slows work without reducing risk, while a missing gate on <Mark>a consequential write</Mark> is a gap. Classifying actions is the first work.
 
 <Figure src="/images/articles/inline/ai-approval-gates-best-practices-1.png" alt="A flow: classify actions, define evidence, assign authority, then review whether the gate changed a decision." caption="Conceptual: place the gate where an action is consequential." />
 
@@ -25,7 +27,11 @@ The second practice is evidence. The agent guidance describes checkpoints where 
 
 The third practice is authority. A reviewer who cannot decline has no real role, and a system that routes around a declined approval defeats the gate. Defining who can decide and what happens after a refusal is part of the design.
 
-The sequence is: classify actions, define evidence, assign authority, then review whether the gate changed a decision. The definitions are local, so the conclusions are `inferred`; the concepts are `source-reported`.
+<KeyPoint>
+The sequence is: classify actions, define evidence, assign authority, then review whether the gate changed a decision.
+</KeyPoint>
+
+The definitions are local, so the conclusions are `inferred`; the concepts are `source-reported`.
 
 ## A worked example
 
@@ -45,7 +51,11 @@ The outcome is a single well-placed gate. The scenario is hypothetical; the meth
 
 ## Why a gate everywhere helps less
 
-A gate on every step trains reviewers to click through, which removes the value of the gate where it matters. Concentration on consequential actions preserves attention, and it is the practical reason to be selective.
+<Trap>
+A gate on every step trains reviewers to click through, which removes the value of the gate where it matters.
+</Trap>
+
+Concentration on consequential actions preserves attention, and it is the practical reason to be selective.
 
 A further constraint is time. A gate that makes a urgent decision wait for a reviewer has a cost, and the design should say what happens when the reviewer is unavailable. An explicit fallback with a record is better than an implicit bypass that nobody admits to.
 
@@ -53,15 +63,17 @@ The gate also cannot make the reviewer an expert. If the decision requires knowl
 
 Finally, a gate that is never reviewed can outlive the risk it was built for. A periodic check of whether it still changes decisions is part of good practice, not an optional improvement.
 
-A gate with no authority behind it is a formality, whatever the workflow describes.
+A gate with no authority behind it is <Mark>a formality</Mark>, whatever the workflow describes.
 
-An urgent decision needs a defined fallback when the reviewer is unavailable.
+An urgent decision needs <Mark>a defined fallback</Mark> when the reviewer is unavailable.
 
 The gate should be reviewed after a material change, since the risk it addressed may no longer exist.
 
 A reviewer with no evidence is only a signature, which is why the context belongs at the gate.
 
+<PullQuote>
 A consequential action deserves a gate that a person can genuinely refuse.
+</PullQuote>
 
 ## What it cannot do
 

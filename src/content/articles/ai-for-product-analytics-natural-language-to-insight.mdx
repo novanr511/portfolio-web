@@ -9,19 +9,25 @@ tags:
   - Verification
 ---
 
+<Lead>
 Product teams ask questions in language, not SQL: "Are new users activating faster this month?" An AI layer can translate that into a chart, which removes friction — until the definition of activation, the cohort, or the denominator is wrong and the chart misleads a roadmap decision. The value depends on definitions, not on the translation.
+</Lead>
 
-**Direct answer:** Use AI to clarify product questions, map them to defined metrics and events, and generate the query — then verify the result against a known baseline before treating it as insight. Anthropic's use-case guides cover analysis patterns, and geo-experiment guidance explains how to test whether a change caused an outcome. The boundary: a chart is a description, not a causal finding, and a fluent natural-language answer does not make a metric well-defined, which the data-governance article explains.
+**Direct answer:** Use AI to clarify product questions, map them to defined metrics and events, and generate the query — then verify the result against a known baseline before treating it as insight. Anthropic's use-case guides cover analysis patterns, and geo-experiment guidance explains how to test whether a change caused an outcome.
+
+<KeyPoint>
+The boundary: a chart is a description, not a causal finding, and a fluent natural-language answer does not make a metric well-defined, which the data-governance article explains.
+</KeyPoint>
 
 ## The four parts
 
-**Question clarification.** Resolve terms like "active", "activation", and "this month" before generating anything. A product metric's definition is a decision, as the unit-economics article shows for CAC and LTV.
+**Question clarification.** Resolve terms like "active", "activation", and "this month" before generating anything. <Mark>A product metric's definition is a decision</Mark>, as the unit-economics article shows for CAC and LTV.
 
 **Metric mapping.** Connect the question to the defined events and dimensions in your tracking plan. If the event does not exist, the answer cannot be computed, which the data-strategy article covers.
 
 **Query generation.** Produce SQL or a dataframe operation that is readable and stored, not hidden behind a chat interface, as the reporting-automation article recommends.
 
-**Verification.** Compare with a published baseline or a second method, and show the definition with the number, as [AI for Data Analysis: From Question to Verified Answer](/articles/ai-for-data-analysis-from-question-to-verified-answer) argues.
+**Verification.** <Mark>Compare with a published baseline</Mark> or a second method, and <Mark>show the definition with the number</Mark>, as [AI for Data Analysis: From Question to Verified Answer](/articles/ai-for-data-analysis-from-question-to-verified-answer) argues.
 
 ## A worked example
 
@@ -58,13 +64,19 @@ A natural-language layer cannot answer a question the tracking plan does not sup
 
 **The tracking plan is reachable.** The AI layer should consult the plan rather than guess which event corresponds to "signup", which the data-strategy article treats as a governance question.
 
+<PullQuote>
 These conditions are unglamorous and determine whether the tool helps or misleads, which the data-quality article argues more generally.
+</PullQuote>
 
 ## What product-analytics AI cannot do
 
 **It cannot define metrics.** Definitions belong to the product and data teams, as the governance article requires.
 
-**It cannot fix broken tracking.** A query over incomplete events produces a confident wrong chart, as the data-quality article warns.
+**It cannot fix broken tracking.**
+
+<Trap>
+A query over incomplete events produces a confident wrong chart, as the data-quality article warns.
+</Trap>
 
 **It cannot establish causation from a chart.** The causal-inference article covers what a genuine causal question requires, which the A/B testing article operationalises.
 

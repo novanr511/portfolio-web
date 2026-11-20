@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI content moderation is often described as a solution to volume, which hides the policy decisions underneath. The Wikipedia entry describes moderation as reviewing content, and the NIST AI RMF frames risk as something to measure and manage. The common questions concern where automation is safe.
+</Lead>
 
 **Direct answer:** Use AI to route content against a defined policy, keep human review for consequential cases, and measure errors by category. The sources describe the practice; the rule is a synthesis.
 
@@ -17,15 +19,19 @@ AI content moderation is often described as a solution to volume, which hides th
 
 ## The mechanism
 
-The first point is policy. The moderation entry describes filtering content, which requires a rule about what should be filtered. A model cannot supply that rule, and a system built without one will apply an implicit policy that nobody can review.
+The first point is policy. The moderation entry describes filtering content, which requires a rule about what should be filtered. A model cannot supply that rule, and a system built without one will apply <Mark>an implicit policy that nobody can review</Mark>.
 
 <Figure src="/images/articles/inline/ai-content-moderation-common-questions-1.png" alt="A four-step moderation flow: define the policy, measure error by category, route uncertain cases to people, then review appeals by cause." caption="Conceptual: moderation needs a policy before automation and measures errors by category." />
 
-The second point is error asymmetry. The NIST RMF asks for risk to be measured, which means the two kinds of error matter differently. Removing legitimate content and leaving harmful content have different costs, and a single accuracy figure hides the difference.
+The second point is <Mark>error asymmetry</Mark>. The NIST RMF asks for risk to be measured, which means the two kinds of error matter differently. Removing legitimate content and leaving harmful content have different costs, and a single accuracy figure hides the difference.
 
 The third point is appeals. A moderation decision that cannot be challenged will be wrong without a correction path, and the appeals themselves are evidence about where the policy or the model fails. Reading them by cause is more useful than counting them.
 
-The sequence is: define the policy, measure error by category, route uncertain cases to people, then review appeals. The definitions are local, so the conclusions are `inferred`; the practice is `source-reported`.
+<KeyPoint>
+The sequence is: define the policy, measure error by category, route uncertain cases to people, then review appeals.
+</KeyPoint>
+
+The definitions are local, so the conclusions are `inferred`; the practice is `source-reported`.
 
 ## A worked example
 
@@ -45,9 +51,13 @@ The outcome is a moderation design with recorded limits. The scenario is hypothe
 
 ## Why speed is not accuracy
 
-A system can process millions of items quickly and still make systematically wrong decisions, which is a policy failure at scale. Measuring the throughput says nothing about whether the right content was removed, and the two should be reported separately.
+A system can process millions of items quickly and still make systematically wrong decisions, which is <Mark>a policy failure at scale</Mark>. Measuring the throughput says nothing about whether the right content was removed, and the two should be reported separately.
 
-A further point is context. A model that evaluates a single message cannot know the conversation around it, and the same phrase can be harmless or harmful depending on history. Systems that treat content in isolation will make predictable errors, which is another reason to keep human review for borderline cases.
+A further point is context. A model that evaluates a single message cannot know the conversation around it, and the same phrase can be harmless or harmful depending on history.
+
+<Trap>
+Systems that treat content in isolation will make predictable errors, which is another reason to keep human review for borderline cases.
+</Trap>
 
 The moderation policy also has to be reviewed as the community changes. A rule that reflected one audience may not fit a new one, and an unrevised policy will appear consistent while becoming wrong. Setting a review condition at the start is part of the design.
 
@@ -84,7 +94,11 @@ For the method, see [AI Content Moderation](/articles/ai-content-moderation-with
 
 ## A counterargument
 
-The prescription assumes a policy can be stated clearly enough to apply consistently, which for many moderation domains is the contested thing rather than a starting point. The cited sources do not establish the remedy: Wikipedia describes reviewing and filtering content, and the NIST RMF asks for risk to be measured and managed, but neither shows that human review resolves ambiguity or that appeals improve the model. The article's own claim-status table marks "route uncertain cases to people" as `inferred`, yet the paragraph treats it as the central control. A critic would also note that reviewers disagree and have limited attention, so keeping humans for consequential cases can relocate the policy problem rather than solve it. The framing is incomplete where it presents policy definition as a prerequisite step instead of an ongoing site of conflict.
+<PullQuote>
+The prescription assumes a policy can be stated clearly enough to apply consistently, which for many moderation domains is the contested thing rather than a starting point.
+</PullQuote>
+
+The cited sources do not establish the remedy: Wikipedia describes reviewing and filtering content, and the NIST RMF asks for risk to be measured and managed, but neither shows that human review resolves ambiguity or that appeals improve the model. The article's own claim-status table marks "route uncertain cases to people" as `inferred`, yet the paragraph treats it as the central control. A critic would also note that reviewers disagree and have limited attention, so keeping humans for consequential cases can relocate the policy problem rather than solve it. The framing is incomplete where it presents policy definition as a prerequisite step instead of an ongoing site of conflict.
 
 ## References & Further Reading
 

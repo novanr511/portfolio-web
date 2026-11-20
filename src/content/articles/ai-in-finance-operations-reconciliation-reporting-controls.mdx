@@ -9,7 +9,9 @@ tags:
   - Controls
 ---
 
+<Lead>
 Finance operations is a natural fit for AI assistance because much of the work is rule-based: matching records, assembling reports, and checking for anomalies. It is also a domain where a confident error is expensive, which means the human and control layer matters more than the model.
+</Lead>
 
 **Direct answer:** Use AI to match records, draft narrative reports from verified numbers, and flag anomalies for review — with the reconciliation rule and the final approval kept explicit. Anthropic's use-case guides cover analysis and extraction patterns, and revenue-recognition guidance explains why definitions and timing matter. The boundary: a model can propose a match or a flag, but the control — the rule that decides whether a discrepancy is acceptable — must be independent of the model, as the security checklist explains for tool boundaries.
 
@@ -19,7 +21,11 @@ Finance operations is a natural fit for AI assistance because much of the work i
 
 **Reporting.** Draft the narrative around numbers that have already been validated, using the figures verbatim and avoiding causal claims that the data does not support, as the reporting-automation article recommends.
 
-**Controls.** Flag anomalies — an unusual amount, a duplicate payment, an out-of-period entry — for a person to review. The model is a detector, not the control, which the anomaly-detection article explains.
+**Controls.** Flag anomalies — an unusual amount, a duplicate payment, an out-of-period entry — for a person to review.
+
+<KeyPoint>
+The model is a detector, not the control, which the anomaly-detection article explains.
+</KeyPoint>
 
 ## A worked reconciliation
 
@@ -37,7 +43,7 @@ Three checks decide whether it is safe:
 
 1. **False-match audit.** Have a person review a sample of the 46,000 automatic matches. A wrong match that closes a real discrepancy is the dangerous error, which the evaluation-rubric article explains for false negatives.
 2. **Rule transparency.** Can the team see why a pair was matched? A black-box match cannot be defended to an auditor, which the data-governance article requires for documented decisions.
-3. **Exception quality.** Of the 1,000 flagged, how many were real issues? A high false-positive rate wastes investigation time, which the anomaly-detection article covers as alert fatigue.
+3. **Exception quality.** Of the 1,000 flagged, how many were real issues? A high false-positive rate wastes investigation time, which the anomaly-detection article covers as <Mark>alert fatigue</Mark>.
 
 Three conclusions follow:
 
@@ -49,13 +55,17 @@ Three conclusions follow:
 
 The value of a human checkpoint depends on where it sits. Four design choices matter:
 
-**Review the automatic bucket, not only the exceptions.** The dangerous error is a wrong match that closes a real discrepancy, which is why a sample of the high-confidence matches needs review, as the evaluation-rubric article explains for false negatives.
+**Review the automatic bucket, not only the exceptions.**
+
+<Trap>
+The dangerous error is a wrong match that closes a real discrepancy, which is why a sample of the high-confidence matches needs review, as the evaluation-rubric article explains for false negatives.
+</Trap>
 
 **Give reviewers the evidence, not just the flag.** A reviewer should see the two records being matched and the reason proposed, which the model-explainability article argues for in high-stakes decisions.
 
 **Make the exception queue actionable.** Each flagged item should carry enough context for a person to decide quickly, which the anomaly-detection article covers as alert design.
 
-**Keep a decision record.** Every approval, override, and adjustment needs an owner and a timestamp for the audit trail, as the data-governance article requires.
+**Keep a decision record.** Every approval, override, and adjustment needs an owner and a timestamp for the <Mark>audit trail</Mark>, as the data-governance article requires.
 
 A checkpoint designed this way catches errors without becoming a rubber stamp, which the human-in-the-loop article explains as the central design challenge.
 
@@ -63,11 +73,15 @@ A checkpoint designed this way catches errors without becoming a rubber stamp, w
 
 **It cannot define the rule.** What counts as a match or an acceptable variance is a policy decision, as the revenue-recognition article explains for accounting judgements.
 
-**It cannot replace the control environment.** Segregation of duties, approvals, and audit trails remain, which the AI-governance article addresses for high-impact systems.
+**It cannot replace the control environment.** <Mark>Segregation of duties</Mark>, approvals, and audit trails remain, which the AI-governance article addresses for high-impact systems.
 
 **It cannot guarantee compliance.** A model that flags anomalies does not ensure the underlying process is sound, which the risk-assessment article covers.
 
-The counterargument — that finance is too regulated for AI — is fair for final decisions and wrong for the preparation work. Automating matching and drafting while keeping approval human is a common pattern, as the reporting-automation article describes.
+The counterargument — that finance is too regulated for AI — is fair for final decisions and wrong for the preparation work.
+
+<PullQuote>
+Automating matching and drafting while keeping approval human is a common pattern, as the reporting-automation article describes.
+</PullQuote>
 
 ## A decision test
 

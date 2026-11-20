@@ -9,13 +9,21 @@ tags:
   - Technical SEO
 ---
 
+<Lead>
 The most consequential change in crawling since sitemaps is not a new algorithm — it is a population of new clients. A server that spent a decade tuning for one crawler now fields requests from a dozen distinct AI user agents, each with a different purpose, a different business model behind it, and a different opinion about whether your content should be indexed, quoted, or used as training data. Most sites respond to this with a blanket `Disallow: /` aimed at everything unfamiliar, and then wonder why their content stopped appearing in AI results.
+</Lead>
 
 **Direct Answer:** AI crawlers are split by *purpose*, not by vendor, and the vendors document the split themselves. OpenAI runs `OAI-SearchBot` (search results), `GPTBot` (model training), `OAI-AdsBot` (ad landing-page validation), and `ChatGPT-User` (user-initiated fetches). Anthropic runs `Claude-SearchBot`, `ClaudeBot` (training), and `Claude-User`. Perplexity runs `PerplexityBot` (search) and `Perplexity-User`. Google separates `Googlebot` (Search, where robots.txt is the control) from `Google-Extended` (training and grounding in other systems). Because the purposes are separate, a single `robots.txt` rule cannot express the decision you actually want to make — which is why the IETF `aipref` working group is standardising an explicit usage-preference mechanism.
 
 ## The vendor docs already split the categories
 
-This is the part most advice gets wrong. The vendor documentation does not describe "AI crawlers" as one category. It describes distinct user agents with distinct consequences, and it states plainly what happens when you block each one.
+This is the part most advice gets wrong.
+
+<KeyPoint>
+The vendor documentation does not describe "AI crawlers" as one category.
+</KeyPoint>
+
+It describes distinct user agents with distinct consequences, and it states plainly what happens when you block each one.
 
 OpenAI's crawler documentation makes the distinction explicit and states that the settings are independent: "a webmaster can allow OAI-SearchBot in order to appear in search results while disallowing GPTBot to indicate that crawled content should not be used for training OpenAI's generative AI foundation models." For `OAI-SearchBot`: "Sites that are opted out of OAI-SearchBot will not be shown in ChatGPT search answers, though can still appear as navigational links." For `GPTBot`: "Disallowing GPTBot indicates a site's content should not be used in training generative AI foundation models."
 
@@ -23,12 +31,21 @@ Anthropic's documentation uses the same three-way structure and, importantly, st
 
 Perplexity's documentation states the same pattern and adds a detail that matters operationally: `Perplexity-User` "generally ignores robots.txt rules" because "Since a user requested the fetch, this fetcher generally ignores robots.txt rules."
 
-Google's position is the one most SEO readers already know, but the AI-specific half is often missed. Google's AI features documentation states that "robots.txt directives for Googlebot is the control for site owners to manage access to how their sites are crawled for Search," and then draws a separate line: "To limit AI training and grounding in some of Google's other systems, read more about Google-Extended." Two different controls, two different systems.
+Google's position is the one most SEO readers already know, but the AI-specific half is often missed. Google's AI features documentation states that "robots.txt directives for Googlebot is the control for site owners to manage access to how their sites are crawled for Search," and then draws a separate line: "To limit AI training and grounding in some of Google's other systems, read more about Google-Extended." <Mark>Two different controls, two different systems.</Mark>
 
 Two more details from these documents that affect how you should write rules:
 
 - **Propagation delay is real.** OpenAI states "it can take ~24 hours from a site's robots.txt update for our systems to adjust." Perplexity's docs say "it may take up to 24 hours for our systems to reflect changes." A rule change is not instantaneous, and a crawler that fetched the old file will keep behaving per the old file.
-- **IP-blocking is a fragile substitute.** Anthropic warns that "Alternate methods like blocking IP address(es) from which Anthropic Bots operates may not work correctly or persistently guarantee an opt-out, as doing so impedes our ability to read your robots.txt file." If you block the crawler's IP, it can never fetch the file that grants or denies it.
+- **IP-blocking is a fragile substitute.** Anthropic warns that "Alternate methods like blocking IP address(es) from which Anthropic Bots operates may not work correctly or persistently guarantee an opt-out, as doing so impedes our ability to read your robots.txt file."
+
+<Trap>
+If you block the crawler's IP, it can never fetch the file that grants or denies it.
+</Trap>
+
+<KeyFigures items={[
+  { value: "~24 hours", label: "for OpenAI's systems to adjust after a robots.txt update", source: "OpenAI, Overview of OpenAI Crawlers" },
+  { value: "up to 24 hours", label: "for Perplexity's systems to reflect robots.txt changes", source: "Perplexity, Perplexity Crawlers" },
+]} />
 
 ## The user-initiated category is genuinely different
 
@@ -40,7 +57,7 @@ Look again at the three categories that recur across all three vendors:
 | Model training | `GPTBot` | `ClaudeBot` | (none — "not used to crawl content for AI foundation models") |
 | User-initiated fetch | `ChatGPT-User` | `Claude-User` | `Perplexity-User` |
 
-The third category is the subtle one. OpenAI describes `ChatGPT-User` as used "for certain user actions in ChatGPT and Custom GPTs," noting that "ChatGPT-User is not used for crawling the web in an automatic fashion" and that "because these actions are initiated by a user, robots.txt rules may not apply." Anthropic frames `Claude-User` as supporting "Claude AI users" and warns that disabling it "may reduce your site's visibility for user-directed web search."
+<Mark>The third category is the subtle one.</Mark> OpenAI describes `ChatGPT-User` as used "for certain user actions in ChatGPT and Custom GPTs," noting that "ChatGPT-User is not used for crawling the web in an automatic fashion" and that "because these actions are initiated by a user, robots.txt rules may not apply." Anthropic frames `Claude-User` as supporting "Claude AI users" and warns that disabling it "may reduce your site's visibility for user-directed web search."
 
 The practical consequence: **a user-initiated fetch is arguably not "crawling" at all.** It is a request on behalf of a person who asked a question, much like a browser loading a page. Treating it as a crawl — and blocking it as you would a scraper — removes you from user-directed answers without a corresponding benefit, because the fetch is not accumulating a corpus.
 
@@ -86,7 +103,7 @@ Allow: /
 Content-Usage: train-ai=y
 ```
 
-The semantics are the part to internalise, because they resolve the ambiguity that makes `robots.txt` confusing. The draft states that this "creates a two-stage arrangement that distinguishes acquisition and usage. Acquisition relies on Allow/Disallow rules; usage preference relies on Content-Usage rules." Usage preferences "apply only to those resources that can be crawled according to Allow/Disallow rules; no preferences are implied for resources that are disallowed."
+The semantics are the part to internalise, because they resolve the ambiguity that makes `robots.txt` confusing. The draft states that this "creates a <Mark>two-stage arrangement that distinguishes acquisition and usage</Mark>. Acquisition relies on Allow/Disallow rules; usage preference relies on Content-Usage rules." Usage preferences "apply only to those resources that can be crawled according to Allow/Disallow rules; no preferences are implied for resources that are disallowed."
 
 There are two behavioural details that differ from `robots.txt` convention and would surprise anyone assuming the old semantics:
 
@@ -123,7 +140,11 @@ For how to fold this into existing crawl-budget and log-analysis workflows, see 
 
 ## A counterargument
 
-The layered model is practical, but its own evidence makes its durability look thin. Perplexity states that user-initiated fetches generally ignore `robots.txt`, and Anthropic says the way it reads and applies settings may change, so the purpose taxonomy the whole framework depends on is provisional; presenting six layers as what works today overstates that stability. IP verification, which Layer 3 treats as the reliable check, is precisely what Anthropic warns may not persist, and the article notes the ranges change. Layer 4's separation of blocking from training consent relies on IETF `aipref` signals that are Active Internet-Drafts, with the vocabulary section explicitly lacking consensus and only one vendor recognising them gradually. A reasonable critic would call this a governance of documented intent rather than enforced control, which is a useful discipline but not the guarantee the framing implies.
+The layered model is practical, but its own evidence makes its durability look thin. Perplexity states that user-initiated fetches generally ignore `robots.txt`, and Anthropic says the way it reads and applies settings may change, so the purpose taxonomy the whole framework depends on is provisional; presenting six layers as what works today overstates that stability. IP verification, which Layer 3 treats as the reliable check, is precisely what Anthropic warns may not persist, and the article notes the ranges change. Layer 4's separation of blocking from training consent relies on IETF `aipref` signals that are Active Internet-Drafts, with the vocabulary section explicitly lacking consensus and only one vendor recognising them gradually.
+
+<PullQuote>
+A reasonable critic would call this a governance of documented intent rather than enforced control, which is a useful discipline but not the guarantee the framing implies.
+</PullQuote>
 
 ## References & Further Reading
 

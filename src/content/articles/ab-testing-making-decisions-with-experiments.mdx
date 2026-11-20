@@ -9,9 +9,15 @@ tags:
   - Product
 ---
 
+<Lead>
 The most common way organisations use A/B tests is also the least reliable: launch a change, wait until a number looks favourable, and ship. That is not experimentation, and it is not an opinion about a lack of rigour — it is a description of a specific statistical failure that produces false wins at a predictable rate.
+</Lead>
 
-**Direct answer:** An A/B test is a decision instrument whose output is a noisy estimate, and its value depends entirely on design choices made before it runs — the sample size, the metric, the assignment, and the stopping rule. The most useful practical finding in the field is that you do not need more traffic to get more sensitivity: CUPED uses data from the pre-experiment period to reduce metric variability, and the reported Bing result is "reduce variance by about 50%, effectively achieving the same statistical power with only half of the users, or half the duration". That result reframes the whole conversation from "how long do we run it" to "how much noise are we carrying".
+**Direct answer:** The most useful practical finding in the field is that you do not need more traffic to get more sensitivity: CUPED uses data from the pre-experiment period to reduce metric variability, and the reported Bing result is "reduce variance by about 50%, effectively achieving the same statistical power with only half of the users, or half the duration". That result reframes the whole conversation from "how long do we run it" to "how much noise are we carrying".
+
+<KeyPoint>
+An A/B test is a decision instrument whose output is a noisy estimate, and its value depends entirely on design choices made before it runs — the sample size, the metric, the assignment, and the stopping rule.
+</KeyPoint>
 
 ## The failure mode is variance, not traffic
 
@@ -21,13 +27,21 @@ CUPED addresses this directly. The method is described as using "data from the p
 
 The reported magnitude is the point. A 50% reduction in variance means doubling the effective sensitivity without doubling the sample — the same power with half the users or half the duration. For any team whose answer to "we cannot detect small effects" is "we need more traffic", this is the first thing to check.
 
-It also carries a condition: the pre-experiment data must exist and must be joined to the same users. An organisation that did not instrument the pre-period cannot use the method retroactively, which is one of many reasons instrumentation is a strategic decision rather than a reporting detail.
+It also carries a condition: <Mark>the pre-experiment data</Mark> must exist and must be joined to the same users. An organisation that did not instrument the pre-period cannot use the method retroactively, which is one of many reasons instrumentation is a strategic decision rather than a reporting detail.
+
+<KeyFigures items={[
+  { value: "50%", label: "reported reduction in variance with CUPED (Bing)", source: "Kohavi, Tang, and Xu, 2013 (CUPED)" },
+]} />
 
 ## Design the decision before the metric
 
 The most important question in an experiment is not which statistical test to run. It is what decision will follow from each possible result, and what outcome would change your mind.
 
-This is where most programmes quietly fail. A team launches an experiment, the result comes back, and the organisation discovers it had not agreed on what a win looked like. At that point the result is interpreted in light of the preferred outcome, and the experiment becomes a way to ratify a decision rather than inform one.
+This is where most programmes quietly fail. A team launches an experiment, the result comes back, and the organisation discovers it had not agreed on what a win looked like.
+
+<Trap>
+At that point the result is interpreted in light of the preferred outcome, and the experiment becomes a way to ratify a decision rather than inform one.
+</Trap>
 
 The practical discipline is to write four things before launch:
 
@@ -36,7 +50,9 @@ The practical discipline is to write four things before launch:
 - **The sample size and duration** implied by that effect, at an agreed confidence level.
 - **The decision rule** — what happens if the result is positive, negative, or inconclusive.
 
+<PullQuote>
 The last item is the one teams skip, and it is the one that makes experiments useful.
+</PullQuote>
 
 ## The geo alternative when you cannot randomise users
 
@@ -49,10 +65,10 @@ The trade-off is specific. You trade the precision of individual randomisation f
 ## What to do on Monday
 
 1. **Check whether your metric has pre-experiment data.** If it does, look at variance reduction before you buy more traffic.
-2. **Write the decision rule before the test starts**, including what you will do with an inconclusive result.
+2. **Write <Mark>the decision rule</Mark> before the test starts**, including what you will do with an inconclusive result.
 3. **State the smallest effect worth shipping.** This is a business judgement, not a statistical output.
 4. **Fix the sample size and duration in advance**, and report when they changed.
-5. **Do not stop when the number looks good.** Repeated peeking at a noisy metric manufactures false positives; if you need to monitor, use a method designed for it.
+5. **Do not stop when the number looks good.** Repeated peeking at a noisy metric manufactures <Mark>false positives</Mark>; if you need to monitor, use a method designed for it.
 6. **Keep a record of every test, including the failures.** An archive with only wins is evidence of a process problem, not of a successful experimentation culture.
 
 For the recommender-specific version of this, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias); for the attribution question underneath marketing experiments, see [Marketing Attribution](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation).

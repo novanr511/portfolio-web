@@ -9,21 +9,31 @@ tags:
   - Testing
 ---
 
+<Lead>
 An AI red team that only tries famous jailbreak prompts is testing last year's attacks. The purpose of red teaming is to discover *new* failure modes in your specific system — the combination of model, tools, data, and interface that you deployed. That requires a method, not a prompt list.
+</Lead>
 
 **Direct answer:** Red teaming is a structured attempt to make a system fail in ways that matter, with defined scope, attackers, and success criteria. NIST's adversarial-ML taxonomy and OWASP's LLM Top 10 provide the reference categories. The boundary: a red-team exercise finds vulnerabilities present at that time under those conditions — it is evidence of failure, not proof of safety when nothing is found.
 
 ## A repeatable method
 
-**1. Define the system boundary.** What is in scope — the model, the tools, the retrieved data, the interface? A prompt-only test misses tool and data failures, which the security checklist covers.
+**1. Define the system boundary.** What is in scope — the model, the tools, the retrieved data, the interface?
+
+<Trap>
+A prompt-only test misses tool and data failures, which the security checklist covers.
+</Trap>
 
 **2. Define the threat model.** Who is the adversary, what can they control, and what do they want? A curious user and a determined attacker have different capabilities. NIST's taxonomy organises attacks by goals and knowledge.
 
 **3. Choose the attack categories.** Map to a recognised list — prompt injection, data exfiltration, excessive agency, misinformation, resource abuse — then add categories specific to your domain.
 
-**4. Record attempts and outcomes.** Each test needs the input, the observed behaviour, and a severity judgement. Without records, the exercise is anecdotes.
+**4. Record attempts and outcomes.** Each test needs the input, the observed behaviour, and <Mark>a severity judgement</Mark>. Without records, the exercise is anecdotes.
 
-**5. Fix and retest.** A finding without an owner and a retest is a report, not a programme. The governance checklist covers the ownership question.
+**5. Fix and retest.** The governance checklist covers the ownership question.
+
+<KeyPoint>
+A finding without an owner and a retest is a report, not a programme.
+</KeyPoint>
 
 ## A worked exercise
 
@@ -49,7 +59,7 @@ Three lessons follow:
 
 **Recurrence.** Do fixed failures reappear after a model or prompt change? Recurrence means the fix was superficial, as the evaluation article warns.
 
-**Coverage.** Which categories were tested, and which were not? An untested category is not safe; it is unknown.
+**Coverage.** Which categories were tested, and which were not? <Mark>An untested category is not safe</Mark>; it is unknown.
 
 ## Building a team and a cadence
 
@@ -65,13 +75,17 @@ These practices turn an exercise into an institutional capability. Without them,
 
 ## What red teaming cannot do
 
-**It cannot prove absence.** A session with no findings is evidence about that session, not about the system in general.
+**It cannot prove absence.**
+
+<PullQuote>
+A session with no findings is evidence about that session, not about the system in general.
+</PullQuote>
 
 **It cannot replace monitoring.** Production traffic contains novel attacks. The observability article covers the alerting discipline.
 
 **It cannot fix governance.** A finding that nobody owns will not be repaired, which is why the stop condition and owner matter as much as the test.
 
-The counterargument — that red teaming is expensive for a small system — is fair. The response is proportionality: a short, scoped exercise on the highest-impact boundary is better than an elaborate programme that never runs.
+The counterargument — that red teaming is expensive for a small system — is fair. The response is proportionality: a short, scoped exercise on <Mark>the highest-impact boundary</Mark> is better than an elaborate programme that never runs.
 
 ## A decision test
 

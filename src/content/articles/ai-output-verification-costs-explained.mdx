@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI output looks fluent and complete, so teams often treat checking it as an optional nicety. In practice, verification is recurring labor with a real price, and that price is usually missing from the case for using the tool. The problem is that the cost of confirming an output can approach or exceed the cost of generating it, especially when the reviewer cannot tell a correct answer from a confident wrong one.
+</Lead>
 
-**Direct answer:** Treat verification as a budgeted control, not an afterthought. The Anthropic use case guides position human review inside common workflows, and the NIST AI Risk Management Framework frames risk work as governing, mapping, measuring and managing. The decision is how much checking to apply where, based on the consequence of a wrong output.
+**Direct answer:** Treat verification as <Mark>a budgeted control</Mark>, not an afterthought. The Anthropic use case guides position human review inside common workflows, and the NIST AI Risk Management Framework frames risk work as governing, mapping, measuring and managing. The decision is how much checking to apply where, based on the consequence of a wrong output.
 
 **Delta:** This article adds a claim-status table and a cost-allocation decision test beyond the sources: it maps each verification choice to a risk tier, with claim status explicit.
 
@@ -23,7 +25,13 @@ The Anthropic use case guides describe common ways people apply Claude, from dra
 
 The NIST AI Risk Management Framework offers the structure for thinking about that check. It organizes risk work around functions such as governing, mapping, measuring and managing, and it describes characteristics of trustworthy systems, including validity, reliability, accountability and transparency. The practical consequence is that verification should be designed and measured rather than assumed. A review step that nobody can describe or evaluate is not a control; it is a hope that someone will notice errors.
 
-Combining the two sources reveals what drives verification cost. The cost scales with output volume, with the underlying rate of errors that matter, and with the expertise needed to detect them. Generation has become cheap, so verification is the growing share of total cost. When the base error rate is high, or when errors are subtle, the reviewer must spend more attention per item, and the economics tilt toward fewer, higher-value uses of the tool rather than more automation.
+Combining the two sources reveals what drives verification cost. The cost scales with output volume, with the underlying rate of errors that matter, and with the expertise needed to detect them.
+
+<KeyPoint>
+Generation has become cheap, so verification is the growing share of total cost.
+</KeyPoint>
+
+When the base error rate is high, or when errors are subtle, the reviewer must spend more attention per item, and the economics tilt toward fewer, higher-value uses of the tool rather than more automation.
 
 The output of this analysis is a verification plan attached to each use case. It states which error types matter, how they will be sampled or fully checked, and who is competent to catch them. The plan makes the hidden labor visible before it accumulates, so the team can decide where verification is worth paying for.
 
@@ -43,17 +51,25 @@ The first two rows restate what the sources say. The third is an inference about
 
 ## What it cannot do
 
-Verification cannot eliminate the need for judgment. The NIST framework is about managing risk, not erasing it, and the Anthropic guides describe assistance rather than certainty. A checked output is less likely to be wrong in ways the check covers; it is not thereby correct. Teams that treat a passed review as proof of truth confuse a control with a guarantee. The residual risk remains, and it belongs to the person who accepted the output, not to the tool that produced it.
+Verification cannot eliminate the need for judgment. The NIST framework is about managing risk, not erasing it, and the Anthropic guides describe assistance rather than certainty. A checked output is less likely to be wrong in ways the check covers; it is not thereby correct.
 
-The hidden cost is expertise. A reviewer can only catch errors they are able to recognize. If an output contains a fabricated citation or a plausible but wrong statistic, a reviewer without the source material will approve it, and the verification becomes theater. Building genuine competence takes training and time, and that time is part of the cost the business must budget. Assigning review to whoever is available minimizes friction while maximizing the chance that errors pass through.
+<Trap>
+Teams that treat a passed review as proof of truth confuse a control with a guarantee.
+</Trap>
 
-The main failure mode is automation bias under volume. Fluent output invites trust, and repetitive checking invites shortcuts. As the number of items grows, reviewers tire, skim, and begin to assume that previous batches were fine. The verification that looked careful in a pilot quietly degrades in production. A plan that depends on sustained attention without sampling, rotation or spot audits will overstate how much checking actually happens.
+The residual risk remains, and it belongs to the person who accepted the output, not to the tool that produced it.
+
+<Mark>The hidden cost is expertise</Mark>. A reviewer can only catch errors they are able to recognize. If an output contains a fabricated citation or a plausible but wrong statistic, a reviewer without the source material will approve it, and the verification becomes theater. Building genuine competence takes training and time, and that time is part of the cost the business must budget. Assigning review to whoever is available minimizes friction while maximizing the chance that errors pass through.
+
+The main failure mode is <Mark>automation bias under volume</Mark>. Fluent output invites trust, and repetitive checking invites shortcuts. As the number of items grows, reviewers tire, skim, and begin to assume that previous batches were fine. The verification that looked careful in a pilot quietly degrades in production. A plan that depends on sustained attention without sampling, rotation or spot audits will overstate how much checking actually happens.
 
 There is a boundary around what sampling can support. Sampling estimates an error rate for a population; it does not certify any particular item. Low-frequency, high-severity errors can escape a sample entirely, which is why a sampled plan is a poor fit for decisions where a single mistake is expensive. The sources do not supply a verification threshold or a safe sample size. Those are local choices that must be justified by the consequence of the decision, not borrowed from a generic rule.
 
 Because use cases, models and error rates change, the verification plan needs review. A flow that was low-risk at launch can become high-risk when its output is reused downstream. Both the Anthropic guidance and the NIST framework are living documents, so the assumptions behind a plan should carry recheck conditions. Without that record, a future reader cannot tell whether a light-touch check was a deliberate choice or an unexamined default.
 
+<PullQuote>
 The counterargument that fluent output is fair for low-stakes drafting is incomplete when the same output feeds a decision with real consequences.
+</PullQuote>
 
 ## A decision test
 

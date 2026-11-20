@@ -9,17 +9,27 @@ tags:
   - Data
 ---
 
+<Lead>
 Document processing is where AI often delivers its clearest value, because the tasks are bounded and the outputs are checkable. Classification, extraction, and redaction sound like one workflow, but they fail differently — a wrong category is usually recoverable, a wrong extracted number can propagate, and a missed redaction is a privacy incident.
+</Lead>
 
-**Direct answer:** Use AI for document classification to route items, extraction to turn text into structured fields, and redaction to remove sensitive content — with validation proportionate to each task's error cost. Anthropic's use-case guides cover document and extraction patterns, and structured output provides the schema. The boundary: a model's output is a proposal; the system must verify it against the document and the business rule before the result is trusted.
+**Direct answer:** Anthropic's use-case guides cover document and extraction patterns, and structured output provides the schema. The boundary: a model's output is a proposal; the system must verify it against the document and the business rule before the result is trusted.
+
+<KeyPoint>
+Use AI for document classification to route items, extraction to turn text into structured fields, and redaction to remove sensitive content — with validation proportionate to each task's error cost.
+</KeyPoint>
 
 ## Three tasks, three controls
 
-**Classification.** Assign a document to a category — invoice, contract, complaint. The output is a label, which is easy to validate against examples, as the classification-pattern article explains. Errors are usually recoverable because the document can be rerouted.
+**Classification.** Assign a document to a category — invoice, contract, complaint. The output is a label, which is <Mark>easy to validate against examples</Mark>, as the classification-pattern article explains. Errors are usually recoverable because the document can be rerouted.
 
-**Extraction.** Pull structured fields — dates, amounts, parties — from the text. A field can look valid and be wrong, so cross-field checks matter: a total should equal the sum of line items, and a date should fall in a plausible range. The structured-output article covers the schema.
+**Extraction.** Pull structured fields — dates, amounts, parties — from the text. The structured-output article covers the schema.
 
-**Redaction.** Remove or mask sensitive content before a document is shared or stored. A missed redaction has high impact and may be invisible, so recall is the priority and human review is often required. The data-privacy article covers the obligations.
+**Redaction.** Remove or mask sensitive content before a document is shared or stored. A missed redaction has high impact and may be invisible, so <Mark>recall is the priority</Mark> and human review is often required. The data-privacy article covers the obligations.
+
+<Trap>
+A field can look valid and be wrong, so cross-field checks matter: a total should equal the sum of line items, and a date should fall in a plausible range.
+</Trap>
 
 ## A worked pipeline
 
@@ -41,7 +51,7 @@ Three conclusions follow:
 
 - **Each stage has its own metric**, and an aggregate "accuracy" would hide a redaction failure.
 - **Low-confidence routing is a control**, not a sign of weakness, which the human-in-the-loop article argues.
-- **Provenance matters** — keep the original document linked to the processed result so a disputed field can be checked, as the reporting-automation article recommends.
+- **Provenance matters** — keep the original document linked to the processed result so <Mark>a disputed field can be checked</Mark>, as the reporting-automation article recommends.
 
 ## Choosing the review boundary
 
@@ -63,7 +73,11 @@ These choices are not fixed. As measured error rates fall, review can be reduced
 
 **It cannot guarantee privacy.** Redaction is a probabilistic process; high-stakes sharing needs an independent check, as [Data Privacy: GDPR, CCPA, Data Governance, and Privacy by Design](/articles/data-privacy-gdpr-ccpa-data-governance-and-privacy-by-design) explains.
 
-The counterargument — that document AI is mature and needs no review — is true for low-stakes, high-volume work and false where an error has real consequences. The error cost decides the review design.
+<PullQuote>
+The counterargument — that document AI is mature and needs no review — is true for low-stakes, high-volume work and false where an error has real consequences.
+</PullQuote>
+
+The error cost decides the review design.
 
 ## A decision test
 

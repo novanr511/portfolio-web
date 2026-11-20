@@ -9,19 +9,21 @@ tags:
   - Memory
 ---
 
+<Lead>
 Agent memory is often described as a long-term store that makes an assistant remember everything. That is the wrong goal. An unbounded store retrieved on every turn adds noise and cost, and a memory that surfaces the wrong item can change a decision more than no memory would, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) argues for designing what the model sees, as the retrieval article explains for why selection matters.
+</Lead>
 
-**Direct answer:** Agent memory should be divided into working state, semantic facts, and episodic records, with deliberate rules about what is stored and retrieved. The Generative Agents work describes observation, reflection, and retrieval in agents, and the context-engineering article explains why context is scarce. The boundary: memory is a model of past interactions, not truth, which the data-governance article requires you to source and date, as the hallucination article warns about confident wrong detail.
+**Direct answer:** Agent memory should be divided into working state, semantic facts, and episodic records, with deliberate rules about what is stored and retrieved. The Generative Agents work describes observation, reflection, and retrieval in agents, and the context-engineering article explains why context is scarce. The boundary: memory is <Mark>a model of past interactions, not truth</Mark>, which the data-governance article requires you to source and date, as the hallucination article warns about confident wrong detail.
 
 ## The three types
 
 **Working state.** The current task's structured state — what has been done, what remains, what the user wants — which the context-engineering article recommends keeping small and typed, as the KV-cache article explains for the cost of long conversations.
 
-**Semantic facts.** Durable information such as a customer's plan or preferences, which should have a source and a date, as the data-governance article requires for any relied-upon record, as the first-party-data article treats consent and purpose as constraints.
+**Semantic facts.** Durable information such as a customer's plan or preferences, which should have <Mark>a source and a date</Mark>, as the data-governance article requires for any relied-upon record, as the first-party-data article treats consent and purpose as constraints.
 
 **Episodic records.** Summaries of specific past events, with dates and outcomes, which the Generative Agents work treats as material for reflection, as [Agent Memory Architectures: Short-Term, Long-Term, and Episodic](/articles/agent-memory-architectures-short-term-long-term-and-episodic) describes for the design, as the monitoring article warns about stale records.
 
-Three consequences follow. Retrieval should use more than similarity, which the reranking article explains for precision, as the embedding-selection article advises for own-data evaluation. Storage should be selective, as the data-curation article argues for quality over volume, as the model-collapse article warns about uncontrolled corpora. And the memory should be reviewable, as the model-explainability article argues for traces, as the governance checklist requires an owner.
+Three consequences follow. Retrieval should use more than similarity, which the reranking article explains for precision, as the embedding-selection article advises for own-data evaluation. Storage should be selective, as the data-curation article argues for <Mark>quality over volume</Mark>, as the model-collapse article warns about uncontrolled corpora. And the memory should be reviewable, as the model-explainability article argues for traces, as the governance checklist requires an owner.
 
 ## A worked design
 
@@ -29,13 +31,25 @@ The following is hypothetical and illustrative. A support agent needs to remembe
 
 Three checks decide the design. First, what is stored, as the data-governance article requires provenance? The plan comes from the billing system with a date; the tickets come from the support system with outcomes. Second, what is retrieved, as the reranking article advises? On a new ticket, retrieve the current plan and only the two most recent relevant tickets, which the context-engineering article recommends for a bounded context. Third, what is expired, as the monitoring article advises? A plan older than a billing cycle triggers a fresh lookup, which the first-party-data article treats as a quality rule.
 
-Three conclusions follow. The memory is a cache of authoritative systems, not a replacement for them, as the data-governance article argues for provenance. A small, relevant set is more useful than a large one, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) explains. And the design should be reviewed after a change in systems, as the monitoring article advises.
+Three conclusions follow.
+
+<PullQuote>
+The memory is a cache of authoritative systems, not a replacement for them, as the data-governance article argues for provenance.
+</PullQuote>
+
+<KeyPoint>
+A small, relevant set is more useful than a large one, as [Context Engineering: Designing What the Model Sees, Not Just the Prompt](/articles/context-engineering-designing-what-the-model-sees-not-just-the-prompt) explains.
+</KeyPoint>
+
+And the design should be reviewed after a change in systems, as the monitoring article advises.
 
 ## What agent memory cannot do
 
 It cannot create knowledge that was never stored, which the data-quality article treats as an upstream problem, as the hallucination article warns about invented detail. It does not guarantee that the right item surfaces, which the reranking article treats as a precision question, as the evaluation article requires for a test. And it does not remove privacy duties, which the privacy article makes jurisdiction-specific, as the first-party-data article treats purpose as a constraint.
 
+<Trap>
 The counterargument that a bigger memory is better is wrong in direction, which the context-engineering article explains: capacity is not selection, as the long-context article warns about information in the middle of a prompt.
+</Trap>
 
 ## A decision test
 

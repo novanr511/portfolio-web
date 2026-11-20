@@ -9,9 +9,15 @@ tags:
   - A/B Testing
 ---
 
+<Lead>
 Testing a recommender is not like testing a button colour, and treating it as such is how teams end up with a metric that improved while users were worse off. The system chooses what people see, which means the experiment changes the thing being measured, and the customers in the two groups are not independent of each other in the usual way.
+</Lead>
 
-**Direct answer:** The lift from a recommender change has to be measured against an unbiased assignment, over a horizon long enough to include the feedback loop, with a metric tied to value rather than to clicks. Three properties make this hard: position bias — users click what is shown near the top regardless of relevance; interference — one user's behaviour helps train the model that serves another; and delayed feedback — a good recommendation today changes what a user buys next month. The practical answer combines user-level randomisation, delayed measurement, and variance reduction such as CUPED.
+**Direct answer:** Three properties make this hard: <Mark>position bias</Mark> — users click what is shown near the top regardless of relevance; interference — one user's behaviour helps train the model that serves another; and delayed feedback — a good recommendation today changes what a user buys next month. The practical answer combines user-level randomisation, delayed measurement, and variance reduction such as CUPED.
+
+<KeyPoint>
+The lift from a recommender change has to be measured against an unbiased assignment, over a horizon long enough to include <Mark>the feedback loop</Mark>, with a metric tied to value rather than to clicks.
+</KeyPoint>
 
 ## Why position bias poisons a naive test
 
@@ -31,7 +37,11 @@ The implication is that the unit of analysis matters. User-level randomisation i
 
 ## The metric has to survive the feedback loop
 
-Recommenders operate over time: what you show a user changes what they click, which changes what you show them next. A short test measures the first step and misses the loop.
+Recommenders operate over time: what you show a user changes what they click, which changes what you show them next.
+
+<Trap>
+A short test measures the first step and misses the loop.
+</Trap>
 
 This is why the primary metric in a recommender test should be something that survives the horizon — retained usage, repeat purchase, total value over a defined window — rather than immediate click-through. CTR is a diagnostic, not an objective. A model that optimises for it can win the test and degrade the experience by surfacing sensational items that are clicked once and never returned to.
 
@@ -41,7 +51,11 @@ The ranking objective itself matters here. DeepFM's work on click-through predic
 
 Recommender metrics are noisy, and user-level variance is high. CUPED is described as using "data from the pre-experiment period to reduce metric variability and hence achieve better sensitivity", and the reported Bing result is about a 50% reduction in variance — "the same statistical power with only half of the users, or half the duration".
 
-For a recommender test, this is unusually valuable, because the pre-period behaviour is a strong predictor of the post-period behaviour, and the same users are typically available. The practical consequence is that a recommender team should treat the pre-period data as a first-class asset and design the logging to support it, rather than treat variance reduction as an analysis-time trick.
+For a recommender test, this is unusually valuable, because the pre-period behaviour is a strong predictor of the post-period behaviour, and the same users are typically available. The practical consequence is that a recommender team should treat the pre-period data as a first-class asset and design the logging to support it, rather than treat <Mark>variance reduction</Mark> as an analysis-time trick.
+
+<KeyFigures items={[
+  { value: "50%", label: "reported reduction in variance with CUPED (Bing)", source: "Kohavi, Tang, and Xu, 2013 (CUPED)" },
+]} />
 
 ## A test design that holds up
 
@@ -61,7 +75,11 @@ The following is hypothetical and illustrative. A hypothetical online shop with 
 
 ## A counterargument
 
-For all its design discipline, the argument overstates how far instrumentation can stabilise a recommender test. CUPED's reported 50 percent cut rests on pre-period behaviour predicting post-period behaviour, yet a recommender deliberately reshapes that behaviour, so the covariate the method leans on may be the very thing the treatment changes - and the result was demonstrated on Bing, not on a ranking system with this feedback structure. The article also treats user-level randomisation as a default while conceding that the model retrains on everyone's clicks; when the intervention changes the catalogue, the geo designs of Vaver and Koehler buy feasibility at the cost of the precision the article wants. Calling CTR a diagnostic rather than an objective sidesteps the attribution limits the Google Ads help documentation itself records: the long-horizon value metric is no less model-dependent, only slower to read. The framing presents a stabilising design as a neutral one.
+For all its design discipline, the argument overstates how far instrumentation can stabilise a recommender test. CUPED's reported 50 percent cut rests on pre-period behaviour predicting post-period behaviour, yet a recommender deliberately reshapes that behaviour, so the covariate the method leans on may be the very thing the treatment changes - and the result was demonstrated on Bing, not on a ranking system with this feedback structure. The article also treats user-level randomisation as a default while conceding that the model retrains on everyone's clicks; when the intervention changes the catalogue, the geo designs of Vaver and Koehler buy feasibility at the cost of the precision the article wants. Calling CTR a diagnostic rather than an objective sidesteps the attribution limits the Google Ads help documentation itself records: the long-horizon value metric is no less model-dependent, only slower to read.
+
+<PullQuote>
+The framing presents a stabilising design as a neutral one.
+</PullQuote>
 
 ## References & Further Reading
 

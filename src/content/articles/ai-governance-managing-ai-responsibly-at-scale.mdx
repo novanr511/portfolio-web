@@ -9,15 +9,23 @@ tags:
   - Leadership
 ---
 
+<Lead>
 AI governance is usually presented as a stage that comes after the model is built: someone reviews the risks, writes a policy, and the organisation becomes "responsible". That sequence does not survive contact with a system that has to run in production at scale, because by the time a model is finished, most of the decisions that create risk have already been made — in what data was collected, what was never measured, and what the optimiser was rewarded for.
+</Lead>
 
-**Direct answer:** Governing AI at scale means three things done continuously rather than once: producing documentation that makes a system's intended use and measured limits reviewable, deciding where human input goes and how much of it is needed, and adopting a shared measurement vocabulary so claims about AI systems can be compared across jurisdictions and sectors. The frameworks that exist are mostly voluntary, which is precisely why the artefacts they produce — model cards, dataset datasheets, risk profiles — matter more than the frameworks themselves.
+**Direct answer:**
+
+<KeyPoint>
+Governing AI at scale means three things done continuously rather than once: producing documentation that makes a system's intended use and measured limits reviewable, deciding where human input goes and how much of it is needed, and adopting a shared measurement vocabulary so claims about AI systems can be compared across jurisdictions and sectors.
+</KeyPoint>
+
+The frameworks that exist are mostly voluntary, which is precisely why the artefacts they produce — model cards, dataset datasheets, risk profiles — matter more than the frameworks themselves.
 
 ## Voluntary frameworks, and why that shapes the work
 
 The most widely referenced government framework for AI risk makes its own status explicit. NIST describes the Artificial Intelligence Risk Management Framework as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems."
 
-Read the second half of that sentence carefully. The stated goal is not compliance; it is the ability to incorporate trustworthiness considerations into design, development, use, and *evaluation*. The framework is a scaffold for engineering practice, not a certificate. The practical consequence is that a voluntary framework only works if somebody inside the organisation does the work it describes — and that work has to survive contact with a delivery schedule.
+Read the second half of that sentence carefully. The stated goal is not compliance; it is the ability to incorporate trustworthiness considerations into design, development, use, and *evaluation*. The framework is <Mark>a scaffold for engineering practice</Mark>, not a certificate. The practical consequence is that a voluntary framework only works if somebody inside the organisation does the work it describes — and that work has to survive contact with a delivery schedule.
 
 The other structural signal is how the framework is extending. NIST launched the Trusted and Responsible AI Resource Center on March 30, 2023, "to facilitate implementation of, and international alignment with, the AI RMF", and on April 7, 2026 released "a concept note for an AI RMF Profile on Trustworthy AI in Critical Infrastructure". The mechanism is profiles: a general framework plus sector-specific refinements. That is the shape governance actually takes as systems spread — the general framework sets the vocabulary, and the sector profile encodes what is unacceptable in that sector's context.
 
@@ -29,7 +37,11 @@ Gebru et al. propose *datasheets for datasets*, by analogy with the electronics 
 
 Mitchell et al. propose the complementary artefact for models — *model cards*, which "provide benchmarked evaluation in a variety of conditions, such as across different cultural, demographic, or phenotypic groups ... and intersectional groups" relevant to the intended application. They also disclose "the context in which models are intended to be used" and "details of the performance evaluation procedures".
 
-The governance point is not that these documents are paperwork. It is that each one closes a specific question a regulator, a customer, or a journalist will eventually ask. Who collected this, and for what? Who is affected by this model's errors, and how did you measure that? Where is it allowed to be used? A programme that answers those questions as a by-product of normal engineering has governance. A programme that answers them in a separate document written after launch does not.
+The governance point is not that these documents are paperwork. It is that each one closes a specific question a regulator, a customer, or a journalist will eventually ask. Who collected this, and for what? Who is affected by this model's errors, and how did you measure that? Where is it allowed to be used? A programme that answers those questions as a by-product of normal engineering has governance.
+
+<Trap>
+A programme that answers them in a separate document written after launch does not.
+</Trap>
 
 ## How much human input is actually needed
 
@@ -58,7 +70,7 @@ If you have to build this from nothing, the order of operations matters more tha
 3. **Decide the human-input budget explicitly.** Write down which comparisons need a person, at what frequency, and what happens when the model disagrees with them. Christiano et al. suggest the budget can be very small; the point is that it is chosen rather than assumed.
 4. **Write the principles you are willing to encode.** If you use a constitutional approach, the rules are the governance artefact. They will be incomplete and contested, and that is fine — but they must be written, versioned, and owned.
 5. **Adopt a sector profile.** General guidance plus the specific prohibitions, data rules, and escalation paths that apply to your domain. This is also how you satisfy a customer or regulator asking "what standard do you work to".
-6. **Measure the things you claim.** Use a shared vocabulary for adoption, effect, and risk so your claims can be checked against someone else's.
+6. **Measure the things you claim.** Use <Mark>a shared vocabulary</Mark> for adoption, effect, and risk so your claims can be checked against someone else's.
 
 None of this requires a large governance organisation to start. It requires that the artefacts exist, and that the artefacts are produced by the people who did the work.
 
@@ -66,11 +78,15 @@ For the ethics questions underneath these process choices — who decides, and w
 
 ## A worked example
 
-The following is hypothetical and illustrative. A hypothetical lender wants to deploy a credit-scoring model across several markets and asks its governance function for sign-off. Three checks make the review concrete. First, do the two documents exist? A datasheet for every dataset entering the pipeline (Gebru et al.) and a model card stating intended use and measured limits (Mitchell et al.) must be produced by the people who did the work; a card written after launch does not count. Second, is the human-input budget explicit? The team records which comparisons need a person and at what frequency, noting that Christiano et al. report useful feedback on under one percent of interactions, so oversight is a placement decision rather than a standing tax. Third, are claims measured in a shared vocabulary? The OECD observatory exists so adoption and effect can be compared across countries. The outcome is bounded: if the card cannot be produced, the model does not proceed, and the framework stays a scaffold rather than a certificate (NIST).
+The following is hypothetical and illustrative. A hypothetical lender wants to deploy a credit-scoring model across several markets and asks its governance function for sign-off. Three checks make the review concrete. First, do the two documents exist? A datasheet for every dataset entering the pipeline (Gebru et al.) and a model card stating intended use and measured limits (Mitchell et al.) must be produced by the people who did the work; a card written after launch does not count. Second, is the <Mark>human-input budget</Mark> explicit? The team records which comparisons need a person and at what frequency, noting that Christiano et al. report useful feedback on under one percent of interactions, so oversight is a placement decision rather than a standing tax. Third, are claims measured in a shared vocabulary? The OECD observatory exists so adoption and effect can be compared across countries. The outcome is bounded: if the card cannot be produced, the model does not proceed, and the framework stays a scaffold rather than a certificate (NIST).
 
 ## A counterargument
 
-The confidence that documentation enforces governance outruns the cited evidence. Gebru et al. and Mitchell et al. propose formats and state motivations - the lack of a standardised documentation process, the need for benchmarked evaluation across groups - but neither reports whether model cards or datasheets change deployment outcomes. The OECD observatory tracks adoption and firm-level effects, not whether governance artefacts reduce harm. A critic would say the article conflates producing documentation with exercising power: a card can be completed while a risky deployment proceeds unchanged, which is the review-gate failure the piece opens by rejecting. Voluntariness cuts both ways, since NIST's framework is "intended for voluntary use" and nothing in the sources makes artefact production enforceable. The framing is incomplete where it treats documentation as a self-enforcing control.
+<PullQuote>
+The confidence that documentation enforces governance outruns the cited evidence.
+</PullQuote>
+
+Gebru et al. and Mitchell et al. propose formats and state motivations - the lack of a standardised documentation process, the need for benchmarked evaluation across groups - but neither reports whether model cards or datasheets change deployment outcomes. The OECD observatory tracks adoption and firm-level effects, not whether governance artefacts reduce harm. A critic would say the article conflates producing documentation with exercising power: a card can be completed while a risky deployment proceeds unchanged, which is the review-gate failure the piece opens by rejecting. Voluntariness cuts both ways, since NIST's framework is "intended for voluntary use" and nothing in the sources makes artefact production enforceable. The framing is incomplete where it treats documentation as a self-enforcing control.
 
 ## References & Further Reading
 
