@@ -9,11 +9,13 @@ tags:
   - Web Infrastructure
 ---
 
+<Lead>
 When multiple URLs on your domain serve substantially identical content—such as parameterized product pages, sorting variations, or tracking links—search engines face an ambiguity problem. Which URL should be indexed? Which URL should accumulate external link equity? Which URL should appear in search results?
+</Lead>
 
-To resolve this ambiguity, Google, Yahoo, and Microsoft introduced the `rel="canonical"` link element in 2009. However, the most critical concept engineers must understand is this: **a canonical tag is a strong hint, not a binding directive.**
+To resolve this ambiguity, Google, Yahoo, and Microsoft introduced the `rel="canonical"` link element in 2009. However, the most critical concept engineers must understand is this: **a canonical tag is <Mark>a strong hint, not a binding directive</Mark>.**
 
-**Direct Answer:** A canonical tag (`<link rel="canonical" href="...">`) signals to search engines which URL represents the authoritative version of a duplicate cluster. Unlike `noindex` or `robots.txt`—which act as strict operational rules—Googlebot treats canonical tags as one signal among many. If your internal links, XML sitemaps, HTTP redirects, and content body contradict your canonical tag, Googlebot will ignore your tag and select its own canonical URL, triggering the *"Google chose different canonical than user"* status in Search Console.
+**Direct Answer:** A canonical tag (`<link rel="canonical" href="...">`) signals to search engines which URL represents the authoritative version of a duplicate cluster. Unlike `noindex` or `robots.txt`—which act as strict operational rules—Googlebot treats canonical tags as <Mark>one signal among many</Mark>. If your internal links, XML sitemaps, HTTP redirects, and content body contradict your canonical tag, Googlebot will ignore your tag and select its own canonical URL, triggering the *"Google chose different canonical than user"* status in Search Console.
 
 Understanding how search engines calculate canonical confidence allows engineers to resolve duplicate URL clusters and align all infrastructure signals.
 
@@ -58,7 +60,7 @@ What you *can* work from is the documented signal hierarchy above, plus these ob
 
 - **Strong signals:** a permanent redirect to the target, and a `rel="canonical"` annotation pointing at it. Google's documentation also states that "Google prefers HTTPS pages over equivalent HTTP pages as canonical," with exceptions, and that Google "generally doesn't support URL fragments" for canonicalisation.
 - **Weak signals:** sitemap inclusion. The documentation is candid that when using the sitemap method, "Google must still determine the associated duplicate for any canonicals that you declare in the sitemap."
-- **Your job:** make the strong signals agree with each other. If your redirect points at `/product` and your canonical tag points at `/product?color=blue`, you have created a conflict that no amount of internal linking will resolve.
+- **Your job:** <Mark>make the strong signals agree with each other</Mark>. If your redirect points at `/product` and your canonical tag points at `/product?color=blue`, you have created a conflict that no amount of internal linking will resolve.
 
 That last point is the actionable one, and it is fully supported: "these methods can stack and thus become more effective when combined." Stacking only helps when the stack is coherent.
 
@@ -82,7 +84,13 @@ If you place `<link rel="canonical" href="/master-page">` on `/variant-page`, bu
 
 then the signals conflict. Google documents that it prefers HTTPS versions, that redirects and canonical annotations are strong signals while sitemap inclusion is weak, and that when methods are combined their effect stacks. It also documents, in its Search Console reporting, a "canonical" designation for the URL it considers canonical and a "user-declared canonical" field that can disagree with it - so a conflicting setup shows up as a discrepancy you can inspect rather than as a silent outcome.
 
-What the documentation does *not* state is a threshold, a weight, or a rule about how many internal links it takes to override a canonical tag. Claims like "Googlebot ignores your canonical when 99% of internal links point elsewhere" describe a mechanism Google has not published. The defensible version is the weaker and still useful one: strong signals that disagree with each other make the outcome less predictable, and the site owner is the only party who can resolve that by making them agree.
+What the documentation does *not* state is a threshold, a weight, or a rule about how many internal links it takes to override a canonical tag.
+
+<Trap>
+Claims like "Googlebot ignores your canonical when 99% of internal links point elsewhere" describe a mechanism Google has not published.
+</Trap>
+
+The defensible version is the weaker and still useful one: strong signals that disagree with each other make the outcome less predictable, and the site owner is the only party who can resolve that by making them agree.
 
 ---
 
@@ -190,7 +198,11 @@ Inspect "User-declared canonical" vs "Google-selected canonical"
 
 ## Summary & Next Steps
 
-Canonical tags are an indispensable tool for taming duplicate URL proliferation, but they cannot overcome contradictory infrastructure signals. To ensure search engines respect your chosen canonical URLs, align your HTTP redirects, internal links, XML sitemaps, and canonical tags into a unified, consistent signal.
+<KeyPoint>
+Canonical tags are an indispensable tool for taming duplicate URL proliferation, but they cannot overcome contradictory infrastructure signals.
+</KeyPoint>
+
+To ensure search engines respect your chosen canonical URLs, align your HTTP redirects, internal links, XML sitemaps, and canonical tags into a unified, consistent signal.
 
 Continue exploring indexing and semantic markup:
 * **[Structured Data and Schema.org: What It Can—and Cannot—Do](/articles/structured-data-and-schema-org-what-it-can-and-cannot-do)** — Enhancing indexed canonical pages with semantic entity markup.
@@ -199,7 +211,11 @@ Continue exploring indexing and semantic markup:
 
 ## A counterargument
 
-An objection to the article's disciplined restraint is that it understates how little the site owner actually controls. The whole prescription - align redirects, canonical annotations, and sitemaps - leans on Google's statement that the methods "can stack," which is itself an undocumented claim about how signals combine, and the article offers no way to verify that stacking beyond Search Console's after-the-fact verdict. Google also says it will identify the "objectively best version" when no canonical is specified, and the article concedes that content differences and internal links can drive an override. If quality and link structure are what actually decide the cluster, then signal alignment is hygiene rather than a lever: it removes contradictions but cannot make Google prefer a thinner page. The framing risks implying more control over canonical selection than the documented evidence supports.
+An objection to the article's disciplined restraint is that it understates how little the site owner actually controls. The whole prescription - align redirects, canonical annotations, and sitemaps - leans on Google's statement that the methods "can stack," which is itself an undocumented claim about how signals combine, and the article offers no way to verify that stacking beyond Search Console's after-the-fact verdict. Google also says it will identify the "objectively best version" when no canonical is specified, and the article concedes that content differences and internal links can drive an override. If quality and link structure are what actually decide the cluster, then signal alignment is hygiene rather than a lever: it removes contradictions but cannot make Google prefer a thinner page.
+
+<PullQuote>
+The framing risks implying more control over canonical selection than the documented evidence supports.
+</PullQuote>
 
 ## References & Further Reading
 

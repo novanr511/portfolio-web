@@ -9,7 +9,9 @@ tags:
   - Economics
 ---
 
-A serving system can be fast for one request and inefficient for a thousand, or the reverse. Batching — grouping requests so the hardware processes them together — is the lever that trades latency for throughput. Understanding that trade is necessary before choosing either a model or a serving framework.
+<Lead>
+A serving system can be fast for one request and inefficient for a thousand, or the reverse. Batching — grouping requests so the hardware processes them together — is the lever <Mark>that trades latency for throughput</Mark>. Understanding that trade is necessary before choosing either a model or a serving framework.
+</Lead>
 
 **Direct answer:** Batch inference processes multiple requests in one pass, increasing throughput because the hardware is used more fully, while adding waiting time as requests accumulate into a batch. The vLLM/PagedAttention paper describes how continuous batching and memory management raise serving throughput. The boundary: the right batch size depends on the latency your users will accept, which is a product decision, not a hardware setting.
 
@@ -25,7 +27,7 @@ Three variables interact:
 
 Two metrics describe the outcome:
 
-- **Throughput** — requests completed per second, which determines cost per request at fixed hardware cost.
+- **Throughput** — requests completed per second, which determines <Mark>cost per request</Mark> at fixed hardware cost.
 - **Latency** — time from arrival to response, especially the tail that users experience.
 
 They move in opposite directions in the region where batching matters.
@@ -64,19 +66,31 @@ The arithmetic is simplified — real systems use continuous batching, which the
 
 **Mixed workloads** where a long request holds a batch and delays short ones, which is why request-length bucketing exists.
 
-The counterargument — that faster hardware removes the trade-off — is wrong in direction. Faster hardware makes both paths faster; the relative tension between throughput and latency remains, which the GPU article explains at the hardware level.
+<Trap>
+The counterargument — that faster hardware removes the trade-off — is wrong in direction.
+</Trap>
+
+Faster hardware makes both paths faster; the relative tension between throughput and latency remains, which the GPU article explains at the hardware level.
 
 ## Setting a latency budget
 
 A useful latency budget starts from the user experience and works backwards. Three steps:
 
-**Choose a target percentile.** The median hides the experience of the slowest requests. Pick a tail percentile — commonly the 95th or 99th — that reflects when users notice or abandon, as the SRE article explains for service objectives.
+**Choose a target percentile.**
+
+<PullQuote>
+The median hides the experience of the slowest requests.
+</PullQuote>
+
+Pick a tail percentile — commonly the 95th or 99th — that reflects when users notice or abandon, as the SRE article explains for service objectives.
 
 **Allocate the budget.** Split the target across components: network, queueing, prefill, and decoding. A 2-second budget might allow 100 ms of network, 200 ms of queueing, and the rest to generation. An allocation makes trade-offs visible.
 
 **Measure the queue separately.** Queue time is the clearest sign of overload and the component most affected by batch size. An alert on queue growth gives the system a chance to shed load before latency becomes unacceptable, which the observability article covers.
 
+<KeyPoint>
 With a budget in hand, batch size becomes a parameter chosen to meet it rather than a number picked for throughput in isolation.
+</KeyPoint>
 
 ## What the metrics miss
 
@@ -84,7 +98,7 @@ With a budget in hand, batch size becomes a parameter chosen to meet it rather t
 
 **Tail latency matters more than average.** A few slow responses shape user perception, which the observability article covers.
 
-**Queues amplify failures.** If the system cannot keep up, the backlog grows and older requests become useless — a failure mode the SRE article calls a latency outage.
+**Queues amplify failures.** If the system cannot keep up, the backlog grows and older requests become useless — a failure mode the SRE article calls <Mark>a latency outage</Mark>.
 
 ## A decision test
 

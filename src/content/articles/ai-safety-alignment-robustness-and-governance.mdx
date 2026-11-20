@@ -9,19 +9,32 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 AI safety is a term that covers several different concerns, and treating them as one produces muddled policies. A system can faithfully follow the wrong objective, behave correctly on the test distribution and badly outside it, or be technically sound while operating without any accountable owner. These are three problems with three different literatures.
+</Lead>
 
-**Direct answer:** Alignment asks whether a system does what its operators intend; robustness asks whether it continues to behave correctly under distribution shift and adversarial input; governance asks who is accountable and what evidence is required. The research gives concrete mechanisms for each — reinforcement learning from human preferences for alignment, evaluation under shift for robustness, and frameworks such as NIST's for governance. NIST describes its AI Risk Management Framework as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems": a process for producing evidence, not a guarantee of safety.
+**Direct answer:**
+
+<KeyPoint>
+Alignment asks whether a system does what its operators intend; robustness asks whether it continues to behave correctly under distribution shift and adversarial input; governance asks who is accountable and what evidence is required.
+</KeyPoint>
+
+The research gives concrete mechanisms for each — reinforcement learning from human preferences for alignment, evaluation under shift for robustness, and frameworks such as NIST's for governance. NIST describes its AI Risk Management Framework as "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products, services, and systems": a process for producing evidence, not a guarantee of safety.
 
 ## Alignment: the problem of specifying intent
 
-A system optimises the objective it is given, not the one its designers had in mind. When the objective is an approximation — a proxy for what we actually want — an optimiser will find ways to score well on the proxy while failing at the intended goal.
+A system optimises the objective it is given, not the one its designers had in mind. When the objective is an approximation — a proxy for what we actually want — an optimiser will find ways to <Mark>score well on the proxy</Mark> while failing at the intended goal.
 
-Christiano et al. show that goals can be defined through "(non-expert) human preferences between pairs of trajectory segments", solving complex tasks "without access to the reward function", including Atari games and simulated locomotion. The cost of oversight was remarkably low: feedback on "less than one percent of our agent's interactions", and roughly "an hour of human time" to train complex novel behaviours. The mechanism works because comparing two outcomes is easier for a human than writing a complete reward function.
+Christian et al. show that goals can be defined through "(non-expert) human preferences between pairs of trajectory segments", solving complex tasks "without access to the reward function", including Atari games and simulated locomotion. The cost of oversight was remarkably low: feedback on "less than one percent of our agent's interactions", and roughly "an hour of human time" to train complex novel behaviours. The mechanism works because comparing two outcomes is easier for a human than writing a complete reward function.
+
+<KeyFigures items={[
+  { value: "less than one percent", label: "of our agent's interactions", source: "Christiano et al." },
+  { value: "an hour of human time", label: "to train complex novel behaviours", source: "Christiano et al." },
+]} />
 
 Bai et al. extend this with Constitutional AI, where "the only human oversight is provided through a list of rules or principles". The method combines a supervised phase of self-critique and revision with a reinforcement phase using "RL from AI Feedback" (RLAIF), producing an assistant that is "harmless but non-evasive" — one that "engages with harmful queries by explaining its objections to them".
 
-The governance significance is easy to miss: the principles list is the artefact that encodes the values, and it is therefore the thing that must be reviewed, versioned, and owned. A constitutional approach does not remove human judgement; it makes the judgement explicit and machine-enforceable.
+The governance significance is easy to miss: the principles list is <Mark>the artefact that encodes the values</Mark>, and it is therefore the thing that must be reviewed, versioned, and owned. A constitutional approach does not remove human judgement; it makes the judgement explicit and machine-enforceable.
 
 ## Robustness: the problem of novel conditions
 
@@ -41,7 +54,9 @@ The honest limit is that no evaluation covers every future condition. A system's
 
 ## Governance: the problem of accountability
 
+<Trap>
 A technically excellent system deployed without an accountable owner is a governance failure, and the failure becomes visible when something goes wrong.
+</Trap>
 
 Mitchell et al.'s model cards and Gebru et al.'s datasheets are the documentation layer: they require the intended use, the evaluation conditions, and the known limits to be written down alongside the artefact. NIST's framework is the process layer, organising the work into governance, mapping, measurement, and management.
 
@@ -85,7 +100,7 @@ Three limits should temper any claim that a system is safe.
 
 **Safety properties do not compose.** A model can be well-aligned and a deployment can still be unsafe because the interface encourages misuse, the fallback is broken, or the accountable owner has no authority. The worked example above showed how three independent failures can produce the same visible symptom, and the same is true in reverse: fixing one does not guarantee the system is safe.
 
-**The threat model changes.** A system that was safe against natural distribution shift may not be safe against an adversary who studies it, and a policy that was appropriate at one scale of deployment may not be at another. Safety is therefore a programme of continuous evaluation and review, not a certification obtained once.
+**The threat model changes.** A system that was safe against natural distribution shift may not be safe against an adversary who studies it, and a policy that was appropriate at one scale of deployment may not be at another. Safety is therefore <Mark>a programme of continuous evaluation and review</Mark>, not a certification obtained once.
 
 This is why the NIST framework is described as a tool for incorporating trustworthiness into "design, development, use, and evaluation" — the list includes use and evaluation as ongoing activities, not final checks. The documentation artefacts are valuable for the same reason: they make the system's claimed limits available to the people who will operate it, so that the limits can be tested in practice.
 
@@ -93,7 +108,11 @@ For the alignment research in detail, see [Reinforcement Learning](/articles/rei
 
 ## A counterargument
 
-The three-way split is useful for organising questions but overstates how independent the problems are. Constitutional AI is filed under alignment, yet Bai et al. present it as a harmlessness procedure spanning self-critique and RLAIF, and the article itself says the principles list must be reviewed, versioned, and owned - which makes it a governance artefact as much as an alignment one. Christiano et al.'s "less than one percent" oversight figure is offered as a cost result, but such sparse feedback is also what leaves a reward model fragile under the distribution shift the article treats as a separate robustness problem. NIST describes its RMF as "intended for voluntary use", so the governance column rests on a process the piece elsewhere calls "not a guarantee of safety". The taxonomy is incomplete as a claim that three causes have three independent fixes.
+The three-way split is useful for organising questions but overstates how independent the problems are. Constitutional AI is filed under alignment, yet Bai et al. present it as a harmlessness procedure spanning self-critique and RLAIF, and the article itself says the principles list must be reviewed, versioned, and owned - which makes it a governance artefact as much as an alignment one. Christiano et al.'s "less than one percent" oversight figure is offered as a cost result, but such sparse feedback is also what leaves a reward model fragile under the distribution shift the article treats as a separate robustness problem. NIST describes its RMF as "intended for voluntary use", so the governance column rests on a process the piece elsewhere calls "not a guarantee of safety".
+
+<PullQuote>
+The taxonomy is incomplete as a claim that three causes have three independent fixes.
+</PullQuote>
 
 ## References & Further Reading
 

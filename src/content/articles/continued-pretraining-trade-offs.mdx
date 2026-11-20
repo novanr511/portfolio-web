@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Continued pretraining is often presented as a way to teach a model a new domain, which hides what it can cost. The model documentation literature describes what a model card should record, and the synthetic-data entry covers generated data and its limits. The trade-off is between new knowledge and what is lost.
+</Lead>
 
 **Direct answer:** Continue pretraining only when the domain gap is measurable, with a held-out test for both the new domain and general ability. The sources describe documentation and data; the evaluation rule is a synthesis.
 
@@ -21,7 +23,7 @@ Three points matter:
 
 <Figure src="/images/articles/inline/continued-pretraining-trade-offs-1.png" alt="A comparison of domain gain on a held-out test against general loss on broader tasks, with a note to keep a rollback checkpoint." caption="Conceptual: measure the new domain and general ability together." />
 
-- **Knowledge is not additive.** Training on new material changes existing weights. The model card literature exists partly to record what a model can and cannot do, which matters after a change.
+- **Knowledge is not additive.** <Mark>Training on new material changes existing weights</Mark>. The model card literature exists partly to record what a model can and cannot do, which matters after a change.
 - **Data quality dominates.** The synthetic-data entry describes limits of generated data. Training on more of it can reinforce errors.
 - **General ability can degrade.** Improvement on a domain test can come at the cost of broader performance, which is why both must be measured.
 
@@ -37,11 +39,15 @@ The outcome is a decision to train or use another method. The scenario is hypoth
 
 ## Why a checkpoint matters
 
-Continued training changes a model in ways that are hard to reverse precisely. Saving a checkpoint before the run means a degraded general ability can be rolled back without retraining from the beginning. The cost of the checkpoint is storage; the benefit is a recoverable decision.
+Continued training changes a model in ways that are hard to reverse precisely. Saving a checkpoint before the run means a degraded general ability can be rolled back without retraining from the beginning. The cost of the checkpoint is storage; the benefit is <Mark>a recoverable decision</Mark>.
 
 ## Why the corpus is the real input
 
-The quality of the material dominates the choice of method. A small, clean, representative corpus can produce a useful improvement, while a large noisy one can degrade both the domain and general behaviour. Treating curation as the main work, rather than the training run, is the practical lesson.
+<KeyPoint>
+The quality of the material dominates the choice of method.
+</KeyPoint>
+
+A small, clean, representative corpus can produce a useful improvement, while a large noisy one can degrade both the domain and general behaviour. Treating curation as the main work, rather than the training run, is the practical lesson.
 
 ## Evidence status
 
@@ -53,9 +59,13 @@ The quality of the material dominates the choice of method. A small, clean, repr
 
 ## Why retrieval is the baseline
 
-Before training, the team should ask whether retrieval can supply the same knowledge. If it can, training adds cost and risk without a clear benefit. Comparing against retrieval is the cheapest way to justify or reject continued pretraining.
+Before training, the team should ask whether retrieval can supply the same knowledge. If it can, training adds cost and risk without a clear benefit. Comparing against retrieval is <Mark>the cheapest way to justify or reject</Mark> continued pretraining.
 
-It also cannot guarantee that the new knowledge is correct. A corpus can contain errors that the model will reproduce with confidence, which is why provenance matters as much as volume.
+It also cannot guarantee that the new knowledge is correct.
+
+<Trap>
+A corpus can contain errors that the model will reproduce with confidence, which is why provenance matters as much as volume.
+</Trap>
 
 The decision should name the recheck condition. A model that was better than retrieval last quarter may fall behind as retrieval improves, and a periodic comparison keeps the choice honest.
 
@@ -77,7 +87,9 @@ The recheck should include the cost of the alternative, since both options conti
 
 It cannot guarantee that new knowledge is retained correctly. It does not remove the need for evaluation. And it cannot make a poor corpus useful.
 
+<PullQuote>
 The counterargument that more domain data always helps is fair for a clean corpus and incomplete when general ability matters.
+</PullQuote>
 
 ## A decision test
 

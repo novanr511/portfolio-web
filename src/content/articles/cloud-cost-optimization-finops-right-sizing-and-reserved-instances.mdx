@@ -9,7 +9,9 @@ tags:
   - Infrastructure
 ---
 
+<Lead>
 Cloud cost has a reputation for being mysterious, and much of that mystery is self-inflicted. The bills are detailed, the pricing models are published, and the reason teams cannot explain their spend is usually that nobody owns the connection between what engineers build and what finance pays. FinOps exists to close that gap.
+</Lead>
 
 **Direct answer:** FinOps is the practice of managing cloud cost as a shared engineering and financial responsibility. The AWS Well-Architected Framework describes a cost-optimised workload as one that "delivers business outcomes at the lowest appropriate price point while meeting its functional requirements and your performance, reliability, security, and sustainability standards" — note that "lowest" is qualified by outcomes and standards. Cloud cost optimisation "differs from traditional on-premises environments because it emphasizes continuous improvement, automation, and alignment between resource consumption and business outcomes, rather than capacity prediction and procurement". The practical tools are visibility, right-sizing, commitment-based discounts, and a cultural habit of treating spend as a property of the system.
 
@@ -17,15 +19,19 @@ Cloud cost has a reputation for being mysterious, and much of that mystery is se
 
 In a data centre, capacity is bought in advance and mostly fixed. The dominant question is whether you bought enough, and the cost is largely sunk by the time the workload runs.
 
-In the cloud, capacity can be added in seconds and removed just as quickly, and the pricing reflects that flexibility. The consequence is that cost becomes a runtime property of the system, driven by decisions that engineers make every day: instance sizes, storage tiers, data transfer paths, retention periods, and whether an environment is switched off at night.
+In the cloud, capacity can be added in seconds and removed just as quickly, and the pricing reflects that flexibility. The consequence is that <Mark>cost becomes a runtime property of the system</Mark>, driven by decisions that engineers make every day: instance sizes, storage tiers, data transfer paths, retention periods, and whether an environment is switched off at night.
 
-AWS's framing is explicit: the emphasis is on "continuous improvement, automation, and alignment between resource consumption and business outcomes". A quarterly review cannot manage something that changes hourly, which is why a one-off cost-cutting project always decays. The discipline has to live in the loop.
+AWS's framing is explicit: the emphasis is on "continuous improvement, automation, and alignment between resource consumption and business outcomes". A quarterly review cannot manage something that changes hourly, which is why a one-off cost-cutting project always decays.
+
+<KeyPoint>
+The discipline has to live in the loop.
+</KeyPoint>
 
 ## The three levers
 
 **Right-sizing** means matching resources to actual demand. Instances are frequently oversized because they were chosen conservatively at launch and never revisited, because a burst became permanent, or because a service's memory profile changed. The measurement is straightforward — CPU and memory utilisation over a representative window — and the obstacle is usually the perceived risk of changing something that works.
 
-A useful caution: right-sizing to average utilisation can break a service whose load is spiky. The target is the workload's actual performance requirement, not a utilisation percentage. The AWS definition explicitly includes performance and reliability standards, which is the reminder that the cheapest instance is not the right one if it fails under load.
+A useful caution: right-sizing to average utilisation can break a service whose load is spiky. The target is the workload's actual performance requirement, not a utilisation percentage. The AWS definition explicitly includes performance and reliability standards, which is the reminder that <Mark>the cheapest instance is not the right one if it fails under load</Mark>.
 
 **Commitment-based discounts** — reserved instances and savings plans — trade flexibility for price. If a workload is stable and long-running, committing to a quantity of usage reduces cost substantially; if the workload is uncertain, the commitment becomes an obligation you pay whether or not you use it. The decision requires a forecast with a stated confidence level, and it should be revisited when the workload changes.
 
@@ -33,7 +39,9 @@ The term "reserved instances" in the article title is a reminder that the mechan
 
 **Visibility and attribution** — FinOps calls this showback or chargeback — makes spend visible to the teams that create it. The FinOps Foundation describes its role as "advancing the people who manage the value of technology", which is a cultural claim: the point is not a dashboard but a shared understanding of what the spend buys.
 
+<Trap>
 Without attribution, engineers optimise what they can see and finance cuts what it cannot, which produces the familiar pattern of across-the-board cuts that slow everything without fixing the cause.
+</Trap>
 
 ## A worked example of right-sizing
 
@@ -59,7 +67,7 @@ That saving is only real if the capacity is needed for the full year. Three scen
 - **The workload doubles in month four.** The original commitment covers half the need; the rest is bought at on-demand rates, and the total is higher than either a larger commitment or a flexible plan would have produced.
 - **Instance sizes change after a right-sizing exercise.** The commitment is tied to a specific type and region, and moving to a smaller family makes part of it unusable.
 
-The decision therefore depends on a forecast with an explicit confidence level and a review date. A sane policy commits to the stable floor of demand — the load that will certainly be there — and leaves the variable part on demand or under a flexible savings plan. Committing the peak is a bet that the peak persists, which is usually wrong.
+The decision therefore depends on a forecast with an explicit confidence level and a review date. A sane policy commits to <Mark>the stable floor of demand</Mark> — the load that will certainly be there — and leaves the variable part on demand or under a flexible savings plan. Committing the peak is a bet that the peak persists, which is usually wrong.
 
 A second term matters for the whole bill: data transfer. Right-sizing compute can be undone by moving data between regions or out to the internet at scale. AWS's definition of a cost-optimised workload includes the requirement to meet "functional requirements and your performance, reliability, security, and sustainability standards" — a reminder that the cheapest architecture is not the one with the smallest instance bill.
 
@@ -88,7 +96,13 @@ For the operational practice that makes this manageable, see [DevOps](/articles/
 
 ## A counterargument
 
-The article presents FinOps as neutral engineering hygiene, and a critic would question that framing. The AWS definition it quotes makes "lowest appropriate price point" conditional on performance, reliability, security, and sustainability standards - so deciding what is "appropriate" is a governance choice about which standard yields, not a measurement the dashboard can settle. Calling the responsibility "shared" can obscure that someone still decides whose reliability margin is spent to hit the number. The worked right-sizing example also assumes instance size is the unit of optimisation, but the cited Kubernetes autoscaling documentation points to a world where capacity follows demand automatically and the saving lives in architecture and scheduling, not in a smaller instance type. Finally, commitment discounts reward predictability, which quietly biases an organisation toward keeping stable workloads rather than replacing them - a commercial incentive against exactly the continuous improvement the discipline claims to promote.
+The article presents FinOps as neutral engineering hygiene, and a critic would question that framing. The AWS definition it quotes makes "lowest appropriate price point" conditional on performance, reliability, security, and sustainability standards - so deciding what is "appropriate" is a governance choice about which standard yields, not a measurement the dashboard can settle.
+
+<PullQuote>
+Calling the responsibility "shared" can obscure that someone still decides whose reliability margin is spent to hit the number.
+</PullQuote>
+
+The worked right-sizing example also assumes instance size is the unit of optimisation, but the cited Kubernetes autoscaling documentation points to a world where capacity follows demand automatically and the saving lives in architecture and scheduling, not in a smaller instance type. Finally, commitment discounts reward predictability, which quietly biases an organisation toward keeping stable workloads rather than replacing them - a commercial incentive against exactly the continuous improvement the discipline claims to promote.
 
 ## References & Further Reading
 

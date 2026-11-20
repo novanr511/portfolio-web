@@ -9,21 +9,31 @@ tags:
   - Debugging
 ---
 
+<Lead>
 Cumulative layout shift is a measure of how much visible content moves during a page's lifetime. It is often treated as a CSS problem, which is why teams rewrite layouts without fixing the cause: an image without reserved dimensions, a font that swaps late, or content injected after the first paint. The Core Web Vitals material defines the metric, and the font-loading article covers one common source.
+</Lead>
 
 **Direct answer:** Diagnose layout shift by finding which element moved and what changed its size or position, using a trace rather than a screenshot. The Core Web Vitals reference defines the score, and MDN's image guidance covers one frequent cause. The boundary: a low score does not guarantee a stable experience in conditions you did not measure, which the web-performance article warns about testing on realistic connections, as the publication standard forbids performance guarantees.
 
 ## The pitfalls
 
-**Looking at a screenshot.** A static screenshot cannot show movement, which is why the diagnosis needs a recording or a trace, as the tracing article recommends for observing a system over time. The moment of the shift is the evidence.
+**Looking at a screenshot.** <Mark>A static screenshot cannot show movement</Mark>, which is why the diagnosis needs a recording or a trace, as the tracing article recommends for observing a system over time.
 
-**Blaming CSS first.** Layout changes are often caused by late-arriving resources — images, fonts, or ads — rather than by the stylesheet, as the image and font articles explain for reserved dimensions and display strategies, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises for finding the slow layer.
+<KeyPoint>
+The moment of the shift is the evidence.
+</KeyPoint>
+
+**Blaming CSS first.** Layout changes are often caused by <Mark>late-arriving resources</Mark> — images, fonts, or ads — rather than by the stylesheet, as the image and font articles explain for reserved dimensions and display strategies, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises for finding the slow layer.
 
 **Testing on a fast connection.** Resources that arrive instantly on a developer machine may arrive late for users, which the web-performance article requires you to account for, as the mobile-first article explains for device constraints.
 
-**Optimising the aggregate score.** A single score hides where the shift happened, which the evaluation-rubric article warns about for metrics without dimensions, as the dashboard article argues for signals tied to a decision.
+**Optimising the aggregate score.**
 
-Three consequences follow. The diagnosis should identify the element and the trigger, which the tracing method supports. It should be performed on a realistic connection, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises. And the fix should be measured again, as the monitoring article treats as a review of any maintained change.
+<Trap>
+A single score hides where the shift happened, which the evaluation-rubric article warns about for metrics without dimensions, as the dashboard article argues for signals tied to a decision.
+</Trap>
+
+Three consequences follow. The diagnosis should identify <Mark>the element and the trigger</Mark>, which the tracing method supports. It should be performed on a realistic connection, as [Web Performance from DNS to Browser: Find the Slow Layer](/articles/web-performance-from-dns-to-browser-find-the-slow-layer) advises. And the fix should be measured again, as the monitoring article treats as a review of any maintained change.
 
 ## A worked diagnosis
 
@@ -37,7 +47,9 @@ Three conclusions follow. The largest shift came from the image, which the trace
 
 It cannot identify the business consequence of a shift, which the value-proposition article treats as a separate question, as the evaluation-rubric article requires outcome measures. It does not guarantee a score after a template change, which the monitoring article treats as a review trigger. And it cannot replace a broader performance investigation, which the web-performance article explains for finding the slow layer, as the Core Web Vitals article treats the metrics as a set.
 
+<PullQuote>
 The counterargument that a single number is enough ignores the diagnosis problem, which the worked example shows: the score tells you there was movement, not what moved, as the tracing article argues for observing a system over time.
+</PullQuote>
 
 ## A decision test
 

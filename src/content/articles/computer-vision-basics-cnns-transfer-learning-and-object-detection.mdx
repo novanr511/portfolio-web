@@ -9,13 +9,19 @@ tags:
   - Object Detection
 ---
 
-Computer vision converts pixels into representations a model can use. The field's history is a sequence of answers to a specific question: how do you build a representation that is useful across an image, robust to where an object appears, and cheap enough to train? The architectures people memorise are solutions to that problem, not arbitrary milestones.
+<Lead>
+Computer vision converts pixels into representations a model can use. The field's history is a sequence of answers to a specific question: how do you build a representation that is useful across an image, robust to where an object appears, and cheap enough to train? The architectures people memorise are <Mark>solutions to that problem, not arbitrary milestones</Mark>.
+</Lead>
 
-**Direct answer:** Convolutional neural networks learn spatial filters that build a hierarchy — edges, textures, parts, objects — while sharing weights across an image. ResNet made very deep networks trainable through residual connections; Faster R-CNN and YOLO represent the two-stage and single-stage approaches to detection; Focal Loss addressed the class imbalance that held single-stage methods back; and Vision Transformers replaced convolution with attention over image patches. Transfer learning is the default because pretrained features transfer well to new tasks with limited data, which is the situation most practitioners actually face.
+**Direct answer:** Convolutional neural networks learn spatial filters that build a hierarchy — edges, textures, parts, objects — while sharing weights across an image. ResNet made very deep networks trainable through residual connections; Faster R-CNN and YOLO represent the two-stage and single-stage approaches to detection; Focal Loss addressed the class imbalance that held single-stage methods back; and Vision Transformers replaced convolution with attention over image patches. <Mark>Transfer learning is the default</Mark> because pretrained features transfer well to new tasks with limited data, which is the situation most practitioners actually face.
 
 ## Why convolution works
 
-A fully connected layer applied to an image treats every pixel as an independent input, which destroys spatial structure and produces an unmanageable number of parameters. Convolution addresses both problems.
+<Trap>
+A fully connected layer applied to an image treats every pixel as an independent input, which destroys spatial structure and produces an unmanageable number of parameters.
+</Trap>
+
+Convolution addresses both problems.
 
 A filter — a small window of weights — slides across the image and produces a response at each location. Three properties follow:
 
@@ -31,7 +37,15 @@ Pooling reduces spatial dimensions and provides a degree of translation invarian
 
 Depth helps until it does not: adding layers beyond a point makes training harder, with accuracy degrading rather than improving. He et al.'s solution was the residual connection — a shortcut that lets a layer block learn a modification of its input rather than a complete transformation of it. Their paper, "Deep Residual Learning for Image Recognition", demonstrated that networks with 50 to 152 layers could be trained effectively, which is the structural claim behind the familiar depth numbers.
 
-The general lesson is that optimisation, not expressiveness, was the constraint. A deeper network could represent more; it was simply hard to train until the architecture made the identity mapping easy to learn.
+<KeyPoint>
+The general lesson is that optimisation, not expressiveness, was the constraint.
+</KeyPoint>
+
+A deeper network could represent more; it was simply hard to train until the architecture made the identity mapping easy to learn.
+
+<KeyFigures items={[
+  { value: "50 to 152", label: "layers that could be trained effectively with residual connections", source: "He et al., 2016 (Deep Residual Learning for Image Recognition)" },
+]} />
 
 ## Detection is a different problem
 
@@ -45,7 +59,9 @@ The field split into two approaches:
 
 For years the trade-off seemed fixed: two-stage methods were more accurate, single-stage methods were faster. Lin et al.'s "Focal Loss for Dense Object Detection" changed that by addressing the class imbalance that hurts single-stage training — most candidate locations are easy negatives, and they dominate the loss. With focal loss, a single-stage detector could match two-stage accuracy while retaining its speed advantage.
 
+<PullQuote>
 The pattern is instructive: the bottleneck was not the architecture but the training objective, and a better loss function changed the comparison.
+</PullQuote>
 
 ## Transformers enter vision
 
@@ -65,7 +81,7 @@ Three decisions matter:
 2. **The learning rate.** Pretrained weights are useful and should not be destroyed by a large update; a smaller rate for the backbone than for the new head is standard.
 3. **Domain similarity.** Features learned on natural photographs transfer poorly to medical images or satellite data when the low-level statistics are very different. The more distant the domain, the more fine-tuning is required.
 
-The honest caveat is that pretrained models carry the biases and blind spots of their training data. A model pretrained on one population may underperform on another, which is why model cards call for evaluation across relevant groups.
+The honest caveat is that <Mark>pretrained models carry the biases and blind spots of their training data</Mark>. A model pretrained on one population may underperform on another, which is why model cards call for evaluation across relevant groups.
 
 ## A practical sequence
 

@@ -13,9 +13,13 @@ tags:
 Healthcare is the domain where the promise of AI is most compelling and the cost of failure highest. A system that reads images, predicts deterioration, or drafts clinical documentation could relieve real pressure on clinicians. The same system applied carelessly can harm a patient, and the harm is difficult to detect because the model's confidence is not evidence of correctness.
 </Lead>
 
-**Direct answer:** <KeyPoint>
+**Direct answer:**
+
+<KeyPoint>
 Clinical AI succeeds or fails on three things that are not the model architecture: whether the evaluation reflects the population and workflow where it will be used, whether the data and the model's limits are documented, and whether a named clinician remains accountable.
-</KeyPoint> Model cards call for "benchmarked evaluation in a variety of conditions" across relevant groups, and datasheets document a dataset's "motivation, composition, collection process, recommended uses". NIST's AI RMF is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products". Those are the instruments that turn a promising result into a deployable system.
+</KeyPoint>
+
+Model cards call for "benchmarked evaluation in a variety of conditions" across relevant groups, and datasheets document a dataset's "motivation, composition, collection process, recommended uses". NIST's AI RMF is "intended for voluntary use and to improve the ability to incorporate trustworthiness considerations into the design, development, use, and evaluation of AI products". Those are the instruments that turn a promising result into a deployable system.
 
 ## Where the promise is real
 
@@ -27,7 +31,9 @@ This is the right frame for most clinical applications: augmentation with a clea
 
 ## The validation gap
 
+<Trap>
 The most common failure is a model that performs well in a paper and poorly in a hospital.
+</Trap>
 
 **Population shift.** A model trained on images from one institution may not generalise to another, because the equipment, patient mix, and imaging protocols differ. The reported accuracy is a property of the evaluation set, not of the disease.
 
@@ -35,9 +41,9 @@ The most common failure is a model that performs well in a paper and poorly in a
 
 **Label uncertainty.** The "ground truth" in clinical data is often a clinician's judgement, which varies, or a billing code, which is an administrative category rather than a diagnosis. A model evaluated against a noisy label can appear accurate for the wrong reason.
 
-scikit-learn's guidance on data leakage is relevant: leakage occurs when "information that would not be available at prediction time is used when building the model". In clinical data this can be subtle — a note written after the outcome, a test ordered because the outcome was suspected — and it produces results that collapse in prospective use.
+scikit-learn's guidance on <Mark>data leakage</Mark> is relevant: leakage occurs when "information that would not be available at prediction time is used when building the model". In clinical data this can be subtle — a note written after the outcome, a test ordered because the outcome was suspected — and it produces results that collapse in prospective use.
 
-The discipline that addresses this is prospective validation in the actual workflow, with the same population and the same messy inputs the system will face. A retrospective result is a reason to run that study, not a reason to deploy.
+The discipline that addresses this is <Mark>prospective validation</Mark> in the actual workflow, with the same population and the same messy inputs the system will face. A retrospective result is a reason to run that study, not a reason to deploy.
 
 ## Documentation is a clinical instrument
 
@@ -74,7 +80,7 @@ Suppose a model predicts sepsis risk from electronic health record data and repo
 - **Which patients were in the set?** If it excludes the elderly or the very young, performance on those groups is unknown, which matters because they are often at highest risk.
 - **What is the false-positive rate at the chosen threshold?** A system that alerts frequently will be ignored, and an ignored alert system has no clinical value regardless of its metric.
 
-The point is that the accuracy figure is the least informative part of the evaluation. Prevalence, timing, population, and the cost of errors are the substance, and all four require judgement about the clinical context.
+The point is that the accuracy figure is the least informative part of the evaluation. Prevalence, timing, population, and <Mark>the cost of errors</Mark> are the substance, and all four require judgement about the clinical context.
 
 ## A practical checklist
 
@@ -91,7 +97,11 @@ For the evaluation discipline, see [MLOps](/articles/mlops-from-experiment-to-pr
 
 ## A counterargument
 
-The prescription is strong but leaves a tension unresolved: the cited sources are governance formats and a voluntary framework, not evidence of clinical safety. Model cards call for benchmarked evaluation across groups and datasheets document provenance, while NIST's RMF is "intended for voluntary use" - none of them establishes that a system performs safely in a real workflow. Prospective validation, the article's own key control, is precisely what those artefacts cannot guarantee. Naming an accountable clinician does not supply the time or authority to override a system embedded in care, and the piece concedes that nominal review steps often fail because clinicians lack both. A reasonable critic would say the checklist produces evidence without ensuring it is acted on. The framing is incomplete about the gap between documenting limits and enforcing them.
+<PullQuote>
+The prescription is strong but leaves a tension unresolved: the cited sources are governance formats and a voluntary framework, not evidence of clinical safety.
+</PullQuote>
+
+Model cards call for benchmarked evaluation across groups and datasheets document provenance, while NIST's RMF is "intended for voluntary use" - none of them establishes that a system performs safely in a real workflow. Prospective validation, the article's own key control, is precisely what those artefacts cannot guarantee. Naming an accountable clinician does not supply the time or authority to override a system embedded in care, and the piece concedes that nominal review steps often fail because clinicians lack both. A reasonable critic would say the checklist produces evidence without ensuring it is acted on. The framing is incomplete about the gap between documenting limits and enforcing them.
 
 ## References & Further Reading
 

@@ -9,9 +9,11 @@ tags:
   - Automation
 ---
 
-A computer-use agent looks at a screen and acts with a mouse and keyboard. That makes it usable with software that has no API — legacy systems, internal tools, anything designed for humans. It also means the agent inherits every ambiguity and trap of a graphical interface, from deceptive buttons to confirmation dialogs it cannot fully read.
+<Lead>
+A computer-use agent looks at a screen and acts with a mouse and keyboard. That makes it usable with software that has no API — legacy systems, internal tools, anything designed for humans. It also means the agent <Mark>inherits every ambiguity and trap of a graphical interface</Mark>, from deceptive buttons to confirmation dialogs it cannot fully read.
+</Lead>
 
-**Direct answer:** Computer-use agents perceive a GUI through screenshots and act through clicks and keystrokes, as Anthropic's announcement describes. They are useful where no API exists and unreliable where the interface is complex or adversarial. The boundary: the agent's perception is a screenshot, not a semantic understanding of the application, so it can be fooled by what a page *looks* like — which the prompt-injection article covers for text and extends naturally to visual interfaces.
+**Direct answer:** Computer-use agents perceive a GUI through screenshots and act through clicks and keystrokes, as Anthropic's announcement describes. They are useful where no API exists and unreliable where the interface is complex or adversarial. The boundary: the agent's perception is <Mark>a screenshot, not a semantic understanding of the application</Mark>, so it can be fooled by what a page *looks* like — which the prompt-injection article covers for text and extends naturally to visual interfaces.
 
 ## What the capability enables
 
@@ -25,9 +27,19 @@ Three properties matter: the agent works through perception, through actions wit
 
 ## Failure modes
 
-**Misreading the screen.** A screenshot is pixels, not a semantic model. A button that looks like "Confirm" but sits in a different context can be clicked in error.
+**Misreading the screen.**
 
-**Drift after an action.** The interface may change asynchronously — a loading spinner, a popup, a redirect. An agent acting on a stale screenshot will click the wrong thing.
+<KeyPoint>
+A screenshot is pixels, not a semantic model.
+</KeyPoint>
+
+A button that looks like "Confirm" but sits in a different context can be clicked in error.
+
+**Drift after an action.** The interface may change asynchronously — a loading spinner, a popup, a redirect.
+
+<Trap>
+An agent acting on a stale screenshot will click the wrong thing.
+</Trap>
 
 **Prompt injection in visual form.** Instructions embedded in a webpage or document can redirect the agent, as the security checklist explains for textual content. The GUI does not make this safer.
 
@@ -45,7 +57,7 @@ A team deploys an agent to process refunds in a legacy admin tool with no API. T
 
 Three lessons follow:
 
-- **The GUI is the attack surface**, so reducing what is reachable is the strongest control.
+- **The GUI is the attack surface**, so <Mark>reducing what is reachable is the strongest control</Mark>.
 - **Irreversible steps need human approval**, regardless of how confident the agent appears.
 - **Stopping is a feature.** An agent that halts on ambiguity is more useful than one that improvises.
 
@@ -65,7 +77,11 @@ Three lessons follow:
 
 **Adversarial content**, such as untrusted webpages that can place instructions where the agent will see them, as the red-teaming article explains.
 
-The counterargument — that better models will read screens more accurately — is true at the margin and does not remove the need for boundaries. A more accurate agent that can still act irreversibly is still a risk.
+The counterargument — that better models will read screens more accurately — is true at the margin and does not remove the need for boundaries.
+
+<PullQuote>
+A more accurate agent that can still act irreversibly is still a risk.
+</PullQuote>
 
 ## A decision test
 

@@ -9,7 +9,9 @@ tags:
   - Personalization
 ---
 
+<Lead>
 Every recommender works by learning from past behaviour, and every system meets a moment when there is no past behaviour to learn from. A new user has no history; a new item has no interactions; a new platform has neither. The cold start is not an edge case in a catalogue that grows — it is the permanent condition at the boundary of the system.
+</Lead>
 
 **Direct answer:** There are three distinct cold starts — user, item, and system — and they require different responses. User cold start needs information about the person beyond their behaviour; item cold start needs information about the item beyond its interactions; system cold start needs a strategy that does not depend on personalisation at all. Content-based signals, side information, and a deliberate onboarding moment are the standard instruments, and each trades precision for coverage.
 
@@ -23,7 +25,7 @@ Every recommender works by learning from past behaviour, and every system meets 
 
 ## Content is the bridge
 
-The most general answer to both user and item cold start is side information — anything known about the entity that does not depend on interactions with it.
+The most general answer to both user and item cold start is <Mark>side information</Mark> — anything known about the entity that does not depend on interactions with it.
 
 For items, that means the product description, category, price, image, text, or the structured attributes a catalogue already carries. A content-based model can recommend items similar to what the user liked even if nobody else has interacted with them, which is exactly what a collaborative model cannot do.
 
@@ -35,15 +37,27 @@ The trade-off is that content-based methods are limited by the richness of the m
 
 When the side information is text or images, pretrained embeddings turn it into a representation a model can use. Sentence-BERT produces sentence embeddings that "can be compared using cosine-similarity", which is the basis for recommending items by the semantic similarity of their descriptions. Word2vec-style embeddings do the same for shorter text and for sequences of behaviour.
 
-This is not a cure. A pretrained embedding brings the model's own training distribution and biases into your catalogue, and a domain with specialised vocabulary will be represented poorly. The embeddings are a bridge over the cold start, not a source of truth about the item.
+This is not a cure.
+
+<Trap>
+A pretrained embedding brings the model's own training distribution and biases into your catalogue, and a domain with specialised vocabulary will be represented poorly.
+</Trap>
+
+The embeddings are a bridge over the cold start, not a source of truth about the item.
 
 ## Why the problem never goes away
 
 A catalogue is a stream. New items arrive continuously, new users arrive continuously, and the system's cold-start population is therefore a steady-state property, not a phase it passes through.
 
-Two consequences follow. First, cold-start handling has to be a permanent part of the architecture rather than a launch-time workaround. Second, the system needs a way to move entities *out* of the cold start — an exposure policy that gives new items a controlled chance to accumulate interactions, and a measurement of whether that exposure produced useful signal.
+Two consequences follow.
 
-A catalogue that never exposes new items will converge on its past favourites, and the recommendation quality will appear excellent while the catalogue quietly becomes a museum. This is a distribution problem as much as a modelling one: without a deliberate route to exposure, new items have no chance to become recommendable.
+<KeyPoint>
+First, cold-start handling has to be a permanent part of the architecture rather than a launch-time workaround.
+</KeyPoint>
+
+Second, the system needs a way to move entities *out* of the cold start — an exposure policy that gives new items a controlled chance to accumulate interactions, and a measurement of whether that exposure produced useful signal.
+
+A catalogue that never exposes new items will <Mark>converge on its past favourites</Mark>, and the recommendation quality will appear excellent while the catalogue quietly becomes a museum. This is a distribution problem as much as a modelling one: without a deliberate route to exposure, new items have no chance to become recommendable.
 
 ## A strategy for each case
 
@@ -51,7 +65,7 @@ A catalogue that never exposes new items will converge on its past favourites, a
 2. **Item cold start:** ensure the catalogue carries descriptive metadata; use content-based similarity; reserve a small, measured share of exposure for new items.
 3. **System cold start:** use editorial curation and popularity, and instrument the behaviour that will later feed the model.
 4. **All three:** build a hybrid ranker that can combine content and collaborative signals, and validate it on the segments where one signal is absent.
-5. **Measure the transition:** track how long it takes a new user or item to acquire enough signal to be served by the main model. That time is the real measure of your cold-start handling.
+5. **Measure the transition:** track how long it takes a new user or item to acquire enough signal to be served by the main model. That time is <Mark>the real measure of your cold-start handling</Mark>.
 
 For the modelling side, see [Recommender Systems](/articles/recommender-systems-collaborative-filtering-content-based-and-hybrid-approaches); for the experimentation constraints, see [A/B Testing Recommendation Systems](/articles/a-b-testing-recommendation-systems-measuring-lift-without-bias).
 
@@ -61,7 +75,13 @@ The following is hypothetical and illustrative. A new catalogue platform is laun
 
 ## A counterargument
 
-A reasonable critic would question the confidence placed in side information as the bridge. The cited work is largely about representation: DeepFM models feature interactions and Sentence-BERT produces embeddings whose similarity is "comparable using cosine-similarity", and neither addresses what happens when the metadata itself is thin, noisy, or biased. The article concedes that pretrained embeddings import their training distribution and that content-based methods produce "more of the same", yet the strategy section still treats an explicit onboarding signal and content similarity as largely additive fixes. If users skip onboarding or the catalogue's attributes are generic, the recommended instruments reproduce the invisibility they are meant to solve. The exposure question, which the article itself calls a distribution problem, is exactly where the cited modelling literature is silent.
+A reasonable critic would question the confidence placed in side information as the bridge. The cited work is largely about representation: DeepFM models feature interactions and Sentence-BERT produces embeddings whose similarity is "comparable using cosine-similarity", and neither addresses what happens when the metadata itself is thin, noisy, or biased. The article concedes that pretrained embeddings import their training distribution and that content-based methods produce "more of the same", yet the strategy section still treats an explicit onboarding signal and content similarity as largely additive fixes.
+
+<PullQuote>
+If users skip onboarding or the catalogue's attributes are generic, the recommended instruments reproduce the invisibility they are meant to solve.
+</PullQuote>
+
+The exposure question, which the article itself calls a distribution problem, is exactly where the cited modelling literature is silent.
 
 ## References & Further Reading
 

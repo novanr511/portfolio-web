@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often reach for continued pretraining whenever a model underperforms on domain text, assuming more training always helps. The BERT paper describes how pre-training builds general representations through masked language modeling and next sentence prediction, and Google Cloud's architecture resources place training inside a broader ML system. The real problem is deciding whether extra pre-training is the right intervention at all.
+</Lead>
 
 **Direct answer:** Continued pretraining runs the language modeling objective on additional in-domain text before task-specific fine-tuning. It is justified when task labels are scarce but domain text is plentiful; it is not a substitute for labeled task data. The sources describe the pre-training objective and the system context, not a guarantee of improvement.
 
@@ -21,9 +23,13 @@ The BERT paper trains a transformer on unlabeled text with two objectives. The m
 
 <Figure src="/images/articles/inline/continued-pretraining-common-questions-1.png" alt="A comparison of domain adaptation, which more in-domain text can shift, against task learning, which the pretraining objective cannot replace." caption="Conceptual: domain adaptation and task learning are different targets." />
 
-Google Cloud's architecture resources place training inside a wider system of data pipelines, evaluation, and operations. That context matters because a training run is only one step. Text must be collected and cleaned, a baseline must exist, and the result must be measured before it can count as an improvement. The practical consequence is that continued pretraining is an investment in infrastructure as much as in model weights. A team that can run the training but cannot reproduce the comparison has not established that the extra phase helped.
+Google Cloud's architecture resources place training inside a wider system of data pipelines, evaluation, and operations. That context matters because a training run is only one step. Text must be collected and cleaned, a baseline must exist, and the result must be measured before it can count as an improvement. The practical consequence is that continued pretraining is <Mark>an investment in infrastructure as much as in model weights</Mark>. A team that can run the training but cannot reproduce the comparison has not established that the extra phase helped.
 
-The two sources connect at a point neither states directly. BERT defines what the objective optimizes; the cloud architecture material defines where a training phase sits in an ML system. Neither says when additional pre-training is warranted. That decision is local: it depends on whether the bottleneck is domain language or something else, such as task labels or a weak evaluation. The useful distinction is between domain adaptation, which the objective can plausibly affect, and task learning, which it cannot replace.
+The two sources connect at a point neither states directly. BERT defines what the objective optimizes; the cloud architecture material defines where a training phase sits in an ML system. Neither says when additional pre-training is warranted. That decision is local: it depends on whether <Mark>the bottleneck is domain language</Mark> or something else, such as task labels or a weak evaluation.
+
+<KeyPoint>
+The useful distinction is between domain adaptation, which the objective can plausibly affect, and task learning, which it cannot replace.
+</KeyPoint>
 
 The output is a mapping from the available text corpus to a hypothesis about what the extra phase will change, paired with a baseline test. That mapping is the decision instrument: it makes the reason for the spend explicit and gives a reviewer something to check when the result arrives.
 
@@ -43,17 +49,23 @@ The first two rows are drawn directly from the sources: the objectives used in B
 
 ## What it cannot do
 
-Continued pretraining does not create task knowledge. The BERT objective trains a model to reconstruct masked tokens and to judge sentence relationships, not to perform a downstream task. Improvement on the task metric is therefore an empirical result, not an implication of the objective. The sources describe what pre-training learns and where it sits in an ML system; they do not promise that another phase of it will help a particular task. A team that assumes the extra phase must improve performance has substituted hope for an evaluation.
+Continued pretraining does not create task knowledge. The BERT objective trains a model to reconstruct masked tokens and to judge sentence relationships, not to perform a downstream task. Improvement on the task metric is therefore an empirical result, not an implication of the objective. The sources describe what pre-training learns and where it sits in an ML system; they do not promise that another phase of it will help a particular task. A team that assumes the extra phase must improve performance has substituted <Mark>hope for an evaluation</Mark>.
 
 The hidden cost is the full system around the training run. Domain text must be collected, cleaned, and checked for duplication; the run consumes compute; and a comparison baseline must exist before the result can be judged. Google Cloud's architecture resources place training among data pipelines, evaluation, and operations, which is the practical point: the run is the cheap part. Most of the effort goes into making the before-and-after comparison trustworthy, and that effort is easy to omit from a proposal.
 
-The main failure mode is changing two things at once. If the data, the objective, and the task tuning all change between measurements, a gain cannot be attributed to continued pretraining. A related failure is treating the pre-training corpus as representative when it is not: text that is abundant is not necessarily text that matches the task. Because the sources do not specify a corpus-selection rule, the choice is local and must be tested rather than assumed. A reviewer should be able to see exactly which corpus was added and what stayed fixed.
+<Trap>
+The main failure mode is changing two things at once.
+</Trap>
+
+If the data, the objective, and the task tuning all change between measurements, a gain cannot be attributed to continued pretraining. A related failure is treating the pre-training corpus as representative when it is not: text that is abundant is not necessarily text that matches the task. Because the sources do not specify a corpus-selection rule, the choice is local and must be tested rather than assumed. A reviewer should be able to see exactly which corpus was added and what stayed fixed.
 
 The method does not replace fine-tuning, labeled examples, or a downstream evaluation. It does not decide whether a model is safe to deploy, satisfy a regulatory requirement, or fix a problem caused by poor task labels. It addresses one narrow question: whether additional in-domain, unlabeled text improves the representation before task training. Anything outside that question, including deployment risk and data rights for the new corpus, needs a separate review.
 
 Because model architectures and cloud tooling change, the decision should carry a recheck condition. A new objective or architecture may alter what extra pre-training buys; a change in the training platform may alter the cost. Each run should record the corpus, the baseline, and the metric used, so a later reviewer can reproduce the comparison. Without that record the team cannot tell whether a past gain was real or an artifact of a different setup.
 
+<PullQuote>
 The counterargument that more pre-training is fair when labeled data is scarce is incomplete when the scarce resource is actually a trustworthy evaluation baseline.
+</PullQuote>
 
 ## A decision test
 

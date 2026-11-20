@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A model that performs well at launch can degrade quietly as the world it learned from changes. Teams often treat deployment as the finish line, so the shift is noticed only after decisions have worsened. Continuous learning is the discipline of detecting that change and responding to it in a controlled way.
+</Lead>
 
 **Direct answer:** Continuous learning means monitoring for concept drift and feeding the signal back into a versioned retraining pipeline. The sources describe drift and the MLOps lifecycle; the rule that connects a drift signal to a retraining decision is a synthesis.
 
@@ -17,11 +19,11 @@ A model that performs well at launch can degrade quietly as the world it learned
 
 ## The mechanism
 
-Concept drift describes a change in the statistical relationship a model learned, such as when the distribution of inputs shifts or the mapping from input to outcome changes. The source distinguishes gradual, sudden, and recurring forms. The practical consequence is that a single training snapshot cannot be assumed to stay valid; what was true at training time may stop being true in production.
+<Mark>Concept drift</Mark> describes a change in the statistical relationship a model learned, such as when the distribution of inputs shifts or the mapping from input to outcome changes. The source distinguishes gradual, sudden, and recurring forms. The practical consequence is that a single training snapshot cannot be assumed to stay valid; what was true at training time may stop being true in production.
 
 <Figure src="/images/articles/inline/continuous-learning-best-practices-1.png" alt="A cycle from monitoring inputs and outcomes, comparing to a baseline and detecting sustained drift, through versioned retraining and rollback back to monitoring." caption="Conceptual: a drift signal becomes a versioned, reviewable retraining decision." />
 
-MLOps brings versioning, automated testing, and monitoring to the machine learning lifecycle. It treats a model as a system that moves through stages, not a file that is handed over once. Continuous training and continuous monitoring are part of that lifecycle, so a retraining event is a controlled release with a record, not an ad hoc notebook run.
+MLOps brings versioning, automated testing, and monitoring to the machine learning lifecycle. It treats a model as a system that moves through stages, not a file that is handed over once. Continuous training and continuous monitoring are part of that lifecycle, so a retraining event is <Mark>a controlled release with a record</Mark>, not an ad hoc notebook run.
 
 Putting the two together produces a loop: monitor the input and outcome distributions, compare them to a documented baseline, and treat a sustained deviation as a trigger to retrain. The trigger matters because a drift alert on its own has no operational meaning. It must be tied to a decision someone is authorized to make.
 
@@ -49,13 +51,19 @@ Continuous learning cannot tell you that a model is correct. It can tell you tha
 
 It does not remove the need for labels. Outcome drift can only be measured once outcomes arrive, and in many systems that lag is long. Input monitoring is an earlier proxy, but a proxy is not the thing itself. A team that relies only on input shifts may retrain in response to harmless variation while missing a serious change in a small segment.
 
-There is a hidden cost in retraining frequency. Each retrain consumes compute and engineering attention, and each new version needs its own evaluation and approval. A pipeline that retrains on every fluctuation produces churn, and the team spends its time reviewing releases instead of understanding the model. The discipline is to retrain on sustained, decision-relevant change, not on noise.
+There is a hidden cost in retraining frequency. Each retrain consumes compute and engineering attention, and each new version needs its own evaluation and approval. A pipeline that retrains on every fluctuation produces churn, and the team spends its time reviewing releases instead of understanding the model. The discipline is to retrain on sustained, <Mark>decision-relevant change</Mark>, not on noise.
 
-A failure mode is silent feedback. If a model's own outputs influence the data it later learns from, a bias can be amplified with each cycle. Drift monitoring that watches only aggregate distributions will miss this, because the aggregate may look stable while the feedback loop narrows the range of cases the model sees. Spotting it requires segment-level review and a record of what the model was allowed to observe.
+<Trap>
+A failure mode is silent feedback.
+</Trap>
+
+If a model's own outputs influence the data it later learns from, a bias can be amplified with each cycle. Drift monitoring that watches only aggregate distributions will miss this, because the aggregate may look stable while the feedback loop narrows the range of cases the model sees. Spotting it requires segment-level review and a record of what the model was allowed to observe.
 
 The boundary is that these sources describe concepts, not a threshold. They do not say how large a drift must be before a retrain is justified. That threshold is a local decision that depends on the cost of a wrong prediction and the cost of a retrain. It must be set by the team and reviewed when either cost changes, because a threshold copied from another context carries assumptions that do not transfer.
 
+<PullQuote>
 Counterargument: "The counterargument that watching accuracy is enough is fair for a static, well-understood input space and incomplete when the relationship between inputs and outcomes drifts over time."
+</PullQuote>
 
 ## A decision test
 
@@ -67,7 +75,11 @@ Counterargument: "The counterargument that watching accuracy is enough is fair f
 6. Retrain on a refreshed window and keep the old version.
 7. Record the trigger, the decision, and the recheck condition.
 
-Continuous learning is a loop, not a one-time configuration, and its value comes from the quality of the decision at its center. A team that can explain why it retrained, and can point to the signal that prompted it, has a process that survives review. A team that cannot should fix the record before adding more automation.
+<KeyPoint>
+Continuous learning is a loop, not a one-time configuration, and its value comes from the quality of the decision at its center.
+</KeyPoint>
+
+A team that can explain why it retrained, and can point to the signal that prompted it, has a process that survives review. A team that cannot should fix the record before adding more automation.
 
 For further reading, see [Data Quality in Practice](/articles/data-quality-in-practice).
 

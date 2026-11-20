@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 Crawl budget describes how much attention a search crawler gives a site. Google's crawler overview explains how crawlers discover and fetch pages, and RFC 9110 defines the HTTP semantics that govern those requests and responses. The real problem is that teams try to influence a crawler with tactics, while the lever they actually control is the response their server returns.
+</Lead>
 
-**Direct answer:** Keep the URL inventory clean, return accurate status codes, and use clear HTTP responses so a crawler spends its effort on pages that matter. The Google overview describes crawling and RFC 9110 defines response semantics. The rule that server responses steer crawling effort is a synthesis.
+**Direct answer:** Keep the URL inventory clean, return <Mark>accurate status codes</Mark>, and use clear HTTP responses so a crawler spends its effort on pages that matter. The Google overview describes crawling and RFC 9110 defines response semantics. The rule that server responses steer crawling effort is a synthesis.
 
 **Delta:** This article adds a claim-status table and a response-level decision test beyond the sources: it maps each server response to a crawling decision, with claim status explicit.
 
@@ -25,7 +27,11 @@ The practical consequence is that every request a crawler makes consumes effort.
 
 The sources describe crawler behavior and HTTP semantics, but they do not set a specific request limit or promise a ranking outcome. Any statement about how much effort a site receives is an inference. What is grounded in the sources is that responses communicate state: a 404 signals a missing resource, a 5xx signals a server problem, and a redirect signals that a resource moved. The meaning of those codes comes from the RFC; the fact that crawlers act on them comes from the crawler overview. Together they support a practical rule: make the response match reality.
 
-The consequence for practice is a server-side discipline. Return accurate status codes, avoid soft errors that render a 200 for a missing page, and keep parameters from multiplying the number of distinct URLs. The team controls its own responses, not the crawler's internal allocation of effort. Good practice is therefore measured by the quality of the responses a site produces, not by a hoped-for change in crawler behavior.
+The consequence for practice is a server-side discipline. Return accurate status codes, avoid soft errors that render a 200 for a missing page, and keep parameters from multiplying the number of distinct URLs. The team controls its own responses, not the crawler's internal allocation of effort.
+
+<KeyPoint>
+Good practice is therefore measured by the quality of the responses a site produces, not by a hoped-for change in crawler behavior.
+</KeyPoint>
 
 ## A worked example
 
@@ -43,17 +49,23 @@ The first two rows are factual claims taken from the sources. The third is an in
 
 ## What it cannot do
 
-Crawl budget best practices cannot force indexing or ranking. A clean response tells a crawler what a page is, but the decision to index or to rank that page is separate and is not specified by either source. Treating response hygiene as a direct ranking lever overstates what is documented. A site can return perfect status codes and still fail to rank, because ranking depends on factors the crawler overview does not enumerate and the HTTP specification does not address. The value of the practice is reducing waste, not buying position.
+Crawl budget best practices cannot force indexing or ranking. A clean response tells a crawler what a page is, but the decision to index or to rank that page is separate and is not specified by either source. Treating <Mark>response hygiene</Mark> as a direct ranking lever overstates what is documented. A site can return perfect status codes and still fail to rank, because ranking depends on factors the crawler overview does not enumerate and the HTTP specification does not address. The value of the practice is reducing waste, not buying position.
 
 The hidden cost is that cleaning URL inventory and fixing status codes touches templates, routing, and server configuration. The work is cross-functional and slow, and regression is easy: a new template can reintroduce duplicate parameters the following month. The cost is front-loaded and then recurring, not a one-time fix. Teams often underestimate the coordination required, because the visible symptom is a crawl report while the actual change lives in code that several groups own.
 
-The common failure mode is misreading status semantics. Returning a 200 for a missing page, often called a soft error, or choosing the wrong redirect type sends a misleading signal. RFC 9110 defines what the codes mean, but applying them correctly is local work that depends on the site's logic. A wrong code can cause more wasted requests than the problem it was meant to solve. Because the crawler responds to what it is told, an incorrect response is worse than no response at all.
+<Trap>
+The common failure mode is misreading status semantics.
+</Trap>
+
+Returning a 200 for a missing page, often called <Mark>a soft error</Mark>, or choosing the wrong redirect type sends a misleading signal. RFC 9110 defines what the codes mean, but applying them correctly is local work that depends on the site's logic. A wrong code can cause more wasted requests than the problem it was meant to solve. Because the crawler responds to what it is told, an incorrect response is worse than no response at all.
 
 There is a boundary around the guidance. It covers crawler requests and HTTP responses and nothing beyond them. It does not address site authority, content quality, or links from other pages, and it cannot control how a particular crawler allocates its effort internally. The source describes that allocation only at a high level, so any specific claim about quantities should be treated as local inference. A team that expects the guidance to explain a sudden change in crawl volume will not find that explanation here.
 
 Because sites change, response hygiene needs periodic review. Server logs and crawl reports should be checked against the status codes the site intends to return. Each decision should be recorded with a recheck condition, and any request-volume target should be marked as local rather than source-derived. Without that record, a future reviewer cannot tell whether a response was deliberate or an accident of configuration.
 
+<PullQuote>
 The counterargument that limiting URLs is fair for small sites is incomplete when a large catalog relies on generated parameters.
+</PullQuote>
 
 ## A decision test
 

@@ -9,13 +9,15 @@ tags:
   - Regulation
 ---
 
+<Lead>
 Cryptocurrency is usually discussed as a price chart or a cultural argument. Both obscure the more interesting question: what problem does the technology solve, and what does it cost to solve it? The answer is precise — it allows parties who do not trust one another to agree on a shared record without a central operator — and the costs are equally precise: probabilistic settlement, energy use, and a regulatory position that is still being written.
+</Lead>
 
 **Direct answer:** A cryptocurrency is a digital asset whose ownership and transfer are recorded on a distributed ledger and secured by cryptography and a consensus mechanism. The UK's Financial Conduct Authority defines cryptoassets as "cryptographically secured digital representations of value or contractual rights that use some type of distributed ledger technology (DLT) and can be transferred, stored or traded electronically". The boundary matters: this describes a mechanism for agreement, not a claim that every token is useful money, a good investment, or free of intermediary risk.
 
 ## The problem being solved
 
-In a conventional payment system, a bank maintains the ledger and decides whether a transaction is valid. That works because participants trust the bank and because a legal framework backs it. The difficulty appears when participants do not share a trusted operator and still need to prevent the same unit from being spent twice — the double-spending problem.
+In a conventional payment system, a bank maintains the ledger and decides whether a transaction is valid. That works because participants trust the bank and because a legal framework backs it. The difficulty appears when participants do not share a trusted operator and still need to prevent the same unit from being spent twice — <Mark>the double-spending problem</Mark>.
 
 Nakamoto's Bitcoin whitepaper, *Bitcoin: A Peer-to-Peer Electronic Cash System*, proposes a solution: a public timestamped record of transactions, ordered by a proof-of-work process in which participants compete to extend the chain. Nodes reject invalid transactions, so an attacker cannot create value from nothing; the most they can do is try to reverse a transaction they themselves made.
 
@@ -45,9 +47,14 @@ The following numbers are hypothetical and illustrative, using the whitepaper's 
 | 3 | ~0.14% |
 | 6 | ~0.002% |
 
-This is why a six-confirmation convention exists: it is a chosen risk threshold, not a law of nature. Change the assumption — an attacker with 30% of the hash power gives q/p ≈ 0.43, and six confirmations leave roughly 0.6% catch-up probability — and the same convention becomes much weaker.
+This is why a six-confirmation convention exists: it is <Mark>a chosen risk threshold, not a law of nature</Mark>. Change the assumption — an attacker with 30% of the hash power gives q/p ≈ 0.43, and six confirmations leave roughly 0.6% catch-up probability — and the same convention becomes much weaker.
 
 The honest limitation is that the formula is a model. It assumes an attacker who cannot rewrite arbitrary transactions, that block discovery is memoryless, and that hash power can be treated as a fixed share. Real networks involve fees, reorganisations, and concentrated mining power. The calculation is valuable because it makes the risk *explicit and parameterised*, not because it predicts an attack.
+
+<KeyFigures items={[
+  { value: "six confirmations", label: "chosen risk threshold from the Bitcoin whitepaper's confirmation model", source: "Nakamoto, 2008 (Bitcoin whitepaper)" },
+  { value: "25 October 2027", label: "date from which FCA final rules apply to cryptoasset firms granted FSMA permission", source: "UK Financial Conduct Authority (FCA), 2026" },
+]} />
 
 ## What regulators actually say
 
@@ -55,7 +62,11 @@ Regulation is where the "future of money" claim meets the present. The FCA's pag
 
 A concrete development: on 30 June 2026 the FCA published final rules and guidance that "will apply to all cryptoasset firms who have been granted permission to operate under FSMA on or after 25 October 2027". The direction is toward bringing firms into a permissioned framework, not toward endorsing tokens as investments.
 
-For a reader, this has two implications. First, regulatory status is jurisdiction-specific and changes; a claim that was accurate in one year may not be in the next. Second, "regulated firm" and "regulated asset" are different claims. A platform being supervised does not make the assets it lists safe or suitable.
+For a reader, this has two implications. First, regulatory status is jurisdiction-specific and changes; a claim that was accurate in one year may not be in the next. Second, "regulated firm" and "regulated asset" are different claims.
+
+<Trap>
+A platform being supervised does not make the assets it lists safe or suitable.
+</Trap>
 
 ## Where the technology is genuinely useful
 
@@ -67,7 +78,11 @@ Three cases survive scrutiny better than the general hype:
 
 **Asset representation** — a token can represent a claim on something else, which can simplify transfer and settlement. The value depends entirely on the credibility of the underlying claim and the legal framework around it.
 
-In each case the question is the same: does this need a shared, adversarial-proof ledger, or would a database with an owner do? Most applications do not need the former, and using it anyway imports cost without benefit.
+In each case the question is the same: does this need a shared, adversarial-proof ledger, or would a database with an owner do?
+
+<KeyPoint>
+Most applications do not need the former, and using it anyway imports cost without benefit.
+</KeyPoint>
 
 ## The limitations that decide the answer
 
@@ -75,7 +90,7 @@ In each case the question is the same: does this need a shared, adversarial-proo
 
 **Volatility is a property, not a bug.** A system whose supply is fixed or rule-based cannot expand to absorb demand shocks the way a central bank can. That is a feature for those who want a predictable monetary rule and a source of instability for those who need a stable unit of account.
 
-**Intermediaries return.** Exchanges, custodians, wallet providers, and stablecoin issuers reintroduce the trust that the protocol removed. A "decentralised" asset held on a centralised exchange is only as safe as that exchange.
+**Intermediaries return.** Exchanges, custodians, wallet providers, and stablecoin issuers <Mark>reintroduce the trust that the protocol removed</Mark>. A "decentralised" asset held on a centralised exchange is only as safe as that exchange.
 
 **Energy and concentration.** Proof-of-work security is paid for in electricity, and mining power can concentrate. These are design trade-offs of the mechanism, not public-relations problems.
 
@@ -94,7 +109,11 @@ For the market context, see [Stock Market Fundamentals](/articles/stock-market-f
 
 ## A counterargument
 
-A reasonable critic would push back that the clean split between mechanism and value is a framing its sources complicate. The FCA's rule-making is premised on consumer-protection and market-integrity risks, which sit awkwardly with a definition of crypto by the coordination problem it solves. Nakamoto removes the central ledger operator, but the confirmation model assumes an honest majority of hash power; the article concedes mining can concentrate, making that property conditional. Ethereum's shift from recording payments to recording what was executed broadens the surface: a shared record of execution is only as reliable as the code. The decision test is useful, but incomplete where it treats the mechanism as neutral and leaves concentration and code risk outside it.
+A reasonable critic would push back that the clean split between mechanism and value is a framing its sources complicate. The FCA's rule-making is premised on consumer-protection and market-integrity risks, which sit awkwardly with a definition of crypto by the coordination problem it solves. Nakamoto removes the central ledger operator, but the confirmation model assumes an honest majority of hash power; the article concedes mining can concentrate, making that property conditional. Ethereum's shift from recording payments to recording what was executed broadens the surface: a shared record of execution is only as reliable as the code.
+
+<PullQuote>
+The decision test is useful, but incomplete where it treats the mechanism as neutral and leaves concentration and code risk outside it.
+</PullQuote>
 
 ## References & Further Reading
 

@@ -9,9 +9,15 @@ tags:
   - Verified
 ---
 
+<Lead>
 Cache-Control headers reduce repeated work, which makes them look like a pure saving. RFC 9111 defines the directives, and RFC 9110 defines the HTTP semantics around them. The cost appears when a cached response must be invalidated before its time expires.
+</Lead>
 
-**Direct answer:** Set caching directives from how often a resource changes and how quickly you need changes to be visible. The RFCs define the directives; the trade-off is a synthesis.
+**Direct answer:** The RFCs define the directives; the trade-off is a synthesis.
+
+<KeyPoint>
+Set caching directives from how often a resource changes and how quickly you need changes to be visible.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and a worked example, separating protocol definitions from the local choice of freshness windows.
 
@@ -21,7 +27,7 @@ Three directives do most of the work:
 
 <Figure src="/images/articles/inline/cache-control-headers-costs-explained-1.png" alt="Two contrasting outcomes of one cache directive: a cache hit avoids an origin request, while a stale hit serves a response that misses the change." caption="Conceptual: max-age trades requests saved against changes delayed." />
 
-- **max-age.** RFC 9111 defines how long a response may be reused. A longer value reduces requests and extends the window in which a stale copy can be served.
+- **max-age.** RFC 9111 defines how long a response may be reused. A longer value reduces requests and <Mark>extends the window in which a stale copy can be served</Mark>.
 - **no-cache.** The term is counterintuitive: it requires revalidation rather than forbidding storage. The RFC is explicit about this.
 - **immutable.** For resources whose content never changes at a given URL, a long lifetime is safe. Applying it to changing content is not.
 
@@ -43,7 +49,7 @@ The first cost is operational. A purge requires knowing which caches exist, whic
 
 ## Why the policy needs a date
 
-A caching decision is tied to a release process. When that process changes, the safe lifetime changes with it. Recording the policy with a recheck date turns it from a permanent assumption into a decision that can be revisited. This is a small discipline that prevents a long-ago optimisation from quietly becoming a constraint.
+A caching decision is tied to a release process. When that process changes, the safe lifetime changes with it. Recording the policy with a recheck date turns it from a permanent assumption into a decision that can be revisited. This is a small discipline that prevents <Mark>a long-ago optimisation from quietly becoming a constraint</Mark>.
 
 ## Evidence status
 
@@ -57,9 +63,13 @@ A caching decision is tied to a release process. When that process changes, the 
 
 Every cache hit is a request that did not reach the origin, which is the saving. Every stale hit is a user who did not receive the change, which is the cost. The two are controlled by the same directive, so they cannot be optimised independently.
 
-Content-addressed URLs resolve the conflict for static assets. When the URL changes with the content, a long lifetime is safe because a new version has a new name. For resources that must keep a stable URL, revalidation is the control, and it requires the origin to answer validation requests quickly.
+<Mark>Content-addressed URLs</Mark> resolve the conflict for static assets. When the URL changes with the content, a long lifetime is safe because a new version has a new name. For resources that must keep a stable URL, revalidation is the control, and it requires the origin to answer validation requests quickly.
 
-A related issue is shared caches. A directive honoured by a browser may be interpreted differently by an intermediate proxy, and a private response must be marked so it is not stored where others can read it. The RFCs define the semantics, but correct deployment depends on applying them consistently across every layer that can hold a copy. A policy that is right at the origin and wrong at the edge produces a result that looks like a cache problem and is actually a configuration problem.
+A related issue is shared caches. A directive honoured by a browser may be interpreted differently by an intermediate proxy, and a private response must be marked so it is not stored where others can read it. The RFCs define the semantics, but correct deployment depends on applying them consistently across every layer that can hold a copy.
+
+<Trap>
+A policy that is right at the origin and wrong at the edge produces a result that looks like a cache problem and is actually a configuration problem.
+</Trap>
 
 The same caution applies to HTML, where a long lifetime can keep an old navigation or a stale price visible.
 
@@ -67,7 +77,9 @@ The same caution applies to HTML, where a long lifetime can keep an old navigati
 
 It cannot make a changing resource immutable. It does not guarantee that every cache obeys the directive. And it cannot remove the need to monitor origin load after a change.
 
+<PullQuote>
 The counterargument that a longer cache is always cheaper is fair for static assets and incomplete for content that changes unexpectedly.
+</PullQuote>
 
 ## A decision test
 

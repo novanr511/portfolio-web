@@ -9,9 +9,15 @@ tags:
   - Verified
 ---
 
+<Lead>
 Continued pretraining takes an already trained language model and trains it further on additional data, often to adapt it to a domain. The sources cover the pretraining method itself and the cloud infrastructure used for machine learning work. The real problem is that teams often treat continued pretraining as a cheap fine-tuning step, when it re-enters a compute-heavy phase on an entirely new corpus.
+</Lead>
 
-**Direct answer:** Continued pretraining extends the pretraining objective on more data, so its cost tracks corpus size and training compute rather than a small labeled set. The sources describe the pretraining approach and the cloud resources that support ML; the cost framing is a synthesis. Budget it as a training run, not as a fine-tune.
+**Direct answer:** Continued pretraining extends the pretraining objective on more data, so its cost tracks corpus size and training compute rather than a small labeled set. The sources describe the pretraining approach and the cloud resources that support ML; the cost framing is a synthesis.
+
+<KeyPoint>
+Budget it as a training run, not as a fine-tune.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and a compute-driven cost decision test beyond the sources: it maps each cost driver to a budgeting decision, with claim status explicit.
 
@@ -23,7 +29,7 @@ The BERT paper describes pre-training as a distinct phase in which a deep bidire
 
 The Google Cloud architecture source organizes AI and machine learning resources around data, training infrastructure, and deployment. Training runs consume compute and storage, and those resources are provisioned and billed as part of a cloud workload. The practical consequence is that cost is a function of how long a run lasts and what hardware it occupies. Any estimate must begin from the resources a training job actually requests, not from the label attached to the technique.
 
-The main cost drivers follow from those two definitions. Corpus size, sequence length, model size, and the number of training steps determine how much compute a run consumes. Because continued pretraining pushes another corpus through the same objective, the bill scales with data volume and compute intensity rather than with the size of a downstream label set. The sources establish what pretraining is and what resource categories exist; they do not provide a cost formula or a token price.
+The main cost drivers follow from those two definitions. Corpus size, sequence length, model size, and the number of training steps determine how much compute a run consumes. Because continued pretraining pushes another corpus through the same objective, the bill scales with <Mark>data volume and compute intensity</Mark> rather than with the size of a downstream label set. The sources establish what pretraining is and what resource categories exist; they do not provide a cost formula or a token price.
 
 That gap matters for how the estimate is framed. Hardware choice, token counts, and cloud pricing are local facts that the sources do not supply. They should be marked as inferred or as items to verify against a current price list. Keeping the definitional claims separate from the budgeting assumptions lets a reviewer see which parts of the estimate are grounded and which are choices made by the team. It also prevents a method description from being read as a cost guarantee.
 
@@ -45,15 +51,21 @@ The first two rows are factual claims drawn from the sources. The third is an in
 
 This framing does not produce a dollar figure. The sources describe a pretraining method and a set of cloud resource categories; they contain no price list, no hardware benchmark, and no estimate for a particular run. Any number attached to a continued pretraining project comes from local pricing and local scale assumptions, not from these sources. Treating the framing as a quote would misrepresent what it supports.
 
-The hidden cost is everything around the training loop. A corpus must be collected, cleaned, deduplicated, and stored before a run begins. Experiments must be tracked so that a failed or unhelpful run can be diagnosed. Storage, data transfer, and checkpointing all consume budget even when the model is not actively training. Failed runs are common in practice, and each one still bills for the compute it used. A cost model that counts only the successful run understates the true spend.
+The hidden cost is everything around the training loop. A corpus must be collected, cleaned, deduplicated, and stored before a run begins. Experiments must be tracked so that a failed or unhelpful run can be diagnosed. Storage, data transfer, and checkpointing all consume budget even when the model is not actively training. Failed runs are common in practice, and each one still bills for the compute it used. A cost model that counts only the successful run <Mark>understates the true spend</Mark>.
 
-The main failure mode is confusing continued pretraining with fine-tuning. Fine-tuning adapts a model on a comparatively small labeled set and is cheap by design. Continued pretraining processes a large unlabeled corpus through the pretraining objective and is not cheap. When a team budgets the former and runs the latter, the overrun appears only after the bill arrives. The vocabulary sounds similar, which is exactly why the distinction must be stated before budgeting begins.
+<Trap>
+The main failure mode is confusing continued pretraining with fine-tuning.
+</Trap>
+
+Fine-tuning adapts a model on a comparatively small labeled set and is <Mark>cheap by design</Mark>. Continued pretraining processes a large unlabeled corpus through the pretraining objective and is not cheap. When a team budgets the former and runs the latter, the overrun appears only after the bill arrives. The vocabulary sounds similar, which is exactly why the distinction must be stated before budgeting begins.
 
 There is a boundary around what these sources support. They do not model whether added data improves downstream performance, how quickly a run converges, or whether a domain corpus helps at all. They do not address catastrophic forgetting, data quality effects, or the choice between continued pretraining and other adaptation methods. A decision about whether to run the job at all requires evidence the sources do not provide.
 
 Because hardware prices and corpora change, the estimate needs a periodic review. Each assumption about size or compute should carry a recheck condition, and the run should be re-scoped when the corpus grows. Without that record, a future reviewer cannot tell which cost inputs were deliberate and which were rough guesses made early in planning.
 
+<PullQuote>
 The counterargument that continued pretraining is fair for deep domain adaptation is incomplete when a smaller fine-tune would reach the same target.
+</PullQuote>
 
 ## A decision test
 

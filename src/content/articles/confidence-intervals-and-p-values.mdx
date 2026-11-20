@@ -9,9 +9,15 @@ tags:
   - Decision Science
 ---
 
-A dashboard reports "p = 0.04" and a team treats it as proof that a feature worked. Another report shows a confidence interval that crosses zero and the same team concludes there is no effect. Both readings are common and both misstate what the numbers say. The problem is not the arithmetic; it is the interpretation attached to it.
+<Lead>
+A dashboard reports "p = 0.04" and a team treats it as proof that a feature worked. Another report shows a confidence interval that crosses zero and the same team concludes there is no effect. <Mark>Both readings are common and both misstate what the numbers say</Mark>. The problem is not the arithmetic; it is the interpretation attached to it.
+</Lead>
 
 **Direct answer:** A confidence interval is a range of values "which is likely to contain the population parameter of interest", constructed at a level such as 95% — which means that if the same population were sampled repeatedly, about 95% of the intervals produced would contain the true parameter. A p-value measures how compatible the observed data are with a specified null model; it is "not the probability that the studied hypothesis is true". The boundary, stated by the American Statistical Association, is that a threshold alone should not drive a conclusion or a decision, and a p-value does not measure the size of an effect.
+
+<KeyFigures items={[
+  { value: "95%", label: "of intervals from repeated sampling bracket the true population parameter", source: "NIST/SEMATECH e-Handbook of Statistical Methods" },
+]} />
 
 ## What the confidence level actually claims
 
@@ -31,7 +37,11 @@ The ASA's 2016 statement was written because p-values are routinely over-interpr
 
 In practice, a p-value answers a narrow question: *if the null model were correct, how surprising would data at least this extreme be?* A small answer means the data are uncomfortable under that model. It does not identify which assumption is wrong, and it does not tell you whether the effect is large enough to matter.
 
-This is why "statistically significant" and "important" are not synonyms. A tiny effect measured on millions of observations can produce a very small p-value and no practical consequence. A large effect measured on a handful of observations can produce an unimpressive p-value and still be worth investigating.
+<KeyPoint>
+This is why "statistically significant" and "important" are not synonyms.
+</KeyPoint>
+
+A tiny effect measured on millions of observations can produce a very small p-value and no practical consequence. A large effect measured on a handful of observations can produce an unimpressive p-value and still be worth investigating.
 
 ## A worked example of sample size and significance
 
@@ -55,7 +65,7 @@ Now keep the *same* 1-point lift but increase each group to 8,000 users:
 
 Nothing about the underlying effect changed. Only the sample size did, and the √N in the denominator is the mechanism. Three lessons follow:
 
-1. **Significance is partly a function of sample size.** The same lift can fail or pass a threshold depending on N, which is why a p-value alone is a poor statement of effect size.
+1. **Significance is partly a function of sample size.** The same lift can fail or pass a threshold depending on N, which is why <Mark>a p-value alone is a poor statement of effect size</Mark>.
 2. **The interval is more informative.** It shows both the plausible magnitude and the uncertainty; the reader can decide whether 0.05 percentage points or 2 points matters commercially.
 3. **A wide interval is not "no effect".** It is a statement that the data cannot distinguish a range of possibilities, including zero. The honest conclusion is "we do not know", not "there is no difference".
 
@@ -67,11 +77,21 @@ Three problems survive correct arithmetic.
 
 **Multiple comparisons.** Testing many metrics or many segments at the 5% level produces false positives by construction. The 95% property applies to each procedure, not to the family of procedures you actually ran.
 
-**Optional stopping.** Checking significance repeatedly as data arrives and stopping when p crosses 0.05 breaks the repeated-sampling interpretation the level depends on. The procedure that was actually run is not the one the threshold describes.
+**Optional stopping.**
 
-**Selection and reporting.** The ASA's call for "full reporting and transparency" matters because the numbers that get shown are often the ones that cleared a threshold. An unreported null result is invisible to the reader assessing the evidence.
+<Trap>
+Checking significance repeatedly as data arrives and stopping when p crosses 0.05 breaks the repeated-sampling interpretation the level depends on.
+</Trap>
 
-The counterargument — that thresholds are still useful as a decision rule — is fair. They are useful as *rules*, provided the organisation knows what the rule does and does not establish. The error is treating a rule as a fact about the world.
+The procedure that was actually run is not the one the threshold describes.
+
+**Selection and reporting.** The ASA's call for "full reporting and transparency" matters because the numbers that get shown are often the ones that cleared a threshold. <Mark>An unreported null result is invisible to the reader assessing the evidence</Mark>.
+
+The counterargument — that thresholds are still useful as a decision rule — is fair. They are useful as *rules*, provided the organisation knows what the rule does and does not establish.
+
+<PullQuote>
+The error is treating a rule as a fact about the world.
+</PullQuote>
 
 ## A decision test
 

@@ -9,9 +9,11 @@ tags:
   - Infrastructure
 ---
 
+<Lead>
 "Best open-weight model" is a question that cannot be answered in the abstract. The right model depends on the hardware you have, the task you need to run, and whether you value inspectability more than convenience. A published leaderboard ranks models on someone else's tasks under someone else's conditions, which is why the benchmarks article treats such ranks as shortlists rather than decisions.
+</Lead>
 
-**Direct answer:** Two well-documented open-weight families illustrate the current design space: DeepSeek-V3, with 671B total and 37B parameters activated per token, and Mixtral 8x7B, a sparse mixture of experts whose router selects two experts per token at each layer. The boundary: open weights remove licensing friction and allow self-hosting, but they do not remove compute, memory, or operational cost — and a paper's evaluation is not proof of performance on your workload.
+**Direct answer:** Two well-documented open-weight families illustrate the current design space: DeepSeek-V3, with 671B total and 37B parameters activated per token, and Mixtral 8x7B, a sparse mixture of experts whose router selects two experts per token at each layer. The boundary: open weights <Mark>remove licensing friction and allow self-hosting</Mark>, but they do not remove compute, memory, or operational cost — and a paper's evaluation is not proof of performance on your workload.
 
 ## What open weight changes
 
@@ -23,7 +25,11 @@ Open weights give you the model parameters. That enables three things:
 
 **Modification.** You can fine-tune or adapt the model without a vendor's permission. The LoRA and PEFT article covers the practical method.
 
-What it does not give you is a support contract, guaranteed uptime, or freedom from hardware limits. A 671B-parameter model, even with only 37B active per token, still needs all its weights resident somewhere.
+What it does not give you is a support contract, guaranteed uptime, or freedom from hardware limits.
+
+<Trap>
+A 671B-parameter model, even with only 37B active per token, still needs all its weights resident somewhere.
+</Trap>
 
 ## Two designs worth comparing
 
@@ -33,13 +39,23 @@ What it does not give you is a support contract, guaranteed uptime, or freedom f
 
 The mixture-of-experts article explains why these designs matter: they buy capacity without proportional per-token compute. It also explains what they cost — memory, communication, and routing complexity.
 
+<KeyFigures items={[
+  { value: "671B", label: "total parameters", source: "DeepSeek-V3 Technical Report" },
+  { value: "37B", label: "activated per token", source: "DeepSeek-V3 Technical Report" },
+  { value: "8x7B", label: "sparse mixture of experts", source: "Mixtral of Experts" },
+]} />
+
 ## A worked selection example
 
 The following is hypothetical and illustrative.
 
 A team wants to self-host a model for document extraction. It has a machine with 80 GB of accelerator memory and needs roughly 500 requests a day.
 
-**Check 1 — memory.** A dense 70B model in a low-precision format may fit with careful quantisation. A 671B sparse model does not fit on 80 GB without sharding across multiple devices, regardless of its 37B active parameters. The hardware decides before the benchmark matters.
+**Check 1 — memory.** A dense 70B model in a low-precision format may fit with careful quantisation. A 671B sparse model does not fit on 80 GB without sharding across multiple devices, regardless of its 37B active parameters.
+
+<PullQuote>
+The hardware decides before the benchmark matters.
+</PullQuote>
 
 **Check 2 — task fit.** Document extraction is closer to classification and structured output than to open-ended reasoning. A smaller model fine-tuned for the task may outperform a larger general model on the specific metric, as the task-taxonomy article argues.
 
@@ -55,7 +71,7 @@ Three conclusions follow:
 
 A defensible comparison includes four things:
 
-**Task-level results on your data.** Public benchmarks measure other distributions. A labelled set from your own work is the only direct evidence.
+**Task-level results on your data.** <Mark>Public benchmarks measure other distributions</Mark>. A labelled set from your own work is the only direct evidence.
 
 **Memory and latency on your hardware.** Published specs describe architecture, not your deployment. Measure tokens per second and time to first token on the actual machine.
 
@@ -65,13 +81,17 @@ A defensible comparison includes four things:
 
 ## What an open-weight claim does not guarantee
 
-**Reproducibility of results.** Weights can be downloaded; the training data and exact procedure often cannot. A paper's evaluation is a report, not a reproduction.
+**Reproducibility of results.** Weights can be downloaded; the training data and exact procedure often cannot. A paper's evaluation is <Mark>a report, not a reproduction</Mark>.
 
 **Safety guarantees.** An open model can be modified to remove safeguards. That is a property of openness, and it shifts responsibility to the deployer.
 
 **Longevity.** A model may be superseded quickly. The migration cost belongs in the decision.
 
-The counterargument — that closed models are always easier — is fair for small teams. Open weights trade operational burden for control, and that trade is only attractive when control is worth something specific.
+The counterargument — that closed models are always easier — is fair for small teams.
+
+<KeyPoint>
+Open weights trade operational burden for control, and that trade is only attractive when control is worth something specific.
+</KeyPoint>
 
 ## A decision test
 

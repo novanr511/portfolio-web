@@ -9,7 +9,9 @@ tags:
   - gRPC
 ---
 
+<Lead>
 Style debates about APIs are usually settled by fashion rather than analysis, and the reason is that the question is framed wrongly. REST, GraphQL, and gRPC are not competing answers to one problem; they place the complexity in different parts of the system. Which one is right depends on who calls the API, how often, over what network, and who has to change it when the business changes.
+</Lead>
 
 **Direct answer:** REST organises an API as resources addressed by URLs with standard methods; the durable-contract side of that choice is covered in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). GraphQL lets clients request the exact shape of the response, moving query complexity to the server. gRPC uses a schema and binary encoding, buying efficiency and strong typing at the cost of browser and human readability. An API gateway handles cross-cutting concerns — authentication, rate limiting, routing — and safe retries require idempotency, which Stripe implements with client-generated keys: "The API supports idempotency for safely retrying requests without accidentally performing the same operation twice."
 
@@ -17,13 +19,17 @@ Style debates about APIs are usually settled by fashion rather than analysis, an
 
 REST's advantage is not performance. It is that a client can predict the shape of an endpoint it has never seen, which is why it remains the default for public APIs. That predictability comes from a resource model and consistent standard methods — the subject of [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems), which covers resource naming, the failure contract, and versioning in depth.
 
-What matters for the style decision here is narrower: REST maps onto HTTP semantics, so it inherits HTTP's caching, status codes, and tooling. That makes it a strong default when clients are external and varied. The alternative styles are best understood as answers to cases where that baseline does not fit.
+What matters for the style decision here is narrower: REST maps onto HTTP semantics, so it inherits <Mark>HTTP's caching, status codes, and tooling</Mark>. That makes it a strong default when clients are external and varied. The alternative styles are best understood as answers to cases where that baseline does not fit.
 
 ## GraphQL moves the work
 
 GraphQL lets a client specify which fields it wants, and the server resolves exactly that shape — the query language and type system are defined in the [GraphQL specification](https://spec.graphql.org/). The benefit is real for clients with varied needs — a mobile app and a reporting tool can ask for different fields from the same endpoint — and it reduces the number of round trips needed to assemble a screen.
 
-The costs are also real. Query complexity moves to the server, which now has to parse and authorise arbitrary selections and may need to defend against expensive queries. Caching is harder because responses are request-specific, and the familiar HTTP caching model applies less directly. A GraphQL endpoint that becomes the single entry point for every client can turn into a distributed monolith with a schema that is difficult to evolve.
+The costs are also real. Query complexity moves to the server, which now has to parse and authorise arbitrary selections and may need to defend against expensive queries. Caching is harder because <Mark>responses are request-specific</Mark>, and the familiar HTTP caching model applies less directly.
+
+<PullQuote>
+A GraphQL endpoint that becomes the single entry point for every client can turn into a distributed monolith with a schema that is difficult to evolve.
+</PullQuote>
 
 The question to ask is whether clients genuinely need different shapes. If they all need the same data, the extra machinery buys little.
 
@@ -39,15 +45,25 @@ An API gateway terminates client connections and routes them to backend services
 
 Doing these once at the boundary is better than reimplementing them in every service, and it is also where a new class of failure appears: the gateway becomes a single point of failure and a bottleneck, and its configuration becomes a critical part of the system. A gateway that enforces a limit based on a client identifier it cannot reliably determine will rate-limit the wrong party, which is why the identity dimension has to be explicit.
 
-Rate limiting itself is a policy decision, not a technical setting. OWASP's API Security Top 10 treats unrestricted resource consumption as a design failure, and the economics behind the limit belong in the failure contract described in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). A limit that ignores per-request cost can be economically wrong even when it is technically correct.
+<KeyPoint>
+Rate limiting itself is a policy decision, not a technical setting.
+</KeyPoint>
+
+OWASP's API Security Top 10 treats unrestricted resource consumption as a design failure, and the economics behind the limit belong in the failure contract described in [API Design: The Contract Between Systems](/articles/api-design-the-contract-between-systems). A limit that ignores per-request cost can be economically wrong even when it is technically correct.
 
 ## Idempotency is what makes retries safe
 
-Any client that retries a request over an unreliable network faces a question: did the first attempt succeed? If the operation created an order, retrying it might create two.
+Any client that retries a request over an unreliable network faces a question: <Mark>did the first attempt succeed</Mark>? If the operation created an order, retrying it might create two.
 
 Stripe's implementation is the clearest published example. "The API supports idempotency for safely retrying requests without accidentally performing the same operation twice", and the mechanism is a client-generated key: "A client generates an idempotency key, which is a unique key that the server uses to recognize subsequent retries of the same request." For API v1, "Stripe saves the status code and body of the first request made with a given idempotency key after endpoint execution begins" — so a retry returns the original result rather than executing again. Keys are "up to 255 characters", and the guidance explicitly says to "avoid using sensitive data (for example, email addresses or personal identifiers) as idempotency keys".
 
+<KeyFigures items={[
+  { value: "255", label: "maximum length in characters of a Stripe idempotency key", source: "Stripe, Idempotent requests" },
+]} />
+
+<Trap>
 That last detail matters: using a customer's email as an idempotency key would make all requests for that customer collapse into one, and would leak personal data into request metadata.
+</Trap>
 
 ## A worked versioning problem
 

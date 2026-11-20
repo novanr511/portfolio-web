@@ -9,7 +9,9 @@ tags:
   - Data Science
 ---
 
+<Lead>
 Correlation tells you that two things move together. It does not tell you that moving one would change the other, and in a business decision that difference is the whole question. Causal inference is the machinery for the counterfactual question — what would have happened to this outcome if we had done something else — and its most important property is that the answer is only as good as the assumptions you can state out loud.
+</Lead>
 
 **Direct answer:** Causal inference asks the "what if" question by combining a causal model with an identification strategy that connects it to observable data. The design logic is to specify the intervention you want, write down the assumptions required to answer it from the data you have, and check whether those assumptions are defensible. The formal machinery — graphs, do-calculus, adjustment — is what makes those assumptions explicit and checkable. Where identification fails, no method rescues you; the honest output is "this question is not answerable with this data".
 
@@ -19,13 +21,13 @@ Zhang et al. state the question in its general form: "many problems ask a questi
 
 They then make a distinction that changes how you should frame a question. "To address this kind of questions, calculating an average treatment effect (ATE) is often uninformative, because one would like to know how much impact a variable (such as skin color) has on a specific individual."
 
-This is the difference between two genuinely different requests. "What is the average effect of the intervention across the population?" is a well-posed statistical question with a well-known answer shape. "What would have happened to *this* customer if we had offered the discount?" is a counterfactual question about a single unit, and the answer is not the average. No amount of sample size fixes this: it is a difference in estimand, not in precision.
+This is the difference between two genuinely different requests. "What is the average effect of the intervention across the population?" is a well-posed statistical question with a well-known answer shape. "What would have happened to *this* customer if we had offered the discount?" is a counterfactual question about a single unit, and the answer is not the average. No amount of sample size fixes this: it is <Mark>a difference in estimand, not in precision</Mark>.
 
 Most business questions are the second kind, which is why "run an A/B test" is the honest answer when you can and "model it from observational data" is the compromised one.
 
 ## The design logic: specify the trial you wish you had run
 
-Hernán and Robins' framing is the most useful available, because it turns causal inference into a design problem rather than a statistical trick. Their approach — target trial emulation — asks you to specify the hypothetical randomised trial you would have run, then to construct from observational data the closest analogue of it.
+Hernán and Robins' framing is the most useful available, because it turns causal inference into a design problem rather than a statistical trick. Their approach — <Mark>target trial emulation</Mark> — asks you to specify the hypothetical randomised trial you would have run, then to construct from observational data the closest analogue of it.
 
 The specification has parts you already know from randomised trials: eligibility criteria, treatment assignment strategies, assignment date, follow-up start, outcome, causal contrast, and analysis plan. The contribution is the discipline of writing them down before you look at the data, because the specification forces you to confront the assumptions that an observational analysis otherwise hides.
 
@@ -34,7 +36,7 @@ The value of the exercise is that it exposes the two failure modes that sink obs
 - **Confounding.** The treatment and the outcome share a common cause, so the observed association mixes the treatment's effect with the cause's effect.
 - **Selection and time.** Who is observed, and when, is rarely random, and the treatment changes who survives to be observed.
 
-A target trial specification makes both visible at the point where you can still do something about them: by choosing eligibility criteria that make treatment groups comparable, by using time-zero and follow-up definitions that avoid immortal-time bias, and by stating explicitly which confounder adjustment you are relying on.
+A target trial specification makes both visible at the point where you can still do something about them: by choosing eligibility criteria that make treatment groups comparable, by using time-zero and follow-up definitions that avoid <Mark>immortal-time bias</Mark>, and by stating explicitly which confounder adjustment you are relying on.
 
 ## The graph is where the assumptions live
 
@@ -50,13 +52,19 @@ This is also where the "do" notation earns its keep. Intervening on a variable i
 
 ## Where identification fails
 
+<KeyPoint>
 The honest boundary of causal inference is that many questions cannot be answered from observational data, no matter how sophisticated the method.
+</KeyPoint>
 
 Fan et al. make the point in the context of a specific method, and it generalises: "a key challenge to drawing such inferences in observational settings is the possible existence of unmeasured confounding, which may invalidate most commonly used methods that assume no hidden confounding bias."
 
 Read that as a design constraint rather than a method complaint. If a confounder is unmeasured, then methods that assume no hidden confounding bias are simply invalid for your data. What remains is not a weaker version of the same estimate — it is a different kind of claim: an assumption-dependent sensitivity analysis, a partially identified bound, or an honest statement that the effect is not identified.
 
-The practical implication for planning is important. If a decision hinges on an effect that your data cannot identify, the options are to collect the data that would (a randomised trial, an instrument, a natural experiment), to narrow the question so it becomes identified, or to make the decision under explicit uncertainty. Choosing a more elaborate method instead is the failure mode, because the sophistication of the method is invisible in the result while the assumption is not.
+The practical implication for planning is important. If a decision hinges on an effect that your data cannot identify, the options are to collect the data that would (a randomised trial, an instrument, a natural experiment), to narrow the question so it becomes identified, or to make the decision under explicit uncertainty.
+
+<Trap>
+Choosing a more elaborate method instead is the failure mode, because the sophistication of the method is invisible in the result while the assumption is not.
+</Trap>
 
 ## The difference between a causal claim and a leakage-free model
 
@@ -82,7 +90,11 @@ For the evaluation-design counterpart — how to make a split that supports a ca
 
 ## A counterargument
 
-There is a practical objection to this rigorous framing: its honesty can be paralysing. The article is right that a DAG makes assumptions explicit, but the graph is drawn by the analyst, and no test inside the framework validates it - Hernan and Robins' target trial emulation is still an observational approximation whose credibility rests on the very comparability assumptions it asks you to write down. Fan et al.'s warning about unmeasured confounding leads to the correct conclusion that the effect may be unidentified, yet the alternative the article offers - bounds, sensitivity analysis, "not answerable with this data" - gives a decision-maker no actionable magnitude. When a business must choose now, a coarse estimate with stated assumptions may dominate a principled refusal. The discipline of stating assumptions is a real contribution, but treating identification failure as a hard stop conflates what the data can prove with what a decision requires.
+There is a practical objection to this rigorous framing: its honesty can be paralysing. The article is right that a DAG makes assumptions explicit, but the graph is drawn by the analyst, and no test inside the framework validates it - Hernan and Robins' target trial emulation is still an observational approximation whose credibility rests on the very comparability assumptions it asks you to write down. Fan et al.'s warning about unmeasured confounding leads to the correct conclusion that the effect may be unidentified, yet the alternative the article offers - bounds, sensitivity analysis, "not answerable with this data" - gives a decision-maker no actionable magnitude. When a business must choose now, a coarse estimate with stated assumptions may dominate a principled refusal.
+
+<PullQuote>
+The discipline of stating assumptions is a real contribution, but treating identification failure as a hard stop conflates what the data can prove with what a decision requires.
+</PullQuote>
 
 ## References & Further Reading
 

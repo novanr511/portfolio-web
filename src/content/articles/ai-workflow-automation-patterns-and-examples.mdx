@@ -9,7 +9,9 @@ tags:
   - Workflow
 ---
 
+<Lead>
 A workflow is more than a model call. It includes the trigger, the data gathered beforehand, the decision the model makes, the action that follows, and the handling of failure. Automation projects that focus only on the model call produce demos that work once and systems that fail at the seams.
+</Lead>
 
 **Direct answer:** The useful patterns are classification-and-route, extract-and-validate, draft-and-review, monitor-and-escalate, and retrieve-and-answer. Anthropic publishes production guides for ticket routing, customer support agents, content moderation and similar use cases — concrete instances of these patterns. The boundary: a pattern is a skeleton; reliability comes from defining failure states, review points, and measurement around it.
 
@@ -41,25 +43,37 @@ Three frictions change the result:
 
 1. **Misclassification.** If 5% of auto-handled tickets were routed wrongly, 90 tickets need rework. At 8 minutes each, add 12 hours.
 2. **Low-confidence detection.** If the confidence signal is poorly calibrated, some wrong drafts go out unreviewed. The reduce-hallucinations article shows how citation checks help.
-3. **Retrieval coverage.** If the handbook lacks the answer, the draft will be weak and the escalation rate will rise. The measured saving depends on document quality, not model quality.
+3. **Retrieval coverage.** If the handbook lacks the answer, the draft will be weak and the escalation rate will rise. The measured saving depends on <Mark>document quality, not model quality</Mark>.
 
 Three decisions follow:
 
 - **Start with the classification stage.** It is the easiest to measure against existing labels and determines the rest of the flow.
 - **Keep review on irreversible actions.** Sending a customer a wrong reply has a cost; drafting one does not.
-- **Measure the combined system**, not each stage. A 95% accurate classifier feeding a 90% accurate drafter is not a 95% accurate workflow.
+- **Measure the combined system**, not each stage. A 95% accurate classifier feeding a 90% accurate drafter is <Mark>not a 95% accurate workflow</Mark>.
 
 ## Choosing the first workflow
 
-The first automation should be chosen for measurability, not for ambition. Three properties make a good candidate:
+<KeyPoint>
+The first automation should be chosen for measurability, not for ambition.
+</KeyPoint>
+
+Three properties make a good candidate:
 
 **High volume with a repetitive shape.** A task performed hundreds of times a day with roughly the same structure gives enough examples to evaluate. A task performed twice a week does not repay the setup cost, and the model has too few cases to learn from.
 
 **Recoverable errors.** If a wrong output is caught before it reaches a customer or a financial system, the workflow can be improved safely. An irreversible action — sending a payment, deleting a record — belongs in a later phase once the earlier stages have been measured.
 
-**An existing baseline.** If the team knows the current handling time, error rate, and cost, an improvement can be demonstrated. Without a baseline, the project's result is a matter of opinion, and opinions about automation are notoriously optimistic.
+**An existing baseline.** If the team knows the current handling time, error rate, and cost, an improvement can be demonstrated.
 
-These criteria explain why ticket routing and document extraction are common first projects while autonomous decision-making is not. The former have labels and a baseline; the latter has neither, and its errors are expensive. A team that starts with the hard case often spends months discovering what a simpler project would have taught in a week.
+<Trap>
+Without a baseline, the project's result is a matter of opinion, and opinions about automation are notoriously optimistic.
+</Trap>
+
+These criteria explain why ticket routing and document extraction are common first projects while autonomous decision-making is not. The former have labels and a baseline; the latter has neither, and its errors are expensive.
+
+<PullQuote>
+A team that starts with the hard case often spends months discovering what a simpler project would have taught in a week.
+</PullQuote>
 
 ## What automation does not remove
 
@@ -67,7 +81,7 @@ These criteria explain why ticket routing and document extraction are common fir
 
 **It does not remove drift.** Inputs change, products change, and policies change. A workflow tuned in one quarter may misroute in the next. Schedule re-evaluation on change.
 
-**It does not make human work disappear.** It changes the nature of the work: fewer routine cases, more exceptions. That can be more demanding, which is a people and training issue as much as a technical one.
+**It does not make human work disappear.** It changes the nature of the work: <Mark>fewer routine cases, more exceptions</Mark>. That can be more demanding, which is a people and training issue as much as a technical one.
 
 The counterargument — that end-to-end agents make these patterns unnecessary — is premature. An agent is a composition of the same stages with more autonomy, which means the failure surfaces multiply, as the autonomous-business article explains.
 

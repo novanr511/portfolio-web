@@ -9,15 +9,21 @@ tags:
   - Decision Science
 ---
 
+<Lead>
 Dashboards are full of correlations. Two lines move together, and someone concludes one causes the other. That conclusion is often wrong.
+</Lead>
 
 **Direct answer:** Correlation means two variables move together; causation means one variable directly produces a change in another. Correlation does not imply causation, and treating it as if it did is one of the most common and costly mistakes in data analysis. Establishing causation requires more than a shared trend—it requires ruling out confounders, reverse causation, and coincidence.
 
 ## What correlation actually measures
 
-A correlation coefficient tells you the strength and direction of a linear relationship between two variables. It says nothing about mechanism, direction, or whether a third factor drives both.
+A correlation coefficient tells you the strength and direction of a linear relationship between two variables.
 
-Ice cream sales and drowning incidents both rise in summer. The correlation is positive and strong. But ice cream does not cause drowning, and drowning does not cause ice cream sales. Hot weather causes both: more people eat ice cream and more people swim. Temperature is the confounder—the third variable that creates the illusion of a direct link.
+<KeyPoint>
+It says nothing about mechanism, direction, or whether a third factor drives both.
+</KeyPoint>
+
+Ice cream sales and drowning incidents both rise in summer. The correlation is positive and strong. But ice cream does not cause drowning, and drowning does not cause ice cream sales. Hot weather causes both: more people eat ice cream and more people swim. Temperature is the <Mark>confounder</Mark>—the third variable that creates the illusion of a direct link.
 
 This is the central trap. A strong correlation can exist because:
 
@@ -34,7 +40,9 @@ Businesses act on correlations all the time. Examples:
 - A SaaS company sees users who invite teammates churn less, and concludes referral programs reduce churn. It may be that engaged users both invite teammates and stay, with no causal link from inviting to retention.
 - A manufacturer finds machines operated by senior technicians fail less often, and concludes seniority prevents failure. It may be that senior technicians are assigned to newer, more reliable machines.
 
+<Trap>
 Each error wastes money, and worse, it locks in a wrong theory that is hard to dislodge because the dashboard "confirms" it.
+</Trap>
 
 ## How to test for causation
 
@@ -73,15 +81,21 @@ The practical value is not the formalism but the discipline. Drawing a graph ask
 
 ## A worked example
 
-The following is hypothetical and illustrative. Suppose an analyst at a subscription company observes that customers who use a certain feature renew at higher rates and proposes mandating it for everyone. The correlation is real, but the earlier section on reverse causation and confounders applies: engaged customers may simply be more likely to both discover the feature and renew.
+The following is hypothetical and illustrative. Suppose an analyst at a subscription company observes that customers who use a certain feature renew at higher rates and proposes mandating it for everyone. The correlation is real, but the earlier section on <Mark>reverse causation</Mark> and confounders applies: engaged customers may simply be more likely to both discover the feature and renew.
 
-Hernan and Robins offer a design discipline for exactly this situation. Target trial emulation asks the analyst to specify the trial they would have run if they could: who would be eligible, what the treatment and comparator would be, when follow-up starts, and what outcome matters. Writing that protocol before touching the observational data makes the design choices explicit and prevents the analysis from being shaped by the result.
+Hernan and Robins offer a design discipline for exactly this situation. <Mark>Target trial emulation</Mark> asks the analyst to specify the trial they would have run if they could: who would be eligible, what the treatment and comparator would be, when follow-up starts, and what outcome matters. Writing that protocol before touching the observational data makes the design choices explicit and prevents the analysis from being shaped by the result.
 
 The analyst then uses the observational data to approximate that trial, applying methods suited to confounding rather than a naive comparison. The result is still weaker than a randomized experiment, and the honest report says so. What changes is the quality of the question: instead of asking whether the feature correlates with renewal, the team asks whether prompting it would increase renewal for a comparable customer who would not otherwise use it. That is a causal question, and it is the one the decision actually depends on.
 
 ## A counterargument
 
-A reasonable critic would note that the causal framework recommended here trades one hidden assumption for another. Peters, Janzing, and Scholkopf are explicit that a graph is not inferred from observational data alone: several graphs encode the same distribution, so the committed arrows are assumptions the data cannot verify. Writing a graph is discipline, but it can also manufacture confidence, since a wrong graph is no more falsifiable than the coefficient it replaced. Hernan and Robins' target trial emulation sharpens the question yet still depends on the confounders the record contains, so an unmeasured common cause survives the exercise. The framing is strong when assumptions are stated and defended; incomplete when a conditional conclusion is presented as settled fact.
+A reasonable critic would note that the causal framework recommended here trades one hidden assumption for another. Peters, Janzing, and Scholkopf are explicit that a graph is not inferred from observational data alone: several graphs encode the same distribution, so the committed arrows are assumptions the data cannot verify.
+
+<PullQuote>
+Writing a graph is discipline, but it can also manufacture confidence, since a wrong graph is no more falsifiable than the coefficient it replaced.
+</PullQuote>
+
+Hernan and Robins' target trial emulation sharpens the question yet still depends on the confounders the record contains, so an unmeasured common cause survives the exercise. The framing is strong when assumptions are stated and defended; incomplete when a conditional conclusion is presented as settled fact.
 
 ## References & Further Reading
 

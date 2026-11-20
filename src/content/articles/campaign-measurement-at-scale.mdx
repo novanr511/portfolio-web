@@ -9,9 +9,15 @@ tags:
   - Verified
 ---
 
+<Lead>
 Campaign measurement at scale fails for structural reasons rather than a lack of tools. Google's measurement documentation describes conversion tracking, and the analytics event documentation covers event collection. The difficulty is connecting the two across systems and time.
+</Lead>
 
-**Direct answer:** Measure campaigns by defining the conversion, aligning identity across platforms, and using a comparison for effect claims. The sources describe the mechanics; the measurement rule is a synthesis.
+**Direct answer:** The sources describe the mechanics; the measurement rule is a synthesis.
+
+<KeyPoint>
+Measure campaigns by defining the conversion, aligning identity across platforms, and using a comparison for effect claims.
+</KeyPoint>
 
 **Delta:** This article adds a claim-status table and a worked audit, separating documented platform behaviour from local decisions about definitions.
 
@@ -37,7 +43,7 @@ The outcome is a reconciliation, not a choice of preferred dashboard. The scenar
 
 ## Why identity breaks first
 
-At scale, the same person appears in several systems under different identifiers. A campaign platform may count a conversion that the analytics system attributes to another source, and neither is necessarily wrong. The mismatch is a property of the measurements, not an error anyone can fix by choosing a better dashboard.
+At scale, the same person appears in several systems under different identifiers. A campaign platform may count a conversion that the analytics system attributes to another source, and neither is necessarily wrong. <Mark>The mismatch is a property of the measurements, not an error anyone can fix by choosing a better dashboard</Mark>.
 
 The practical response is to decide which system is the reference for the business outcome, usually the one closest to the transaction, and treat platform figures as views. That decision should be recorded so the team does not relitigate it whenever the numbers disagree.
 
@@ -51,15 +57,19 @@ The practical response is to decide which system is the reference for the busine
 
 ## Why more dashboards do not help
 
-An additional dashboard adds another view of the same unresolved definitions. Unless the event and the window are aligned, a comparison across dashboards is measuring the platforms' rules. Reconciliation against an independent record, such as orders, is what turns the numbers into evidence.
+An additional dashboard adds another view of the same unresolved definitions. Unless the event and the window are aligned, a comparison across dashboards is measuring the platforms' rules. Reconciliation against an independent record, such as orders, is what <Mark>turns the numbers into evidence</Mark>.
 
 A further limit is time. A platform can report a conversion immediately and revise it later as identities resolve, which means the same campaign has different numbers depending on when it is read. Recording the observation date is therefore part of the measurement, not a detail for the report footer.
 
-None of this removes the need for incrementality tests. Reconciliation makes the figures consistent; a comparison is still required to know whether the campaign caused the outcome. A team that does only the first will have reliable numbers that answer the wrong question.
+None of this removes the need for incrementality tests. Reconciliation makes the figures consistent; a comparison is still required to know whether the campaign caused the outcome.
+
+<Trap>
+A team that does only the first will have reliable numbers that answer the wrong question.
+</Trap>
 
 A final consideration is the cost of the measurement system itself. A large stack of platforms, event schemas, and reconciliation work has a running cost in people and time. A team that spends more on measurement than the decisions it informs has inverted the purpose of the system, which is a question worth asking when the number of dashboards grows.
 
-The useful discipline is to keep only the measurements that change a decision. A report nobody acts on is a cost, and removing it is often more valuable than adding another view. Recording which decisions each report supports makes that judgement possible.
+The useful discipline is to <Mark>keep only the measurements that change a decision</Mark>. A report nobody acts on is a cost, and removing it is often more valuable than adding another view. Recording which decisions each report supports makes that judgement possible.
 
 A measurement that nobody acts on should be removed before another one is added.
 
@@ -71,7 +81,9 @@ The reference system should be named in the report so that a reader knows which 
 
 It cannot prove causation from platform credit. It does not remove the need for a comparison design. And it cannot fix a conversion that was defined wrongly at the start.
 
+<PullQuote>
 The counterargument that the platform number is authoritative is fair as a record of its rules and incomplete as a business result.
+</PullQuote>
 
 ## A decision test
 

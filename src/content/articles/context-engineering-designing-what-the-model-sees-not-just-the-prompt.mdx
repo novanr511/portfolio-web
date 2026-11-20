@@ -9,19 +9,29 @@ tags:
   - Architecture
 ---
 
+<Lead>
 A team can spend a week refining a system prompt and still get unreliable agent behaviour, because the prompt is only a small part of what the model actually reads. The retrieved documents, tool definitions, conversation history, and output of previous steps all occupy the same context window — and all compete for attention.
+</Lead>
 
-**Direct answer:** Context engineering is the discipline of assembling everything a model sees — instructions, retrieved knowledge, tool schemas, history, and intermediate results — so the right information is available and the wrong information is not. Anthropic's engineering article distinguishes it from prompt engineering and argues that context is a scarce resource in capable agents. The boundary: a well-assembled context improves the conditions for a good answer; it does not supply knowledge or judgement the model lacks.
+**Direct answer:** Context engineering is the discipline of assembling everything a model sees — instructions, retrieved knowledge, tool schemas, history, and intermediate results — so the right information is available and the wrong information is not. Anthropic's engineering article distinguishes it from prompt engineering and argues that context is <Mark>a scarce resource</Mark> in capable agents. The boundary: a well-assembled context improves the conditions for a good answer; it does not supply knowledge or judgement the model lacks.
 
 ## Why the distinction matters
 
-Prompt engineering asks: how should I phrase the instruction? Context engineering asks: what should be in the window at the moment the model decides?
+Prompt engineering asks: how should I phrase the instruction?
+
+<KeyPoint>
+Context engineering asks: what should be in the window at the moment the model decides?
+</KeyPoint>
 
 Three differences follow:
 
-**The unit is dynamic.** A prompt is fixed text. An agent's context changes at every step as tools return results and new history accumulates. A static prompt cannot control what a dynamic context contains.
+**The unit is dynamic.** A prompt is fixed text. An agent's context changes at every step as tools return results and new history accumulates.
 
-**Relevance is a scarce resource.** A long context includes the answer and a great deal else. The "Lost in the Middle" finding shows that position affects whether information is used, which means assembly order is part of the design.
+<Trap>
+A static prompt cannot control what a dynamic context contains.
+</Trap>
+
+**Relevance is a scarce resource.** A long context includes the answer and a great deal else. The "Lost in the Middle" finding shows that position affects whether information is used, which means <Mark>assembly order is part of the design</Mark>.
 
 **Failure is often upstream.** When an agent gives a wrong answer, the cause may be that retrieval returned the wrong passage or that an old tool result is still in the window. Rewording the prompt does not fix either.
 
@@ -51,7 +61,7 @@ A support agent handles a refund request. Its context budget is 8,000 tokens.
 
 **Step 3 — retrieved policy (1,200 tokens).** The refund policy section matching the order type, placed immediately before the request rather than buried after a long history.
 
-**Step 4 — task history (900 tokens).** A compressed summary of earlier turns: order identified, customer stated the reason, policy section retrieved. Verbatim history is replaced by a structured state with the key facts.
+**Step 4 — task history (900 tokens).** A compressed summary of earlier turns: order identified, customer stated the reason, policy section retrieved. Verbatim history is replaced by <Mark>a structured state</Mark> with the key facts.
 
 **Step 5 — current request (200 tokens).** "The item arrived damaged; I'd like a refund."
 
@@ -69,7 +79,11 @@ Three decisions follow:
 
 **It cannot remove the need for boundaries.** Tool permissions and refusal paths still have to be enforced outside the model. The security checklist explains why.
 
-The counterargument — that larger context windows make this unnecessary — is wrong in direction. A larger window lets you include more, which increases the need to decide what belongs. Capacity is not selection.
+The counterargument — that larger context windows make this unnecessary — is wrong in direction. A larger window lets you include more, which increases the need to decide what belongs.
+
+<PullQuote>
+Capacity is not selection.
+</PullQuote>
 
 ## A decision test
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 AI video tools can turn a short prompt into a polished clip in minutes, which makes it tempting to treat the output as finished content. The real problem is that fluency is not accuracy: a generated scene can depict people, claims, and events that never existed, and the cost of that error falls on the person who publishes it. Good practice is therefore less about prompting tricks and more about defining the job and governing the risk.
+</Lead>
 
 **Direct answer:** AI video generation should start from a specific communication task with defined success criteria, then move through a repeatable cycle of generation, evaluation, and revision before a human approves the result. The NIST AI Risk Management Framework supplies the governance structure: govern who decides, map the context and affected parties, measure the outputs, and manage the risks. The boundary is that a generated video is a draft and a risk-bearing artifact, not a verified record.
 
@@ -21,7 +23,7 @@ Anthropic's guides to common use cases organise AI work around concrete tasks ra
 
 <Figure src="/images/articles/inline/ai-video-generation-best-practices-1.png" alt="A repeating loop from defining the task and success criteria, through storyboarding and generating a sample, measuring it against criteria and risks, revising the prompt, and ending at human approval with a synthetic-media label." caption="Conceptual: a generated video is a draft inside a review loop." />
 
-The same use-case discipline treats outputs as drafts to be reviewed and refined. For video, that means a loop: storyboard, generate a short sample, assess it against the criteria, and revise the prompt or inputs. Parameters and prompts should be recorded so that a result can be reproduced and a failure understood. This is ordinary quality control applied to a new medium, and it matters more than any single prompting technique because it is repeatable and can be handed to another person who did not create the first draft.
+The same use-case discipline treats outputs as drafts to be reviewed and refined. For video, that means a loop: storyboard, <Mark>generate a short sample</Mark>, assess it against the criteria, and revise the prompt or inputs. Parameters and prompts should be recorded so that a result can be reproduced and a failure understood. This is ordinary quality control applied to a new medium, and it matters more than any single prompting technique because it is repeatable and can be handed to another person who did not create the first draft.
 
 The NIST AI Risk Management Framework provides the second half of the method through four functions: govern, map, measure, and manage. Applied to video, govern asks who may generate, approve, and publish, and what is permitted. Map asks about context: who appears in the clip, who could be affected, and what could go wrong if it is misleading. Measure asks how outputs are tested against the success criteria and the risk categories. Manage asks how identified risks are prioritised, treated, and monitored over time.
 
@@ -29,7 +31,11 @@ NIST also describes characteristics of trustworthy AI, including validity and re
 
 ## A worked example
 
-The following is hypothetical and illustrative. A team wants a short product explainer generated with AI rather than filmed. Three checks gate publication. First, the use case is defined: the clip must explain one feature to a specific audience, with success criteria about clarity and factual accuracy, so the first drafts can be judged against something concrete. Second, the team maps risks: the script could overstate what the product does, and any human likeness would require consent, so the decision is made to use no real faces and to keep every claim traceable to a product document. Third, outputs are measured and reviewed: several drafts fail the accuracy check and are revised, the final clip is labelled as synthetic, and a named reviewer signs off. The outcome is a usable video, but the time is spent mostly in review rather than generation.
+The following is hypothetical and illustrative. A team wants a short product explainer generated with AI rather than filmed. Three checks gate publication. First, the use case is defined: the clip must explain one feature to a specific audience, with success criteria about clarity and factual accuracy, so the first drafts can be judged against something concrete. Second, the team maps risks: the script could overstate what the product does, and any human likeness would require consent, so the decision is made to use no real faces and to keep every claim traceable to a product document. Third, outputs are measured and reviewed: several drafts fail the accuracy check and are revised, the final clip is labelled as synthetic, and a named reviewer signs off.
+
+<PullQuote>
+The outcome is a usable video, but the time is spent mostly in review rather than generation.
+</PullQuote>
 
 ## Evidence status
 
@@ -43,15 +49,21 @@ The table separates the two source-backed descriptions from the inference built 
 
 ## What it cannot do
 
-A generated video cannot guarantee truth. The model produces sequences that look plausible, and there is nothing in the output that marks a false claim as false. If the script asserts something the product cannot do, or depicts an event that did not occur, the video will present it with the same confidence as a verified statement. Accuracy has to be supplied from outside the tool, by checking every factual assertion against a source and by refusing to publish claims that cannot be substantiated. Fluency is not evidence, and a convincing image is not a confirmation that anything shown actually happened.
+A generated video cannot guarantee truth. The model produces sequences that look plausible, and there is nothing in the output that marks a false claim as false. If the script asserts something the product cannot do, or depicts an event that did not occur, the video will present it with the same confidence as a verified statement. Accuracy has to be supplied from outside the tool, by checking every factual assertion against a source and by refusing to publish claims that cannot be substantiated. <Mark>Fluency is not evidence</Mark>, and a convincing image is not a confirmation that anything shown actually happened.
 
-There is a hidden cost in review. Generation is cheap and fast, which encourages volume, but each additional clip carries a verification burden: checking claims, confirming consent, assessing bias and representation, and reviewing for disclosure. The scarce resource shifts from production skill to editorial judgment. A team that measures success by how many videos it produces will underinvest in the review that makes them safe, and the risk accumulates quietly in content that looks finished. The speed of the tool is only an advantage if the review loop can keep pace with it.
+There is a hidden cost in review. Generation is cheap and fast, which encourages volume, but each additional clip carries a verification burden: checking claims, confirming consent, assessing bias and representation, and reviewing for disclosure. The scarce resource shifts from production skill to editorial judgment.
+
+<Trap>
+A team that measures success by how many videos it produces will underinvest in the review that makes them safe, and the risk accumulates quietly in content that looks finished.
+</Trap>
+
+The speed of the tool is only an advantage if the review loop can keep pace with it.
 
 A major failure mode concerns likeness, consent, and intellectual property. A generated video can reproduce a real person's face or voice, imitate a brand, or draw on protected material, often without any clear signal that it has done so. The result can mislead viewers and expose the publisher to legal and reputational harm. Disclosure that media is synthetic reduces but does not remove this risk, because many viewers will not see or understand the label. The practical response is to set clear rules about what may be depicted and to enforce them before generation, not after a troublesome clip has already been made and circulated.
 
 There are boundaries where this approach should not be used. Where authenticity is the point, such as evidence, news, testimony, or any record of what actually happened, a generated video is the wrong artifact regardless of how good it looks. The same applies to high-stakes domains like health, law, or finance, where an error in a visual claim can cause real harm. Generated video is best suited to illustrative, low-stakes content where the audience understands it is created material and where a human retains responsibility for the claims. Outside those conditions, the tool should give way to a real recording.
 
-Finally, the practice needs review because both the technology and the rules around it move quickly. Models gain new capabilities, detection methods change, regulations and platform policies tighten, and a workflow that was acceptable last quarter may not be today. A risk assessment should have an owner and a recheck condition, and the record of prompts, sources, approvals, and disclosures should be kept so a published clip can be audited. Governance is a continuing process, not a one-time setup, and a control that is never revisited eventually stops controlling anything.
+Finally, the practice needs review because both the technology and the rules around it move quickly. Models gain new capabilities, detection methods change, regulations and platform policies tighten, and a workflow that was acceptable last quarter may not be today. A risk assessment should have an owner and a recheck condition, and the record of prompts, sources, approvals, and disclosures should be kept so a published clip can be audited. Governance is <Mark>a continuing process, not a one-time setup</Mark>, and a control that is never revisited eventually stops controlling anything.
 
 The counterargument that AI video lowers production cost is fair for routine, low-stakes content where speed matters, and incomplete for contexts where authenticity and accountability carry the meaning; there the audience needs a real record, not a plausible substitute.
 
@@ -65,7 +77,11 @@ The counterargument that AI video lowers production cost is fair for routine, lo
 6. Label synthetic media and require a named human reviewer to approve publication.
 7. Record prompts, sources, approvals, and disclosures, and set a recheck condition.
 
-Useful AI video work is defined by its controls, not by its output volume. When the task is specific, the risks are mapped, and a human signs off on claims and disclosure, generation becomes a fast draft that serves a clear purpose. When those controls are absent, the same speed becomes a liability, because convincing but unverified content reaches an audience before anyone has checked it. The decision test is a way of establishing which situation applies before a clip is published.
+<KeyPoint>
+Useful AI video work is defined by its controls, not by its output volume.
+</KeyPoint>
+
+When the task is specific, the risks are mapped, and a human signs off on claims and disclosure, generation becomes a fast draft that serves a clear purpose. When those controls are absent, the same speed becomes a liability, because convincing but unverified content reaches an audience before anyone has checked it. The decision test is a way of establishing which situation applies before a clip is published.
 
 For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 

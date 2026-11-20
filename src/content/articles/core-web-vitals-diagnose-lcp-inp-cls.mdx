@@ -9,13 +9,17 @@ tags:
   - User Experience
 ---
 
+<Lead>
 For years, measuring web performance meant tracking generic metrics like "Page Load Time" or "DOMContentLoaded." These legacy metrics failed to capture the actual user experience: a page could trigger `window.onload` while remaining a blank white screen, or load visibly while freezing the browser interface whenever a user attempted to click a button.
+</Lead>
 
 To bridge the gap between technical network events and real human perception, Google introduced **Core Web Vitals (CWV)**.
 
-**Direct Answer:** Core Web Vitals are three standardized user-centric metrics: **Largest Contentful Paint (LCP)** measures loading velocity (target: ≤ 2.5s), **Interaction to Next Paint (INP)** measures interaction responsiveness (target: ≤ 200ms), and **Cumulative Layout Shift (CLS)** measures visual stability (target: ≤ 0.1). Google evaluates compliance at the **75th percentile of real users over a rolling 28-day window** via the Chrome User Experience Report (CrUX). While CWV serves as an official Google page experience ranking signal, its primary function is operational: fixing LCP, INP, and CLS eliminates real user friction and bounce rates.
+**Direct Answer:** Core Web Vitals are three standardized user-centric metrics: **Largest Contentful Paint (LCP)** measures loading velocity (target: ≤ 2.5s), **Interaction to Next Paint (INP)** measures interaction responsiveness (target: ≤ 200ms), and **Cumulative Layout Shift (CLS)** measures visual stability (target: ≤ 0.1). Google evaluates compliance at the **75th percentile of real users over a rolling 28-day window** via the Chrome User Experience Report (CrUX). While CWV serves as an official Google page experience ranking signal, its primary function is operational: fixing LCP, INP, and CLS eliminates <Mark>real user friction</Mark> and bounce rates.
 
+<KeyPoint>
 Understanding the architectural root causes of these three metrics allows developers to diagnose and fix performance regressions systematically.
+</KeyPoint>
 
 ```text
 Core Web Vitals Trio (75th Percentile of Real Users)
@@ -41,6 +45,12 @@ Google evaluates pages against three specific thresholds:
 | **INP** | Interaction Latency | ≤ 200 milliseconds | 200ms - 500ms | > 500 milliseconds |
 | **CLS** | Visual Stability | ≤ 0.1 | 0.1 - 0.25 | > 0.25 |
 
+<KeyFigures items={[
+  { value: "≤ 2.5s", label: "LCP good threshold, Largest Contentful Paint", source: "web.dev, Web Vitals" },
+  { value: "≤ 200ms", label: "INP good threshold, Interaction to Next Paint", source: "web.dev, Web Vitals" },
+  { value: "≤ 0.1", label: "CLS good threshold, Cumulative Layout Shift", source: "web.dev, Web Vitals" },
+]} />
+
 ### Why INP Replaced FID
 In March 2024, Google formally replaced **First Input Delay (FID)** with **Interaction to Next Paint (INP)**.
 * **FID (Legacy):** Measured only the initial input delay of the *very first* user interaction, ignoring the time taken to run event callbacks or update the screen.
@@ -50,7 +60,9 @@ In March 2024, Google formally replaced **First Input Delay (FID)** with **Inter
 
 ## 2. Lab Data vs Field Data (CrUX): Why Lighthouse Lies
 
+<Trap>
 A frequent point of frustration for engineering teams is achieving a 100/100 score in Google Lighthouse, only to fail Core Web Vitals in Google Search Console:
+</Trap>
 
 ```text
 Lighthouse (Lab Data)                      vs   Chrome User Experience Report (Field Data)
@@ -67,7 +79,7 @@ Lighthouse (Lab Data)                      vs   Chrome User Experience Report (F
 
 ## 3. Diagnosing Largest Contentful Paint (LCP)
 
-LCP measures the time required to render the largest visible element in the viewport—typically a hero image, video poster, or large heading block.
+LCP measures the time required to render the largest visible element in the viewport—typically a <Mark>hero image</Mark>, video poster, or large heading block.
 
 To diagnose a slow LCP, decompose it into its **Four Sub-Phases**:
 
@@ -147,7 +159,7 @@ Total INP = Input Delay + Processing Duration + Presentation Delay
 
 ## 5. Diagnosing Cumulative Layout Shift (CLS)
 
-CLS measures visual instability: when visible elements change their starting position from one rendered frame to the next without user interaction.
+CLS measures <Mark>visual instability</Mark>: when visible elements change their starting position from one rendered frame to the next without user interaction.
 
 ```text
 Layout Shift Score = Impact Fraction * Distance Fraction
@@ -194,7 +206,13 @@ The following is hypothetical and illustrative. A team sees a perfect Lighthouse
 
 ## A counterargument
 
-A fair objection is that the article overstates what passing the thresholds guarantees. Its closing line claims a 75th percentile CrUX result eliminates user bounce rates, yet the same paragraph concedes that "high scores alone will not rescue irrelevant content" - the two claims cannot both hold, and web.dev defines the metrics without establishing a causal link to bounce. The field-data framing has a blind spot: a rolling 28-day 75th percentile mixes devices and networks and lags fixes, so a page can pass in aggregate while failing for a segment. Even the LCP sub-phase split (~20%, ~10%, ~40%, ~30%) is unsupported by any listed reference. And "Why Lighthouse Lies" overstates the conflict: the cited SEO Starter Guide asks for crawlable, rendered, accessible pages, which lab testing verifies rather than contradicts.
+A fair objection is that the article overstates what passing the thresholds guarantees. Its closing line claims a 75th percentile CrUX result eliminates user bounce rates, yet the same paragraph concedes that "high scores alone will not rescue irrelevant content" - the two claims cannot both hold, and web.dev defines the metrics without establishing a causal link to bounce.
+
+<PullQuote>
+The field-data framing has a blind spot: a rolling 28-day 75th percentile mixes devices and networks and lags fixes, so a page can pass in aggregate while failing for a segment.
+</PullQuote>
+
+Even the LCP sub-phase split (~20%, ~10%, ~40%, ~30%) is unsupported by any listed reference. And "Why Lighthouse Lies" overstates the conflict: the cited SEO Starter Guide asks for crawlable, rendered, accessible pages, which lab testing verifies rather than contradicts.
 
 ## References & Further Reading
 

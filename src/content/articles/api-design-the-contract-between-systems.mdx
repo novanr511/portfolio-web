@@ -9,7 +9,9 @@ tags:
   - Engineering
 ---
 
+<Lead>
 An API is a contract with a long lifetime and an unusual property: the other party does not have to read your code to use it, and cannot be relied on to adapt when you change it. That makes design decisions about naming, versioning, and error behaviour more consequential than similar decisions inside a single program.
+</Lead>
 
 **Direct answer:** Good API design makes the contract legible and boring: resources with consistent names, a small set of standard methods, predictable errors, and a versioning policy that says what may change. Google's published design guidance is resource-oriented, with dedicated rules for resource names, standard methods (Get, List, Create, Update, Delete), custom methods, and versioning. The point of the convention is not aesthetics — it is that a client can predict the shape of an endpoint it has never seen, which is what makes an API cheap to use and safe to evolve.
 
@@ -19,7 +21,7 @@ The dominant convention treats an API as a collection of **resources** — named
 
 Google's guidance points to specific AIPs for each part: resource-oriented design, resource names, standard methods, custom methods, versioning, and backward compatibility. The existence of separate, numbered rules for each of these is itself the lesson: the surface of an API has many independent decisions, and a convention is a way of making them consistently rather than freshly each time.
 
-The benefit to a client is predictability. If `GET /projects/123` returns a project, a client can reasonably expect `GET /projects/123/tasks` to return its tasks, and `DELETE /projects/123` to remove it. That expectation reduces the documentation burden and the chance of a subtle mistake — which is why consistency is worth more in an API than novelty.
+The benefit to a client is predictability. If `GET /projects/123` returns a project, a client can reasonably expect `GET /projects/123/tasks` to return its tasks, and `DELETE /projects/123` to remove it. That expectation reduces the documentation burden and the chance of a subtle mistake — which is why <Mark>consistency is worth more in an API than novelty</Mark>.
 
 Custom methods are the escape hatch, and their existence is a warning. When an operation does not fit Create, Read, Update, or Delete, it may need a custom method, and each one is an exception a client must learn. A proliferation of custom methods usually means the resource model is wrong.
 
@@ -27,7 +29,11 @@ Custom methods are the escape hatch, and their existence is a warning. When an o
 
 A large share of API design is deciding what happens when things go wrong, and `429 Too Many Requests` is a good example. RFC 6585 defines it for a client that has sent too many requests in a given time. A response may include `Retry-After` to indicate how long to wait — RFC 9110 defines its value as an HTTP date or a non-negative delay in seconds — and the status code itself does not disclose whether the limit applies per account, per IP, or across a service.
 
-That ambiguity is a design decision left to the implementer, and leaving it undocumented is a common failure. A client that receives 429 and does not know the scope of the limit cannot implement a sensible backoff, and a team that changes the limit silently can break clients that were relying on it. The contract has to say which dimension is limited and what the recommended behaviour is, or the status code is only half a signal.
+<Trap>
+That ambiguity is a design decision left to the implementer, and leaving it undocumented is a common failure.
+</Trap>
+
+A client that receives 429 and does not know the scope of the limit cannot implement a sensible backoff, and a team that changes the limit silently can break clients that were relying on it. The contract has to say which dimension is limited and what the recommended behaviour is, or <Mark>the status code is only half a signal</Mark>.
 
 The same applies to error bodies, pagination, and the meaning of a partially successful response. None of these is interesting when everything works, and all of them are what a client integrator actually has to code against.
 
@@ -39,9 +45,13 @@ Each of these is a decision about what the API exposes, and each has to be made 
 
 ## Versioning and the cost of change
 
-The hardest property of an API contract is that clients keep using old versions after you would like them to stop. A versioning policy is therefore not a formality; it is the statement of how long you will support a promise and what counts as breaking it.
+<KeyPoint>
+The hardest property of an API contract is that clients keep using old versions after you would like them to stop.
+</KeyPoint>
 
-Google's guidance has separate rules for versioning and backward compatibility, which is the right distinction: adding a field may be compatible for most clients and breaking for one that rejects unknown fields; renaming a field is breaking for everyone. A policy that says "we avoid breaking changes" is not a policy until it says which changes count.
+A versioning policy is therefore not a formality; it is the statement of how long you will support a promise and what counts as breaking it.
+
+Google's guidance has separate rules for versioning and backward compatibility, which is the right distinction: adding a field may be compatible for most clients and breaking for one that rejects unknown fields; renaming a field is breaking for everyone. A policy that says "we avoid breaking changes" is not a policy until it says <Mark>which changes count</Mark>.
 
 Prices, URLs, and schemas all age. The way you retire a version — deprecation notices, overlapping support, a documented removal date — is part of the contract, and clients will judge the API by it.
 
@@ -63,7 +73,11 @@ The following is hypothetical and illustrative. A hypothetical scheduling servic
 
 ## A counterargument
 
-A critic could push back that the article treats Google's resource-oriented convention as settled - "why resource-oriented design won" - when the Google API Design Guide is one company's published preference, not neutral evidence that the abstraction is universally superior. The cited authorities answer different questions: RFC 9110 defines what a 429 means, OWASP catalogues recurring failures, and neither establishes that a resource model fits every domain. The article itself concedes that custom methods proliferate when the resource model is wrong, a significant admission that the convention has a boundary. For APIs whose operations are actions rather than stateful things, predictability may be a weaker benefit than the framing suggests. Saying consistency is worth more than novelty begs the question of which consistency, and who decides it.
+A critic could push back that the article treats Google's resource-oriented convention as settled - "why resource-oriented design won" - when the Google API Design Guide is one company's published preference, not neutral evidence that the abstraction is universally superior. The cited authorities answer different questions: RFC 9110 defines what a 429 means, OWASP catalogues recurring failures, and neither establishes that a resource model fits every domain. The article itself concedes that custom methods proliferate when the resource model is wrong, a significant admission that the convention has a boundary. For APIs whose operations are actions rather than stateful things, predictability may be a weaker benefit than the framing suggests.
+
+<PullQuote>
+Saying consistency is worth more than novelty begs the question of which consistency, and who decides it.
+</PullQuote>
 
 ## References & Further Reading
 

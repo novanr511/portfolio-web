@@ -9,15 +9,21 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often treat a canonical tag as a switch that decides which URL search engines index. The canonical link element and Google's documentation describe it as a hint that consolidates signals across duplicate pages, not a command. The real problem is knowing whether the hint worked and what to measure when it did not.
+</Lead>
 
-**Direct answer:** A canonical tag tells search engines which URL you prefer as the representative of a duplicate set, and Google may still choose a different one. Measure the gap between the canonical you declare and the canonical the engine selects. That gap, not the tag's presence, is the signal that matters.
+**Direct answer:** A canonical tag tells search engines which URL you prefer as the representative of a duplicate set, and Google may still choose a different one. That gap, not the tag's presence, is the signal that matters.
+
+<KeyPoint>
+Measure the gap between the canonical you declare and the canonical the engine selects.
+</KeyPoint>
 
 **Delta:** This article adds a measurement test beyond the sources: it maps canonical signals to a consolidation decision, with claim status explicit.
 
 ## The mechanism
 
-The canonical link element is an HTML link tag in the head of a page that points to a preferred URL. Its purpose is to consolidate ranking signals that would otherwise be split across near-duplicate pages, such as product pages reachable through several parameter combinations or the same article served at multiple paths. Wikipedia's entry traces the convention to the major search engines, which introduced it to give site owners a way to label the preferred copy. The practical consequence is that canonicalization is a signal-management tool: the point is to concentrate signals, not to hide pages.
+The canonical link element is an HTML link tag in the head of a page that points to a preferred URL. Its purpose is to consolidate ranking signals that would otherwise be split across near-duplicate pages, such as product pages reachable through several parameter combinations or the same article served at multiple paths. Wikipedia's entry traces the convention to the major search engines, which introduced it to give site owners a way to label the preferred copy. The practical consequence is that canonicalization is <Mark>a signal-management tool</Mark>: the point is to concentrate signals, not to hide pages.
 
 <Figure src="/images/articles/inline/canonicalization-metrics-that-matter-1.png" alt="Two canonicals compared: the URL the page tag declares versus the URL the search engine actually selects, with the gap between them as the metric." caption="Conceptual: a declared hint and the selected outcome are different things." />
 
@@ -25,7 +31,7 @@ Google's documentation lists several ways to express a canonical: the link eleme
 
 The crucial qualification in both sources is that a canonical is a hint, not a directive. Google states that it may consider other signals and select a different canonical. This is where measurement enters. Because the tag does not guarantee the outcome, verifying consolidation requires observing which URL the engine actually treats as canonical. Treating the presence of a tag as proof of consolidation skips the only step that confirms the result.
 
-The synthesis is to read canonicalization as a measurement problem. A declared canonical and a selected canonical are two different things, and the distance between them is the useful metric. Mapping that gap to a decision - fix the tag, fix a conflicting signal, or accept the engine's choice - is a judgement about how to use the documentation, not a statement the sources make. Keeping that mark visible prevents a reading method from being reported as a finding.
+The synthesis is to read canonicalization as a measurement problem. A declared canonical and a selected canonical are two different things, and <Mark>the distance between them is the useful metric</Mark>. Mapping that gap to a decision - fix the tag, fix a conflicting signal, or accept the engine's choice - is a judgement about how to use the documentation, not a statement the sources make. Keeping that mark visible prevents a reading method from being reported as a finding.
 
 ## A worked example
 
@@ -43,11 +49,21 @@ The first two rows are claims the sources make. The third is a measurement metho
 
 ## What it cannot do
 
-A canonical tag cannot force a search engine to index a preferred URL. Both sources describe it as a hint, and Google explicitly reserves the right to choose a different canonical based on other signals. A perfectly formed tag can therefore be ignored, and a measurement that assumes compliance will misread the result. This is the central limit: the tag expresses a preference, and preference is not control. Teams that treat canonicalization as a directive will keep asking why the wrong URL ranks instead of examining the signals the engine weighed.
+A canonical tag cannot force a search engine to index a preferred URL. Both sources describe it as a hint, and Google explicitly reserves the right to choose a different canonical based on other signals. A perfectly formed tag can therefore be ignored, and a measurement that assumes compliance will misread the result.
 
-The hidden cost is that a wrong canonical can consolidate signals onto the wrong page. If a template emits a canonical pointing at a category page instead of the item page, the engine may concentrate ranking signals where the team did not intend. Because consolidation is the mechanism, an error in the target is amplified rather than ignored. A misdirected canonical is more damaging than no canonical, since it actively steers signals away from the pages the team wanted to rank, and the resulting loss is hard to attribute without the measurement described above.
+<PullQuote>
+This is the central limit: the tag expresses a preference, and preference is not control.
+</PullQuote>
 
-A common failure mode is conflicting signals. A canonical tag that says one thing while a redirect, a noindex directive, or internal linking says another creates ambiguity, and the engine resolves it on its own terms. Parameter-heavy URLs, paginated series, and pages rendered by JavaScript are frequent sources of such conflict, especially when the canonical appears only after client-side rendering. When signals disagree, the declared canonical is no longer a reliable input, and the measured gap widens for reasons that have nothing to do with the tag itself.
+Teams that treat canonicalization as a directive will keep asking why the wrong URL ranks instead of examining the signals the engine weighed.
+
+The hidden cost is that a wrong canonical can <Mark>consolidate signals onto the wrong page</Mark>. If a template emits a canonical pointing at a category page instead of the item page, the engine may concentrate ranking signals where the team did not intend. Because consolidation is the mechanism, an error in the target is amplified rather than ignored. A misdirected canonical is more damaging than no canonical, since it actively steers signals away from the pages the team wanted to rank, and the resulting loss is hard to attribute without the measurement described above.
+
+<Trap>
+A common failure mode is conflicting signals.
+</Trap>
+
+A canonical tag that says one thing while a redirect, a noindex directive, or internal linking says another creates ambiguity, and the engine resolves it on its own terms. Parameter-heavy URLs, paginated series, and pages rendered by JavaScript are frequent sources of such conflict, especially when the canonical appears only after client-side rendering. When signals disagree, the declared canonical is no longer a reliable input, and the measured gap widens for reasons that have nothing to do with the tag itself.
 
 The boundary is between consolidation and removal. A canonical consolidates signals and keeps one URL representative; noindex removes a page from the index; a redirect moves users and crawlers to a new address. Confusing these tools produces the wrong outcome for the wrong problem. A page that should not be indexed is not fixed by a canonical, and a page that has permanently moved is not fixed by a hint. The documentation describes these as distinct mechanisms, and evaluation is where the distinction has to be applied rather than assumed.
 

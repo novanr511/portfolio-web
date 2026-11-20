@@ -9,9 +9,17 @@ tags:
   - MLOps
 ---
 
+<Lead>
 Choosing a model is itself a search problem. Pick a family, set its hyperparameters, decide how to preprocess the inputs, choose which features to keep — each choice creates a branch, and the branches multiply. AutoML is the attempt to let an algorithm explore that space instead of a person guessing. The results can be strong, but the machinery has a specific boundary that is easy to miss: it optimizes a score you can measure, not the outcome you actually care about.
+</Lead>
 
 **Direct answer:** Automated machine learning covers three related tasks — selecting a model, tuning its hyperparameters, and in neural architecture search (NAS), designing the network structure itself. The methods differ in how they search: Bayesian optimisation, bandit-style resource allocation, and reinforcement learning are the main families. Zoph and Le's neural architecture search used a recurrent controller trained with reinforcement learning and reached a 3.65% test error on CIFAR-10, then 0.09 percentage points better and 1.05× faster than the previous comparable state of the art. The boundary is that every method optimizes a validation metric, so a system that is excellent at that metric can still be a poor fit for the deployed problem.
+
+<KeyFigures items={[
+  { value: "3.65%", label: "test error on CIFAR-10", source: "Zoph and Le, Neural Architecture Search with Reinforcement Learning" },
+  { value: "0.09 percentage points", label: "better than the previous comparable state of the art", source: "Zoph and Le, Neural Architecture Search with Reinforcement Learning" },
+  { value: "1.05×", label: "faster than the previous comparable state of the art", source: "Zoph and Le, Neural Architecture Search with Reinforcement Learning" },
+]} />
 
 ## The three things being searched
 
@@ -21,7 +29,7 @@ It helps to separate the layers, because "AutoML" is used for all of them.
 
 **Pipeline and model selection** searches across families and preprocessing steps. Auto-sklearn, described by Feurer et al. as improving on earlier AutoML methods, does this by "automatically taking into account past performance on similar datasets, and by constructing ensembles from the models evaluated during the optimization". Meta-learning — using results from previous datasets to start in a promising region — is the distinctive idea here.
 
-**Neural architecture search** searches the structure of the network itself: how many layers, what operations, how they connect. Zoph and Le's formulation generates model descriptions with a recurrent network and trains that controller "with reinforcement learning to maximize the expected accuracy of the generated architectures on a validation set". This is the most expensive layer and the one with the largest potential payoff.
+**Neural architecture search** searches the structure of the network itself: how many layers, what operations, how they connect. Zoph and Le's formulation generates model descriptions with a recurrent network and trains that controller "with reinforcement learning to maximize the expected accuracy of the generated architectures on a validation set". This is <Mark>the most expensive layer</Mark> and the one with the largest potential payoff.
 
 The three are often combined. A NAS system still needs its training hyperparameters tuned, and a pipeline search still picks among fixed model families.
 
@@ -29,11 +37,15 @@ The three are often combined. A NAS system still needs its training hyperparamet
 
 Every AutoML system has three components, and understanding them explains both the strengths and the limits.
 
-**A search space** defines what can be tried. A broad space can contain better solutions but is harder to explore; a narrow space is fast but may exclude the best design. This is a human decision disguised as a configuration — someone decides which operations and ranges are admissible.
+**A search space** defines what can be tried. A broad space can contain better solutions but is harder to explore; a narrow space is fast but may exclude the best design. This is <Mark>a human decision disguised as a configuration</Mark> — someone decides which operations and ranges are admissible.
 
 **A search strategy** decides what to try next. Bayesian optimisation builds a model of the objective and samples where improvement is likely. Random search, unfashionable but hard to beat, samples configurations independently. Hyperband, from Li et al., takes a different approach: it "focus[es] on speeding up random search through adaptive resource allocation and early-stopping", formulating the problem as a "pure-exploration non-stochastic infinite-armed bandit problem". The practical effect is that weak configurations are killed early and the budget goes to promising ones.
 
-**A performance estimation strategy** decides how good a configuration is. Training each one fully is accurate but expensive, so systems use subsets of data, fewer epochs, or lower-fidelity models. Every shortcut introduces a bias: a configuration that looks good at low fidelity may not hold up at full scale.
+**A performance estimation strategy** decides how good a configuration is. Training each one fully is accurate but expensive, so systems use subsets of data, fewer epochs, or lower-fidelity models.
+
+<Trap>
+Every shortcut introduces a bias: a configuration that looks good at low fidelity may not hold up at full scale.
+</Trap>
 
 Optuna illustrates the engineering side. Its documentation describes an "imperative, define-by-run style user API" with which "the user of Optuna can dynamically construct the search spaces for the hyperparameters", together with algorithms that "efficiently prun[e] unpromising trials". Define-by-run matters because real search spaces are often conditional — a parameter exists only if another takes a certain value — and a static configuration format handles that awkwardly.
 
@@ -52,7 +64,7 @@ Successive halving — the mechanism behind Hyperband — proceeds in rounds. Ke
 
 The total is 324 epochs instead of 2,187 — a saving of roughly 6.75× — while the final configuration still received the full 27 epochs. The trick is that 78 candidates were discarded after cheap evaluations, and the budget was concentrated on the survivors.
 
-This is not free. A configuration that needs many epochs to show its value can be eliminated too early, and the random search that Hyperband accelerates is itself not guaranteed to find the global optimum. The saving is real; the guarantee is not. For the same reason, distillation — Hinton et al.'s method of compressing an ensemble into a single model using soft targets — addresses a different cost: not the search but the deployment of the result.
+This is not free. A configuration that needs many epochs to show its value can be eliminated too early, and the random search that Hyperband accelerates is itself not guaranteed to find the global optimum. <Mark>The saving is real; the guarantee is not.</Mark> For the same reason, distillation — Hinton et al.'s method of compressing an ensemble into a single model using soft targets — addresses a different cost: not the search but the deployment of the result.
 
 ## What the automation does not solve
 
@@ -60,13 +72,23 @@ Three limitations change how AutoML should be used.
 
 **The metric is a proxy.** A search maximises validation accuracy, cross-entropy, or another measurable score. If the deployed system cares about calibration, latency, fairness across groups, or robustness to shift, the search will not optimise for those unless they are written into the objective. Feurer et al.'s ensembles are a useful reminder: an ensemble often wins on the metric precisely because it averages over many models, and that may be exactly the complexity a low-latency deployment cannot afford.
 
-**Search overfits the validation set.** Trying hundreds of configurations against one validation split turns the split into a training set. The configuration that wins may have won by fitting the noise in that split. Nested cross-validation and a held-out final test set are not optional; they are the difference between a measured result and a lucky one.
+**Search overfits the validation set.**
+
+<PullQuote>
+Trying hundreds of configurations against one validation split turns the split into a training set.
+</PullQuote>
+
+The configuration that wins may have won by fitting the noise in that split. Nested cross-validation and a held-out final test set are not optional; they are the difference between a measured result and a lucky one.
 
 **The cost is real.** NAS's 3.65% on CIFAR-10 came from a search that, in the original formulation, trained many child networks. That is acceptable for a research benchmark and often unacceptable for a product team with a deadline. The honest comparison is not "AutoML versus manual tuning" but "AutoML plus its compute cost versus the best result a person could reach in the same time".
 
 ## A decision test
 
-Use AutoML when the search space is well-defined, the validation metric genuinely represents the goal, and compute is cheaper than the engineer's time. Prefer manual exploration when the objective is poorly specified, when interpretability or latency constraints dominate, or when understanding *why* a model works matters more than the last point of accuracy.
+<KeyPoint>
+Use AutoML when the search space is well-defined, the validation metric genuinely represents the goal, and compute is cheaper than the engineer's time.
+</KeyPoint>
+
+Prefer manual exploration when the objective is poorly specified, when interpretability or latency constraints dominate, or when understanding *why* a model works matters more than the last point of accuracy.
 
 A practical sequence:
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
-Computer-use agents can operate software through the same interface a person uses, which makes them attractive for tasks with no clean integration. The real problem is cost: a task that looks simple can expand into many steps, each carrying the context of a screen and an action. Understanding what drives that cost is what separates a sensible use from an expensive demo.
+<Lead>
+Computer-use agents can operate software through the same interface a person uses, which makes them attractive for tasks with no clean integration. The real problem is cost: a task that looks simple can expand into many steps, each carrying the context of a screen and an action. <Mark>Understanding what drives that cost</Mark> is what separates a sensible use from an expensive demo.
+</Lead>
 
 **Direct answer:** A computer-use agent sees a screen and acts through cursor and keyboard to complete tasks, as described in Anthropic's announcement. The same source introduced the capability at an early stage, and the agent guidance stresses starting simple and adding guardrails. The boundary: these sources describe a capability and a design approach, not a price list or a reliability guarantee.
 
@@ -21,9 +23,15 @@ Anthropic's announcement introduced computer use as a capability that lets a mod
 
 <Figure src="/images/articles/inline/computer-use-agents-costs-explained-1.png" alt="A repeating loop: view the screen state, decide the next action, click or type, and retry on failure before viewing the screen again." caption="Conceptual: cost scales with steps, screen context and retries, not the answer's size." />
 
-The cost follows from the loop. Each action requires the agent to take in the current screen state and decide the next step, and screen content is part of the context the model processes. A task that takes many steps consumes a round of that context for each one, plus the screenshots that describe the state at each point. The practical consequence is that cost scales with the length of the interaction, not with the size of the final answer. A short result can still be expensive to reach.
+The cost follows from the loop. Each action requires the agent to take in the current screen state and decide the next step, and screen content is part of the context the model processes. A task that takes many steps consumes a round of that context for each one, plus the screenshots that describe the state at each point.
 
-Failures multiply that cost. When a step is wrong, the agent may need to recover, and recovery often means more steps and more screen context. Anthropic's engineering guidance on building effective agents recommends starting with a simple design, giving the agent only the tools it needs, and adding guardrails and evaluation rather than assuming a first attempt will work. The practical consequence is that reliability work is cost work: fewer failed steps mean fewer paid rounds and less time spent waiting.
+<KeyPoint>
+The practical consequence is that cost scales with the length of the interaction, not with the size of the final answer.
+</KeyPoint>
+
+A short result can still be expensive to reach.
+
+Failures multiply that cost. When a step is wrong, the agent may need to recover, and recovery often means more steps and more screen context. Anthropic's engineering guidance on building effective agents recommends starting with a simple design, giving the agent only the tools it needs, and adding guardrails and evaluation rather than assuming a first attempt will work. The practical consequence is that <Mark>reliability work is cost work</Mark>: fewer failed steps mean fewer paid rounds and less time spent waiting.
 
 The output is a comparison, not a verdict. The two sources describe a capability and a set of design principles; they do not supply per-action prices or a total cost for a task. The defensible move is to reason about the drivers that are visible in the description, steps, screen context, and retries, and compare them with the cost of a direct alternative. That mapping is a local decision built on the sources, not a figure either one publishes.
 
@@ -43,17 +51,23 @@ The first two rows report what the sources state directly and can be checked aga
 
 ## What it cannot do
 
-It cannot replace a direct integration for structured work. When a task can be expressed as a call to an API or a query against a database, driving a screen adds steps without adding value. Each unnecessary click is paid for in context and time, and it introduces a chance of error that a direct call would not have. The sources present computer use as a way to reach interfaces that lack such alternatives, not as a default replacement for them. Choosing it for a task with a clean interface is paying a premium for no benefit.
+It cannot replace a direct integration for structured work. When a task can be expressed as a call to an API or a query against a database, driving a screen adds steps without adding value. Each unnecessary click is paid for in context and time, and it introduces a chance of error that a direct call would not have. The sources present computer use as a way to reach interfaces that lack such alternatives, not as a default replacement for them.
+
+<Trap>
+Choosing it for a task with a clean interface is paying a premium for no benefit.
+</Trap>
 
 It is fragile in the face of interface change. A computer-use agent depends on the layout it sees, so a moved button, a new dialog, or a different resolution can break a flow that worked before. The announcement described an early capability, and that status matters: reliability is not comparable to a stable integration. The practical consequence is ongoing maintenance, because the target software can change without the agent's designer doing anything. A flow that passes today may need repair after an unrelated update to the application.
 
-The hidden cost is verification. A wrong click may produce a plausible result, such as a value copied from the wrong row, with no obvious signal that anything failed. Catching that requires human review or an independent check, and that labor is part of the true cost of the approach. The agent guidance emphasizes evaluation and guardrails precisely because output cannot be assumed correct. A cost model that counts only model usage will miss this line item, and a budget built on it will be too optimistic.
+<Mark>The hidden cost is verification</Mark>. A wrong click may produce a plausible result, such as a value copied from the wrong row, with no obvious signal that anything failed. Catching that requires human review or an independent check, and that labor is part of the true cost of the approach. The agent guidance emphasizes evaluation and guardrails precisely because output cannot be assumed correct. A cost model that counts only model usage will miss this line item, and a budget built on it will be too optimistic.
 
 There is a boundary in what the sources establish. They describe a capability and offer design guidance; they do not provide reliability targets, service levels, or a guarantee that a given task will complete. Claims that a computer-use agent will work across any software without oversight go beyond what is supported. What can be said is narrower: the capability exists, it works through the interface, and effective use appears to depend on simple designs and verification. Treat any stronger claim as unverified.
 
 Because the capability and guidance evolve, the cost decision needs review. Availability, model behavior, and recommended practices change, and an approach that was too expensive or too unreliable last quarter may become viable. Each assumption about steps or retry rates should carry a recheck condition tied to an update in the capability or the guidance. Without that, a team keeps paying for a task that a newer option handles more cheaply, and nobody has a reason to revisit the choice.
 
+<PullQuote>
 The counterargument that computer use handles any graphical task is fair for rare legacy workflows and incomplete for high-volume work where a direct API is cheaper and more predictable.
+</PullQuote>
 
 ## A decision test
 

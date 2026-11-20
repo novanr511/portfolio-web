@@ -9,13 +9,17 @@ tags:
   - MLOps
 ---
 
+<Lead>
 Tutorials on building a recommender usually start with a matrix and end with a ranked list, which is a fair description of the model and a poor description of the system. A production recommender is an event pipeline, a training job, a serving path, and a measurement loop — and most of the failures happen at the boundaries between those pieces.
+</Lead>
 
 **Direct answer:** The pipeline runs from event capture through dataset construction, model training, offline evaluation, serving, and online measurement. The critical design decisions are made at the seams: what counts as an interaction, how the training snapshot is built, whether the serving code computes features identically to training, and whether the evaluation split matches the time at which predictions happen. Python is the glue; the correctness lives in those definitions.
 
 ## Stage one: what is an interaction
 
+<KeyPoint>
 Everything downstream depends on how an interaction is defined, and the definition is a business decision disguised as a data field.
+</KeyPoint>
 
 A click is not a purchase; a purchase is not a retained customer. A model trained on clicks learns what attracts attention, and a model trained on purchases learns what creates value. The choice determines the whole system, and mixing them without weighting produces a ranker that optimises the easy signal.
 
@@ -23,13 +27,17 @@ The underlying unit is an event. scikit-learn's pipelines assume structured rows
 
 ## Stage two: building the training snapshot
 
-The off-by-one errors that quietly destroy recommenders happen here.
+The off-by-one errors that <Mark>quietly destroy recommenders</Mark> happen here.
 
 For each training example, every feature must have been knowable at the prediction moment. A user's "average purchase value" computed over all their history including the target purchase is a leak. A rolling statistic whose window ends after the prediction timestamp is a leak. A target-encoded item category computed on the full dataset is a leak.
 
 scikit-learn's guidance states the rule generally — "data leakage occurs when information that would not be available at prediction time is used when building the model" — and prescribes splitting before preprocessing. For a recommender this has to be implemented as a time-aware snapshot: take the state of the world as it was at time $t$, compute features from events strictly before $t$, and predict the outcome after $t$.
 
-The split also needs to match deployment. scikit-learn's `TimeSeriesSplit` builds expanding folds in which training precedes testing — an early fold trains on indices 0–5 and tests on 6–7, a later fold on 0–7 testing on 8–9 — and supports a `gap` for late-arriving labels. Random splits are wrong for interaction data that accumulates over time.
+The split also needs to match deployment. scikit-learn's `TimeSeriesSplit` builds expanding folds in which training precedes testing — an early fold trains on indices 0–5 and tests on 6–7, a later fold on 0–7 testing on 8–9 — and supports a `gap` for late-arriving labels.
+
+<Trap>
+Random splits are wrong for interaction data that accumulates over time.
+</Trap>
 
 ## Stage three: model and ranking
 
@@ -41,7 +49,7 @@ DeepFM is built to learn "both low- and high-order feature interactions" end to 
 
 ## Stage four: serving without drift
 
-A model trained correctly can still behave wrongly in production if the features are computed differently at serving time. This is the most common operational failure in recommender systems and the hardest to see, because both paths produce plausible numbers.
+A model trained correctly can still behave wrongly in production if the features are computed differently at serving time. This is <Mark>the most common operational failure in recommender systems</Mark> and the hardest to see, because both paths produce plausible numbers.
 
 The fix is structural: share the feature computation code between training and serving, or generate the serving features from the same pipeline rather than reimplementing them in another language. A feature store is one way of enforcing this; disciplined code sharing is another. What does not work is hoping the two implementations agree.
 
@@ -49,7 +57,7 @@ Serving also needs a fallback. When the model is unavailable, the system must re
 
 ## Stage five: measurement closes the loop
 
-Offline metrics are a filter, not a decision. A recommender that wins offline can lose online because of position bias, interference between users, or a feedback loop that amplifies early clicks.
+Offline metrics are <Mark>a filter, not a decision</Mark>. A recommender that wins offline can lose online because of position bias, interference between users, or a feedback loop that amplifies early clicks.
 
 The online test has to log the candidate set and the position, randomise at a unit that matches the intervention, and run long enough to see retained behaviour. CUPED is relevant to the statistical side: it "utilizes data from the pre-experiment period to reduce metric variability" and reports about a 50% variance reduction on Bing, which is often the difference between detecting a modest ranking improvement and not.
 
@@ -71,7 +79,11 @@ The following is hypothetical and illustrative. A team is adding a neural ranker
 
 ## A counterargument
 
-A reasonable critic could push back that the article's "correctness lives in the definitions" framing treats the pipeline seams as the whole problem while the cited deep-learning sources point the other way. DeepFM and NGCF are included as a "reasonable progression," yet they receive little attention beyond a note that they need enough data - the one stage tutorials emphasise is compressed into two sentences, and the claim that the model stage is "often the smallest part" is asserted rather than demonstrated. scikit-learn's cross-validation and common-pitfalls docs ground the leakage and time-split warnings, but they are generic ML guidance, not evidence specific to recommenders; position bias and feedback loops, raised in the measurement stage, are not addressed by those sources at all.
+<PullQuote>
+A reasonable critic could push back that the article's "correctness lives in the definitions" framing treats the pipeline seams as the whole problem while the cited deep-learning sources point the other way.
+</PullQuote>
+
+DeepFM and NGCF are included as a "reasonable progression," yet they receive little attention beyond a note that they need enough data - the one stage tutorials emphasise is compressed into two sentences, and the claim that the model stage is "often the smallest part" is asserted rather than demonstrated. scikit-learn's cross-validation and common-pitfalls docs ground the leakage and time-split warnings, but they are generic ML guidance, not evidence specific to recommenders; position bias and feedback loops, raised in the measurement stage, are not addressed by those sources at all.
 
 ## References & Further Reading
 

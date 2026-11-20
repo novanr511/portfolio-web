@@ -9,7 +9,9 @@ tags:
   - MLOps
 ---
 
+<Lead>
 Anomaly detection appears in fraud, monitoring, manufacturing, and security, and it is routinely presented as a model-selection problem. It is more fundamentally a definition problem: an anomaly is an observation that deviates from a model of normal behaviour, so the method you choose encodes what you mean by normal. A sophisticated model built on a flawed definition will find the wrong things confidently.
+</Lead>
 
 **Direct answer:** The main families are statistical methods that model a distribution and flag low-probability points, distance- or density-based methods such as Local Outlier Factor and Isolation Forest, and deep methods that learn representations of normal behaviour. scikit-learn's documentation is candid about the trade-offs: Isolation Forest and neighbour-based methods "perform reasonably well on the data sets considered here", while One-Class SVM "is known to be sensitive to outliers and thus does not perform very well for outlier detection" and needs careful tuning of `nu`. The practical discipline is to define what an anomaly costs, build a clean baseline, and evaluate with a method that accounts for the extreme class imbalance.
 
@@ -23,11 +25,15 @@ Three different questions get called anomaly detection, and they need different 
 
 **Change detection** asks whether the generating process has shifted over time. This is a different statistical question and is usually better handled with monitoring of the input distribution than with a per-row anomaly score.
 
-Choosing the right question precedes choosing an algorithm. A fraud team that needs to score each new transaction is doing novelty detection; a team investigating a batch of historical records is doing outlier detection.
+<KeyPoint>
+Choosing the right question precedes choosing an algorithm.
+</KeyPoint>
+
+A fraud team that needs to score each new transaction is doing novelty detection; a team investigating a batch of historical records is doing outlier detection.
 
 ## The method families
 
-**Statistical methods** fit a distribution to the data and flag observations with low probability. They are fast and interpretable, and they fail when the data has multiple modes or heavy tails, because a single distribution cannot describe a population with several distinct regimes.
+**Statistical methods** fit a distribution to the data and flag observations with low probability. They are fast and interpretable, and they fail when the data has <Mark>multiple modes or heavy tails</Mark>, because a single distribution cannot describe a population with several distinct regimes.
 
 **Distance and density methods** flag points far from their neighbours or in low-density regions. Isolation Forest isolates observations by random splits and scores how quickly a point is separated; Local Outlier Factor compares local density to the density of neighbours. These methods make fewer distributional assumptions and are strong general-purpose baselines.
 
@@ -37,11 +43,21 @@ Choosing the right question precedes choosing an algorithm. A fraud team that ne
 
 ## The evaluation trap
 
-Anomaly datasets are extremely imbalanced, which makes accuracy almost meaningless. If anomalies are 0.1% of the data, a model that never flags anything is 99.9% accurate and completely useless.
+Anomaly datasets are extremely imbalanced, which makes accuracy almost meaningless.
 
-The metrics that matter are precision and recall on the anomalous class, the false-positive rate at the operating threshold, and the cost of the two error types in business terms. A system that generates many false positives trains its human reviewers to ignore alerts, which destroys the value of the system even when its recall is high.
+<PullQuote>
+If anomalies are 0.1% of the data, a model that never flags anything is 99.9% accurate and completely useless.
+</PullQuote>
 
-scikit-learn's leakage guidance applies with full force: "data leakage occurs when information that would not be available at prediction time is used when building the model". In anomaly detection, the common form is fitting the normal-behaviour model on data that already contains the anomalies being sought, or tuning the threshold on the same data used to report performance. The documentation's prescription — split before preprocessing, and use pipelines so the correct transform is applied to the correct subset — is the remedy.
+The metrics that matter are <Mark>precision and recall on the anomalous class</Mark>, the false-positive rate at the operating threshold, and the cost of the two error types in business terms. A system that generates many false positives trains its human reviewers to ignore alerts, which destroys the value of the system even when its recall is high.
+
+scikit-learn's leakage guidance applies with full force: "data leakage occurs when information that would not be available at prediction time is used when building the model".
+
+<Trap>
+In anomaly detection, the common form is fitting the normal-behaviour model on data that already contains the anomalies being sought, or tuning the threshold on the same data used to report performance.
+</Trap>
+
+The documentation's prescription — split before preprocessing, and use pipelines so the correct transform is applied to the correct subset — is the remedy.
 
 For time-ordered data, the split must respect chronology. scikit-learn's `TimeSeriesSplit` builds expanding folds, and its `gap` parameter handles the case where labels arrive late. A random split lets the model learn from the future, which in monitoring is the same as knowing the incident happened.
 
@@ -53,7 +69,7 @@ Lowering the threshold to flag 500 events might catch 19 incidents — recall of
 
 The right threshold is a business decision: the cost of a missed incident versus the cost of an investigation. Writing those two numbers down before tuning the model is what makes the choice defensible, and it usually reveals that the "best" model by a generic metric is not the best system at the operating point.
 
-The human factor matters as much as the arithmetic. A system with 15% precision generates 85 false alerts a day, and analysts will learn to dismiss them. An alert that is ignored has zero value, so a threshold that keeps reviewers engaged can be better than one that maximises recall.
+The human factor matters as much as the arithmetic. A system with 15% precision generates 85 false alerts a day, and analysts will <Mark>learn to dismiss them</Mark>. An alert that is ignored has zero value, so a threshold that keeps reviewers engaged can be better than one that maximises recall.
 
 ## A practical sequence
 

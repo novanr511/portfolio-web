@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 CDN selection is often decided by feature tables and provider reputation, while the question that matters is whether real users get faster, more stable pages. Those are different criteria. A network that wins on paper can leave field metrics unchanged if the bottleneck sits elsewhere.
+</Lead>
 
 **Direct answer:** A content delivery network serves copies of content from locations closer to users, reducing distance and origin load. Wikipedia's CDN entry describes the distribution and caching mechanism, while Web Vitals from web.dev defines LCP, INP, and CLS as user-centred outcome metrics. The decision should be made against those field outcomes, not against a feature list.
 
@@ -17,15 +19,19 @@ CDN selection is often decided by feature tables and provider reputation, while 
 
 ## The mechanism
 
-The CDN entry describes a distributed network of proxy servers that delivers content to users from a location near them, using caching to reduce latency and load on the origin. The practical consequence is that the benefit depends on how much of the traffic is cacheable and how close the edge is to the audience. A site serving mostly static assets can gain a great deal; a site serving personalised, uncacheable responses gains far less from the same network.
+The CDN entry describes a distributed network of proxy servers that delivers content to users from a location near them, using caching to reduce latency and load on the origin. The practical consequence is that the benefit depends on how much of the traffic is cacheable and <Mark>how close the edge is to the audience</Mark>. A site serving mostly static assets can gain a great deal; a site serving personalised, uncacheable responses gains far less from the same network.
 
 <Figure src="/images/articles/inline/cdn-selection-at-scale-1.png" alt="A four-step flow: a cacheable static asset reaches an edge cache near the audience, shortens time to first byte, and improves LCP in field data." caption="Conceptual: a CDN helps only where content is cacheable and the edge is near." />
 
 Web Vitals defines a small set of metrics for real user experience. Largest Contentful Paint captures loading, Interaction to Next Paint captures responsiveness, and Cumulative Layout Shift captures visual stability. The practical consequence is that each metric points to a different part of the delivery chain. A CDN can shorten the time to first byte and improve loading, but it cannot by itself fix layout shifts caused by the page or slow interactions caused by JavaScript.
 
-Mapping the two sources gives a selection rule. For loading metrics, the relevant questions are cache hit ratio, edge coverage in the audience's regions, and time to first byte. For responsiveness, the network matters mainly where it delivers the scripts and APIs that drive interaction. For stability, the CDN is largely neutral, because the cause is usually layout and asset sizing on the page. The practical consequence is that a provider should be judged metric by metric, not on an overall impression of speed.
+Mapping the two sources gives a selection rule. For loading metrics, the relevant questions are cache hit ratio, edge coverage in the audience's regions, and time to first byte. For responsiveness, the network matters mainly where it delivers the scripts and APIs that drive interaction. For stability, the CDN is largely neutral, because the cause is usually layout and asset sizing on the page.
 
-The mechanism also distinguishes lab from field data. Controlled tests are useful for diagnosis, but Web Vitals emphasises real-user measurement, which reflects actual devices, networks, and regions. The practical consequence is that a migration should be evaluated with field data segmented by geography, and with a rollback path. Without segmentation, an average can hide a region where the new provider performs worse than the old one.
+<KeyPoint>
+The practical consequence is that a provider should be judged metric by metric, not on an overall impression of speed.
+</KeyPoint>
+
+The mechanism also distinguishes lab from field data. Controlled tests are useful for diagnosis, but Web Vitals emphasises <Mark>real-user measurement</Mark>, which reflects actual devices, networks, and regions. The practical consequence is that a migration should be evaluated with field data segmented by geography, and with a rollback path. Without segmentation, an average can hide a region where the new provider performs worse than the old one.
 
 ## A worked example
 
@@ -43,17 +49,25 @@ The two source rows are definitional and stable, though Web Vitals evolves as me
 
 ## What it cannot do
 
-A CDN cannot fix a slow origin or a heavy page. If the server takes a long time to generate a response, or the browser must download large scripts before the page is usable, caching copies of static files changes only part of the experience. The practical consequence is that a CDN migration can produce a clean report and disappointed users, because the metric that mattered was never the one the network influences. Diagnosis has to come before selection.
+A CDN cannot fix a slow origin or a heavy page. If the server takes a long time to generate a response, or the browser must download large scripts before the page is usable, caching copies of static files changes only part of the experience. The practical consequence is that a CDN migration can produce <Mark>a clean report and disappointed users</Mark>, because the metric that mattered was never the one the network influences. Diagnosis has to come before selection.
 
 The hidden costs are configuration and lock-in. Cache rules, invalidation, compression, and routing must be maintained, and a mistake can serve stale content or miss the cache entirely. Egress and origin-shield charges can exceed the headline price, and moving away from a provider means reconfiguring the same layers. The practical consequence is that the total cost of a CDN includes engineering time, not just bandwidth, and a comparison that omits it will favour whichever option is easiest to advertise.
 
-The common failure modes are stale content and cache stampedes. A wrong time-to-live keeps old pages in edge caches after an update, while a burst of misses sends a wave of requests to the origin at the worst moment. Misconfigured headers can also make personalised responses cacheable, which is a correctness problem, not just a performance one. The practical consequence is that the risks appear after rollout, in behaviour that a feature comparison never exposed, so the selection process must include a plan for invalidation and monitoring.
+The common failure modes are stale content and cache stampedes. A wrong time-to-live keeps old pages in edge caches after an update, while a burst of misses sends a wave of requests to the origin at the worst moment.
+
+<Trap>
+Misconfigured headers can also make personalised responses cacheable, which is a correctness problem, not just a performance one.
+</Trap>
+
+The practical consequence is that the risks appear after rollout, in behaviour that a feature comparison never exposed, so the selection process must include a plan for invalidation and monitoring.
 
 There are boundaries to the tool's reach. A small audience concentrated in one region may gain little from a global network, and highly personalised, low-cacheability traffic may see negligible benefit. A CDN is also not a substitute for application security or for a sound build pipeline; it can absorb some traffic but cannot repair the origin. The honest boundary is that the tool improves delivery of cacheable content to a distributed audience. Outside that setting, the same spend may buy more by fixing the application.
 
 Finally, the choice needs scheduled review. Web Vitals definitions change, traffic mix shifts, and provider networks expand into new regions. A provider that was best for last year's audience may not be best for this year's. The practical requirement is to keep the field-data comparison running after the migration, to watch each metric separately, and to record when a change in the page or the audience invalidates the original decision. Without that discipline, the selection becomes a one-time event rather than a maintained choice.
 
+<PullQuote>
 The counterargument that CDN choice is a commodity decision is fair for small, static, single-region sites and incomplete for large distributed audiences, where regional coverage and cache behaviour materially change field outcomes.
+</PullQuote>
 
 ## A decision test
 

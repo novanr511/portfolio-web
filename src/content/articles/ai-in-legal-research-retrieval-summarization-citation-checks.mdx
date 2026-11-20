@@ -9,15 +9,23 @@ tags:
   - Verification
 ---
 
+<Lead>
 Legal research has three properties that make AI both useful and dangerous: the sources are authoritative and citable, the language is precise, and a wrong answer can affect a real decision. A tool that helps find and summarise law is valuable; a tool that invents a citation is a liability. The discipline is to keep the source visible at every step.
+</Lead>
 
-**Direct answer:** Use AI to retrieve relevant authorities, summarise what they say, and check that every citation points to a real source supporting the claim. Anthropic's legal summarisation guide is the primary use-case reference, and the retrieval article covers the search mechanism. The boundary: a model can locate and condense authority, but it cannot replace legal judgement about how a source applies to a specific matter, which the contract-review article explains for adjacent work.
+**Direct answer:**
+
+<KeyPoint>
+Use AI to retrieve relevant authorities, summarise what they say, and check that every citation points to a real source supporting the claim.
+</KeyPoint>
+
+Anthropic's legal summarisation guide is the primary use-case reference, and the retrieval article covers the search mechanism. The boundary: a model can locate and condense authority, but it cannot replace legal judgement about how a source applies to a specific matter, which the contract-review article explains for adjacent work.
 
 ## Three tasks
 
-**Retrieval.** Find statutes, regulations, and case law relevant to a question. This is a search problem, as the retrieval article explains, and the measure is recall — did the search find the controlling authority?
+**Retrieval.** Find statutes, regulations, and case law relevant to a question. This is a search problem, as the retrieval article explains, and the measure is <Mark>recall</Mark> — did the search find the controlling authority?
 
-**Summarisation.** Condense a long judgment or statute into the points that matter for the question. The reduce-hallucinations article covers grounding: every claim should trace to the text.
+**Summarisation.** Condense a long judgment or statute into the points that matter for the question. The reduce-hallucinations article covers <Mark>grounding</Mark>: every claim should trace to the text.
 
 **Citation checking.** Verify that every cited source exists and supports the claim attached to it. This is the hardest and most important task, because a plausible but nonexistent citation is a specific failure mode of language models, as the detection article discusses for generated text generally.
 
@@ -35,7 +43,7 @@ The workflow:
 
 Three checks decide whether the result is safe:
 
-1. **Citation existence.** Does the cited section exist? A check against the source database catches invented references, which the reduce-hallucinations article treats as a core verification.
+1. **Citation existence.** Does the cited section exist? A check against the source database catches <Mark>invented references</Mark>, which the reduce-hallucinations article treats as a core verification.
 2. **Citation support.** Does the cited passage actually say what the summary claims? A real citation attached to a wrong claim is a subtler failure, which the evaluation-rubric article explains for groundedness scoring.
 3. **Completeness.** Was the controlling authority retrieved at all? A clean summary of the wrong source is worse than no answer, which the reranking article covers for retrieval quality.
 
@@ -49,13 +57,19 @@ Three conclusions follow:
 
 A citation check is only useful if it is routine and specific. Three practices make it reliable:
 
-**Check in two directions.** Verify both that a cited source exists and that it supports the exact claim, as the reduce-hallucinations article distinguishes grounding from mere reference. A real citation attached to the wrong proposition is the subtle failure.
+**Check in two directions.** Verify both that a cited source exists and that it supports the exact claim, as the reduce-hallucinations article distinguishes grounding from mere reference.
+
+<Trap>
+A real citation attached to the wrong proposition is the subtle failure.
+</Trap>
 
 **Keep the source text adjacent.** A summary whose cited passage sits next to it is faster to check than one that requires opening a database. The context-engineering article explains why placing material near the decision improves use.
 
 **Record what was checked.** A note of which citations were verified and when gives the reviewer a trail and makes a later challenge answerable, which the data-governance article requires for relied-upon records.
 
+<PullQuote>
 These habits are slow relative to generating a summary, which is precisely why they must be designed into the workflow rather than left to the reviewer's discretion at the end of a busy day.
+</PullQuote>
 
 ## What legal AI cannot do
 

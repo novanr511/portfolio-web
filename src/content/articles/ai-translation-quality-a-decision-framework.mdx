@@ -9,9 +9,11 @@ tags:
   - Verified
 ---
 
+<Lead>
 Teams often treat machine translation as a single quality level and apply it uniformly to all content. Output quality in reality varies with the language pair, the domain, and the type of text, so a setting that is fine for internal notes may be unacceptable for a customer contract. The problem is choosing, for each content class, how much human review is actually required.
+</Lead>
 
-**Direct answer:** Machine translation can produce useful drafts, but quality is contingent on language pair, domain, and text type; it is not a fixed guarantee. Use a framework that maps content risk to a review gate: low-risk, high-volume text can tolerate light review, while high-stakes or nuanced text needs human post-editing. The Anthropic use-case guidance places translation among tasks where review is part of responsible deployment.
+**Direct answer:** Machine translation can produce useful drafts, but quality is <Mark>contingent on language pair, domain, and text type</Mark>; it is not a fixed guarantee. Use a framework that maps content risk to a review gate: low-risk, high-volume text can tolerate light review, while high-stakes or nuanced text needs human post-editing. The Anthropic use-case guidance places translation among tasks where review is part of responsible deployment.
 
 **Delta:** This article adds a gating rule beyond the sources: it maps content risk to a human-review decision, with claim status explicit.
 
@@ -21,11 +23,15 @@ Machine translation uses computational models to translate text from one languag
 
 <Figure src="/images/articles/inline/ai-translation-quality-a-decision-framework-1.png" alt="Two review gates compared: low-consequence text gets machine output plus sampled review, while high-consequence text gets full human post-editing." caption="Conceptual: content risk sets the review gate." />
 
-The consequence is that quality must be treated as a property of a specific translation task, not of a tool. A system that handles routine informational text well may fail on legal clauses, idioms, or brand voice, where errors carry consequences. Anthropic's use-case guidance lists translation and localization among common applications and points toward workflows where the model assists a human rather than fully replacing one. The implication for a team is to think in terms of a pipeline: machine output plus a review step whose rigor depends on the content, rather than a single switch that is either on or off.
+<KeyPoint>
+The consequence is that quality must be treated as a property of a specific translation task, not of a tool.
+</KeyPoint>
+
+A system that handles routine informational text well may fail on legal clauses, idioms, or brand voice, where errors carry consequences. Anthropic's use-case guidance lists translation and localization among common applications and points toward workflows where the model assists a human rather than fully replacing one. The implication for a team is to think in terms of a pipeline: machine output plus a review step whose rigor depends on the content, rather than a single switch that is either on or off.
 
 Evaluating that pipeline takes more than an impression of fluency. Two different questions matter: is the output faithful to the source meaning, and is it appropriate for the audience and context? A translation can read smoothly and still shift meaning, which is exactly the failure that is hardest to catch without a comparison to the source. Depending on the content, the check might be human assessment, a targeted review of critical terms, or a back-translation pass. The choice of check should follow the risk of the content class rather than a fixed routine.
 
-The decision framework follows from that reasoning: sort content by the consequence of an error. Low-consequence, high-volume material can go out with machine translation and sampled review. High-consequence material, such as contractual, medical, or safety-related text, warrants full human review or post-editing. The framework does not claim a fixed quality threshold, because the sources do not supply one; it supplies a mapping from risk to the amount of review that is prudent. That mapping is the part a team can actually control.
+The decision framework follows from that reasoning: <Mark>sort content by the consequence of an error</Mark>. Low-consequence, high-volume material can go out with machine translation and sampled review. High-consequence material, such as contractual, medical, or safety-related text, warrants full human review or post-editing. The framework does not claim a fixed quality threshold, because the sources do not supply one; it supplies a mapping from risk to the amount of review that is prudent. That mapping is the part a team can actually control.
 
 ## A worked example
 
@@ -47,7 +53,11 @@ Machine translation cannot guarantee accuracy. Variability across language pairs
 
 The hidden costs sit in the review step. Human post-editing takes time and requires people who know both the source and target language well enough to catch meaning shifts, not just awkward phrasing. Reviewers are a limited resource, so a gate that demands full review on too much content will either slow delivery or be quietly bypassed. Teams also bear the cost of maintaining glossaries and style rules so that terminology stays consistent across languages and across separate translation jobs.
 
-A recurring failure mode is trusting fluency. Confident, smooth output hides errors better than visibly broken output, so the cases that most need review are often the ones that look finished. Idioms, tone, and domain-specific terms are especially prone to subtle shifts. A second failure is applying one gate to all content, which either wastes review effort on low-risk material or exposes high-risk material to an inadequate check.
+A recurring failure mode is <Mark>trusting fluency</Mark>. Confident, smooth output hides errors better than visibly broken output, so the cases that most need review are often the ones that look finished. Idioms, tone, and domain-specific terms are especially prone to subtle shifts.
+
+<Trap>
+A second failure is applying one gate to all content, which either wastes review effort on low-risk material or exposes high-risk material to an inadequate check.
+</Trap>
 
 The boundary is the nature of the sources. One is a general reference entry on machine translation, and the other is platform use-case guidance; neither is a validated quality standard or a benchmark with agreed thresholds. The risk-to-review mapping offered here is a practical inference, so the cutoffs must be chosen locally and stated explicitly. Nothing in the material justifies presenting the framework as an industry standard or a measured result.
 
@@ -65,7 +75,11 @@ Finally, the gates need review. Model behavior and language coverage change over
 6. Confirm reviewer capacity for the gates you have chosen.
 7. Record the mapping and the signal that would change it.
 
-A translation gate is a living decision, not a one-time configuration. Keep a short record of why each content class received its gate and watch for the errors that would justify tightening or relaxing it. That keeps review effort aimed at the content where mistakes matter most.
+<PullQuote>
+A translation gate is a living decision, not a one-time configuration.
+</PullQuote>
+
+Keep a short record of why each content class received its gate and watch for the errors that would justify tightening or relaxing it. That keeps review effort aimed at the content where mistakes matter most.
 
 For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 

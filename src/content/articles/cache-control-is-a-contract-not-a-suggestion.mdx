@@ -9,7 +9,9 @@ tags:
   - Performance
 ---
 
+<Lead>
 Caching is the single largest performance lever on the web, and the single most frequently misconfigured one. The confusion is understandable: there are two separate caching RFCs, a dozen directive names, two different `max-age` behaviours, and a header (`Age`) that most people have never learned to read. The result is a lot of production traffic served under rules nobody consciously chose.
+</Lead>
 
 **Direct Answer:** HTTP caching is governed by RFC 9111 (which obsoleted RFC 7234 in June 2022) and works in three stages — *freshness* (is the stored response still usable without asking the origin?), *validation* (if not fresh, can it be confirmed cheaply?), and *stale serving* (if validation fails, may an old copy be served anyway?). `max-age` and `s-maxage` control the first stage and apply to different audiences; `stale-while-revalidate` and `stale-if-error` control the third and are **not** defined in RFC 9111 at all — they come from RFC 5861, an Informational RFC from 2010.
 
@@ -22,7 +24,13 @@ RFC 9111 defines the freshness lifetime as the first match of a fixed list:
 - Otherwise if `Expires` is present, use it minus the `Date` value.
 - Otherwise there is no explicit expiration, and heuristic freshness may apply.
 
-That ordering has an immediate consequence people miss: **`s-maxage` overrides both `max-age` and `Expires` for shared caches**. A CDN in front of your origin, a reverse proxy, and a browser will each compute a different freshness lifetime from the same header set, and that is by design. `max-age` is what a *private* cache (a browser) may reuse; `s-maxage` is what a *shared* cache (a CDN edge) may reuse.
+That ordering has an immediate consequence people miss: **`s-maxage` overrides both `max-age` and `Expires` for shared caches**.
+
+<KeyPoint>
+A CDN in front of your origin, a reverse proxy, and a browser will each compute a different freshness lifetime from the same header set, and that is by design.
+</KeyPoint>
+
+`max-age` is what a *private* cache (a browser) may reuse; `s-maxage` is what a *shared* cache (a CDN edge) may reuse.
 
 `Expires` is the third fallback, and it is the one to retire. RFC 9111 is explicit: if `Cache-Control: max-age` is present, a recipient "MUST ignore the `Expires` header field," and if `s-maxage` is present, a shared cache "MUST ignore the `Expires` header field." `Expires` exists only for recipients that have not implemented `Cache-Control` at all.
 
@@ -48,13 +56,18 @@ The directives that permit it are **`stale-while-revalidate`** and **`stale-if-e
 
 Concretely, `stale-while-revalidate=30` lets a cache serve a stale copy for up to 30 seconds while it revalidates in the background. `stale-if-error=1200` lets a cache serve a stale copy for up to 1200 seconds when the origin returns a 5xx. The first is a latency optimisation; the second is an availability optimisation. They solve different problems and are frequently confused.
 
+<KeyFigures items={[
+  { value: "30 seconds", label: "stale copy served while revalidating (stale-while-revalidate=30)", source: "RFC 5861" },
+  { value: "1200 seconds", label: "stale copy served when the origin returns a 5xx (stale-if-error=1200)", source: "RFC 5861" },
+]} />
+
 Because RFC 9111 requires caches to ignore unrecognised directives, a cache that does not implement RFC 5861 will simply ignore these — which is a safe default and also the reason you cannot assume stale serving is happening.
 
 ## Reading `Age` correctly
 
 `Age` is the most underused header in HTTP. RFC 9111 §4.2.3 defines it as "the cache's estimate of the number of seconds since the origin server generated or validated the response" — and crucially, "The `Age` value is therefore the sum of the time that the response has been resident in each of the caches along the path from the origin server, plus the time it has been in transit along network paths."
 
-So `Age` is not "how long this edge has held it." It is the response's total age since the origin produced it. That makes it the correct instrument for measuring the end-to-end staleness your users actually experience.
+So `Age` is not "how long this edge has held it." It is <Mark>the response's total age since the origin produced it</Mark>. That makes it the correct instrument for measuring the end-to-end staleness your users actually experience.
 
 Here is a real observation, taken against live production hosts with `curl -sSI` on 2026-11-14:
 
@@ -80,13 +93,17 @@ vary: Accept-Encoding
 
 Three things to notice. First, `age: 169` against `max-age=600` means this copy was generated roughly 169 seconds ago and is fresh for another ~431 seconds — and the `x-cache: MISS, HIT` line shows two cache layers were involved, with the outer one missing and an inner one hitting. The response is 404 and still cached, deliberately: a cacheable error response is a *feature* for protecting the origin, not a bug.
 
-Second, note the `Expires` header on the Mozilla response: it is dated *before* the `Date` header, so it would imply the response is already expired. Because `max-age=600` is also present, RFC 9111 requires recipients to ignore `Expires` entirely, and the response is correctly treated as fresh. This is the clearest possible demonstration of why sending both headers is a mistake — whichever one a recipient happens to honour, you get a different answer.
+Second, note the `Expires` header on the Mozilla response: it is dated *before* the `Date` header, so it would imply the response is already expired. Because `max-age=600` is also present, RFC 9111 requires recipients to ignore `Expires` entirely, and the response is correctly treated as fresh.
 
-Third, `vary: Accept-Language, Accept-Encoding` on the Mozilla response is a cache-key multiplier. `Vary` tells the cache to store separate entries per combination of the listed request headers. A CDN that honours `Vary: Accept-Language` stores one copy per language variant — which is correct behaviour and also a common source of "the cache hit rate mysteriously collapsed" reports when a site started sending more variants than the edge expected.
+<Trap>
+This is the clearest possible demonstration of why sending both headers is a mistake — whichever one a recipient happens to honour, you get a different answer.
+</Trap>
+
+Third, `vary: Accept-Language, Accept-Encoding` on the Mozilla response is <Mark>a cache-key multiplier</Mark>. `Vary` tells the cache to store separate entries per combination of the listed request headers. A CDN that honours `Vary: Accept-Language` stores one copy per language variant — which is correct behaviour and also a common source of "the cache hit rate mysteriously collapsed" reports when a site started sending more variants than the edge expected.
 
 ## The `Vary` trap and cache-key hygiene
 
-`Vary` interacts with everything above. A response with `Vary: Accept-Language` and `max-age=600` means the effective cacheability depends on how many `Accept-Language` values you serve — and on whether your CDN's cache key includes that header. If the edge ignores `Vary` while the origin sends it, you get wrong-language content served to the wrong user; if the edge honours it and you have many variants, you get a low hit rate. Both failure modes are configuration outcomes, not protocol bugs.
+`Vary` interacts with everything above. A response with `Vary: Accept-Language` and `max-age=600` means the effective cacheability depends on how many `Accept-Language` values you serve — and on whether your CDN's cache key includes that header. If the edge ignores `Vary` while the origin sends it, you get wrong-language content served to the wrong user; if the edge honours it and you have many variants, you get a low hit rate. Both failure modes are <Mark>configuration outcomes, not protocol bugs</Mark>.
 
 The practical hygiene rules that fall out of RFC 9111:
 
@@ -114,7 +131,11 @@ The following is hypothetical and illustrative. An operator reports that a CDN l
 
 ## A counterargument
 
-The contract metaphor is tidier than the system RFC 9111 actually describes, and a careful critic would call that out. The article notes that shared and private caches derive different freshness lifetimes from the same headers by design, and that caches must ignore directives they do not recognise - which is exactly why the stale-serving extensions in RFC 5861, an Informational document, cannot be assumed to be in force. If every cache along the path is free to ignore unrecognised directives or fall back to heuristic freshness when no explicit expiration is present, the origin's intent is not a single enforced agreement but a set of local interpretations. The Mozilla response quoted above, with an `Expires` date predating its `Date`, is the article's own evidence that deployed headers are messy and that honouring the RFC is not the same as controlling what users receive.
+<PullQuote>
+The contract metaphor is tidier than the system RFC 9111 actually describes, and a careful critic would call that out.
+</PullQuote>
+
+The article notes that shared and private caches derive different freshness lifetimes from the same headers by design, and that caches must ignore directives they do not recognise - which is exactly why the stale-serving extensions in RFC 5861, an Informational document, cannot be assumed to be in force. If every cache along the path is free to ignore unrecognised directives or fall back to heuristic freshness when no explicit expiration is present, the origin's intent is not a single enforced agreement but a set of local interpretations. The Mozilla response quoted above, with an `Expires` date predating its `Date`, is the article's own evidence that deployed headers are messy and that honouring the RFC is not the same as controlling what users receive.
 
 ## References & Further Reading
 

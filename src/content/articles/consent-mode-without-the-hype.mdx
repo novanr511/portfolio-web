@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Consent mode is often described as a way to keep measuring after a refusal, which hides what it actually does. GDPR Article 6 sets conditions for lawful processing, and the Privacy Sandbox entry describes browser mechanisms that limit tracking. The question is what a consent signal changes.
+</Lead>
 
 **Direct answer:** Use consent mode to make measurement respect a stated choice, with a lawful basis for what remains and a clear account of what is lost. The sources describe the law and the mechanisms; the rule is a synthesis.
 
@@ -17,7 +19,7 @@ Consent mode is often described as a way to keep measuring after a refusal, whic
 
 ## The mechanism
 
-The first point is the signal. A consent choice is information about what a person allowed, which a system must be able to receive and honour. A mechanism that records the choice but continues the same processing has not changed anything, whatever its name.
+The first point is the signal. A consent choice is information about what a person allowed, which a system must be able to receive and honour. A mechanism that <Mark>records the choice but continues the same processing</Mark> has not changed anything, whatever its name.
 
 <Figure src="/images/articles/inline/consent-mode-without-the-hype-1.png" alt="A flow from an honoured consent signal through a lawful basis and processing decisions to a report that separates observed from modelled figures." caption="Conceptual: a signal is not a legal basis, and modelled figures must be labelled." />
 
@@ -45,13 +47,19 @@ The outcome is an implementation with an honest data account. The scenario is hy
 
 ## Why it is not a safe harbour
 
-A consent mechanism is an implementation detail, and a legal assessment depends on the processing it supports. Treating the presence of a signal as compliance skips the question that matters, which is what the organisation does with the data.
+A consent mechanism is an implementation detail, and a legal assessment depends on the processing it supports. Treating the presence of a signal as compliance skips the question that matters, which is <Mark>what the organisation does with the data</Mark>.
 
 A further point is that consent can be withdrawn. A system that handles the first choice but cannot handle a later change will keep processing after permission ends, and the reversal path belongs in the design. Testing it is part of implementation.
 
-The modelled data also needs a limit. An estimate that fills a reporting gap is useful for some decisions and weak for others, and a report that does not distinguish it from an observation will be trusted too much. Labelling the source of each figure is the practical control.
+The modelled data also needs a limit. An estimate that fills a reporting gap is useful for some decisions and weak for others, and <Mark>a report that does not distinguish it from an observation will be trusted too much</Mark>. Labelling the source of each figure is the practical control.
 
-The third limitation is that a consent choice reduces data. A team that treats the resulting drop as a bug will try to work around it, which is the wrong response to a design that respects a decision. Accepting the gap is part of adopting the mechanism.
+The third limitation is that a consent choice reduces data.
+
+<Trap>
+A team that treats the resulting drop as a bug will try to work around it, which is the wrong response to a design that respects a decision.
+</Trap>
+
+Accepting the gap is part of adopting the mechanism.
 
 A consent choice can be withdrawn, and the reversal path belongs in the design.
 
@@ -59,11 +67,15 @@ A modelled figure should be labelled as an estimate, not reported as an observat
 
 A tool that implements the signal correctly can still lack a lawful basis, which is a separate question.
 
+<KeyPoint>
 A mechanism is not a legal basis, and the two belong in separate reviews.
+</KeyPoint>
 
 The data lost after a refusal should be accepted, not treated as a bug to fix.
 
+<PullQuote>
 A signal that is recorded but not honoured changes nothing about the processing.
+</PullQuote>
 
 Withdrawal should be tested as carefully as the first choice.
 

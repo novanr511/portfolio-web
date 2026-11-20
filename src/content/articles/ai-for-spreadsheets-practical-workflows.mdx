@@ -13,9 +13,13 @@ tags:
 Spreadsheets are still the most widely used data tool in many organisations. They are also where <Mark>confident mistakes are easiest to hide</Mark>: a formula that references the wrong column, a category inferred incorrectly, a summary that silently drops rows. AI assistance can speed up spreadsheet work, and it can make those mistakes faster to produce.
 </Lead>
 
-**Direct answer:** <KeyPoint>
+**Direct answer:**
+
+<KeyPoint>
 The useful AI workflows in spreadsheets are formula explanation, data cleaning suggestions, text classification, summarisation, and natural-language questions over a defined range.
-</KeyPoint> Anthropic's use-case guides cover analysis and extraction patterns, and O*NET's task descriptions help identify which parts of a role these tools actually change. The boundary: <Mark>a spreadsheet has no schema, no types, and no test suite by default</Mark> — so every AI-assisted output needs a visible check before it is trusted.
+</KeyPoint>
+
+Anthropic's use-case guides cover analysis and extraction patterns, and O*NET's task descriptions help identify which parts of a role these tools actually change. The boundary: <Mark>a spreadsheet has no schema, no types, and no test suite by default</Mark> — so every AI-assisted output needs a visible check before it is trusted.
 
 ## Five workflows
 
@@ -39,9 +43,15 @@ The raw proposal looks plausible, but three checks matter:
 
 1. **Coverage.** Do all distinct raw values appear in the mapping? If "Germany" was silently dropped, 300 rows lose their region. Ask for a count of distinct values before and after.
 2. **Ambiguity.** Is "UK" mapped to EMEA or to a separate category? The assistant's choice is a business rule, not a technical one. Write the rule down before applying it.
-3. **Blanks.** Were empty cells preserved or filled? Filling them with the most common region invents data. The missing-data article explains why that changes the answer.
+3. **Blanks.** Were empty cells preserved or filled?
 
-Now apply the mapping to a copy, compare row counts and category totals, and keep the original column. If the totals differ by more than the blank count, something was dropped. This takes minutes and catches the errors that otherwise surface in a board deck.
+<Trap>
+Filling them with the most common region invents data.
+</Trap>
+
+The missing-data article explains why that changes the answer.
+
+Now apply the mapping to a copy, <Mark>compare row counts and category totals</Mark>, and keep the original column. If the totals differ by more than the blank count, something was dropped. This takes minutes and catches the errors that otherwise surface in a board deck.
 
 Three decisions follow:
 
@@ -69,7 +79,11 @@ A team that applies these criteria usually finds a small number of high-value us
 
 **Business meaning.** "Region" may mean sales territory, legal jurisdiction, or shipping zone. The label is ambiguous; the business rule is not. That knowledge stays with the user.
 
-The counterargument — that spreadsheet AI will eliminate the need for careful data work — is wrong in direction. It lowers the cost of producing an answer and leaves the cost of a wrong answer unchanged. Careful checking becomes more valuable, not less.
+The counterargument — that spreadsheet AI will eliminate the need for careful data work — is wrong in direction. It lowers the cost of producing an answer and leaves the cost of a wrong answer unchanged.
+
+<PullQuote>
+Careful checking becomes more valuable, not less.
+</PullQuote>
 
 ## A decision test
 

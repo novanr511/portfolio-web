@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Cross-site scripting persists because browsers will execute whatever script a page includes, even script injected through a comment or a parameter. Content Security Policy is a browser-level control that limits which resources a page may load and run. The real problem is that a policy is only as strong as its directives, and a single permissive allowance can make the header decorative.
+</Lead>
 
 **Direct answer:** A content security policy is an HTTP header that tells the browser which sources may supply scripts, styles, and other resources, reducing the impact of injected content. MDN documents the directives and reporting; the OWASP Top 10 frames injection as a leading web risk. A policy that allows inline scripts or wildcard sources provides little protection, so the goal is a narrowly scoped policy introduced in report-only mode.
 
@@ -17,13 +19,13 @@ Cross-site scripting persists because browsers will execute whatever script a pa
 
 ## The mechanism
 
-MDN describes CSP as an HTTP header whose directives tell the browser which origins may supply each resource type. A default-src directive sets a fallback, while script-src, style-src, img-src, and connect-src scope specific categories. Resources that do not match are blocked. The practical consequence is defense in depth: even if injected markup reaches the page, unauthorized script does not run. The policy reduces the impact of a flaw; it does not remove the injection bug that allowed the markup in.
+MDN describes CSP as an HTTP header whose directives tell the browser which origins may supply each resource type. A default-src directive sets a fallback, while script-src, style-src, img-src, and connect-src scope specific categories. Resources that do not match are blocked. The practical consequence is <Mark>defense in depth</Mark>: even if injected markup reaches the page, unauthorized script does not run. The policy reduces the impact of a flaw; it does not remove the injection bug that allowed the markup in.
 
 <Figure src="/images/articles/inline/content-security-policy-best-practices-1.png" alt="A flow from CSP source directives and browser blocking through report-only violation collection to justified exceptions and enforcement." caption="Conceptual: a policy is only as strong as its directives and exceptions." />
 
 The strength of the policy depends on what it allows. Directives such as unsafe-inline and unsafe-eval, or a wildcard source, reopen the paths the header is meant to close. Nonce-based and hash-based allowances let a specific script run while blocking injected ones, and a strict-dynamic approach limits which scripts can introduce new ones. The practical consequence is that the hard work is refactoring the application so it no longer depends on inline scripts and styles. Framework defaults often rely on inline styles, so a tight policy can break a page until that dependency is removed.
 
-The OWASP Top 10 lists injection, including cross-site scripting, among the leading web application risks. That framing places CSP inside a layered defense rather than at its center. The practical consequence is that a header complements output encoding, input handling, and framework protections; it is not a replacement for them. A team that treats CSP as the only defense against injection has left the underlying cause unaddressed and remains exposed wherever the policy has a gap.
+The OWASP Top 10 lists injection, including cross-site scripting, among the leading web application risks. That framing places CSP inside <Mark>a layered defense</Mark> rather than at its center. The practical consequence is that a header complements output encoding, input handling, and framework protections; it is not a replacement for them. A team that treats CSP as the only defense against injection has left the underlying cause unaddressed and remains exposed wherever the policy has a gap.
 
 The sources connect at deployment, where neither is specific to an application. MDN documents a report-only mode that collects violations without blocking resources, and a reporting destination for those violations. The practical consequence is that a team can observe what a proposed policy would break before enforcing it, then work through each reported resource as either a legitimate source to allow or an injection to fix. Neither source supplies an application-specific directive set, so each allowed origin is a local decision and must be marked as inferred. The output is a mapping from each violation to a fix or a justified exception.
 
@@ -43,17 +45,23 @@ The first two rows are factual claims taken from the sources. The third is an in
 
 ## What it cannot do
 
-A content security policy cannot fix an injection flaw. It limits what injected content can do after it reaches the page; it does not stop the content from arriving. A well-scoped policy can prevent a script from executing, but a flaw that writes HTML into a page can still deface it, redirect links, or expose data through elements the policy permits. The practical distinction is between impact and cause: CSP constrains the former and leaves the latter intact. Anyone relying on the header as the fix for cross-site scripting has misunderstood what it enforces.
+A content security policy cannot fix an injection flaw. It limits what injected content can do after it reaches the page; it does not stop the content from arriving. A well-scoped policy can prevent a script from executing, but a flaw that writes HTML into a page can still deface it, redirect links, or expose data through elements the policy permits. The practical distinction is between <Mark>impact and cause</Mark>: CSP constrains the former and leaves the latter intact. Anyone relying on the header as the fix for cross-site scripting has misunderstood what it enforces.
 
 The hidden cost is maintenance. A tight policy requires knowing every resource the application loads, and that inventory changes as features and vendors are added. Refactoring inline styles and scripts to satisfy a nonce-based policy can be a substantial engineering effort, especially in an older codebase. Report-only mode is temporary; leaving it on indefinitely means collecting violations without ever enforcing the policy. The cost is paid in ongoing review of new sources and in the discipline to keep the exception list short. A policy that is never updated will eventually break the site or be loosened until it is meaningless.
 
-The main failure mode is a permissive directive. A policy that allows broad script sources or inline execution looks complete in a configuration review while blocking almost nothing. Another failure is trusting an allowed origin that hosts a JSONP endpoint or user-controlled content: the browser sees an approved source, but an attacker can still supply executable payload from it. Overly strict policies fail in the opposite way, blocking legitimate resources and pushing teams to add broad exceptions under time pressure. The useful measure is not that a header is present, but what it actually blocks on a representative set of pages.
+<Trap>
+The main failure mode is a permissive directive.
+</Trap>
+
+A policy that allows broad script sources or inline execution looks complete in a configuration review while blocking almost nothing. Another failure is trusting an allowed origin that hosts a JSONP endpoint or user-controlled content: the browser sees an approved source, but an attacker can still supply executable payload from it. Overly strict policies fail in the opposite way, blocking legitimate resources and pushing teams to add broad exceptions under time pressure. The useful measure is not that a header is present, but what it actually blocks on a representative set of pages.
 
 There is a boundary around the protection. CSP addresses resource loading and execution in the browser; it is not an access control, a secret, or a defense against server-side attacks. It does not stop data exfiltration through channels the policy allows, does not replace cross-site request forgery defenses, and does not validate input. It also depends on browser support and correct delivery of the header on every response. A policy applied to one route but not others leaves the unprotected routes as open as before. The header is one layer in a defense that must hold across the whole application.
 
 Because applications and browser behavior change, the policy and its exception list need periodic review. A source that was safe to allow can change what it serves, and a new framework version can introduce inline styles that violate the policy. Exceptions should be owned by a named party with a recorded recheck condition. Without that record, a future reviewer cannot tell which allowances were deliberate and which were added to unblock a release. The policy and the reasons behind it must be revisited together.
 
+<PullQuote>
 The counterargument that CSP is fair as a quick header is incomplete when permissive directives leave the original injection path untouched.
+</PullQuote>
 
 ## A decision test
 
@@ -65,7 +73,11 @@ The counterargument that CSP is fair as a quick header is incomplete when permis
 6. Is every exception justified and owned by a named party?
 7. Is there a recheck condition for new dependencies or framework changes?
 
-A content security policy is useful when its directives are narrow and its exceptions are documented. The test turns a header into a sequence of decisions with a visible rationale, so a reviewer can see what was allowed, why it was allowed, and when the policy must be revisited. For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+<KeyPoint>
+A content security policy is useful when its directives are narrow and its exceptions are documented.
+</KeyPoint>
+
+The test turns a header into a sequence of decisions with a visible rationale, so a reviewer can see what was allowed, why it was allowed, and when the policy must be revisited. For further reading, see [AI Risk Assessment](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 
 ## References & Further Reading
 
