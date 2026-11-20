@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Postmortems are often treated as a ritual that follows every incident, which produces documents nobody reads. The SRE material describes postmortems as part of an incident culture, and NIST's handling guide treats review as part of the lifecycle. The question is what the document changes.
+</Lead>
 
 **Direct answer:** Write a postmortem that states the cause, the contributing conditions, and the actions with owners, then verify that the actions were completed. The sources describe the practice; the usefulness test is a synthesis.
 
@@ -21,11 +23,15 @@ Three points matter:
 
 <Figure src="/images/articles/inline/postmortems-without-the-hype-1.png" alt="A four-step flow: reconstruct the timeline, name conditions rather than people, choose actions with owners, then verify on a date." caption="Conceptual: a postmortem's value is owned actions that get verified." />
 
-- **Cause is not a person.** The SRE material argues for a blame-free review. A cause is a condition that made the failure possible.
+- **Cause is not a person.** The SRE material argues for <Mark>a blame-free review</Mark>. A cause is a condition that made the failure possible.
 - **Contributing conditions matter.** The NIST lifecycle includes preparation and recovery. A review that looks only at the trigger misses those layers.
 - **Actions need owners.** An action without an owner is a suggestion. The review is not complete until someone is accountable.
 
-The sequence is: reconstruct the timeline, name the conditions, choose actions, then verify them. Choosing actions is local judgement, so it is `inferred`; the practice is `source-reported`.
+<KeyPoint>
+The sequence is: reconstruct the timeline, name the conditions, choose actions, then verify them.
+</KeyPoint>
+
+Choosing actions is local judgement, so it is `inferred`; the practice is `source-reported`.
 
 ## A worked example
 
@@ -37,9 +43,13 @@ The outcome is a short document with owners. The scenario is hypothetical; the r
 
 ## Why the timeline comes first
 
-A review that begins with a conclusion will find evidence for it. Reconstructing the timeline first keeps the discussion closer to what happened, because each event must be placed in order before it can be interpreted. This is also where the distinction between trigger and condition becomes visible.
+<Trap>
+A review that begins with a conclusion will find evidence for it.
+</Trap>
 
-A trigger is the event that started the failure. A condition is what made the system unable to absorb it. Both matter, but they call for different actions. A review that only removes the trigger leaves the condition in place, which is how the same class of incident recurs with a different immediate cause.
+Reconstructing the timeline first keeps the discussion closer to what happened, because each event must be placed in order before it can be interpreted. This is also where the distinction between trigger and condition becomes visible.
+
+A trigger is the event that started the failure. A condition is <Mark>what made the system unable to absorb it</Mark>. Both matter, but they call for different actions. A review that only removes the trigger leaves the condition in place, which is how the same class of incident recurs with a different immediate cause.
 
 ## Why completion belongs in the review
 
@@ -55,7 +65,7 @@ An action item that is never completed is a record of intention. Checking comple
 
 ## Why ownership matters more than length
 
-A long postmortem with no owned actions has changed nothing. A short one with two completed actions has improved the system. The usefulness test is therefore completion, not document length. Recording the verification date turns the review into evidence rather than intention.
+A long postmortem with no owned actions has changed nothing. A short one with two completed actions has improved the system. The usefulness test is therefore <Mark>completion, not document length</Mark>. Recording the verification date turns the review into evidence rather than intention.
 
 A final consideration is the audience for the review. A document written only for the people involved will repeat the same assumptions that led to the incident. Including someone who was not in the room, or who will read it months later, encourages the clarity that makes the artefact useful.
 
@@ -65,7 +75,9 @@ The review should record which evidence was missing at the time, since a decisio
 
 The distinction keeps the review focused on the system rather than on the people in it.
 
+<PullQuote>
 A review that records only what went wrong will be read once; one that records what will change is read again.
+</PullQuote>
 
 ## What it cannot do
 

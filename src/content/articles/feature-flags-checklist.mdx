@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Feature flags are often adopted as a convenient way to hide unfinished work. The real problem is that a flag creates a new branch of behavior that must be tracked, tested, and eventually removed, and teams frequently ship the flag without that plan. The code is safe to deploy, but the release is harder to reason about than before.
+</Lead>
 
 **Direct answer:** A feature toggle lets a team switch a feature on or off at runtime, and the canary release technique exposes a change to a limited subset of users first; GitHub Actions provides a way to automate the build, test, and deployment steps around them. The boundary is that a flag is a control surface, not a test of whether the feature is wanted or correct.
 
@@ -17,15 +19,21 @@ Feature flags are often adopted as a convenient way to hide unfinished work. The
 
 ## The mechanism
 
-The feature toggle entry describes a technique for enabling or disabling functionality without changing and redeploying code. The core mechanism is a runtime switch that separates deployment, getting code onto a system, from release, deciding who sees a behavior. The practical consequence is that code can ship dark and activate later, and that a problematic release can often be stopped by flipping a switch. Each flag, however, introduces a branch that the code must support for as long as the flag exists.
+The feature toggle entry describes a technique for enabling or disabling functionality without changing and redeploying code. The core mechanism is <Mark>a runtime switch</Mark> that separates deployment, getting code onto a system, from release, deciding who sees a behavior. The practical consequence is that code can ship dark and activate later, and that a problematic release can often be stopped by flipping a switch. Each flag, however, introduces a branch that the code must support for as long as the flag exists.
 
 <Figure src="/images/articles/inline/feature-flags-checklist-1.png" alt="A feature flag rollout moving from internal to canary to full release, with a kill switch to revert." caption="Conceptual: each stage is reversible; the flag separates deploy from release." />
 
-The canary release concept, covered at the same source, is to expose a change to a small subset of users before widening it. The mechanism is progressive exposure: a limited cohort absorbs the first failures while the rest of the traffic stays on the known state. The practical consequence is that flags and canary rollout fit together naturally. A flag supplies the switch, and a targeting rule supplies the cohort, so monitoring the small group can reveal problems before full rollout.
+The canary release concept, covered at the same source, is to expose a change to <Mark>a small subset of users</Mark> before widening it. The mechanism is progressive exposure: a limited cohort absorbs the first failures while the rest of the traffic stays on the known state. The practical consequence is that flags and canary rollout fit together naturally. A flag supplies the switch, and a targeting rule supplies the cohort, so monitoring the small group can reveal problems before full rollout.
 
-GitHub Actions documentation describes workflows that automate build, test, and deployment tasks. The mechanism relevant here is repeatable automation: checks run the same way on every change, defined in configuration held with the code. The practical consequence is that the checklist becomes executable rather than a matter of memory. A workflow can verify that a flag has a default state, that the off path is exercised, and that the change passed tests before it reaches a canary cohort.
+GitHub Actions documentation describes workflows that automate build, test, and deployment tasks. The mechanism relevant here is repeatable automation: checks run the same way on every change, defined in configuration held with the code. The practical consequence is that the checklist becomes executable rather than a matter of memory. A workflow can verify that a flag has a default state, that <Mark>the off path is exercised</Mark>, and that the change passed tests before it reaches a canary cohort.
 
-Taken together, the sources point to a lifecycle rather than a single switch. A useful flag has an owner, a defined rollout, a tested off state, and a removal date. The decision of whether to add one rests on whether the team can carry that lifecycle. Where it cannot, a flag becomes permanent scaffolding that quietly raises the cost of every later change.
+Taken together, the sources point to a lifecycle rather than a single switch.
+
+<KeyPoint>
+A useful flag has an owner, a defined rollout, a tested off state, and a removal date.
+</KeyPoint>
+
+The decision of whether to add one rests on whether the team can carry that lifecycle. Where it cannot, a flag becomes permanent scaffolding that quietly raises the cost of every later change.
 
 ## A worked example
 
@@ -48,13 +56,19 @@ A feature flag cannot tell a team whether a feature is good. It controls exposur
 
 The hidden cost is combinatorial complexity. Each flag multiplies the states the system can be in, and the number of meaningful combinations grows with every new switch. Code paths guarded by old flags are rarely exercised, so they rot quietly. Testing burden rises not because any one flag is hard, but because the interactions between them are hard to enumerate. Teams that add flags freely often discover the cost only when a late change breaks an old branch nobody remembered.
 
-A common failure mode is assuming the off path still works. A flag intended as a kill switch is useful only if flipping it produces a healthy state, yet that path is exactly what accumulates neglect. A kill switch that itself needs a deployment defeats its purpose, and a default that was correct at launch can be wrong after later edits. Likewise, a flag whose targeting rule is too broad can expose a change far beyond the intended cohort, turning a canary into a full release by accident.
+<Trap>
+A common failure mode is assuming the off path still works.
+</Trap>
+
+A flag intended as a kill switch is useful only if flipping it produces a healthy state, yet that path is exactly what accumulates neglect. A kill switch that itself needs a deployment defeats its purpose, and a default that was correct at launch can be wrong after later edits. Likewise, a flag whose targeting rule is too broad can expose a change far beyond the intended cohort, turning a canary into a full release by accident.
 
 The boundary of the sources is worth stating. They provide a development technique and a CI platform, not a hygiene policy. The decision to remove a flag after rollout, the ownership model, and the rule for when a flag is justified are local choices. Claiming that the sources mandate a particular flag lifecycle overstates what they support; they make such a lifecycle possible, not compulsory.
 
 Because code and teams change, the flag set needs scheduled review. An experiment ends, a team reorganizes, and the owner of a flag leaves; the switch itself does not notice. A practical cadence is a periodic audit that lists active flags, their owners, their intended removal dates, and the last time each off path was tested. Anything past its date is either removed deliberately or given a fresh justification. Without that review, the flag set becomes a record of decisions nobody is making anymore.
 
+<PullQuote>
 The counterargument that feature flags add code complexity is fair for a single small release and incomplete for systems that need frequent, reversible rollouts, where the ability to stop a change quickly outweighs the cost of the extra branch.
+</PullQuote>
 
 ## A decision test
 

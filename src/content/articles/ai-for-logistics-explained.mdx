@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Logistics runs on documents and coordination: shipping records, manifests, invoices, status updates, and exception reports. Teams are under pressure to apply AI to that workload, but the general capabilities described in AI guides do not map cleanly onto a specific operational task. The gap between a tool that can analyze documents and a delivery process that is actually better is where most pilots stall.
+</Lead>
 
 **Direct answer:** AI assistants can help with document understanding, summarization, data extraction, and analysis, which are all common in logistics work. Logistics itself is the coordination of moving goods from origin to consumption across transport, warehousing, and fulfillment. The useful question is which specific logistics task has enough document or analytical load to justify an AI step, with a human review of the output.
 
@@ -21,11 +23,15 @@ Logistics is the planning and coordination of how goods move from origin to cons
 
 <Figure src="/images/articles/inline/ai-for-logistics-explained-1.png" alt="A five-step flow: a document-heavy task, AI drafts output, a human verifies accuracy, time saved is measured, then a decision to expand." caption="Conceptual: logistics AI fits at the task level when a human review path closes the loop." />
 
-The AI use-case guides describe what these systems are good at in general terms: working with documents, summarizing and extracting information, analyzing content, and generating written output. These are capabilities, not logistics solutions. The guides say, in effect, that a model can help with tasks that involve reading and producing text and with some forms of analysis. Applied to logistics, that suggests candidates such as pulling fields from carrier documents, summarizing exception reports, or drafting routine communications. The list is a starting point, not a recommendation for any one process.
+The AI use-case guides describe what these systems are good at in general terms: working with documents, summarizing and extracting information, analyzing content, and generating written output. These are <Mark>capabilities, not logistics solutions</Mark>. The guides say, in effect, that a model can help with tasks that involve reading and producing text and with some forms of analysis. Applied to logistics, that suggests candidates such as pulling fields from carrier documents, summarizing exception reports, or drafting routine communications. The list is a starting point, not a recommendation for any one process.
 
 The overlap between the two is real but narrow. Logistics has a high volume of document handling, and the described capabilities match document handling well. What the guides do not establish is accuracy on a specific company's documents, cost per task, or how errors propagate into operations. An extracted field that is wrong can reroute a shipment or misstate an inventory position, so the value of the assistant depends on how its output is checked, not just on what it can produce in a demo.
 
-The practical consequence is that the decision has to be made at the task level. Pick a task with a high document load, a clear definition of a correct result, and a natural review point. Run it with a human checking the output, and measure whether the review still saves time. A task that fails any of those conditions is a poor first candidate, however impressive the general capability looks. The AI step is justified only when it fits a specific workflow and the review path closes the loop.
+The practical consequence is that the decision has to be made at the task level. Pick a task with <Mark>a high document load</Mark>, <Mark>a clear definition of a correct result</Mark>, and a natural review point. Run it with a human checking the output, and measure whether the review still saves time. A task that fails any of those conditions is a poor first candidate, however impressive the general capability looks.
+
+<KeyPoint>
+The AI step is justified only when it fits a specific workflow and the review path closes the loop.
+</KeyPoint>
 
 ## A worked example
 
@@ -47,13 +53,19 @@ The first limit is that the sources are general. They describe logistics as a fi
 
 A hidden cost is verification. Generated output looks authoritative and is fast to produce, which makes it tempting to use directly. In logistics, a plausible but wrong extraction can flow into a shipment instruction or an inventory record, so someone has to check the result. That review consumes time and attention, and it has to be built into the process from the start. If review eats most of the time saved, the assistant is not value-adding no matter how well it performs in isolation.
 
-The main failure mode is letting generated text drive a decision without a check. Models can produce confident errors, and a system that extracts from unfamiliar document formats can fail quietly. A second failure is choosing a task with no clear definition of correctness, where the team cannot tell whether the output is right. A third is scope creep: starting with document summaries and drifting toward autonomous routing or scheduling decisions that carry real operational risk and need a different kind of oversight.
+<Trap>
+The main failure mode is letting generated text drive a decision without a check.
+</Trap>
+
+Models can produce confident errors, and a system that extracts from unfamiliar document formats can fail quietly. A second failure is choosing a task with no clear definition of correctness, where the team cannot tell whether the output is right. A third is scope creep: starting with document summaries and drifting toward autonomous routing or scheduling decisions that carry real operational risk and need a different kind of oversight.
 
 The boundary is the kind of task. Document-heavy work with a verifiable answer and a review point is a reasonable candidate. Tasks that require current operational data the model cannot see, that involve physical safety, or that have no practical review path are not. The distinction matters because the guides describe capabilities in general terms and will not flag where a capability becomes unsuitable. That judgment belongs to the team running the process.
 
 Deployment also needs review. Document formats change, models are updated, and an error pattern that was rare can become common when inputs shift. Set a trigger to recheck accuracy when document sources change or when the review step starts catching more errors. Without that, a pilot that once saved time quietly becomes a source of rework, and nobody notices because the output still looks fine.
 
+<PullQuote>
 The counterargument that general AI capabilities are broadly applicable is fair for drafting and summarization where errors are cheap to catch, and incomplete for logistics steps where a wrong extracted value propagates into physical operations and real cost.
+</PullQuote>
 
 ## A decision test
 
