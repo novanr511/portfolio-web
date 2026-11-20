@@ -19,15 +19,23 @@ wp-theme/
 ├── functions.php                 Bootstrap / includes
 ├── header.php  footer.php        Site chrome, landmarks, skip link
 ├── front-page.php                Composed from template parts
-├── index.php  page.php
+├── index.php  page.php  category.php
 ├── single.php  search.php  404.php  comments.php
+├── woocommerce/
+│   ├── archive-product.php         Shop archive
+│   ├── single-product.php          Single product wrapper
+│   ├── content-product.php         Product card
+│   ├── content-product_cat.php     Category card
+│   └── content-single-product.php  Product layout + tabs + related
 ├── inc/
 │   ├── setup.php                 Theme supports, menus, image sizes
 │   ├── enqueue.php               CSS/JS, editor assets, font hints
 │   ├── template-tags.php         Safe content helpers + fallbacks
 │   ├── acf.php                   Options page + ACF block
 │   ├── blocks.php                Native Gutenberg block registration
-│   └── rest.php                  Custom REST endpoints
+│   ├── rest.php                  Custom REST endpoints
+│   ├── woocommerce.php           WC support + shop sidebar
+│   └── demo-content.php          Blueprint-only content seeder
 ├── blocks/
 │   └── collection-card/
 │       ├── block.json            Block metadata (API v3)
@@ -94,7 +102,21 @@ the demo is ready to explore.
 
 ---
 
-## 5. Editable content (ACF)
+## 5. Page templates
+
+| Halaman | Template | Catatan |
+| --- | --- | --- |
+| Beranda | `front-page.php` | Hero → collections → editorial → newsletter |
+| Shop | `woocommerce/archive-product.php` | Sidebar filter + grid responsif |
+| Produk | `woocommerce/content-single-product.php` | Gallery, harga, add-to-cart, tabs, related |
+| Artikel | `single.php` | Header editorial, hero image, reading time, related posts |
+| Kategori artikel | `category.php` | Hero kategori + deskripsi + grid |
+| Arsip lain | `index.php` | Fallback |
+
+Blueprint meng-install **WooCommerce** dan men-seed 6 produk + 3 artikel
+via `inc/demo-content.php`, jadi semua halaman tersebut bisa langsung dilihat.
+
+## 6. Editable content (ACF)
 
 With ACF active, **Theme Options** exposes:
 
@@ -108,7 +130,7 @@ content, so the theme never fatals.
 
 ---
 
-## 6. Blocks
+## 7. Blocks
 
 - **`novan/collection-card`** — native Gutenberg block, `block.json` API v3,
   editor UI built with `wp.*` globals (no webpack/build step). Supports image
@@ -118,7 +140,7 @@ content, so the theme never fatals.
 
 ---
 
-## 7. Accessibility (WCAG 2.2 AA)
+## 8. Accessibility (WCAG 2.2 AA)
 
 - Skip link, semantic landmarks, correct heading order
 - `:focus-visible` styles (light on dark sections)
@@ -130,7 +152,7 @@ content, so the theme never fatals.
 
 ---
 
-## 8. Performance
+## 9. Performance
 
 - All imagery converted from PNG (~29 MB) to WebP (~500 KB total)
 - `width`/`height` attributes prevent layout shift
@@ -140,7 +162,7 @@ content, so the theme never fatals.
 
 ---
 
-## 9. REST endpoints
+## 10. REST endpoints
 
 | Endpoint | Description |
 | --- | --- |

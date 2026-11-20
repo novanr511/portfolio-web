@@ -20,6 +20,7 @@ $novan_includes = array(
 	'inc/acf.php',
 	'inc/blocks.php',
 	'inc/rest.php',
+	'inc/woocommerce.php',
 );
 
 foreach ( $novan_includes as $novan_include ) {

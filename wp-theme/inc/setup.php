@@ -64,6 +64,28 @@ function novan_theme_setup() {
 
 	add_image_size( 'novan-collection', 680, 1020, true );
 	add_image_size( 'novan-hero', 1672, 941, true );
+	add_image_size( 'novan-product', 900, 1350, true );
+	add_image_size( 'novan-article', 1400, 800, true );
+
+	add_theme_support(
+		'woocommerce',
+		array(
+			'thumbnail_image_width' => 600,
+			'single_image_width'    => 1200,
+			'product_grid'          => array(
+				'default_rows'    => 3,
+				'min_rows'        => 2,
+				'max_rows'        => 8,
+				'default_columns' => 4,
+				'min_columns'     => 2,
+				'max_columns'     => 5,
+			),
+		)
+	);
+
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
 }
 
 add_filter( 'nav_menu_css_class', 'novan_menu_classes', 10, 2 );

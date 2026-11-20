@@ -173,6 +173,20 @@ function novan_editorial() {
 }
 
 /**
+ * Estimated reading time for the current post.
+ *
+ * @return string
+ */
+function novan_reading_time() {
+	$content   = get_post_field( 'post_content', get_the_ID() );
+	$words     = str_word_count( wp_strip_all_tags( $content ) );
+	$minutes   = max( 1, (int) ceil( $words / 200 ) );
+
+	/* translators: %d: number of minutes. */
+	return sprintf( _n( '%d min read', '%d min read', $minutes, 'novan-base' ), $minutes );
+}
+
+/**
  * Fallback menu when no menu is assigned in Appearance > Menus.
  */
 function novan_default_menu() {

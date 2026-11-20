@@ -18,7 +18,7 @@ $novan_hero = novan_hero();
 		<p class="hero__text"><?php echo esc_html( $novan_hero['text'] ); ?></p>
 
 		<div class="hero__actions">
-			<a class="button button--solid" href="#collections">
+			<a class="button button--solid" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ) ); ?>">
 				<?php esc_html_e( 'Shop now', 'novan-base' ); ?>
 				<?php echo novan_arrow_icon( 'up-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
