@@ -1,0 +1,49 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/",
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "advanced-custom-fields"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "git:directory",
+        "url": "https://github.com/novanr511/portfolio-web.git",
+        "ref": "main",
+        "refType": "branch",
+        "path": "wp-theme"
+      },
+      "options": {
+        "activate": true,
+        "targetFolderName": "novan-base"
+      }
+    },
+    {
+      "step": "login",
+      "username": "admin"
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "Novan Base — Editorial WordPress Theme",
+        "blogdescription": "Bespoke custom theme demo by Rachmadwipa Novandri"
+      }
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp option update permalink_structure '/%postname%/'"
+    }
+  ]
+}
