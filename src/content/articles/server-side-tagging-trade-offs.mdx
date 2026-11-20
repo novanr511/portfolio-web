@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
+<Lead>
 Moving analytics tags from the browser to a server is often presented as an unqualified upgrade for privacy and data quality. In practice it is a trade: you gain control over what is collected and how it is forwarded, but you take on infrastructure, latency, and new failure modes. Teams that adopt it without naming those costs tend to discover them only after their reports have drifted.
+</Lead>
 
-**Direct answer:** Server-side tagging routes data through a server you control before it reaches analytics or advertising endpoints, which reduces browser-side exposure and lets you filter what leaves your environment. The trade is that you now own an always-available service, accept added network hops, and must still respect consent. It improves control, not truth.
+**Direct answer:**
+
+<KeyPoint>
+Server-side tagging routes data through a server you control before it reaches analytics or advertising endpoints, which reduces browser-side exposure and lets you filter what leaves your environment.
+</KeyPoint>
+
+The trade is that you now own an always-available service, accept added network hops, and must still respect consent. It improves <Mark>control, not truth</Mark>.
 
 **Delta:** This article adds a bounded cost map beyond the sources: it maps the tag manager and privacy sandbox concepts to the specific decision of when a team should move tags server-side, with claim status made explicit.
 
@@ -23,7 +31,7 @@ The Google Tag Manager documentation describes a server-side container as a tag 
 
 The Wikipedia entry on Privacy Sandbox describes a set of browser technologies intended to limit cross-site tracking while still supporting advertising. As third-party cookies lose support, the signals that browser-side tags relied on become less reliable. Server-side tagging is partly a response to that shift, because it lets a site collect first-party data and forward it under its own control. The important consequence is that this is not a way to recover the old tracking. It is a way to operate with fewer and cleaner signals. A team that expects server-side tagging to restore cookie-level reach will be disappointed, because the browser still decides what the site is allowed to know.
 
-The same architecture introduces costs. Every request now travels from the browser to your server and then to the vendor, adding at least one network hop. That hop adds latency and a dependency: if your endpoint is slow or down, data stops flowing even though the website works. You have moved a failure point from the vendor's infrastructure to your own. The benefit is control over the payload; the price is ownership of availability. Teams must therefore treat the tagging endpoint as production infrastructure with monitoring and capacity planning, not as a marketing script that can be edited casually and forgotten.
+The same architecture introduces costs. Every request now travels from the browser to your server and then to the vendor, adding at least one network hop. That hop adds latency and a dependency: if your endpoint is slow or down, data stops flowing even though the website works. You have moved a failure point from the vendor's infrastructure to your own. The benefit is control over the payload; <Mark>the price is ownership of availability</Mark>. Teams must therefore treat the tagging endpoint as production infrastructure with monitoring and capacity planning, not as a marketing script that can be edited casually and forgotten.
 
 ## A worked example
 
@@ -41,7 +49,11 @@ The table keeps architecture and intent separate from judgement. The two source-
 
 ## What it cannot do
 
-Server-side tagging cannot recover the tracking that browser privacy changes have removed. It gives you control over the data your site already collects, but it cannot conjure cross-site identifiers that the browser no longer provides. A team that adopts it hoping to rebuild a disappearing attribution picture will end up with a cleaner version of a smaller dataset. The architecture changes where processing happens, not what the user's browser is willing to reveal. Treating it as a workaround for privacy limits is both inaccurate and risky, because it encourages decisions that quietly ignore consent.
+Server-side tagging cannot recover the tracking that browser privacy changes have removed. It gives you control over the data your site already collects, but it cannot conjure cross-site identifiers that the browser no longer provides. A team that adopts it hoping to rebuild a disappearing attribution picture will end up with <Mark>a cleaner version of a smaller dataset</Mark>. The architecture changes where processing happens, not what the user's browser is willing to reveal.
+
+<Trap>
+Treating it as a workaround for privacy limits is both inaccurate and risky, because it encourages decisions that quietly ignore consent.
+</Trap>
 
 The hidden cost is ownership. A server-side container is a service that must be deployed, monitored, patched, and scaled. That requires engineering time and skills that a marketing team may not have, and it creates an internal dependency on the people who maintain the endpoint. When those people are busy elsewhere, the tagging pipeline quietly degrades. The cost is not the software, which may be free, but the ongoing responsibility for an always-on system that sits in the path of every analytics event. That responsibility includes capacity planning, incident response, and the mundane work of keeping credentials and endpoints current.
 
@@ -51,7 +63,11 @@ There are boundaries where the trade is not worth making. A small site with mode
 
 The arrangement also needs review. Consent requirements do not disappear because data passes through your server; you must still honour a user's choices, and the rules governing that are still evolving. As browser APIs and regulations change, the set of data you are allowed to forward will change with them. A team should schedule a periodic audit of what the container collects and forwards, and confirm that each field still has a purpose. A server-side tag that quietly accumulates fields over time is a liability, not an asset, and it deserves the same scrutiny as any other data collection point.
 
-The counterargument that server-side tagging is simply more accurate is fair for payload control and incomplete for completeness. You control what you forward, but you also own every gap created along the path, and gaps are easier to hide on a server than in a browser script.
+<PullQuote>
+The counterargument that server-side tagging is simply more accurate is fair for payload control and incomplete for completeness.
+</PullQuote>
+
+You control what you forward, but you also own every gap created along the path, and gaps are easier to hide on a server than in a browser script.
 
 ## A decision test
 

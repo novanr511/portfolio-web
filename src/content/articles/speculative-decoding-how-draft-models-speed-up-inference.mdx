@@ -9,7 +9,9 @@ tags:
   - AI
 ---
 
+<Lead>
 A large language model generates one token at a time, and each step requires a full pass through its weights. That sequential dependency makes inference slow even when hardware is powerful. Speculative decoding attacks the waiting, not the model: a smaller model proposes several tokens, and the large model checks them in one pass.
+</Lead>
 
 **Direct answer:** Speculative decoding uses a draft model to propose a sequence of tokens that a target model verifies in parallel, accepting the ones that match its own distribution and falling back when they do not. The paper *Fast Inference from Transformers via Speculative Decoding* shows that this can speed up generation while preserving the target model's output distribution. The boundary: the gain depends on draft quality and acceptance rate — a poor draft model adds work without reducing latency.
 
@@ -20,16 +22,22 @@ Three steps repeat:
 <Figure src="/images/articles/inline/speculative-decoding-how-draft-models-speed-up-inference-1.png" alt="A three-step flow: a small draft model proposes k tokens, the target verifies them in one pass, and matches are accepted until the first mismatch is corrected." caption="Conceptual: verification is parallel, so the cost per accepted token falls." />
 
 1. **Draft.** A smaller, faster model generates k candidate tokens autoregressively.
-2. **Verify.** The target model evaluates all k tokens in a single forward pass, using them as a proposed prefix.
+2. **Verify.** <Mark>The target model evaluates all k tokens in a single forward pass</Mark>, using them as a proposed prefix.
 3. **Accept or correct.** Tokens that match the target's distribution are accepted. At the first mismatch, the target's own token is used and the rest are discarded.
 
-The key property is that verification is parallel. A pass that would normally produce one token now checks several, so the amortised cost per accepted token falls. The paper's result is that the output distribution is preserved, which matters — this is not an approximation that changes answers.
+The key property is that verification is parallel.
+
+<KeyPoint>
+A pass that would normally produce one token now checks several, so the amortised cost per accepted token falls.
+</KeyPoint>
+
+The paper's result is that the output distribution is preserved, which matters — this is not an approximation that changes answers.
 
 Three conditions make it work:
 
 **The draft must be much cheaper.** Otherwise proposal time cancels the saving.
 
-**The draft must agree often.** Acceptance rate is the main driver of speedup.
+**The draft must agree often.** <Mark>Acceptance rate is the main driver of speedup.</Mark>
 
 **Verification must batch efficiently.** The hardware and serving stack need to evaluate a prefix in one pass without overhead that erases the gain.
 
@@ -72,15 +80,23 @@ The arithmetic is simplified — real serving stacks have batching, memory bandw
 
 **Very short outputs.** If the answer is five tokens, setup costs dominate.
 
-The counterargument — that faster hardware makes speculation unnecessary — misses the point. Hardware improves for both paths; the relative saving remains, though its absolute value shrinks.
+<PullQuote>
+The counterargument — that faster hardware makes speculation unnecessary — misses the point.
+</PullQuote>
+
+Hardware improves for both paths; the relative saving remains, though its absolute value shrinks.
 
 ## What the paper does not promise
 
-**Not a universal speedup.** The result depends on the draft-target pair and the workload. A benchmark on one model family is evidence for that pair, not a law.
+**Not a universal speedup.** The result depends on the draft-target pair and the workload.
+
+<Trap>
+A benchmark on one model family is evidence for that pair, not a law.
+</Trap>
 
 **Not lower cost in every stack.** Serving infrastructure must support batched verification. Without it, the theoretical gain is unavailable.
 
-**Not a capability change.** Speculative decoding preserves the target's distribution. It does not make the model better, which is why it belongs in the serving layer, not the evaluation conversation.
+**Not a capability change.** Speculative decoding preserves the target's distribution. It does not make the model better, which is why <Mark>it belongs in the serving layer, not the evaluation conversation</Mark>.
 
 ## A decision test
 

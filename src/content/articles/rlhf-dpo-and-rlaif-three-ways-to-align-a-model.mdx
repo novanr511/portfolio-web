@@ -9,13 +9,15 @@ tags:
   - LLM
 ---
 
+<Lead>
 A pretrained model predicts text; it does not know what a useful assistant should do. Alignment methods use preferences to steer it. Three approaches dominate the discussion — RLHF, DPO, and RLAIF — and they differ in two dimensions: who provides the preference signal, and whether a separate reward model is trained.
+</Lead>
 
 **Direct answer:** RLHF trains a reward model on human comparisons and optimises a policy against it; DPO optimises the policy directly from preference pairs without a separate reward model; RLAIF substitutes AI-generated feedback for some human feedback. The underlying papers — RLHF, DPO, and the RLAIF comparison — report different trade-offs. The boundary: these methods align a model to the preferences it was given, which is not the same as making it correct or safe in every context.
 
 ## Three mechanisms
 
-**RLHF.** Collect human comparisons between outputs, train a reward model to predict them, then optimise the policy to maximise reward while staying near the original model. The Anthropic helpful-and-harmless paper is the canonical description. Three stages, three sets of hyperparameters, and a reward model that can be exploited.
+**RLHF.** Collect human comparisons between outputs, train a reward model to predict them, then optimise the policy to maximise reward while staying near the original model. The Anthropic helpful-and-harmless paper is the canonical description. Three stages, three sets of hyperparameters, and <Mark>a reward model that can be exploited</Mark>.
 
 **DPO.** The DPO paper shows that the reward can be expressed in terms of the policy itself, allowing direct optimisation from preference pairs. No separate reward model is trained. The pipeline is simpler, and the result depends on the quality and coverage of the pairs.
 
@@ -39,9 +41,12 @@ Three checks decide:
 
 Three conclusions follow:
 
-- **Method choice follows constraints**, not a universal ranking.
-- **Preference quality dominates method** — a better method on poor pairs loses.
-- **The alignment target must be examined** — the methods optimise preferences, not truth.
+<KeyPoint>
+**Method choice follows constraints**, not a universal ranking.
+</KeyPoint>
+
+- **<Mark>Preference quality dominates method</Mark>** — a better method on poor pairs loses.
+- **The alignment target must be examined** — <Mark>the methods optimise preferences, not truth</Mark>.
 
 ## What to measure before choosing
 
@@ -57,13 +62,23 @@ These questions turn a method debate into an engineering decision with stated co
 
 ## What alignment methods do not do
 
-**They do not make the model factual.** A model can be aligned to give polite, confident answers that are wrong. The hallucination article covers the separate controls.
+**They do not make the model factual.**
+
+<Trap>
+A model can be aligned to give polite, confident answers that are wrong.
+</Trap>
+
+The hallucination article covers the separate controls.
 
 **They do not remove the need for evaluation.** A preference-trained model still needs testing on the behaviours you care about, as the evaluation-rubric article explains.
 
 **They do not settle whose preferences count.** That is a governance question, not a technical one, which the AI-governance article addresses.
 
-The counterargument — that DPO has made RLHF obsolete — is too strong. DPO is simpler, and it depends on the preference data in a different way. The choice is empirical for your setting, not a matter of fashion.
+<PullQuote>
+The counterargument — that DPO has made RLHF obsolete — is too strong.
+</PullQuote>
+
+DPO is simpler, and it depends on the preference data in a different way. The choice is empirical for your setting, not a matter of fashion.
 
 ## A decision test
 

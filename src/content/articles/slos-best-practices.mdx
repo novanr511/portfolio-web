@@ -8,7 +8,10 @@ tags:
   - Error Budgets
   - Verified
 ---
+
+<Lead>
 Service level objectives are often adopted as a number without a decision attached, which turns reliability into a reporting exercise. The harder problem is choosing indicators that reflect user experience and turning the target into an error budget a team can spend. This article grounds those choices in Google SRE guidance and marks what is stated versus inferred.
+</Lead>
 
 **Direct answer:** An SLO is a target for a service level indicator, and its complement is the error budget that governs how much unreliability is tolerable. Google SRE guidance says indicators should be chosen from the user's perspective and that objectives should be attainable but ambitious. The bounded answer is to define user-centered indicators first, set a target, and convert the remainder into an explicit release policy.
 
@@ -20,11 +23,15 @@ The SRE material distinguishes the service level indicator, the measured signal,
 
 <Figure src="/images/articles/inline/slos-best-practices-1.png" alt="A flow from user-facing indicator to internal target, published error budget, and release policy." caption="Conceptual: pick a user signal, publish the budget, agree the exhaustion policy." />
 
-Google SRE recommends choosing indicators based on what users care about, such as request latency, error rate, or availability measured at the user-facing edge. Internal utilization metrics are easier to collect but can look healthy while users suffer. The practical consequence is to start with the user question, then find the measurable signal, rather than starting with whichever telemetry happens to be available and declaring it an indicator.
+Google SRE recommends choosing indicators based on what users care about, such as request latency, error rate, or availability measured at the user-facing edge. Internal utilization metrics are easier to collect but can <Mark>look healthy while users suffer</Mark>. The practical consequence is to start with the user question, then find the measurable signal, rather than starting with whichever telemetry happens to be available and declaring it an indicator.
 
-The error budget is the complement of the objective, so a 99.9 percent target leaves a small allowance of failed requests. The guidance treats this budget as a resource that can be spent by releasing changes, with a policy that pauses releases when the budget is exhausted. The practical consequence is that reliability becomes a currency balancing feature velocity against stability, and the trade-off becomes visible to the whole team instead of staying inside an engineering argument.
+The error budget is the complement of the objective, so a 99.9 percent target leaves a small allowance of failed requests. The guidance treats this budget as a resource that can be spent by releasing changes, with a policy that pauses releases when the budget is exhausted. The practical consequence is that reliability becomes <Mark>a currency balancing feature velocity against stability</Mark>, and the trade-off becomes visible to the whole team instead of staying inside an engineering argument.
 
-Best practice therefore reduces to a short discipline: pick user-centered indicators, set a target that is achievable but not trivial, publish the budget, and agree in advance on what happens when it runs out. The sources supply the structure and the caution against misleading metrics; the team supplies the numbers and the enforcement policy. That division of responsibility is the reason claim status matters here: the framework is sourced, the operating values are chosen.
+<KeyPoint>
+Best practice therefore reduces to a short discipline: pick user-centered indicators, set a target that is achievable but not trivial, publish the budget, and agree in advance on what happens when it runs out.
+</KeyPoint>
+
+The sources supply the structure and the caution against misleading metrics; the team supplies the numbers and the enforcement policy. That division of responsibility is the reason claim status matters here: the framework is sourced, the operating values are chosen.
 
 ## A worked example
 
@@ -44,15 +51,23 @@ The two source-reported rows restate guidance the references state directly. The
 
 The SRE book reflects one organization's operating experience, not a universal law or a controlled study. Its recommendations are practice-based, so transferring them assumes a comparable service and team structure. Claims of effectiveness are therefore weaker than claims of description: the material can justify how to define an objective, but it cannot prove that a particular target will produce a particular business result in a different setting.
 
-Maintaining user-centered indicators requires instrumentation at the user edge, which is more work than reading server health. Setting an ambitious target consumes engineering attention, and a strict error budget can slow releases during periods when speed matters commercially. The budget is only as useful as the organization's willingness to honor it, and a policy that is routinely waived teaches the team that the number is decorative.
+Maintaining user-centered indicators requires instrumentation at the user edge, which is more work than reading server health. Setting an ambitious target consumes engineering attention, and a strict error budget can slow releases during periods when speed matters commercially. The budget is only as useful as the organization's willingness to honor it, and a policy that is routinely waived <Mark>teaches the team that the number is decorative</Mark>.
 
-An indicator can be gamed. A metric that excludes certain failed requests will show a healthy objective while users experience errors. A target set too loose gives no signal at all, and one set too high exhausts the budget immediately and triggers constant freezes. Both extremes produce the same practical outcome: the team stops using the SLO to make decisions and starts using it to report status.
+An indicator can be gamed.
+
+<Trap>
+A metric that excludes certain failed requests will show a healthy objective while users experience errors.
+</Trap>
+
+A target set too loose gives no signal at all, and one set too high exhausts the budget immediately and triggers constant freezes. Both extremes produce the same practical outcome: the team stops using the SLO to make decisions and starts using it to report status.
 
 The guidance does not specify target numbers for arbitrary services, nor does it resolve multi-region or multi-dependency reliability trade-offs. It also treats internal objectives and external agreements as distinct, and the legal consequences of an agreement lie outside the engineering guidance. A team operating under contractual penalties needs input that the source material does not provide.
 
 As traffic patterns, architecture, and user expectations change, indicators and targets drift. A signal that once tracked user pain can become a proxy for something else after a redesign, so both the indicator and the budget policy need scheduled review with explicit ownership. Without that review, an SLO quietly stops representing the service it claims to describe.
 
+<PullQuote>
 The counterargument that a simple uptime metric is fair for small services is reasonable, but incomplete for user trust: uptime can stay high while the requests users make fail, so it understates real degradation.
+</PullQuote>
 
 ## A decision test
 

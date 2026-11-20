@@ -9,9 +9,17 @@ tags:
   - Web Development
 ---
 
+<Lead>
 A deployment can succeed from the application's point of view and still break search-critical behavior: a route starts returning 404, production HTML inherits `noindex`, canonical URLs point to staging, or the sitemap no longer parses. These failures are preventable when a small set of important invariants is checked before and after release.
+</Lead>
 
-**Direct answer:** Add SEO regression checks to the same delivery pipeline used for application tests. Test representative routes for expected HTTP status, absence of accidental `noindex`, canonical-host correctness, valid sitemap XML, and essential rendered content. Run build-time checks against a preview deployment and a short post-deploy smoke test against production. Keep checks focused on invariants the team controls; do not make CI fail merely because Google has not indexed a page or selected the expected canonical.
+**Direct answer:**
+
+<KeyPoint>
+Add SEO regression checks to the same delivery pipeline used for application tests.
+</KeyPoint>
+
+Test representative routes for expected HTTP status, absence of accidental `noindex`, canonical-host correctness, valid sitemap XML, and essential rendered content. Run build-time checks against a preview deployment and a short post-deploy smoke test against production. Keep checks focused on <Mark>invariants the team controls</Mark>; do not make CI fail merely because Google has not indexed a page or selected the expected canonical.
 
 ## 1. Choose stable invariants, not every SEO recommendation
 
@@ -25,7 +33,11 @@ An invariant is behavior that should remain true across releases. Start with a s
 | Sitemap is valid and contains allowed URLs | Parse XML and inspect URL policy | Sitemap generation is asynchronous during preview |
 | Main content renders in the expected template | Check a stable heading or data marker | Copy changes or localization updates |
 
-Avoid brittle tests for exact title wording, exact page counts, or Google-selected canonical and index status unless a specific business requirement truly depends on them. A regression test should detect a defect, not freeze normal editorial changes.
+Avoid brittle tests for exact title wording, exact page counts, or Google-selected canonical and index status unless a specific business requirement truly depends on them.
+
+<Trap>
+A regression test should detect a defect, not freeze normal editorial changes.
+</Trap>
 
 ## 2. Split checks across build, preview, and production
 
@@ -39,7 +51,7 @@ Sitemap generation tests         canonical/robots checks       sitemap + error s
 Schema parse where relevant      rendered-template checks      monitor, don't mutate
 ```
 
-Build-time tests are deterministic and fast. Preview checks verify that the application emits expected output through the deployment platform. Production smoke tests should be read-only, low volume, and run after deployment; they detect environment-specific problems such as wrong host configuration or missing production assets.
+Build-time tests are deterministic and fast. Preview checks verify that the application emits expected output through the deployment platform. Production smoke tests should be <Mark>read-only, low volume</Mark>, and run after deployment; they detect environment-specific problems such as wrong host configuration or missing production assets.
 
 ## 3. A small route-and-HTML smoke test
 
@@ -141,7 +153,7 @@ This is a generic example, not a tested workflow for this repository. Provider-s
 
 ## Summary
 
-SEO regression testing works best as a small safety net around application releases. Check route responses, robots directives, canonicals, sitemap validity, and rendered output at the stage where those signals exist. Keep the checks maintainable, distinguish preview behavior from production, and verify failures before rollback. CI can prevent known regressions; it cannot predict indexing or ranking outcomes.
+SEO regression testing works best as <Mark>a small safety net around application releases</Mark>. Check route responses, robots directives, canonicals, sitemap validity, and rendered output at the stage where those signals exist. Keep the checks maintainable, distinguish preview behavior from production, and verify failures before rollback. CI can prevent known regressions; it cannot predict indexing or ranking outcomes.
 
 For ongoing checks beyond deployment, see [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts).
 
@@ -151,7 +163,13 @@ The following is hypothetical and illustrative. Consider a hypothetical reposito
 
 ## A counterargument
 
-The article is candid that a syntactically valid canonical can still be semantically wrong and that tests catch known invariants while humans judge intent; that concession is also the limit of its case. The recommended suite checks what is easy to assert - status codes, canonical presence, absent noindex, parseable XML - yet a deployment can satisfy all of those and still damage a site in ways the fixtures do not cover. The cited sources support CI mechanics, test-suite shape, and HTTP semantics, not the choice of these particular invariants. A reasonable critic would add that regex-based HTML checks are brittle by the article's own account, so the maintenance cost of even a small suite may exceed the regressions it catches, and a green run can create confidence the checks do not deserve.
+The article is candid that a syntactically valid canonical can still be semantically wrong and that tests catch known invariants while humans judge intent; that concession is also the limit of its case.
+
+<PullQuote>
+The recommended suite checks what is easy to assert - status codes, canonical presence, absent noindex, parseable XML - yet a deployment can satisfy all of those and still damage a site in ways the fixtures do not cover.
+</PullQuote>
+
+The cited sources support CI mechanics, test-suite shape, and HTTP semantics, not the choice of these particular invariants. A reasonable critic would add that regex-based HTML checks are brittle by the article's own account, so the maintenance cost of even a small suite may exceed the regressions it catches, and a green run can create confidence the checks do not deserve.
 
 ## References & Further Reading
 

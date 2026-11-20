@@ -9,9 +9,17 @@ tags:
   - Engineering
 ---
 
-A model's architecture sets the upper bound on serving performance; the serving framework determines how much of that bound you reach. Two ideas from vLLM — continuous batching and paged attention memory — changed the practical throughput of LLM serving without changing the models themselves.
+<Lead>
+A model's architecture sets the upper bound on serving performance; the serving framework determines <Mark>how much of that bound you reach</Mark>. Two ideas from vLLM — continuous batching and paged attention memory — changed the practical throughput of LLM serving without changing the models themselves.
+</Lead>
 
-**Direct answer:** Continuous batching replaces fixed batches with dynamic scheduling as requests finish, and paged memory allocates KV-cache space in blocks rather than contiguous reservations. The vLLM paper reports substantial throughput improvements from these changes. The boundary: a framework improves hardware utilisation; it cannot fix a model that is too large for memory or a workload whose latency target is incompatible with batching.
+**Direct answer:**
+
+<KeyPoint>
+Continuous batching replaces fixed batches with dynamic scheduling as requests finish, and paged memory allocates KV-cache space in blocks rather than contiguous reservations.
+</KeyPoint>
+
+The vLLM paper reports substantial throughput improvements from these changes. The boundary: a framework improves hardware utilisation; it cannot fix a model that is too large for memory or a workload whose latency target is incompatible with batching.
 
 ## Two mechanisms
 
@@ -31,7 +39,7 @@ The following is hypothetical and illustrative.
 
 A server has enough memory for 40 concurrent sequences at an average context length. Under static batching with a fixed batch of 8, a request that finishes early holds its slot until the longest request in the batch completes. If lengths vary from 200 to 2,000 tokens, average utilisation may be 50% because slots sit idle waiting.
 
-With continuous batching, each finished slot is immediately filled. Utilisation rises toward 90%, and effective throughput nearly doubles on the same hardware. Paged memory contributes by fitting more active sequences in the same memory budget, since it allocates for actual tokens rather than reserved maximums.
+With continuous batching, <Mark>each finished slot is immediately filled</Mark>. Utilisation rises toward 90%, and effective throughput nearly doubles on the same hardware. Paged memory contributes by fitting more active sequences in the same memory budget, since it allocates for actual tokens rather than reserved maximums.
 
 Three lessons follow:
 
@@ -49,7 +57,11 @@ A serving framework's benefit is empirical for your workload. Three measurements
 
 **Tail behaviour under bursts.** Steady-state throughput can hide poor behaviour when arrivals spike. Measure the 95th and 99th percentile latency during bursts, which the observability article recommends.
 
-Run the comparison on representative traffic — real request lengths and arrival patterns — not a synthetic uniform load. The benefits of continuous batching grow with length variance, so a uniform test will understate them.
+Run the comparison on representative traffic — real request lengths and arrival patterns — not a synthetic uniform load.
+
+<Trap>
+The benefits of continuous batching grow with length variance, so a uniform test will understate them.
+</Trap>
 
 ## What the framework does not solve
 
@@ -57,11 +69,15 @@ Run the comparison on representative traffic — real request lengths and arriva
 
 **It cannot meet an incompatible latency SLO.** If the workload needs a response in 20 ms and the model needs 40 ms per pass, scheduling cannot close the gap, as the batching-economics article shows.
 
-**It does not remove the need for measurement.** The right configuration — batch limits, memory settings, precision — is empirical and workload-specific, which the observability article covers.
+**It does not remove the need for measurement.** The right configuration — batch limits, memory settings, precision — is <Mark>empirical and workload-specific</Mark>, which the observability article covers.
 
 **It is a dependency.** Serving frameworks evolve, and an update can change behaviour. Pin versions and re-evaluate, as the build-versus-buy article recommends.
 
-The counterargument — that managed APIs make serving frameworks irrelevant — is fair for teams that do not host models. For anyone running their own inference, the framework is the difference between theoretical and actual throughput.
+The counterargument — that managed APIs make serving frameworks irrelevant — is fair for teams that do not host models.
+
+<PullQuote>
+For anyone running their own inference, the framework is the difference between theoretical and actual throughput.
+</PullQuote>
 
 ## A decision test
 

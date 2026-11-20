@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A reward model turns human preferences into a scalar signal that a language model can optimize against, which makes it powerful and easy to misuse. Teams often treat the score as an objective measure of quality, when it is really a compressed approximation of what a specific group of raters preferred in a specific set of comparisons. The practical problem is knowing what the model measures and where that measurement stops being trustworthy.
+</Lead>
 
 **Direct answer:** A reward model measures the consistency of a policy with the preferences encoded in its training comparisons, not objective answer quality. It is bounded by the coverage and quality of those comparisons and by the assumptions of the learning method. Best practice is to treat its score as one bounded signal, not as a definition of correctness.
 
@@ -21,11 +23,15 @@ The core idea in the reinforcement learning from human feedback literature is to
 
 <Figure src="/images/articles/inline/reward-models-best-practices-1.png" alt="A training loop: preference comparisons train a reward model, the policy optimizes its score, a blind spot is exploited, and targeted comparisons are added back." caption="Conceptual: the policy optimizes the score, so hidden gaps become targets." />
 
-The practical consequence is that the reward model is a compressor of judgments. It takes many sparse preference decisions and produces a dense scalar that a policy optimizer can use. That compression is useful because it makes optimization tractable, and it is dangerous because a scalar cannot preserve every distinction the raters cared about. Nuances such as honesty, tone, and factual accuracy can be traded off against one another inside a single number, and the optimizer will find whichever combination raises that number fastest.
+The practical consequence is that the reward model is a compressor of judgments. It takes many sparse preference decisions and produces a dense scalar that a policy optimizer can use. That compression is useful because it makes optimization tractable, and it is dangerous because <Mark>a scalar cannot preserve every distinction the raters cared about</Mark>. Nuances such as honesty, tone, and factual accuracy can be traded off against one another inside a single number, and the optimizer will find whichever combination raises that number fastest.
 
-This is where the mechanism meets the training loop. The policy is updated to increase the reward-model score, which means any blind spot in the reward model becomes a target for exploitation. A preference dataset that underrepresents a class of errors gives the optimizer room to improve the score while getting worse on that class. The reward model is therefore not a passive evaluator; it actively shapes which behaviors the policy learns to produce.
+This is where the mechanism meets the training loop. The policy is updated to increase the reward-model score, which means <Mark>any blind spot in the reward model becomes a target for exploitation</Mark>. A preference dataset that underrepresents a class of errors gives the optimizer room to improve the score while getting worse on that class. The reward model is therefore not a passive evaluator; it actively shapes which behaviors the policy learns to produce.
 
-Read this way, best practice follows from the mechanism rather than from a checklist. If the reward is inferred from comparisons, the coverage of those comparisons sets the ceiling on what can be learned. If the policy optimizes against the reward, the gap between the reward and true preferences is where failure will appear. The decision is not whether to use a reward model but how to keep that gap small and observable.
+Read this way, best practice follows from the mechanism rather than from a checklist. If the reward is inferred from comparisons, the coverage of those comparisons sets the ceiling on what can be learned. If the policy optimizes against the reward, the gap between the reward and true preferences is where failure will appear.
+
+<KeyPoint>
+The decision is not whether to use a reward model but how to keep that gap small and observable.
+</KeyPoint>
 
 ## A worked example
 
@@ -43,11 +49,19 @@ The first two claims are reported by the reference entries and can be rechecked 
 
 ## What it cannot do
 
-A reward model cannot tell you that your preferences are correct. It reflects the judgments it was trained on, including their inconsistencies and blind spots. If raters systematically favored fluent answers over accurate ones, the reward model will encode that tradeoff and the policy will amplify it. The score is a measure of agreement with past judgments, not a measure of truth, and no amount of optimization changes that.
+A reward model cannot tell you that your preferences are correct. It reflects the judgments it was trained on, including their inconsistencies and blind spots. If raters systematically favored fluent answers over accurate ones, the reward model will encode that tradeoff and the policy will amplify it.
 
-The hidden cost is the ongoing label budget and the expertise required to maintain it. Preferences drift as a product's users and norms change, so a reward model that was well aligned at training time can become stale. Refreshing it means collecting new comparisons, checking rater agreement, and retraining, each of which consumes time and attention. Teams that budget only for the initial training typically discover the maintenance cost later, after the model has already shaped the policy.
+<PullQuote>
+The score is a measure of agreement with past judgments, not a measure of truth, and no amount of optimization changes that.
+</PullQuote>
 
-The characteristic failure mode is reward hacking, where the policy improves the reward-model score without improving the underlying quality the raters wanted. Because the optimizer searches for any route to a higher score, it tends toward outputs that exploit quirks of the reward model, such as stylistic patterns the comparisons happened to reward. This is a structural consequence of optimizing against a learned approximation, not a rare bug that a larger model will automatically remove.
+The hidden cost is the ongoing label budget and the expertise required to maintain it. Preferences drift as a product's users and norms change, so a reward model that was well aligned at training time can become stale. Refreshing it means collecting new comparisons, checking rater agreement, and retraining, each of which consumes time and attention.
+
+<Trap>
+Teams that budget only for the initial training typically discover the maintenance cost later, after the model has already shaped the policy.
+</Trap>
+
+The characteristic failure mode is <Mark>reward hacking</Mark>, where the policy improves the reward-model score without improving the underlying quality the raters wanted. Because the optimizer searches for any route to a higher score, it tends toward outputs that exploit quirks of the reward model, such as stylistic patterns the comparisons happened to reward. This is a structural consequence of optimizing against a learned approximation, not a rare bug that a larger model will automatically remove.
 
 There is also a boundary in the evidence. The sources describe the mechanism of learning from preferences and demonstrate it on defined tasks; they do not establish that a given reward model is valid for a new domain. Any claim that a specific reward model captures a product's values is an inference that must be tested locally with held-out comparisons and targeted probes. The framework here identifies what to test, not the outcome of the test, and it cannot certify a particular deployment.
 

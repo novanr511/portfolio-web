@@ -9,7 +9,9 @@ tags:
   - Decision Guide
 ---
 
+<Lead>
 The default assumption in many projects is to use the largest model available and only downgrade when cost forces it. That is backwards for tasks with a narrow scope. A small language model, fine-tuned or prompted for a specific job, can match a frontier model on that job while being faster, cheaper, and deployable closer to the data.
+</Lead>
 
 **Direct answer:** Choose a small model when the task is narrow, the output is verifiable, and latency or cost dominates. Large multimodal families such as Gemini illustrate the capability available at the top end; the edge-AI article covers the deployment techniques that make small models practical. The boundary: a small model has less general knowledge and weaker reasoning on unfamiliar tasks, so it is the right choice for a defined job, not as a universal replacement.
 
@@ -17,7 +19,7 @@ The default assumption in many projects is to use the largest model available an
 
 Three differences matter:
 
-**Capability breadth.** A small model knows less and reasons less well on unfamiliar problems. On a narrow task with a clear pattern, that gap can vanish.
+**Capability breadth.** A small model knows less and reasons less well on unfamiliar problems. <Mark>On a narrow task with a clear pattern, that gap can vanish.</Mark>
 
 **Speed and cost.** Fewer parameters mean faster inference and lower memory, which the KV-cache article quantifies. At high volume the difference is decisive.
 
@@ -37,7 +39,7 @@ Three questions decide:
 
 Three conclusions follow:
 
-- **The small model wins on economics** if the error cost is low and the category set is stable.
+- **The small model wins on economics** if <Mark>the error cost is low and the category set is stable</Mark>.
 - **The frontier model wins on robustness** to novel inputs.
 - **A hybrid is possible** — small model for known categories, escalation to a larger one for low-confidence cases, which the routing article describes.
 
@@ -59,19 +61,31 @@ Three conclusions follow:
 
 **Applications that need multimodal depth** — high-resolution images, audio, or video — where the largest models currently lead, as the Gemini paper illustrates.
 
-The counterargument — that small models are always cheaper — needs a caveat. A small model that fails and needs escalation can cost more than a frontier model that succeeds first time. Measure the full pipeline, as the cost estimator explains.
+The counterargument — that small models are always cheaper — needs a caveat.
+
+<Trap>
+A small model that fails and needs escalation can cost more than a frontier model that succeeds first time.
+</Trap>
+
+Measure the full pipeline, as the cost estimator explains.
 
 ## The evaluation that decides
 
-A small model should be chosen on a labelled comparison, not on a parameter count. Three parts of the evaluation matter:
+<KeyPoint>
+A small model should be chosen on a labelled comparison, not on a parameter count.
+</KeyPoint>
 
-**Task accuracy against a baseline.** Score both models on the same held-out set from real work. A two-point gap is meaningful only if the set is large enough to detect it, as the confidence-interval article explains.
+Three parts of the evaluation matter:
+
+**Task accuracy against a baseline.** <Mark>Score both models on the same held-out set from real work.</Mark> A two-point gap is meaningful only if the set is large enough to detect it, as the confidence-interval article explains.
 
 **Behaviour on novel inputs.** Include cases outside the fine-tuning distribution — a new category, a different phrasing, a malformed request. A small model may fail sharply here while a general model degrades gracefully.
 
 **Full-pipeline cost.** Count escalation, review, and retries alongside token cost. A small model that handles 80% of cases and escalates the rest may beat either extreme, which the routing article shows.
 
+<PullQuote>
 These three measurements turn a size debate into an engineering decision with stated trade-offs.
+</PullQuote>
 
 ## A decision test
 

@@ -9,9 +9,17 @@ tags:
   - Machine Learning
 ---
 
-Search starts with a query; recommendation starts with a user. Increasingly, both are the same problem: given a context and a set of candidates, produce an ordered list that someone will find useful. The systems have converged at the level of architecture even where they differ at the level of intent.
+<Lead>
+Search starts with a query; recommendation starts with a user. Increasingly, both are the same problem: given a context and a set of candidates, produce an ordered list that someone will find useful. The systems have <Mark>converged at the level of architecture</Mark> even where they differ at the level of intent.
+</Lead>
 
-**Direct answer:** Search systems are moving toward learned ranking, personalisation, and semantic matching; recommender systems are moving toward explicit intent and query-like inputs. The shared machinery is candidate generation followed by ranking, with embeddings representing queries, users, and items in a common space. The difference that remains is the role of explicit intent: a search query is a strong signal that should dominate personalisation, while a recommendation has no query and must infer intent from context.
+**Direct answer:**
+
+<KeyPoint>
+Search systems are moving toward learned ranking, personalisation, and semantic matching; recommender systems are moving toward explicit intent and query-like inputs.
+</KeyPoint>
+
+The shared machinery is candidate generation followed by ranking, with embeddings representing queries, users, and items in a common space. The difference that remains is the role of explicit intent: a search query is a strong signal that should dominate personalisation, while a recommendation has no query and must infer intent from context.
 
 ## Two entry points, one ranking problem
 
@@ -21,13 +29,18 @@ That separation has weakened for three reasons:
 
 **Semantic matching.** Dense embeddings allow a search system to match meaning rather than exact terms. Vaswani et al.'s transformer architecture — with 28.4 BLEU on WMT 2014 English-to-German and 41.8 on English-to-French after 3.5 days on eight GPUs — made the representation approach practical at scale, and the same encoder technology now represents documents and queries in a shared space.
 
+<KeyFigures items={[
+  { value: "28.4 BLEU", label: "on WMT 2014 English-to-German", source: "Vaswani et al." },
+  { value: "41.8", label: "on English-to-French after 3.5 days on eight GPUs", source: "Vaswani et al." },
+]} />
+
 **Learned ranking.** Ranking models such as DeepFM were developed for click-through prediction, and their object — modelling low- and high-order feature interactions — applies equally to search results and recommendations. A search ranker now uses behaviour signals just as a recommender does.
 
 **User context.** Search results are increasingly personalised, and recommenders are increasingly conditioned on momentary intent such as a recent search or a current session. The boundary is a matter of degree.
 
 ## Where they still differ
 
-The most important difference is the authority of explicit intent.
+The most important difference is <Mark>the authority of explicit intent</Mark>.
 
 A search query is a deliberate statement of what the user wants. A good search system treats it as the primary signal and uses personalisation to resolve ambiguity, not to override the query. A recommender has no such statement and must infer what would be useful from history, context, and the behaviour of similar users.
 
@@ -49,7 +62,13 @@ The boundary matters because an error in candidate generation cannot be repaired
 
 The practical consequence is organisational as much as technical. Search and recommendation teams often own different surfaces but are solving the same ranking problem with different signals. They can share the candidate-generation infrastructure, the feature store, the embedding models, and the experimentation framework, and they should compare notes on evaluation because both suffer from position bias and feedback loops.
 
-What they should not share is the objective. A search system that optimises engagement at the cost of query fidelity will frustrate users who came to find something specific. A recommender that optimises relevance to past behaviour at the cost of discovery will narrow the experience. The systems have converged in mechanism, not in purpose.
+What they should not share is the objective.
+
+<Trap>
+A search system that optimises engagement at the cost of query fidelity will frustrate users who came to find something specific.
+</Trap>
+
+A recommender that optimises relevance to past behaviour at the cost of discovery will narrow the experience. The systems have converged in mechanism, not in purpose.
 
 ## A checklist
 
@@ -68,7 +87,11 @@ The following is hypothetical and illustrative. Consider a hypothetical product 
 
 ## A counterargument
 
-The convergence thesis is weaker than the shared vocabulary makes it look. Candidate generation followed by ranking describes nearly any retrieval system, so pointing to it does not establish that search and recommendation are becoming the same problem; the cited papers are largely about click-through prediction, collaborative filtering, and representation learning rather than search ranking itself. The article also insists that explicit intent is the difference that remains, while conceding that search is personalised and recommenders take query-like inputs, which makes the boundary look like a matter of framing. A critic would accept the advice to share indexes and experiments but note that not sharing the objective is asserted, and that the evaluation asymmetry - fixed queries for search, longer-run outcomes for recommenders - argues the problems differ more than the architecture analogy allows.
+<PullQuote>
+The convergence thesis is weaker than the shared vocabulary makes it look.
+</PullQuote>
+
+<Mark>Candidate generation followed by ranking</Mark> describes nearly any retrieval system, so pointing to it does not establish that search and recommendation are becoming the same problem; the cited papers are largely about click-through prediction, collaborative filtering, and representation learning rather than search ranking itself. The article also insists that explicit intent is the difference that remains, while conceding that search is personalised and recommenders take query-like inputs, which makes the boundary look like a matter of framing. A critic would accept the advice to share indexes and experiments but note that not sharing the objective is asserted, and that the evaluation asymmetry - fixed queries for search, longer-run outcomes for recommenders - argues the problems differ more than the architecture analogy allows.
 
 ## References & Further Reading
 

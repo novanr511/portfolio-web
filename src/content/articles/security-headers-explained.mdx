@@ -9,21 +9,29 @@ tags:
   - Engineering
 ---
 
-Security headers are response headers that tell a browser how to behave — whether to allow a page in a frame, which sources of scripts are permitted, whether to use HTTPS exclusively. They are cheap to set and easy to misconfigure, which is why a copied set can give a false sense of protection, as the OWASP ASVS material treats controls as something to verify, as [Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response) argues for a defined boundary.
+<Lead>
+Security headers are response headers that tell a browser how to behave — whether to allow a page in a frame, which sources of scripts are permitted, whether to use HTTPS exclusively. They are cheap to set and easy to misconfigure, which is why a copied set can give <Mark>a false sense of protection</Mark>, as the OWASP ASVS material treats controls as something to verify, as [Cybersecurity Fundamentals: Threat Modeling, Zero Trust, Incident Response](/articles/cybersecurity-fundamentals-threat-modeling-zero-trust-incident-response) argues for a defined boundary.
+</Lead>
 
-**Direct answer:** Use security headers to enforce behaviour the browser can control — HTTPS upgrade, MIME handling, framing, and content policy — with a deployment that tests for breakage. MDN documents HSTS, and OWASP ASVS provides the verification standard. The boundary: headers cannot fix server-side vulnerabilities, which the security fundamentals article treats as a separate domain, and a strict content policy can break a site if deployed without testing, as the rollout guidance in the incident article recommends for staged changes.
+**Direct answer:**
+
+<KeyPoint>
+Use security headers to enforce behaviour the browser can control — HTTPS upgrade, MIME handling, framing, and content policy — with a deployment that tests for breakage.
+</KeyPoint>
+
+MDN documents HSTS, and OWASP ASVS provides the verification standard. The boundary: headers cannot fix server-side vulnerabilities, which the security fundamentals article treats as a separate domain, and a strict content policy can break a site if deployed without testing, as the rollout guidance in the incident article recommends for staged changes.
 
 ## The headers
 
 **Strict-Transport-Security (HSTS)** tells browsers to use HTTPS for the host, which MDN describes for the header's effect. It reduces downgrade risk, which the HTTPS-and-SEO article covers for certificate and redirect diagnosis, as the TLS discussion explains for the underlying protocol.
 
-**Content-Security-Policy (CSP)** restricts which sources may load scripts and other resources, which the XSS discussion in the OWASP material treats as a defence, as the output-handling article explains for untrusted content. A policy in report-only mode is a way to learn before enforcing, which the rollout guidance recommends.
+**Content-Security-Policy (CSP)** restricts which sources may load scripts and other resources, which the XSS discussion in the OWASP material treats as a defence, as the output-handling article explains for untrusted content. A policy in <Mark>report-only mode</Mark> is a way to learn before enforcing, which the rollout guidance recommends.
 
 **X-Content-Type-Options** prevents MIME sniffing, which MDN documents for the header, as the file-upload discussion in the threat-modeling article treats content type as a boundary.
 
 **Frame-ancestors or X-Frame-Options** limits embedding, which the clickjacking material in OWASP covers, as the trust-boundary article explains for what a browser can enforce.
 
-Three consequences follow. Headers are defence in depth, which the zero-trust article treats as a principle, as the security checklist requires per-tool controls. They should be tested in staging, as the deployment guidance recommends for staged changes, as the error-handling article covers diagnosis. And they should be verified after deployment, which the diagnostics article advises for checking the actual response, as the observability article treats signals as evidence.
+Three consequences follow. Headers are <Mark>defence in depth</Mark>, which the zero-trust article treats as a principle, as the security checklist requires per-tool controls. They should be tested in staging, as the deployment guidance recommends for staged changes, as the error-handling article covers diagnosis. And they should be verified after deployment, which the diagnostics article advises for checking the actual response, as the observability article treats signals as evidence.
 
 ## A worked config
 
@@ -31,13 +39,21 @@ The following is hypothetical and illustrative. A site enables HSTS, a report-on
 
 Three checks decide the rollout. First, does the site work correctly over HTTPS with valid certificates, which the HTTPS-and-SEO article requires for diagnosis, as MDN's HSTS reference advises before enabling the header? Second, does the report-only CSP reveal legitimate resources that would be blocked, as the OWASP ASVS material treats as verification, as the staged rollout guidance recommends? Third, do the headers appear in the actual response, which the diagnostics article advises checking, as the server-logs article treats requests as evidence?
 
-Three conclusions follow. Report-only prevents breakage, which the rollout guidance supports. A header set without verification is a claim, as the diagnostics article warns. And the config should be reviewed after an application change, as the monitoring article advises.
+Three conclusions follow. Report-only prevents breakage, which the rollout guidance supports.
+
+<Trap>
+A header set without verification is a claim, as the diagnostics article warns.
+</Trap>
+
+And the config should be reviewed after an application change, as the monitoring article advises.
 
 ## What headers cannot do
 
 They cannot fix a server-side injection flaw, which the security fundamentals article treats as a separate domain, as the prompt-injection article explains for input trust. They do not replace a content policy that is actually correct, which the CSP discussion implies, as the output-handling article advises. And they cannot guarantee a security outcome, which the publication standard forbids claiming, as the risk-assessment article requires residual risk.
 
+<PullQuote>
 The counterargument that a framework sets them automatically is fair and incomplete, which the verification step in the worked config shows: a claim about a header is different from evidence of its response, as the diagnostics article advises.
+</PullQuote>
 
 ## A decision test
 

@@ -9,7 +9,9 @@ tags:
   - Web Infrastructure
 ---
 
+<Lead>
 Few technical SEO areas cause more inadvertent search outages than confusing crawl control with indexation control. Engineering teams frequently deploy a `Disallow` rule in `robots.txt` expecting a URL to disappear from Google search results, only to discover that the URL remains indexed with a generic snippet reading *"No information is available for this page."*
+</Lead>
 
 **Direct Answer:** `robots.txt`, `noindex`, and XML sitemaps govern three completely separate stages of search engine ingestion. `robots.txt` controls **crawling** (preventing bots from downloading resources), `noindex` controls **indexation** (preventing pages from appearing in search results), and XML sitemaps control **discovery** (suggesting canonical URLs to fetch). Blocking a page with `robots.txt` prevents crawlers from reading a `noindex` directive, locking the URL in the index if external links point to it.
 
@@ -53,7 +55,10 @@ When a crawler plans to visit a URL on your host, it first checks its cached cop
 * If the path matches an `Allow` rule (or has no matching rule), the crawler proceeds with the fetch.
 
 ### The "Indexed Without Content" Trap
+
+<KeyPoint>
 `robots.txt` is **not an access control mechanism**, nor does it prevent indexation.
+</KeyPoint>
 
 If an external website links to a URL that you have disallowed in `robots.txt`, Googlebot cannot fetch your page to read what is on it, but it still knows the URL exists. Because Googlebot cannot read your page to find a `noindex` tag, it may index the bare URL based entirely on anchor text from incoming links.
 
@@ -67,7 +72,7 @@ The result is a low-quality search snippet:
 
 ## 2. Noindex Directives: Preventing Search Indexation
 
-A `noindex` directive explicitly commands search engines to exclude a document from the search index. It does not prevent crawling; in fact, **it requires crawling to be discovered**.
+A `noindex` directive explicitly commands search engines to <Mark>exclude a document from the search index</Mark>. It does not prevent crawling; in fact, **it requires crawling to be discovered**.
 
 A `noindex` directive can be implemented through two mechanisms:
 
@@ -97,7 +102,7 @@ Content-Type: application/pdf
 X-Robots-Tag: noindex, nofollow
 ```
 
-The `X-Robots-Tag` is especially powerful because:
+The <Mark>`X-Robots-Tag`</Mark> is especially powerful because:
 1. It works on non-HTML assets (e.g., PDF documents, JSON endpoints, image files).
 2. It can be applied globally at the edge (CDN/Nginx) across entire staging environments or subdomains without modifying application templates.
 
@@ -114,13 +119,15 @@ An XML sitemap is a structured inventory file that informs search engine crawler
 ### What Sitemaps Do Not Do
 * **Do not guarantee crawling:** Submitting an XML sitemap does not compel Googlebot to fetch the URLs immediately.
 * **Do not guarantee indexing:** A URL listed in an XML sitemap must still pass quality, uniqueness, and canonicalization criteria.
-* **Do not override directives:** An XML sitemap cannot override a `noindex` tag or a `robots.txt` disallow rule.
+* **Do not override directives:** An XML sitemap <Mark>cannot override a `noindex` tag</Mark> or a `robots.txt` disallow rule.
 
 ---
 
 ## 4. The Fatal Directive Conflict: Blocking Noindex with Robots.txt
 
+<Trap>
 The most frequent architectural failure in technical SEO occurs when an engineer combines `robots.txt` and `noindex` simultaneously:
+</Trap>
 
 ```text
 Step 1: Developer adds <meta name="robots" content="noindex"> to /private-page
@@ -177,7 +184,13 @@ The following is hypothetical and illustrative. Consider a hypothetical site pre
 
 ## A counterargument
 
-The three-stage model is a useful simplification, but it presents directives as more deterministic than the sources warrant. The matrix says a noindex response is completely purged from index and that a disallowed URL stays only if externally linked, while the article itself shows Google ignoring signals that conflict with canonicals or appear in unsupported places. A noindex is a request a crawler chooses to honour, not a switch, and the cited Google documentation describes how signals are used rather than promising an outcome. The referenced RFC adds a wrinkle: a 4xx robots.txt permits access and an unreachable one forbids it, so even the fatal conflict depends on the crawler actually reading the disallow. The stages are distinct; the guarantees are softer than the matrix implies.
+The three-stage model is a useful simplification, but it presents directives as more deterministic than the sources warrant. The matrix says a noindex response is completely purged from index and that a disallowed URL stays only if externally linked, while the article itself shows Google ignoring signals that conflict with canonicals or appear in unsupported places.
+
+<PullQuote>
+A noindex is a request a crawler chooses to honour, not a switch, and the cited Google documentation describes how signals are used rather than promising an outcome.
+</PullQuote>
+
+The referenced RFC adds a wrinkle: a 4xx robots.txt permits access and an unreachable one forbids it, so even the fatal conflict depends on the crawler actually reading the disallow. The stages are distinct; the guarantees are softer than the matrix implies.
 
 ## References & Further Reading
 

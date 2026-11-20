@@ -9,9 +9,15 @@ tags:
   - DevOps
 ---
 
+<Lead>
 Most organisations say they want high availability, and almost none can say what that means in a number, over what window, measured how. Site reliability engineering starts by making that sentence precise, and the precision changes the conversation — because once reliability has a number, the organisation can decide how much unreliability it can afford.
+</Lead>
 
-**Direct answer:** An SLO is a target for a service level indicator — the Google SRE book defines an SLI as "a carefully defined quantitative measure of some aspect of the level of service that is provided" — and an error budget is the amount of failure the SLO permits. The budget is not a ceiling to hide under; it is a currency that funds change. When the budget is intact, the team can ship; when it is exhausted, reliability work takes priority until it recovers. That is the mechanism that stops reliability and velocity from being opposing slogans.
+**Direct answer:** An SLO is a target for a service level indicator — the Google SRE book defines an SLI as "a carefully defined quantitative measure of some aspect of the level of service that is provided" — and an error budget is <Mark>the amount of failure the SLO permits</Mark>. When the budget is intact, the team can ship; when it is exhausted, reliability work takes priority until it recovers. That is the mechanism that stops reliability and velocity from being opposing slogans.
+
+<KeyPoint>
+The budget is not a ceiling to hide under; it is a currency that funds change.
+</KeyPoint>
 
 ## The terms do real work
 
@@ -25,7 +31,7 @@ Choosing an SLI is the first substantive decision. It has to measure what users 
 
 An SLO of 99.9% over a month permits roughly 43 minutes of unavailability. That number is an error budget, and its value is not that it measures failure but that it allocates it.
 
-The allocation works in both directions. A team that has used little of its budget can take risks — deploy more often, run experiments, accept that a change might cause a short incident. A team that has exhausted it stops feature work and spends the next period on reliability, because another incident would breach the objective. This is a pre-agreed decision rule, and it removes the argument about whether "now" is a good time to be careful.
+The allocation works in both directions. A team that has used little of its budget can take risks — deploy more often, run experiments, accept that a change might cause a short incident. A team that has exhausted it stops feature work and spends the next period on reliability, because another incident would breach the objective. This is <Mark>a pre-agreed decision rule</Mark>, and it removes the argument about whether "now" is a good time to be careful.
 
 The budget also makes a uncomfortable question answerable: is 99.9% the right target? If the team never spends the budget, the objective is too loose and users are getting less reliability than they could. If it is permanently exhausted, the objective is too strict for the system's current design, and the answer is engineering work or a renegotiation — not a heroic effort to avoid incidents.
 
@@ -35,7 +41,11 @@ A budget that is reviewed monthly is too slow to prevent a breach. The SRE Workb
 
 The point is behavioural. A slow, low-level failure should not page anyone — it will show up in the monthly review. A fast failure should page immediately, because at that rate the budget will be gone in hours. Alerting on burn rate rather than on a fixed error threshold gives detection time and precision at the same time, which is the stated goal of the approach.
 
-It also discourages the common failure of alert fatigue: dozens of cause-based alerts that fire on harmless fluctuations and teach the team to ignore them. The principle is to alert on symptoms — what users experience — and on the rate at which the agreed budget is being spent.
+<Trap>
+It also discourages the common failure of alert fatigue: dozens of cause-based alerts that fire on harmless fluctuations and teach the team to ignore them.
+</Trap>
+
+The principle is to <Mark>alert on symptoms</Mark> — what users experience — and on the rate at which the agreed budget is being spent.
 
 ## Chaos engineering tests the assumption
 
@@ -43,7 +53,11 @@ An SLO describes what should happen; chaos engineering tests what actually happe
 
 The method starts by defining "steady state as some measurable output of a system that indicates normal behavior", then introduces a real failure and checks whether steady state holds. That is an experiment with a hypothesis and an observable result, not a game day with a script.
 
-The relevance to SLOs is direct: a chaos experiment tells you whether your measured SLI actually captures the failure mode you care about, and whether the fallback you assumed works under realistic conditions. Many organisations discover that their availability metric stayed green during a test while users could not complete a transaction — which means the SLI was wrong, not the system.
+The relevance to SLOs is direct: a chaos experiment tells you whether your measured SLI actually captures the failure mode you care about, and whether the fallback you assumed works under realistic conditions.
+
+<PullQuote>
+Many organisations discover that their availability metric stayed green during a test while users could not complete a transaction — which means the SLI was wrong, not the system.
+</PullQuote>
 
 ## A sequence that works
 

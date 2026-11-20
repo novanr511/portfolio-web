@@ -9,9 +9,21 @@ tags:
   - Decision Science
 ---
 
+<Lead>
 Every dashboard has one number at the top that everyone quotes. Sometimes that number is not merely imprecise — it points in the *opposite direction* from the truth. This is not a hypothetical failure mode; it is a mathematical property of averages, it shows up in real public datasets, and it is trivially reproducible. The point of this article is not that "correlation doesn't imply causation" but something sharper and more actionable: a pooled correlation can reverse sign relative to every subgroup it is composed of.
+</Lead>
 
-**Direct Answer:** Simpson's paradox occurs when a trend present in every subgroup reverses direction in the pooled data, because the groups differ systematically on the variable you are not conditioning on. Using the Palmer Penguins dataset (344 observations, three species), bill depth correlates **negatively** with body mass when pooled across all penguins (r = −0.472), yet **positively** within every one of the three species (r = +0.576 Adelie, +0.604 Chinstrap, +0.719 Gentoo). The reversal is caused by Gentoo penguins having both shallower bills and greater mass than the other two species. Before quoting any single correlation, check the within-group sign.
+**Direct Answer:** Simpson's paradox occurs when a trend present in every subgroup reverses direction in the pooled data, because the groups differ systematically on the variable you are not conditioning on. Using the Palmer Penguins dataset (344 observations, three species), bill depth correlates **negatively** with body mass when pooled across all penguins (r = −0.472), yet **positively** within every one of the three species (r = +0.576 Adelie, +0.604 Chinstrap, +0.719 Gentoo). The reversal is caused by Gentoo penguins having both shallower bills and greater mass than the other two species.
+
+<KeyPoint>
+Before quoting any single correlation, check the within-group sign.
+</KeyPoint>
+
+<KeyFigures items={[
+  { value: "−0.472", label: "pooled correlation of bill depth with body mass", source: "Palmer Penguins dataset (Zenodo)" },
+  { value: "+0.719", label: "within-species correlation for Gentoo", source: "Palmer Penguins dataset (Zenodo)" },
+  { value: "344", label: "observations across three species", source: "Palmer Penguins dataset (Zenodo)" },
+]} />
 
 ## The data
 
@@ -62,11 +74,15 @@ Gentoo penguins are both the shallowest-billed and the heaviest. So the between-
 
 Islands show the same confound from a different angle. Because species and island are nearly collinear in this dataset (Biscoe holds 123 Gentoo and 44 Adelie, Dream holds 56 Adelie and all 68 Chinstrap, Torgersen holds only Adelie), island-level means inherit the same pattern: Biscoe's mean bill depth is 15.87 mm against a mean mass of 4716 g, while Dream and Torgersen sit near 18.4 mm and roughly 3710 g. Any analysis that treats "island" as an independent variable here is partly measuring species.
 
-The reverse also happens and is just as dangerous. The same dataset shows bill length correlating *positively* with body mass pooled (r = 0.595) with a slope of about 87 g per mm — yet the within-species slopes differ substantially (Adelie 94.5, Chinstrap 59.1, Gentoo 109.5 g/mm). A business rule derived from the pooled slope ("each extra millimetre of bill length implies 87 g more mass") would be roughly right on average and wrong by a factor of two depending on which species you apply it to.
+The reverse also happens and is just as dangerous. The same dataset shows bill length correlating *positively* with body mass pooled (r = 0.595) with a slope of about 87 g per mm — yet the within-species slopes differ substantially (Adelie 94.5, Chinstrap 59.1, Gentoo 109.5 g/mm).
+
+<Trap>
+A business rule derived from the pooled slope ("each extra millimetre of bill length implies 87 g more mass") would be roughly right on average and wrong by a factor of two depending on which species you apply it to.
+</Trap>
 
 ## The general shape of the trap
 
-Simpson's paradox is one instance of a broader failure: **conditioning on a variable that is a cause of both the predictor and the outcome**. In the penguin case, species is a genuine cause of both bill morphology and body mass, and it is also correlated with the environment. That makes it a confounder, and the reversal is the signature of a confounder you have not accounted for.
+Simpson's paradox is one instance of a broader failure: **conditioning on a variable that is a cause of both the predictor and the outcome**. In the penguin case, species is a genuine cause of both bill morphology and body mass, and it is also correlated with the environment. That makes it a confounder, and <Mark>the reversal is the signature of a confounder you have not accounted for</Mark>.
 
 The formal statement: if the pooled correlation decomposes into a between-group component and a within-group component, and they have opposite signs, the pooled number describes the *groups*, not the *relationship*. The pooled statistic answers "do the groups differ?" The within-group statistic answers "does the variable relate to the outcome, holding the group constant?" They are different questions, and only one of them is usually the one being asked.
 
@@ -78,7 +94,7 @@ This is the sequence I use on any correlation that will drive a decision:
 
 1. **Compute the pooled statistic.** Establish the number you were going to quote.
 2. **Compute it within every natural subgroup.** Species here; customer tier, channel, device class, or geography in a business dataset. Do not eyeball — calculate.
-3. **Compare signs, not just magnitudes.** If any subgroup's sign differs from the pooled sign, stop. You have a paradox, and the pooled number is not a summary of anything you can act on.
+3. **Compare signs, not just magnitudes.** If any subgroup's sign differs from the pooled sign, stop. You have a paradox, and <Mark>the pooled number is not a summary of anything you can act on</Mark>.
 4. **Check whether the subgroup variable is a confounder** — that is, whether it plausibly causes both the predictor and the outcome, or merely correlates with them.
 5. **Test whether your subgroups are collinear with the grouping variable.** If group membership and geography are nearly the same partition, as island and species are here, you cannot cleanly separate their effects.
 6. **Report the stratified result, not the pooled one,** and state the filter you applied.
@@ -111,13 +127,17 @@ A few habits that prevent the mistake from reaching a decision:
 - **State the sample filter.** 344 rows in, 342 usable, and why.
 - **Prefer effect sizes with units over correlation coefficients.** "87 g per mm" invites the reader to ask whether that holds in their segment; "r = 0.595" invites them to accept a direction.
 - **Distinguish "the group with deeper bills is lighter" from "deeper bills cause lightness."** The first is what the pooled data says; the second is what nobody measured.
-- **Check the residual shape.** Correlations are sensitive to leverage. A few extreme points can manufacture or destroy a sign; the scatterplot is not optional.
+- **Check the residual shape.** Correlations are sensitive to leverage. A few extreme points can manufacture or destroy a sign; <Mark>the scatterplot is not optional</Mark>.
 
 For the applied-engineering side of the same discipline — where the numbers come from and whether the measurement instrument is trustworthy — see [SEO Observability: Turn Logs and Checks into Useful Alerts](/articles/seo-observability-turn-logs-and-checks-into-useful-alerts) and [Server Logs for SEO: See What Googlebot Requests](/articles/server-logs-for-seo-see-what-googlebot-requests).
 
 ## A counterargument
 
-A critic would argue that the prescription to report the stratified result rather than the pooled one swaps one question for another. When the decision concerns the whole population - total body mass, overall conversion, aggregate capacity - the pooled figure is the quantity of interest, and the reversal is a finding about composition rather than an error to be corrected away. Conditioning on species or island, which the article notes are nearly collinear, can also remove the between-group effect that matters when an intervention changes the group mix. The article concedes that with three groups the within estimate is dominated by measurement noise, so the stratified number carries its own uncertainty. The dataset and code show that signs can reverse, not which statistic a decision should use.
+A critic would argue that the prescription to report the stratified result rather than the pooled one swaps one question for another. When the decision concerns the whole population - total body mass, overall conversion, aggregate capacity - the pooled figure is the quantity of interest, and the reversal is a finding about composition rather than an error to be corrected away. Conditioning on species or island, which the article notes are nearly collinear, can also remove the between-group effect that matters when an intervention changes the group mix. The article concedes that with three groups the within estimate is dominated by measurement noise, so the stratified number carries its own uncertainty.
+
+<PullQuote>
+The dataset and code show that signs can reverse, not which statistic a decision should use.
+</PullQuote>
 
 ## References & Further Reading
 

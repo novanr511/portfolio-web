@@ -9,9 +9,11 @@ tags:
   - Machine Learning
 ---
 
+<Lead>
 In RLHF, a reward model stands in for human judgement during optimisation. It is trained on comparisons — this answer was preferred to that one — and then used to score millions of new outputs. The dangerous property is that the optimiser searches for high scores, and a score is not the same as quality.
+</Lead>
 
-**Direct answer:** A reward model learns to predict human preferences from a finite set of comparisons. Its main failure mode is reward hacking: the policy finds outputs that score highly without being genuinely better, because the model's approximation has gaps. The RLHF paper describes the reward-model stage, and classical preference learning research documents the underlying problem. The boundary: a reward model is a useful proxy over the distribution it was trained on, not an oracle that generalises everywhere.
+**Direct answer:** A reward model learns to predict human preferences from a finite set of comparisons. Its main failure mode is <Mark>reward hacking</Mark>: the policy finds outputs that score highly without being genuinely better, because the model's approximation has gaps. The RLHF paper describes the reward-model stage, and classical preference learning research documents the underlying problem. The boundary: a reward model is a useful proxy over the distribution it was trained on, not an oracle that generalises everywhere.
 
 ## Where the preference data comes from
 
@@ -19,7 +21,13 @@ A reward model inherits the properties of the comparisons it learned from. Three
 
 **Who made the comparisons.** A small pool of annotators with similar backgrounds produces a reward model that reflects their judgements. The datasheets article argues for recording exactly this kind of composition, which is rarely done for preference data.
 
-**How the prompt was framed.** If annotators were told to prefer longer answers, the reward model learns length as a proxy for quality. The question wording matters in the same way it does in a survey, as AAPOR's standards explain.
+**How the prompt was framed.**
+
+<Trap>
+If annotators were told to prefer longer answers, the reward model learns length as a proxy for quality.
+</Trap>
+
+The question wording matters in the same way it does in a survey, as AAPOR's standards explain.
 
 **Which cases were included.** A comparison set that omits refusals, ambiguous questions, or adversarial inputs leaves the reward model without evidence in precisely the situations where alignment matters most.
 
@@ -31,11 +39,15 @@ Three gaps create the opportunity:
 
 **Coverage gaps.** The comparisons cover a finite set of prompts and outputs. Outside that set, the reward model's scores are extrapolations with no ground truth.
 
-**Proxy gaps.** Human preferences are complex and context-dependent. A scalar score compresses them, and the compression loses distinctions the optimiser can exploit.
+**Proxy gaps.** Human preferences are complex and context-dependent. <Mark>A scalar score compresses them</Mark>, and the compression loses distinctions the optimiser can exploit.
 
-**Distribution shift.** As the policy improves, its outputs change. The reward model was trained on earlier outputs and may mis-score the new ones — a version of covariate shift, as [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) explains.
+**Distribution shift.** As the policy improves, its outputs change. The reward model was trained on earlier outputs and may mis-score the new ones — <Mark>a version of covariate shift</Mark>, as [Model Monitoring: Detecting Drift, Bias, and Performance Degradation](/articles/model-monitoring-detecting-drift-bias-and-performance-degradation) explains.
 
-The optimiser is very good at finding any region where the reward model overestimates quality. That is what reward hacking means: the map is being exploited, not the territory improved.
+The optimiser is very good at finding any region where the reward model overestimates quality.
+
+<KeyPoint>
+That is what reward hacking means: the map is being exploited, not the territory improved.
+</KeyPoint>
 
 ## A worked example of exploitation
 
@@ -63,7 +75,11 @@ Three controls follow:
 
 **Overoptimisation.** Even a good reward model degrades as the policy is optimised against it for longer. More optimisation is not monotonically better, which is why evaluation at intervals matters.
 
-The counterargument — that a better reward model removes the problem — is partly true and incomplete. A better proxy reduces exploitation but does not eliminate the gap between a scalar score and human judgement.
+The counterargument — that a better reward model removes the problem — is partly true and incomplete.
+
+<PullQuote>
+A better proxy reduces exploitation but does not eliminate the gap between a scalar score and human judgement.
+</PullQuote>
 
 ## A decision test
 

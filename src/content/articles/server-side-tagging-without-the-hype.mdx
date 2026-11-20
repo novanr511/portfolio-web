@@ -9,13 +9,25 @@ tags:
   - Web
 ---
 
-Server-side tagging is often pitched as a fix for every measurement problem: blocked cookies, ad blockers, and inaccurate attribution. It changes where a tag fires, which solves some problems and creates others. The honest case is narrower — more control over what is collected and where it goes, at the cost of infrastructure and new obligations.
+<Lead>
+Server-side tagging is often pitched as a fix for every measurement problem: blocked cookies, ad blockers, and inaccurate attribution. It changes <Mark>where a tag fires, which solves some problems and creates others</Mark>. The honest case is narrower — more control over what is collected and where it goes, at the cost of infrastructure and new obligations.
+</Lead>
 
-**Direct answer:** Server-side tagging runs tag logic on a server you control rather than in the user's browser, which gives you control over the data sent to third parties. Google Tag Manager documentation covers the mechanism, and the analytics event guidance covers how events are defined. The boundary: it does not create consent, does not fabricate identity, and does not guarantee attribution accuracy, which the attribution article treats as a credit rule rather than a causal measurement.
+**Direct answer:**
+
+<KeyPoint>
+Server-side tagging runs tag logic on a server you control rather than in the user's browser, which gives you control over the data sent to third parties.
+</KeyPoint>
+
+Google Tag Manager documentation covers the mechanism, and the analytics event guidance covers how events are defined. The boundary: it does not create consent, does not fabricate identity, and does not guarantee attribution accuracy, which the attribution article treats as a credit rule rather than a causal measurement.
 
 ## The governance question
 
-Moving tags to a server concentrates data handling in one place, which is an opportunity to apply rules consistently but also creates a single point of responsibility. Someone must decide what each vendor receives, which consent signals are honoured, and what happens when a downstream tool changes, as the governance checklist requires for any maintained system. A server container that forwards everything by default has not solved a measurement problem; it has moved an unmanaged set of transfers to a new location, which the data-privacy article treats as a compliance question.
+Moving tags to a server concentrates data handling in one place, which is an opportunity to apply rules consistently but also creates a single point of responsibility. Someone must decide what each vendor receives, which consent signals are honoured, and what happens when a downstream tool changes, as the governance checklist requires for any maintained system.
+
+<Trap>
+A server container that forwards everything by default has not solved a measurement problem; it has moved an unmanaged set of transfers to a new location, which the data-privacy article treats as a compliance question.
+</Trap>
 
 The operational obligation is similar. A client-side tag that fails affects one page; a server container that fails can stop measurement across a whole site, which the observability article treats as a system-level risk. There should be an owner, an alert, and a fallback, as the incident-response article requires for any component that can fail. This is the cost of the control the architecture provides, which the cloud-cost article frames as part of any new workload.
 
@@ -29,7 +41,7 @@ For a small team, the right question is whether the measurement need justifies t
 
 **First-party context.** Requests can arrive at your own domain before being forwarded, which changes how some browsers treat them, as the privacy-sandbox material explains for the changing web platform.
 
-Three consequences follow. The server is now part of your infrastructure, with availability and maintenance duties, which the observability article treats as an operational responsibility. Data still has a legal basis, which the data-privacy article makes jurisdiction-specific. And the measurement is still a model of behaviour, not behaviour itself, as [Marketing Attribution: Multi-Touch Models, Incrementality, and Budget Allocation](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation) warns about credit rules.
+Three consequences follow. The server is now part of your infrastructure, with availability and maintenance duties, which the observability article treats as an operational responsibility. Data still has a legal basis, which the data-privacy article makes jurisdiction-specific. And the measurement is still <Mark>a model of behaviour, not behaviour itself</Mark>, as [Marketing Attribution: Multi-Touch Models, Incrementality, and Budget Allocation](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation) warns about credit rules.
 
 ## A worked example
 
@@ -37,13 +49,17 @@ The following is hypothetical and illustrative. A site wants to measure a purcha
 
 In the browser-only setup, two vendor scripts fire on the thank-you page and each sends its own payload. With server-side tagging, the browser sends one purchase event to the site's server container, which validates the event — order ID, value, currency — and forwards a reduced payload to each vendor. Three checks decide whether this is better. First, is the event definition identical across setups, as the event-measurement guidance requires for comparable data? Second, does the server container forward only what consent permits, which the data-privacy article requires? Third, what does the infrastructure cost, as the cloud-cost article asks for any new workload?
 
-Three conclusions follow. The main gain is control, not magic accuracy, as the mechanism above explains. The consent obligation follows the user, not the architecture, which the privacy article treats as a legal question. And the cost includes a service that must be monitored, as the observability article requires for any production component.
+Three conclusions follow. The main gain is <Mark>control, not magic accuracy</Mark>, as the mechanism above explains. The consent obligation follows the user, not the architecture, which the privacy article treats as a legal question. And the cost includes a service that must be monitored, as the observability article requires for any production component.
 
 ## What server-side tagging cannot do
 
 It cannot reconstruct a user journey that was never observed, which the attribution article treats as a counterfactual problem. It cannot override a privacy choice, which the data-privacy article makes a legal constraint. And it does not guarantee that vendor measurements agree, as [Marketing Attribution: Multi-Touch Models, Incrementality, and Budget Allocation](/articles/marketing-attribution-multi-touch-models-incrementality-and-budget-allocation) explains for different credit rules.
 
-The counterargument that client-side tags are simpler is fair for a small site, which the tag-manager documentation concedes by offering both models. The response is proportionality: choose the model that matches the measurement need and the team's capacity to operate it, as the build-versus-buy article recommends for software capabilities.
+<PullQuote>
+The counterargument that client-side tags are simpler is fair for a small site, which the tag-manager documentation concedes by offering both models.
+</PullQuote>
+
+The response is proportionality: choose the model that matches the measurement need and the team's capacity to operate it, as the build-versus-buy article recommends for software capabilities.
 
 ## A decision test
 

@@ -9,7 +9,9 @@ tags:
   - AI
 ---
 
-A transformer processes all tokens in parallel, which is why it is fast and why it cannot tell, by itself, which token came first. Position encoding supplies that information. Rotary Position Embedding, or RoPE, does it by rotating the query and key vectors according to their position, which makes attention depend on relative distance.
+<Lead>
+A transformer processes all tokens in parallel, which is why it is fast and why it cannot tell, by itself, which token came first. Position encoding supplies that information. Rotary Position Embedding, or RoPE, does it by rotating the query and key vectors according to their position, which makes <Mark>attention depend on relative distance</Mark>.
+</Lead>
 
 **Direct answer:** RoPE applies a position-dependent rotation to queries and keys so that their dot product encodes how far apart two tokens are. The RoFormer paper introduced the method, and it became a default in many later models. The boundary: RoPE encodes position, not meaning — a model can know two tokens are far apart without knowing what to do with that fact, and long-context behaviour still depends on training and data.
 
@@ -31,7 +33,11 @@ For each token at position m, RoPE rotates its query and key vectors by an angle
 
 **Absolute information is present.** Each vector carries a position-dependent rotation.
 
-**Relative information emerges in the dot product.** When a query at position m is compared with a key at position n, the rotation difference depends on m − n, so the attention score carries relative distance.
+**Relative information emerges in the dot product.**
+
+<KeyPoint>
+When a query at position m is compared with a key at position n, the rotation difference depends on m − n, so the attention score carries relative distance.
+</KeyPoint>
 
 **The computation is cheap.** Rotation is a small elementwise operation applied to vectors the model already computes.
 
@@ -58,17 +64,25 @@ Three consequences follow:
 
 **Long-context models** — where the encoding must remain meaningful over thousands of positions.
 
-**Model design** — RoPE is a default in many architectures, so understanding it helps interpret claims about context length and extension techniques.
+**Model design** — <Mark>RoPE is a default in many architectures</Mark>, so understanding it helps interpret claims about context length and extension techniques.
 
 ## What position encoding cannot do
 
-**It cannot create knowledge.** A model that knows two tokens are ten positions apart still needs to learn what that implies.
+**It cannot create knowledge.**
 
-**It does not solve long-context use.** The "Lost in the Middle" finding shows that models do not reliably use all positions in a long input. Encoding position is necessary, not sufficient.
+<Trap>
+A model that knows two tokens are ten positions apart still needs to learn what that implies.
+</Trap>
+
+**It does not solve long-context use.** The "Lost in the Middle" finding shows that models do not reliably use all positions in a long input. <Mark>Encoding position is necessary, not sufficient</Mark>.
 
 **It is not the only scheme.** Absolute encodings, learned position embeddings, and alternatives exist. RoPE is common, not universal.
 
-The counterargument — that position encoding is a low-level detail practitioners need not know — is fair for most application work. It becomes relevant when evaluating claims about context extension, where the mechanism determines what "extending the window" actually means.
+The counterargument — that position encoding is a low-level detail practitioners need not know — is fair for most application work.
+
+<PullQuote>
+It becomes relevant when evaluating claims about context extension, where the mechanism determines what "extending the window" actually means.
+</PullQuote>
 
 ## A decision test
 

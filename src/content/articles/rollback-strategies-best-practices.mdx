@@ -9,17 +9,23 @@ tags:
   - Operations
 ---
 
+<Lead>
 A rollback is treated as the obvious answer when a release goes wrong, which is why teams discover too late that the rollback path was never tested. The bad state may be in a database rather than in code, or a revert may reintroduce a vulnerability, as the rollback trade-offs article treats the choice as a decision with costs, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires a containment step before recovery. A strategy is more than a button.
+</Lead>
 
 **Direct answer:** Prepare a rollback before release, make it fast and tested, decide in advance when to roll back versus roll forward, and verify the result with signals. GitHub Actions documentation covers automation, and the SRE alerting workbook covers detection. The boundary: not every incident is fixed by a rollback — a bad data migration needs a forward fix, which the rollback-measures article distinguishes, as the publication standard forbids guaranteed recovery.
 
 ## The practices
 
-**Define the trigger.** What signal says roll back, which the SRE alerting workbook treats as alerting tied to service objectives, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains? A vague "it feels broken" wastes the window in which a rollback is cheap, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) advises for containment.
+**Define the trigger.** What signal says roll back, which the SRE alerting workbook treats as alerting tied to service objectives, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains? A vague "it feels broken" <Mark>wastes the window in which a rollback is cheap</Mark>, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) advises for containment.
 
 **Keep it reversible.** Schema changes and data migrations are the classic trap, which the rollback trade-offs article treats as a limit on reversibility, as the site-migration article advises on staged changes. Separate the deploy from the data change when possible, as the canary article recommends for bounded exposure.
 
-**Automate and rehearse.** A rollback that lives in a runbook nobody has run is a hypothesis, which the GitHub Actions documentation supports for automation, as the crisis-planning article argues for rehearsed response, as the chaos-engineering article treats failure as something to practise.
+**Automate and rehearse.**
+
+<Trap>
+A rollback that lives in a runbook nobody has run is a hypothesis, which the GitHub Actions documentation supports for automation, as the crisis-planning article argues for rehearsed response, as the chaos-engineering article treats failure as something to practise.
+</Trap>
 
 **Verify the result.** After the rollback, check that the service is healthy, which the observability article treats as evidence from signals, as the SRE alerting workbook advises, as the decision-memo article requires for a recorded judgement.
 
@@ -29,15 +35,23 @@ Three consequences follow. The decision to roll back or forward should be made b
 
 The following is hypothetical and illustrative. A team deploys a new checkout service behind a canary.
 
-Three checks decide the response. First, did the canary show a rise in errors above the threshold defined in advance, as the SRE alerting workbook advises, with the trigger tied to an objective, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains? Second, is the change reversible without a risky data migration, which the rollback trade-offs article asks, as the rollback-measures article distinguishes code from data state? Third, if the team rolls back, can it verify recovery from signals, as the observability article advises, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires for containment?
+Three checks decide the response. First, did the canary show a rise in errors above the threshold defined in advance, as the SRE alerting workbook advises, with the trigger tied to an objective, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains? Second, is the change reversible without <Mark>a risky data migration</Mark>, which the rollback trade-offs article asks, as the rollback-measures article distinguishes code from data state? Third, if the team rolls back, can it verify recovery from signals, as the observability article advises, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) requires for containment?
 
-Three conclusions follow. A canary limits exposure while the decision is made, which the canary article recommends. If the fault is in data, rolling back code will not fix it, which the rollback-measures article treats as a forward-fix case. And the outcome should be recorded with the signal and the reason, as the decision-memo article requires.
+Three conclusions follow. A canary limits exposure while the decision is made, which the canary article recommends.
+
+<KeyPoint>
+If the fault is in data, rolling back code will not fix it, which the rollback-measures article treats as a forward-fix case.
+</KeyPoint>
+
+And the outcome should be recorded with the signal and the reason, as the decision-memo article requires.
 
 ## What rollback strategies cannot do
 
-They cannot undo a data change that was not designed to be reversible, which the rollback trade-offs article treats as a structural limit, as the site-migration article advises on staging. They do not replace monitoring, which the observability article treats as the evidence that something changed, as the alerting workbook requires for detection. And they cannot guarantee a clean recovery, which the publication standard forbids claiming, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) treats recovery as a process with residual risk.
+They cannot undo a data change that was not designed to be reversible, which the rollback trade-offs article treats as a structural limit, as the site-migration article advises on staging. They do not replace monitoring, which the observability article treats as the evidence that something changed, as the alerting workbook requires for detection. And they cannot guarantee a clean recovery, which the publication standard forbids claiming, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) treats recovery as <Mark>a process with residual risk</Mark>.
 
+<PullQuote>
 The counterargument that rolling back is always safest is fair when the change is isolated and reversible and wrong when the fault is in data or the revert creates a new problem, which the rollback-measures article distinguishes, as the worked release shows.
+</PullQuote>
 
 ## A decision test
 

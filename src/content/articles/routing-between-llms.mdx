@@ -9,7 +9,9 @@ tags:
   - Architecture
 ---
 
-A single-model policy treats every request as equally hard. In practice, most application traffic is easy: classify this ticket, extract this field, draft a short reply. A small share is genuinely difficult. Routing sends the easy work to a cheaper model and the hard work to a stronger one — and the published research suggests the saving can be large without giving up answer quality.
+<Lead>
+A single-model policy treats every request as equally hard. In practice, most application traffic is easy: classify this ticket, extract this field, draft a short reply. A small share is genuinely difficult. <Mark>Routing sends the easy work to a cheaper model and the hard work to a stronger one</Mark> — and the published research suggests the saving can be large without giving up answer quality.
+</Lead>
 
 **Direct answer:** FrugalGPT identifies three strategies for reducing LLM inference cost — "prompt adaptation, LLM approximation, and LLM cascade" — and describes its cascade as learning "which combinations of LLMs to use for different queries in order to reduce cost and improve accuracy". RouteLLM trains routers that "dynamically select between a stronger and a weaker LLM during inference", reporting cost reductions "by over 2 times in certain cases—without compromising the quality of responses". The boundary: the savings depend on your traffic having a real easy/hard split, and the router itself makes mistakes.
 
@@ -21,19 +23,28 @@ A single-model policy treats every request as equally hard. In practice, most ap
 
 **LLM cascade** sends a query through a sequence or a selection of models, using the cheaper ones first and escalating when confidence is low. FrugalGPT's version learns the combination from data rather than fixed rules.
 
-RouteLLM's contribution is to learn the selection from preference data — comparisons of which model answered better — rather than hand-writing rules about query types. The reported result is a cost reduction of over 2× in some cases, with response quality maintained on the benchmarks studied.
+RouteLLM's contribution is to learn the selection from preference data — comparisons of which model answered better — rather than hand-writing rules about query types.
+
+<KeyPoint>
+The reported result is a cost reduction of over 2× in some cases, with response quality maintained on the benchmarks studied.
+</KeyPoint>
 
 Two cautions about that number: it is a research result on public benchmarks, and "in certain cases" is doing real work in the sentence. Your traffic mix may not contain the same easy/hard distribution.
 
 ## Why routing can work at all
 
-The premise is that model capability is not needed uniformly. A query asking "what is the return policy?" may be answered correctly by a small, cheap model, while one asking a developer to find a concurrency bug across ten files may need a frontier reasoner. If the application could always use the small model, routing would be pointless; if it always needed the frontier model, routing would add cost for nothing.
+The premise is that <Mark>model capability is not needed uniformly</Mark>. A query asking "what is the return policy?" may be answered correctly by a small, cheap model, while one asking a developer to find a concurrency bug across ten files may need a frontier reasoner. If the application could always use the small model, routing would be pointless; if it always needed the frontier model, routing would add cost for nothing.
 
 Three conditions make routing valuable:
 
 1. **A measurable quality gap.** An evaluation must show that the cheaper model is adequate on a subset of queries. Vendor descriptions like "near-flagship performance" are not that evidence.
 2. **A cost gap at your volumes.** Published prices make this concrete: OpenAI lists GPT-6 Astra at $10/$50 per million input/output tokens and GPT-6.1 Sol at $2/$10 — a 5× list-price difference.
 3. **An identifiable subset.** The router needs features it can use — query length, task type, domain, or a small classifier's output — to decide which tier to call.
+
+<KeyFigures items={[
+  { value: "over 2×", label: "cost reduction reported in certain cases, without compromising quality", source: "RouteLLM" },
+  { value: "5×", label: "list-price difference between the flagship and cheap tiers", source: "OpenAI Models" },
+]} />
 
 ## A worked example of routing economics
 
@@ -61,11 +72,15 @@ Three decisions follow:
 
 ## Building the evaluation that justifies routing
 
-The 70/30 split in the worked example is only as good as the evidence behind it. A defensible evaluation has four properties:
+The 70/30 split in the worked example is <Mark>only as good as the evidence behind it</Mark>. A defensible evaluation has four properties:
 
 **It uses your traffic.** Public benchmarks tell you what a model can do on someone else's questions. Sample real queries from your logs, with the sensitive fields removed, and label which ones the cheap tier handles acceptably.
 
-**It includes the failure modes.** Add queries that are ambiguous, adversarial, or outside the normal distribution. A router trained only on clean traffic will misroute precisely the cases where the cost of a mistake is highest.
+**It includes the failure modes.** Add queries that are ambiguous, adversarial, or outside the normal distribution.
+
+<Trap>
+A router trained only on clean traffic will misroute precisely the cases where the cost of a mistake is highest.
+</Trap>
 
 **It scores the whole pipeline.** Measure end-to-end correctness after escalation, not just the router's accuracy. A router that is 95% correct but sends the hardest 5% to a model that also fails is worse than one that routes more conservatively.
 
@@ -81,7 +96,11 @@ This is the same discipline as any other engineering measurement: the routing la
 
 **Quality metrics can be gamed.** If the router optimises a proxy — say, response length or confidence — it may select models that score well on the proxy and poorly on the task. The evaluation must measure what the business cares about.
 
-The counterargument — that models are getting cheaper, so routing will stop mattering — is partly true and misses the scale effect. Even large price reductions leave a ratio between tiers, and at high volume the ratio determines the bill.
+<PullQuote>
+The counterargument — that models are getting cheaper, so routing will stop mattering — is partly true and misses the scale effect.
+</PullQuote>
+
+Even large price reductions leave a ratio between tiers, and at high volume the ratio determines the bill.
 
 ## A decision test
 

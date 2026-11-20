@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 Speculative decoding promises faster inference by letting a small model draft tokens that a larger model verifies. In practice, teams adopt it and see middling speedups or unexpected regressions. The usual cause is not the idea failing but a mismatch between the technique's assumptions and the serving setup it is dropped into.
+</Lead>
 
 **Direct answer:** Speculative decoding uses a faster draft model to propose tokens, then accepts or rejects them with the target model so the output distribution is preserved. Its payoff depends on draft acceptance and on how the serving system batches and stores the key-value cache. PagedAttention manages that cache in fixed-size blocks, so memory management and drafting interact in ways that are easy to misconfigure.
 
@@ -17,7 +19,7 @@ Speculative decoding promises faster inference by letting a small model draft to
 
 ## The mechanism
 
-Speculative decoding works by generating a short sequence of candidate tokens with a cheaper draft model and then having the larger target model score them in parallel. Tokens that the target would have produced are accepted; the first mismatch is rejected and corrected, with the process continuing from there. The key property, established in the original work, is that the accepted output follows the target model's distribution, so the technique is meant to speed up inference without changing what the model says. When output does change, something in the implementation has broken that guarantee.
+Speculative decoding works by generating a short sequence of candidate tokens with a cheaper draft model and then having the larger target model score them in parallel. Tokens that the target would have produced are accepted; the first mismatch is rejected and corrected, with the process continuing from there. The key property, established in the original work, is that <Mark>the accepted output follows the target model's distribution</Mark>, so the technique is meant to speed up inference without changing what the model says. When output does change, something in the implementation has broken that guarantee.
 
 <Figure src="/images/articles/inline/speculative-decoding-mistakes-to-avoid-1.png" alt="A four-step chain: draft acceptance feeds parallel batching, which relies on PagedAttention KV-cache blocks, together producing realized speedup." caption="Conceptual: acceptance, batching and cache headroom must fit together." />
 
@@ -25,7 +27,7 @@ Because speed comes from accepting multiple draft tokens per target pass, the pa
 
 Serving systems must store the key-value cache for every in-flight request, and that cache grows with sequence length and batch size. PagedAttention addresses this by storing the cache in fixed-size blocks allocated on demand, similar to virtual memory pages, rather than reserving a large contiguous region up front. This reduces fragmentation and lets the system share memory across requests. The practical consequence is that how much memory a request actually consumes depends on block allocation and sharing, not just on the theoretical sequence length.
 
-The two mechanisms meet in deployment. Speculative decoding needs memory for both the draft and target models plus the working cache for the requests being verified. A configuration that fits the target model alone can fail once a draft model and several in-flight batches are added. Mistakes cluster around this interaction: choosing a draft model without measuring acceptance, ignoring the memory cost of concurrent drafts, assuming a single-request benchmark predicts server throughput, and treating the cache as a fixed cost when block allocation makes it dynamic. Each is a configuration error with a measurable signature.
+The two mechanisms meet in deployment. Speculative decoding needs memory for both the draft and target models plus the working cache for the requests being verified. A configuration that fits the target model alone can fail once a draft model and several in-flight batches are added. <Mark>Mistakes cluster around this interaction</Mark>: choosing a draft model without measuring acceptance, ignoring the memory cost of concurrent drafts, assuming a single-request benchmark predicts server throughput, and treating the cache as a fixed cost when block allocation makes it dynamic. Each is a configuration error with a measurable signature.
 
 ## A worked example
 
@@ -45,15 +47,23 @@ The source-reported rows state the guarantees and mechanisms of each paper; neit
 
 This framing has a limited scope. The two sources describe a decoding algorithm and a memory-management technique; they do not promise a speedup for any particular deployment. The guarantees they state are conditional on how the method is implemented and on the workload it serves. Any specific throughput number, acceptance threshold, or memory saving attributed to this setup is a planning assumption, not a result the papers establish. The value here is a set of checks that make failure easier to spot, not a predictor of performance.
 
-A hidden cost is that speculative decoding adds moving parts. A draft model must be hosted, versioned, and kept aligned with the target model; when the target changes, acceptance can fall without an obvious error. Engineering time goes into tuning the draft length and measuring acceptance, and operations time goes into monitoring both models and the cache. Memory that could serve requests is spent holding the draft model. These costs are real even when the technique works, and they are easy to omit from a decision that focuses only on tokens per second.
+A hidden cost is that speculative decoding adds moving parts. A draft model must be hosted, versioned, and kept aligned with the target model; when the target changes, acceptance can fall without an obvious error. <Mark>Engineering time goes into tuning the draft length and measuring acceptance</Mark>, and operations time goes into monitoring both models and the cache. Memory that could serve requests is spent holding the draft model. These costs are real even when the technique works, and they are easy to omit from a decision that focuses only on tokens per second.
 
-The characteristic failure mode is a benchmark that does not resemble production. A single-request test hides whether parallel verification helps and whether memory headroom survives concurrency. A second failure is silent distribution drift: if the acceptance logic is wrong, the system can produce plausible output that no longer matches the target model, and the error is not visible in a latency chart. A third is wasted compute, where a weak draft model adds a forward pass that rarely buys an accepted token. Each failure is cheap to introduce and costly to diagnose without the right measurements.
+<Trap>
+The characteristic failure mode is a benchmark that does not resemble production.
+</Trap>
+
+A single-request test hides whether parallel verification helps and whether memory headroom survives concurrency. A second failure is silent distribution drift: if the acceptance logic is wrong, the system can produce plausible output that no longer matches the target model, and the error is not visible in a latency chart. A third is wasted compute, where a weak draft model adds a forward pass that rarely buys an accepted token. Each failure is cheap to introduce and costly to diagnose without the right measurements.
 
 The boundary is where the technique pays off. Speculative decoding needs a draft model that the target accepts often, verification that can run in parallel, and enough memory for both models plus the active cache. Short outputs, highly sequential workloads, small target models, or low concurrency can erase the benefit, leaving only the added complexity. It is not a universal accelerator, and applying it to a workload whose shape does not match its assumptions is a reliable way to regress performance while believing you improved it.
 
 The configuration also needs review. Acceptance changes when models are updated, traffic patterns shift, and cache behavior changes with sequence-length distribution. A setting that worked at launch can degrade quietly. Track acceptance rate, draft overhead, and memory headroom as ongoing signals, and revisit the setup when any of them moves materially. Without that, the deployment is tuned for a moment in time rather than managed as a system that changes.
 
-The counterargument that speculative decoding is a drop-in speedup is fair when the draft is well matched and the server already batches heavily, and incomplete when acceptance is low or memory is tight. The technique interacts with serving conditions, so its result is a property of the whole system, not of the algorithm alone.
+<PullQuote>
+The counterargument that speculative decoding is a drop-in speedup is fair when the draft is well matched and the server already batches heavily, and incomplete when acceptance is low or memory is tight.
+</PullQuote>
+
+The technique interacts with serving conditions, so its result is a property of the whole system, not of the algorithm alone.
 
 ## A decision test
 
@@ -65,7 +75,11 @@ The counterargument that speculative decoding is a drop-in speedup is fair when 
 6. **Price the overhead.** Count engineering and monitoring cost, not only tokens per second.
 7. **Set review signals.** Track acceptance, draft overhead, and memory headroom and revisit when they shift.
 
-Speculative decoding fails less often as an idea than as a configuration. The papers explain the acceptance guarantee and the cache mechanism, but the realized speedup lives in the interaction between them. Measure acceptance under realistic traffic, budget memory for the whole system, and monitor the signals that change, and the technique becomes a managed choice rather than a hopeful toggle.
+<KeyPoint>
+Speculative decoding fails less often as an idea than as a configuration.
+</KeyPoint>
+
+The papers explain the acceptance guarantee and the cache mechanism, but the realized speedup lives in the interaction between them. Measure acceptance under realistic traffic, budget memory for the whole system, and monitor the signals that change, and the technique becomes a managed choice rather than a hopeful toggle.
 
 For further reading, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
 

@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A service level objective is often written as a percentage, which hides the decision it is meant to support. The SRE material defines objectives in terms of user experience, and the alerting workbook ties signals to those objectives. The measure of an SLO is whether it changes behaviour.
+</Lead>
 
 **Direct answer:** Set an SLO from the experience users need, measure it at the user's boundary, and attach a consequence when it is missed. The sources describe the practice; the decision rule is a synthesis.
 
@@ -21,9 +23,13 @@ The first question is where the objective is measured. A metric taken deep in th
 
 <Figure src="/images/articles/inline/slos-metrics-that-matter-1.png" alt="A sequence from defining user experience to choosing a signal, setting target and window, and attaching a consequence." caption="Conceptual: measure at the user edge and attach a consequence before a miss." />
 
-The second question is what the percentage means in practice. An availability target describes the proportion of successful requests over a window, which translates into an allowance for failure. That allowance is the error budget, and it is the connection between the objective and decisions about shipping. Without making that connection, the target is a number in a document.
+The second question is what the percentage means in practice. An availability target describes the proportion of successful requests over a window, which translates into an allowance for failure. That allowance is the error budget, and it is the connection between the objective and decisions about shipping. Without making that connection, the target is <Mark>a number in a document</Mark>.
 
-The third question is the consequence. The alerting workbook relates signals to objectives, but an alert only leads to action if someone is authorised to act. The consequence of missing an objective — a freeze, extra testing, or a review — should be agreed before the miss occurs, when nobody is under pressure. A target without a consequence is a preference, not a control.
+The third question is the consequence. The alerting workbook relates signals to objectives, but an alert only leads to action if someone is authorised to act. The consequence of missing an objective — a freeze, extra testing, or a review — should be agreed before the miss occurs, when nobody is under pressure.
+
+<KeyPoint>
+A target without a consequence is a preference, not a control.
+</KeyPoint>
 
 The sequence is: define the user experience, choose a measurable signal, set the target and window, then attach the consequence. Each step involves judgement that belongs to the team, which is why the reasoning should be recorded alongside the number.
 
@@ -33,7 +39,7 @@ The sequence is: define the user experience, choose a measurable signal, set the
 
 Three checks decide. First, is the signal measured where users experience it, rather than at an internal health endpoint? Second, does the target and window reflect how often users actually use the service? Third, what happens when the budget is exhausted, and who can apply it?
 
-The outcome is an objective with a decision attached. The scenario is hypothetical; the method is the contribution.
+The outcome is <Mark>an objective with a decision attached</Mark>. The scenario is hypothetical; the method is the contribution.
 
 ## Evidence status
 
@@ -45,7 +51,11 @@ The outcome is an objective with a decision attached. The scenario is hypothetic
 
 ## Why the measurement point matters
 
-A target measured at the wrong layer can be achieved while users fail. A request that reaches an application and returns quickly is not a successful experience if the page never renders for the user. Choosing the measurement point is therefore the most consequential decision in setting an objective, and it should be revisited when the architecture changes.
+<Trap>
+A target measured at the wrong layer can be achieved while users fail.
+</Trap>
+
+A request that reaches an application and returns quickly is not a successful experience if the page never renders for the user. Choosing the measurement point is therefore <Mark>the most consequential decision in setting an objective</Mark>, and it should be revisited when the architecture changes.
 
 An objective also has a cost. Tightening a target improves the promise but requires more capacity or more careful engineering, and the trade-off belongs in the decision. A target chosen without that comparison is a preference that the team may not be able to honour.
 
@@ -57,7 +67,9 @@ The target should be stated where the team can see it, so a decision to ship can
 
 It cannot guarantee a good experience. It does not replace monitoring of other dimensions. And it cannot make a poorly chosen target useful.
 
+<PullQuote>
 The counterargument that a round number is easier to communicate is fair for communication and incomplete for accuracy.
+</PullQuote>
 
 ## A decision test
 

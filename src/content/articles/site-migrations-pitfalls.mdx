@@ -9,7 +9,9 @@ tags:
   - Verified
 ---
 
+<Lead>
 A site migration changes where pages live, and the risk is not the move itself but what happens to the old addresses. Two mechanisms decide whether existing signals survive: URL redirection and the canonical tag. The real problem is that teams treat a migration as a file transfer, when it is actually a set of address-level decisions that each need an owner.
+</Lead>
 
 **Direct answer:** Map each retired URL to its new destination with a permanent redirect, and mark the preferred version of any duplicated content with a rel=canonical. The sources define redirection types and canonical methods; the rule that every mapping needs an owner is a synthesis. Neither source specifies a migration schedule or guarantees a ranking outcome.
 
@@ -17,13 +19,17 @@ A site migration changes where pages live, and the risk is not the move itself b
 
 ## The mechanism
 
-The Wikipedia entry on URL redirection distinguishes a permanent redirect from a temporary one. A 301 response signals that a resource has moved permanently, so a crawler or a returning visitor is pointed at the new location and the old address can be retired. A temporary redirect signals a short-term move and asks the client to keep using the original address. The practical consequence is that the redirect type is a claim about intent: choosing the wrong one tells consumers something false about whether the old address still matters.
+The Wikipedia entry on URL redirection distinguishes a permanent redirect from a temporary one. A 301 response signals that a resource has moved permanently, so a crawler or a returning visitor is pointed at the new location and the old address can be retired. A temporary redirect signals a short-term move and asks the client to keep using the original address. The practical consequence is that <Mark>the redirect type is a claim about intent</Mark>: choosing the wrong one tells consumers something false about whether the old address still matters.
 
 <Figure src="/images/articles/inline/site-migrations-pitfalls-1.png" alt="A comparison of redirects, which move an old URL to a new one, and canonicals, which pick a preferred duplicate." caption="Conceptual: redirects move addresses; canonicals choose among duplicates; they must agree." />
 
-Google's guidance on consolidating duplicate URLs describes the rel=canonical method. When the same content is reachable at more than one address, a canonical link marks the preferred version so that signals can be consolidated rather than split. The guidance presents this as a way to specify a canonical among duplicates. The practical consequence is that canonicals handle the cases a redirect cannot: tracking parameters, protocol variants, and trailing-slash differences that are not really separate pages.
+Google's guidance on consolidating duplicate URLs describes the rel=canonical method. When the same content is reachable at more than one address, a canonical link marks the preferred version so that signals can be consolidated rather than split. The guidance presents this as a way to specify a canonical among duplicates. The practical consequence is that <Mark>canonicals handle the cases a redirect cannot</Mark>: tracking parameters, protocol variants, and trailing-slash differences that are not really separate pages.
 
-The two tools are complementary, not interchangeable. A redirect moves a user and a crawler from an old address to a new one; a canonical chooses a preferred version among addresses that still exist. Applying both to the same URL in conflicting ways sends mixed signals, such as redirecting to one destination while pointing the canonical at another. The sources describe each mechanism on its own; the rule that they must agree is an inference drawn from how the mechanisms interact.
+<KeyPoint>
+The two tools are complementary, not interchangeable.
+</KeyPoint>
+
+A redirect moves a user and a crawler from an old address to a new one; a canonical chooses a preferred version among addresses that still exist. Applying both to the same URL in conflicting ways sends mixed signals, such as redirecting to one destination while pointing the canonical at another. The sources describe each mechanism on its own; the rule that they must agree is an inference drawn from how the mechanisms interact.
 
 The output of a migration is therefore a mapping table: old URL, new URL, redirect type, canonical target, and an owner for each row. The discipline is a sequence, inventory the old addresses, assign a destination, implement the redirects, then verify the canonicals. Each row is a local decision, and the sources do not supply the destinations.
 
@@ -47,13 +53,19 @@ A redirect and canonical audit does not guarantee that rankings survive a migrat
 
 The hidden cost is inventory and maintenance. Every retired URL needs to be found, classified, and assigned a destination before the move, and the mapping must survive later edits to the site structure. Teams often discover orphaned URLs only after traffic has fallen. The labor is recurring rather than one-time, paid in attention and coordination between the people who own content and the people who own the server configuration. A mapping that is correct on launch day decays as soon as the site changes.
 
-The main failure mode is a mismatch between the two mechanisms. A redirect can send a visitor to the new page while a stale canonical points somewhere else, or a chain of redirects can accumulate so that one old address passes through several hops before settling. Each extra hop weakens the signal and slows the client. A clean-looking migration can still contain dozens of these conflicts if no one checks the interactions rather than the individual rules, which is why a row-by-row review matters more than a spot check.
+<Trap>
+The main failure mode is a mismatch between the two mechanisms.
+</Trap>
+
+A redirect can send a visitor to the new page while a stale canonical points somewhere else, or a chain of redirects can accumulate so that one old address passes through several hops before settling. Each extra hop weakens the signal and slows the client. A clean-looking migration can still contain dozens of these conflicts if no one checks the interactions rather than the individual rules, which is why <Mark>a row-by-row review matters more than a spot check</Mark>.
 
 There is a boundary around what these sources cover. The redirection entry describes response types, and Google's guidance describes canonical methods; neither prescribes a migration timeline, a testing procedure, or a rule for when to prefer a redirect over a canonical in a specific case. Those are local judgments. A reader who expects a step-by-step migration plan will not find one here, and should not treat the absence as a defect in the mechanisms themselves. Each design choice still has to be made by someone who knows the site.
 
 Because site structure changes, the mapping needs review whenever pages are added, removed, or renamed. Each row should carry a recheck condition, and the canonical target should be confirmed after each deployment. Without that record, a future reviewer cannot tell which mappings were deliberate and which were carried forward by habit, and a small edit can quietly reintroduce the duplicate or redirect problem the migration was meant to solve.
 
+<PullQuote>
 The counterargument that a redirect-and-canonical audit is fair for preserving existing addresses is incomplete when the new site changes the content itself.
+</PullQuote>
 
 ## A decision test
 

@@ -9,9 +9,17 @@ tags:
   - Verified
 ---
 
-Serverless is often presented as a way to stop thinking about infrastructure, which hides the decisions that remain. The Wikipedia entry describes event-driven compute with managed infrastructure, and the AWS cost framework treats waste as a design problem. The framework starts from the workload.
+<Lead>
+Serverless is often presented as a way to <Mark>stop thinking about infrastructure</Mark>, which hides the decisions that remain. The Wikipedia entry describes event-driven compute with managed infrastructure, and the AWS cost framework treats waste as a design problem. The framework starts from the workload.
+</Lead>
 
-**Direct answer:** Choose serverless when the workload is event-driven and variable, then check cost at the expected scale and the cold-start behaviour. The sources describe the model; the decision rule is a synthesis.
+**Direct answer:**
+
+<KeyPoint>
+Choose serverless when the workload is event-driven and variable, then check cost at the expected scale and the cold-start behaviour.
+</KeyPoint>
+
+The sources describe the model; the decision rule is a synthesis.
 
 **Delta:** This article adds a claim-status table and a worked example, separating documented platform behaviour from local choices about workload fit.
 
@@ -37,7 +45,13 @@ The outcome is a fit decision with a recorded cost. The scenario is hypothetical
 
 ## Why invocation rate decides cost
 
-A function billed per invocation is economical when calls are infrequent or bursty, because no capacity is paid for while idle. A function called continuously can cost more than a server that runs all the time. Estimating the real rate before migrating is the difference between a saving and a surprise.
+A function billed per invocation is economical when calls are infrequent or bursty, because no capacity is paid for while idle.
+
+<Trap>
+A function called continuously can cost more than a server that runs all the time.
+</Trap>
+
+Estimating the real rate before migrating is <Mark>the difference between a saving and a surprise</Mark>.
 
 ## Why cold starts depend on the task
 
@@ -59,7 +73,7 @@ A function also has limits on duration and memory, which shape the workloads tha
 
 The decision should be reviewed when traffic changes, because a workload that fit serverless at one volume can outgrow it at another. Recording the assumed rate makes that review possible.
 
-A practical concern that deserves more attention is vendor coupling. A function written against a provider's event format is portable in theory and expensive to move in practice, because the triggers, permissions, and local tooling are all specific to that provider. The decision to adopt serverless is therefore also a decision about how much switching cost the team is willing to carry. Writing the core logic in a provider-independent module and keeping the glue thin is a common way to limit that cost, but it adds work that must be justified by a real possibility of moving.
+A practical concern that deserves more attention is vendor coupling. A function written against a provider's event format is <Mark>portable in theory and expensive to move in practice</Mark>, because the triggers, permissions, and local tooling are all specific to that provider. The decision to adopt serverless is therefore also a decision about how much switching cost the team is willing to carry. Writing the core logic in a provider-independent module and keeping the glue thin is a common way to limit that cost, but it adds work that must be justified by a real possibility of moving.
 
 Another consideration is observability. A system spread across many short-lived functions is harder to trace than a single long-running process, because a request can cross several invocations whose logs are stored separately. The team needs a way to follow a request end to end before it needs to debug one under pressure. This is not an argument against the model; it is a cost that belongs in the same comparison as invocation pricing.
 
@@ -69,7 +83,9 @@ The decision should also account for local development. A server that runs on a 
 
 It cannot remove all operational concerns. It does not guarantee lower cost. And it cannot make a continuous workload event-driven.
 
+<PullQuote>
 The counterargument that serverless always saves money is fair for spiky workloads and incomplete for steady ones.
+</PullQuote>
 
 ## A decision test
 
