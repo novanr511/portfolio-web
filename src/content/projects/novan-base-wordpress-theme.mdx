@@ -1,0 +1,153 @@
+---
+title: "Novan Base: a bespoke WordPress theme built from an empty folder"
+description: "A portfolio case study on building a custom editorial WordPress theme — classic templates, Gutenberg and ACF blocks, WooCommerce, WCAG 2.2 AA markup, REST endpoints, WebP assets and a zero-hosting live demo via WordPress Playground."
+date: 2026-11-21
+updated: 2026-11-21
+tags:
+  - WordPress
+  - PHP
+  - Gutenberg
+  - ACF
+  - WooCommerce
+  - REST API
+  - Accessibility
+  - Web Performance
+inLanguage: en
+---
+
+## Abstract
+
+This project is a deliberately unglamorous exercise: a WordPress theme built from an empty folder, without a page builder, a starter theme, or a UI kit. The goal was not to ship a client site but to close a specific gap in my own portfolio. My existing WordPress work centred on headless setups — WordPress as a content backend for a Next.js frontend — while the senior roles I was targeting asked for the opposite: bespoke theme development, custom plugins, advanced Gutenberg and ACF blocks, accessibility work, and disciplined Git workflows.
+
+**The deliverable** is a working editorial theme with a shop, product pages, journal articles, category archives, two kinds of custom block, custom REST endpoints, and a live demo that boots in the browser with no hosting bill. Everything lives in a `wp-theme/` subdirectory of this portfolio repository.
+
+<Figure
+  src="/images/projects/novan-base-wordpress-theme/homepage.webp"
+  alt="The theme homepage: cream announcement bar, COLLECTIVE wordmark, and a golden-hour fashion photograph"
+  caption="The front page — announcement bar, wordmark and full-width editorial hero."
+/>
+
+## 1. The brief I gave myself
+
+The trigger was a job description for a Senior WordPress Developer / Tech Lead at an Australian digital agency. It asked for:
+
+- bespoke WordPress themes, custom plugins, advanced Gutenberg and ACF blocks;
+- responsive, semantic and accessible interfaces, explicitly WCAG 2.2 Level AA;
+- REST API and third-party integrations;
+- testing, documentation, Git workflows and deployment discipline;
+- performance optimisation and secure development.
+
+My CV already supported the headless side: I had built headless WordPress with Next.js across five locales and maintained client sites at a hosting company. What it did not show was a single line of `functions.php`, a template hierarchy, or a block. So the specification became: build the thing the CV was missing, then put the code and a live demo where a reviewer could see both.
+
+The visual reference was Shopify's **Rare — Charisma** theme: a warm taupe, cream and black palette; a serif wordmark; uppercase sans headings; editorial photography with architectural light. I generated the imagery for the demo and converted everything to WebP.
+
+## 2. Architecture
+
+The theme lives at `wp-theme/` in this repository. Next.js only compiles `src/`, so the two applications coexist without touching each other. WordPress can only activate themes inside `wp-content/themes/`, so the folder is symlinked into a local WordPress install:
+
+```text
+portfolio-novan/
+├── src/                 # Next.js portfolio
+└── wp-theme/            # source of truth for the theme
+       │
+       └── symlink → Local Sites/supernova/.../wp-content/themes/novan-base
+```
+
+Editing a file in the repo updates the WordPress site immediately. This matters because the repo is the portfolio: a reviewer can read the code and run the same theme locally.
+
+`functions.php` does nothing but define constants and include files from `inc/`. The concerns are separated:
+
+| File | Responsibility |
+|---|---|
+| `setup.php` | theme supports, menus, image sizes, WooCommerce support |
+| `enqueue.php` | CSS/JS, editor assets, font preconnect hints |
+| `template-tags.php` | content helpers with bundled fallbacks |
+| `acf.php` | options page, ACF field group, ACF block |
+| `blocks.php` | native Gutenberg block registration |
+| `rest.php` | custom REST routes |
+| `woocommerce.php` | shop sidebar and product-grid tweaks |
+
+The split is deliberately boring. A single 1,000-line `functions.php` would have defeated the point of demonstrating senior-level structure.
+
+## 3. Templates and pages
+
+The front page is composed from template parts — hero, collections carousel, dark editorial section — so each section is independently editable. Beyond it, the theme covers the pages the job description implied:
+
+| Page | Template |
+|---|---|
+| Shop archive | `woocommerce/archive-product.php` |
+| Single product | `woocommerce/content-single-product.php` |
+| Article | `single.php` |
+| Category archive | `category.php` |
+| Page / search / 404 | `page.php`, `search.php`, `404.php` |
+
+The shop uses a widget area for filters and a responsive grid that overrides WooCommerce's inline float styles instead of fighting them with `!important` wherever possible. The single product template keeps WooCommerce's own price, add-to-cart and tab templates rather than reimplementing them — the goal was to show I understand the plugin's template structure, not to replace it wholesale.
+
+<Figure
+  src="/images/projects/novan-base-wordpress-theme/collections.webp"
+  alt="The signature collections section with five portrait fashion cards and carousel arrows"
+  caption="The collections carousel, built from a template part and a small vanilla-JS scroll controller."
+/>
+
+The demo seeds six products, four product categories and three journal articles through a one-off PHP file invoked by the Playground blueprint. That gives every template something real to render — empty grids are a poor portfolio.
+
+## 4. Two block approaches
+
+I built both block types the job description mentioned, because they solve different problems.
+
+**Native Gutenberg block** (`novan/collection-card`) uses `block.json` API v3 and an editor script written with the `wp.*` globals. No webpack, no build step, no `node_modules` in the theme. The edit view exposes title, caption, link and a `MediaUpload` control; the save view outputs static markup. Keeping it dependency-free also makes the code readable to a reviewer.
+
+**ACF block** (`acf/collection-showcase`) is registered in PHP and rendered through a separate template with a repeater field. Server-side rendering suits content that depends on ACF data and keeps the markup under PHP's escaping functions — `esc_url`, `esc_html`, `esc_attr` appear throughout.
+
+ACF itself is entirely optional. Every content helper in `template-tags.php` falls back to bundled values when `get_field()` is unavailable. A theme that fatals without a premium plugin is a maintenance trap; this one renders either way.
+
+## 5. Accessibility as a constraint, not a feature
+
+WCAG 2.2 AA was the most emphasised requirement in the job ad, so I treated it as a design constraint from the first file:
+
+- a skip link and semantic landmarks, with a correct heading order;
+- `:focus-visible` outlines that switch to light on dark sections;
+- `aria-expanded` and `aria-controls` on the menu and search toggles;
+- Escape closes overlays and returns focus to the trigger;
+- the carousel is a labelled region with descriptive button labels;
+- decorative SVGs are hidden from assistive tech, informative images have alt text;
+- interactive targets are at least 44 px;
+- `prefers-reduced-motion` disables reveals, parallax and smooth scrolling.
+
+The same rule applies to the motion work added later: scroll reveals use `IntersectionObserver` but only when JavaScript is active and motion is allowed. Without JS, content is simply visible.
+
+## 6. Performance and motion
+
+All seven generated PNGs were converted to WebP, taking the asset folder from roughly **29 MB to about 500 KB**. Images carry explicit `width` and `height` to prevent layout shift; below-the-fold images are lazy-loaded with `decoding="async"`, while the hero uses `fetchpriority="high"`. CSS and JS versions are derived from `filemtime()`.
+
+Motion is restrained: a hero scale-in, staggered scroll reveals, a subtle parallax on the editorial image, a scroll-progress bar, a back-to-top button, and small hover transitions. The point was to demonstrate front-end polish without turning a portfolio demo into a motion showcase.
+
+## 7. A live demo without hosting
+
+The last problem was visibility. A GitHub link asks a recruiter to install WordPress; a live demo does not. `blueprint.json` boots a fresh WordPress in the browser and:
+
+1. installs ACF and WooCommerce from wordpress.org;
+2. pulls the theme directly from the `wp-theme/` subdirectory of this repo via a `git:directory` resource;
+3. activates it, logs in as `admin`, sets site options and permalinks;
+4. flushes rewrite rules and seeds the demo content.
+
+The result is a shareable URL that runs the exact code in the repository, with no server, domain or hosting invoice. The blueprint itself is a small but useful piece of evidence: it shows I can make a project reproducible, not just runnable on my machine.
+
+## 8. What this demonstrates
+
+This is a portfolio piece, not a client project, and I would present it that way. Its value is that each requirement from the job ad maps to a concrete file:
+
+| Requirement | Evidence in the repo |
+|---|---|
+| Bespoke theme development | `front-page.php`, template parts, full template hierarchy |
+| Custom plugin / blocks | `novan/collection-card`, `acf/collection-showcase` |
+| Advanced ACF | options page, repeaters, field groups in PHP |
+| Accessibility | skip link, ARIA states, focus management, reduced-motion rules |
+| REST API | `/wp-json/novan/v1/collections`, `/site` |
+| Performance | WebP assets, image attributes, cache-busted assets |
+| Documentation | `wp-theme/README.md` |
+| Git workflow | committed feature history in `portfolio-web` |
+
+It does not prove five years of professional experience or leading a team. What it does prove is that the missing skills are no longer missing — and that I can build, document and publish the evidence rather than just claim it.
+
+**Live demo:** [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fraw.githubusercontent.com%2Fnovanr511%2Fportfolio-web%2Fmain%2Fwp-theme%2Fblueprint.json) · **Source:** [`wp-theme/` on GitHub](https://github.com/novanr511/portfolio-web/tree/main/wp-theme)

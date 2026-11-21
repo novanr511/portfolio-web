@@ -9,13 +9,13 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Project case studies are in progress. Selected work in web development, WordPress, Next.js, and applied AI will be published here.",
+    "Project case studies in web development, WordPress, Next.js, and applied AI — from headless platforms and custom WordPress themes to applied machine learning.",
   alternates: { canonical: "/projects" },
   openGraph: {
     siteName: site.name,
     title: "Projects — Novandri R.",
     description:
-      "Case studies are being prepared; articles cover the same areas from the inside.",
+      "Case studies on WordPress theming, headless platforms and applied machine learning.",
   },
 };
 
