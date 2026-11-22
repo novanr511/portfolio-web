@@ -9,6 +9,9 @@ import { categorySlug, getSortedArticles } from "@/lib/articles";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
+/** Article inventory is read from the filesystem at render time */
+export const instant = false;
+
 /** Home page JSON-LD: Person, WebSite identity lives in the root layout */
 function homeJsonLd() {
   return {
