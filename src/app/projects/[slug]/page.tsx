@@ -5,6 +5,7 @@ import { ViewTransition } from "react";
 import { Reveal } from "@/components/reveal";
 import { TableOfContents } from "@/components/table-of-contents";
 import { getProjectStudy, getProjectStudies } from "@/lib/project-studies";
+import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 /** Full prerender at build; skip instant-UI validation (static content) */
@@ -55,6 +56,8 @@ export default async function ProjectStudyPage({
   const { slug } = await params;
   const study = await getProjectStudy(slug);
   if (!study) notFound();
+
+  const project = projects.find((p) => p.slug === slug);
 
   const { default: Study } = await import(`@/content/projects/${slug}.mdx`);
 
@@ -168,6 +171,30 @@ export default async function ProjectStudyPage({
                 <p className="page-subtitle mt-4 text-[16px]">
                   {study.description}
                 </p>
+                {(project?.links.live || project?.links.source) && (
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {project.links.live && (
+                      <a
+                        href={project.links.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 py-2.5 text-[13.5px] font-medium text-accent-contrast transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                      >
+                        Open live app
+                      </a>
+                    )}
+                    {project.links.source && (
+                      <a
+                        href={project.links.source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 items-center rounded-full border border-border px-5 py-2.5 text-[13.5px] font-medium text-foreground transition-colors hover:border-accent/40 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                      >
+                        View source
+                      </a>
+                    )}
+                  </div>
+                )}
                 <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-5 text-[13px] text-muted">
                   <Link
                     href="/about"

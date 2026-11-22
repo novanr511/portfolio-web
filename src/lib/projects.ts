@@ -40,8 +40,10 @@ export const projects: Project[] = [
     year: "2026",
     featured: true,
     caseStudy: true,
-    // No public repository yet — add `source` here when the code is published.
-    links: {},
+    links: {
+      live: "https://btc-monthly-close-prediction.vercel.app/",
+      source: "https://github.com/novanr511/btc-monthly-close-prediction",
+    },
   },
   {
     slug: "maison-wordpress-theme",
