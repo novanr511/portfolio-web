@@ -2,9 +2,9 @@ export const site = {
   name: "Novandri",
   /** Short wordmark used in the header/footer logo */
   wordmark: "Novandri.",
-  title: "Novandri R. — Web Developer, SEO Specialist & Aspiring Data Scientist",
+  title: "Rachmadwipa Novandri — Web Developer & SEO Specialist",
   description:
-    "Portfolio of Novandri R., a web developer and SEO specialist from Jakarta building with Next.js and WordPress, now diving into data science, machine learning, and applied AI. Practical articles on AI, RAG, LangChain, and LangGraph.",
+    "Portfolio of Rachmadwipa Novandri, a Jakarta web developer and SEO specialist building with Next.js and WordPress, learning data science and applied AI.",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.NODE_ENV === "production"
@@ -13,14 +13,19 @@ export const site = {
   locale: "en_US",
   location: "Jakarta, Indonesia",
   author: {
-    name: "Novandri R.",
-    /** Full pen name used for article bylines and Article JSON-LD */
+    /** One canonical entity name used in bylines, schema, and metadata. */
+    name: "Rachmadwipa Novandri",
     penName: "Rachmadwipa Novandri",
     jobTitle: "Web Developer & SEO Specialist",
   },
   social: {
     github: "https://github.com/novanr511",
     linkedin: "https://www.linkedin.com/in/novandri511/",
+  },
+  contact: {
+    email: "novandri511@gmail.com",
+    /** Stored without the leading "+" for the wa.me deep link. */
+    whatsapp: "6285155426779",
   },
   /** Copyright year — bump it when the site is next updated */
   year: 2026,

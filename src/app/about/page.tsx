@@ -39,6 +39,39 @@ const focus = [
   },
 ];
 
+const evidence = [
+  {
+    kind: "Case study",
+    title: "BTC Monthly ML",
+    note: "133 out-of-sample months. The honest baseline beat the model — and I published the negative result.",
+    href: "/projects/btc-monthly-ml",
+  },
+  {
+    kind: "Case study",
+    title: "Maison — Ecommerce WordPress Theme",
+    note: "A bespoke theme built from an empty folder, with a live demo that runs straight from the repo.",
+    href: "/projects/maison-wordpress-theme",
+  },
+  {
+    kind: "Build log",
+    title: "RAG Research Agent",
+    note: "Lexical retrieval, LangGraph and a number audit — what consistency checks can and cannot prove.",
+    href: "/projects/rag-research-agent",
+  },
+  {
+    kind: "Case study",
+    title: "SEO Content Curation",
+    note: "1,004 templated articles down to ~34. A documented decision, with no traffic outcome claimed.",
+    href: "/projects/seo-content-curation",
+  },
+  {
+    kind: "Essay",
+    title: "Why I killed 966 articles",
+    note: "The first-hand account of the same decision, and the self-referential tell that triggered it.",
+    href: "/articles/why-i-killed-966-articles",
+  },
+];
+
 export default function AboutPage() {
   return (
     <ViewTransition
@@ -140,6 +173,38 @@ export default function AboutPage() {
           </div>
         </div>
 
+        <div className="page-band mt-14 -mx-6 px-6 py-12">
+          <Reveal>
+            <p className="page-eyebrow">Evidence</p>
+            <h2 className="page-title mt-3 text-[28px]">Proof, not adjectives</h2>
+            <p className="page-subtitle mt-2 max-w-2xl text-[14px]">
+              The work I claim is written down. These are the case studies and the
+              essay behind the claims — including the results that went against me.
+            </p>
+          </Reveal>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {evidence.map((item, i) => (
+              <Reveal key={item.href} delay={i * 60}>
+                <Link
+                  href={item.href}
+                  transitionTypes={["nav-forward"]}
+                  className="editorial-card group flex h-full flex-col rounded-2xl border border-border bg-background p-5 transition-colors hover:border-accent/40 hover:bg-tint"
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-accent">
+                    {item.kind}
+                  </span>
+                  <p className="mt-1.5 text-[15px] font-semibold leading-snug text-foreground group-hover:text-accent">
+                    {item.title}
+                  </p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+                    {item.note}
+                  </p>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
         <Reveal>
           <div className="editorial-card mt-14 rounded-2xl border border-border bg-surface px-7 py-8">
             <h2 className="page-title text-[24px]">Get in touch</h2>
@@ -148,6 +213,20 @@ export default function AboutPage() {
               something at the intersection, I&apos;d love to hear from you.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
+              <a
+                href={`mailto:${site.contact.email}`}
+                className="rounded-full bg-accent px-5 py-2.5 text-[13.5px] font-medium text-accent-contrast transition-colors hover:bg-accent-strong"
+              >
+                Email ↗
+              </a>
+              <a
+                href={`https://wa.me/${site.contact.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-accent px-5 py-2.5 text-[13.5px] font-medium text-accent-contrast transition-colors hover:bg-accent-strong"
+              >
+                WhatsApp ↗
+              </a>
               <a
                 href={site.social.linkedin}
                 target="_blank"
