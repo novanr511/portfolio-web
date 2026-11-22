@@ -5,7 +5,7 @@ import { HomeMarquee } from "@/components/home-marquee";
 import { Reveal } from "@/components/reveal";
 import { ArticleCard } from "@/components/article-card";
 import { ProjectCard } from "@/components/project-card";
-import { getSortedArticles } from "@/lib/articles";
+import { categorySlug, getSortedArticles } from "@/lib/articles";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
@@ -43,10 +43,18 @@ export default async function Home() {
       topicCounts.set(tag, (topicCounts.get(tag) ?? 0) + 1);
     }
   }
-  const topics = [...topicCounts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .slice(0, 8)
-    .map(([tag]) => tag);
+  const topics = [
+    ...new Set([
+      ...[...topicCounts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 8)
+        .map(([tag]) => tag),
+      // Explicitly surfaced because they map directly to the work I do.
+      "Technical SEO",
+      "SEO",
+      "Data Analytics",
+    ]),
+  ];
 
   return (
     <ViewTransition
@@ -172,8 +180,14 @@ export default async function Home() {
             <Reveal delay={80}>
               <ul className="mt-10 flex flex-wrap gap-2.5">
                 {topics.map((topic) => (
-                  <li key={topic} className="home-topic">
-                    {topic}
+                  <li key={topic}>
+                    <Link
+                      href={`/articles/category/${categorySlug(topic)}`}
+                      transitionTypes={["nav-forward"]}
+                      className="home-topic"
+                    >
+                      {topic}
+                    </Link>
                   </li>
                 ))}
               </ul>
