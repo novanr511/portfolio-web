@@ -2,7 +2,7 @@
 /**
  * Site header.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,10 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-	<a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'novan-base' ); ?></a>
+	<a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'maison' ); ?></a>
 
 	<div class="announcement">
-		<p><?php echo esc_html( novan_announcement() ); ?></p>
+		<p><?php echo esc_html( maison_announcement() ); ?></p>
 	</div>
 
 	<header class="site-header" id="site-header">
@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				type="button"
 				aria-expanded="false"
 				aria-controls="primary-menu"
-				aria-label="<?php esc_attr_e( 'Open menu', 'novan-base' ); ?>"
+				aria-label="<?php esc_attr_e( 'Open menu', 'maison' ); ?>"
 			>
 				<span class="menu-toggle__bars" aria-hidden="true">
 					<span></span><span></span>
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</button>
 
 			<a class="site-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-				<?php echo esc_html( novan_brand_name() ); ?>
+				<?php echo esc_html( maison_brand_name() ); ?>
 			</a>
 
 			<div class="site-header__actions">
@@ -54,16 +54,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 					type="button"
 					aria-expanded="false"
 					aria-controls="header-search"
-					aria-label="<?php esc_attr_e( 'Open search', 'novan-base' ); ?>"
+					aria-label="<?php esc_attr_e( 'Open search', 'maison' ); ?>"
 				>
 					<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
 				</button>
 
-				<a class="icon-button account-link" href="<?php echo esc_url( wp_login_url() ); ?>" aria-label="<?php esc_attr_e( 'Account', 'novan-base' ); ?>">
+				<a class="icon-button account-link" href="<?php echo esc_url( wp_login_url() ); ?>" aria-label="<?php esc_attr_e( 'Account', 'maison' ); ?>">
 					<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
 				</a>
 
-				<a class="icon-button bag-link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" aria-label="<?php esc_attr_e( 'Shopping bag', 'novan-base' ); ?>">
+				<a class="icon-button bag-link" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" aria-label="<?php esc_attr_e( 'Shopping bag', 'maison' ); ?>">
 					<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
 					<span class="bag-count" aria-hidden="true">0</span>
 				</a>
@@ -74,14 +74,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php get_search_form(); ?>
 		</div>
 
-		<nav class="primary-menu" id="primary-menu" aria-label="<?php esc_attr_e( 'Primary menu', 'novan-base' ); ?>">
+		<nav class="primary-menu" id="primary-menu" aria-label="<?php esc_attr_e( 'Primary menu', 'maison' ); ?>">
 			<?php
 			wp_nav_menu(
 				array(
 					'theme_location' => 'primary',
 					'container'      => false,
 					'menu_class'     => 'primary-menu__list',
-					'fallback_cb'    => 'novan_default_menu',
+					'fallback_cb'    => 'maison_default_menu',
 				)
 			);
 			?>

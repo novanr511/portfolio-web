@@ -2,7 +2,7 @@
 /**
  * Category archive template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,14 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$novan_term = get_queried_object();
+$maison_term = get_queried_object();
 ?>
 
 <section class="archive-hero" aria-labelledby="archive-title" data-reveal>
-	<p class="eyebrow"><?php esc_html_e( 'The Journal', 'novan-base' ); ?></p>
+	<p class="eyebrow"><?php esc_html_e( 'The Journal', 'maison' ); ?></p>
 	<h1 id="archive-title"><?php single_cat_title(); ?></h1>
-	<?php if ( $novan_term && ! empty( $novan_term->description ) ) : ?>
-		<p class="archive-hero__description"><?php echo wp_kses_post( $novan_term->description ); ?></p>
+	<?php if ( $maison_term && ! empty( $maison_term->description ) ) : ?>
+		<p class="archive-hero__description"><?php echo wp_kses_post( $maison_term->description ); ?></p>
 	<?php endif; ?>
 </section>
 
@@ -34,7 +34,7 @@ $novan_term = get_queried_object();
 		</div>
 		<?php the_posts_pagination(); ?>
 	<?php else : ?>
-		<p><?php esc_html_e( 'No articles found in this category.', 'novan-base' ); ?></p>
+		<p><?php esc_html_e( 'No articles found in this category.', 'maison' ); ?></p>
 	<?php endif; ?>
 </div>
 

@@ -2,7 +2,7 @@
 /**
  * Shop archive template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,21 +14,21 @@ get_header();
 
 <section class="shop-hero" aria-labelledby="shop-title">
 	<div class="shop-hero__inner" data-reveal>
-		<p class="eyebrow"><?php esc_html_e( 'The Collection', 'novan-base' ); ?></p>
+		<p class="eyebrow"><?php esc_html_e( 'The Collection', 'maison' ); ?></p>
 		<h1 id="shop-title"><?php echo esc_html( woocommerce_page_title( false ) ); ?></h1>
 		<p class="shop-hero__text">
-			<?php esc_html_e( 'Considered pieces, tailored for everyday elegance. Discover the full COLLECTIVE edit.', 'novan-base' ); ?>
+			<?php esc_html_e( 'Considered pieces, tailored for everyday elegance. Discover the full COLLECTIVE edit.', 'maison' ); ?>
 		</p>
 	</div>
 </section>
 
 <div class="shop-layout">
-	<aside class="shop-sidebar" aria-label="<?php esc_attr_e( 'Product filters', 'novan-base' ); ?>">
+	<aside class="shop-sidebar" aria-label="<?php esc_attr_e( 'Product filters', 'maison' ); ?>">
 		<?php if ( is_active_sidebar( 'shop-sidebar' ) ) : ?>
 			<?php dynamic_sidebar( 'shop-sidebar' ); ?>
 		<?php else : ?>
 			<div class="widget">
-				<h2 class="widget__title"><?php esc_html_e( 'Shop by category', 'novan-base' ); ?></h2>
+				<h2 class="widget__title"><?php esc_html_e( 'Shop by category', 'maison' ); ?></h2>
 				<ul class="shop-categories">
 					<?php
 					wp_list_categories(

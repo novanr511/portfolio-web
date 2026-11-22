@@ -2,34 +2,39 @@ import Link from "next/link";
 import type { Project } from "@/lib/projects";
 
 export function ProjectCard({ project }: { project: Project }) {
+  // External links are rendered outside the case-study <Link>. Nesting <a>
+  // inside <a> is invalid HTML and causes a hydration mismatch.
+  const externalLinks = (
+    <div className="absolute right-7 top-7 z-10 flex gap-4 text-[13px] font-medium">
+      {project.links.live && (
+        <a
+          href={project.links.live}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent transition-opacity hover:opacity-70"
+        >
+          Live ↗
+        </a>
+      )}
+      {project.links.source && (
+        <a
+          href={project.links.source}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent transition-opacity hover:opacity-70"
+        >
+          Source ↗
+        </a>
+      )}
+    </div>
+  );
+
   const body = (
     <article className="editorial-card flex h-full flex-col rounded-2xl border border-border bg-surface p-7 transition-colors duration-300 group-hover:border-accent/40 group-hover:bg-tint/60">
       <div className="flex items-center justify-between">
         <span className="rounded-full bg-tint px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-accent">
           {project.year}
         </span>
-        <div className="flex gap-4 text-[13px] font-medium">
-          {project.links.live && (
-            <a
-              href={project.links.live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent transition-opacity hover:opacity-70"
-            >
-              Live ↗
-            </a>
-          )}
-          {project.links.source && (
-            <a
-              href={project.links.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent transition-opacity hover:opacity-70"
-            >
-              Source ↗
-            </a>
-          )}
-        </div>
       </div>
       <h3 className="mt-4 text-[19px] font-semibold tracking-tight text-foreground">
         {project.name}
@@ -63,16 +68,24 @@ export function ProjectCard({ project }: { project: Project }) {
 
   if (project.caseStudy) {
     return (
-      <Link
-        href={`/projects/${project.slug}`}
-        transitionTypes={["nav-forward"]}
-        className="group block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        aria-label={`Read case study: ${project.name}`}
-      >
-        {body}
-      </Link>
+      <div className="relative h-full">
+        {externalLinks}
+        <Link
+          href={`/projects/${project.slug}`}
+          transitionTypes={["nav-forward"]}
+          className="group block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          aria-label={`Read case study: ${project.name}`}
+        >
+          {body}
+        </Link>
+      </div>
     );
   }
 
-  return body;
+  return (
+    <div className="relative h-full">
+      {externalLinks}
+      {body}
+    </div>
+  );
 }

@@ -2,7 +2,7 @@
 /**
  * Product card for loops.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,9 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<span class="product-card__image">
 			<?php
 			if ( has_post_thumbnail() ) {
-				the_post_thumbnail( 'novan-product', array( 'loading' => 'lazy' ) );
+				the_post_thumbnail( 'maison-product', array( 'loading' => 'lazy' ) );
 			} elseif ( function_exists( 'wc_placeholder_img' ) ) {
-				echo wc_placeholder_img( 'novan-product' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wc_placeholder_img( 'maison-product' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			?>
 		</span>

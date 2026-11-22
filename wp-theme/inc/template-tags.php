@@ -2,7 +2,7 @@
 /**
  * Reusable template helpers with safe fallbacks when ACF is unavailable.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param mixed  $default Fallback.
  * @return mixed
  */
-function novan_option( $key, $default = '' ) {
+function maison_option( $key, $default = '' ) {
 	if ( function_exists( 'get_field' ) ) {
 		$value = get_field( $key, 'option' );
 		if ( is_string( $value ) && '' !== trim( $value ) ) {
@@ -36,7 +36,7 @@ function novan_option( $key, $default = '' ) {
  * @param string $fallback_file File inside assets/images/.
  * @return string
  */
-function novan_image_url( $key, $fallback_file ) {
+function maison_image_url( $key, $fallback_file ) {
 	$image = function_exists( 'get_field' ) ? get_field( $key, 'option' ) : null;
 
 	if ( is_array( $image ) && ! empty( $image['url'] ) ) {
@@ -50,7 +50,7 @@ function novan_image_url( $key, $fallback_file ) {
 		}
 	}
 
-	return esc_url( NOVAN_THEME_URI . '/assets/images/' . $fallback_file );
+	return esc_url( MAISON_THEME_URI . '/assets/images/' . $fallback_file );
 }
 
 /**
@@ -58,8 +58,8 @@ function novan_image_url( $key, $fallback_file ) {
  *
  * @return string
  */
-function novan_brand_name() {
-	return (string) novan_option( 'brand_name', 'COLLECTIVE' );
+function maison_brand_name() {
+	return (string) maison_option( 'brand_name', 'COLLECTIVE' );
 }
 
 /**
@@ -67,8 +67,8 @@ function novan_brand_name() {
  *
  * @return string
  */
-function novan_announcement() {
-	return (string) novan_option(
+function maison_announcement() {
+	return (string) maison_option(
 		'announcement_text',
 		'Big savings on everyday fashion. Only for a short time.'
 	);
@@ -79,11 +79,11 @@ function novan_announcement() {
  *
  * @return array
  */
-function novan_hero() {
+function maison_hero() {
 	return array(
-		'eyebrow' => (string) novan_option( 'hero_eyebrow', 'New Season' ),
-		'title'   => (string) novan_option( 'hero_title', 'Effortless style. Timeless elegance.' ),
-		'text'    => (string) novan_option(
+		'eyebrow' => (string) maison_option( 'hero_eyebrow', 'New Season' ),
+		'title'   => (string) maison_option( 'hero_title', 'Effortless style. Timeless elegance.' ),
+		'text'    => (string) maison_option(
 			'hero_text',
 			'Discover tailored blazers, relaxed trousers, and sophisticated everyday essentials designed for the modern woman.'
 		),
@@ -95,8 +95,8 @@ function novan_hero() {
  *
  * @return array
  */
-function novan_collections() {
-	$items = novan_option( 'collections', array() );
+function maison_collections() {
+	$items = maison_option( 'collections', array() );
 
 	if ( is_array( $items ) && ! empty( $items ) ) {
 		$result = array();
@@ -125,32 +125,32 @@ function novan_collections() {
 		}
 	}
 
-	$base = NOVAN_THEME_URI . '/assets/images/';
+	$base = MAISON_THEME_URI . '/assets/images/';
 
 	return array(
 		array(
-			'title' => __( 'Dresses', 'novan-base' ),
-			'meta'  => __( 'Effortless silhouettes', 'novan-base' ),
+			'title' => __( 'Dresses', 'maison' ),
+			'meta'  => __( 'Effortless silhouettes', 'maison' ),
 			'image' => esc_url( $base . 'collection-dresses.webp' ),
 		),
 		array(
-			'title' => __( 'Tops', 'novan-base' ),
-			'meta'  => __( 'Considered essentials', 'novan-base' ),
+			'title' => __( 'Tops', 'maison' ),
+			'meta'  => __( 'Considered essentials', 'maison' ),
 			'image' => esc_url( $base . 'collection-tops.webp' ),
 		),
 		array(
-			'title' => __( 'Jeans', 'novan-base' ),
-			'meta'  => __( 'Relaxed tailoring', 'novan-base' ),
+			'title' => __( 'Jeans', 'maison' ),
+			'meta'  => __( 'Relaxed tailoring', 'maison' ),
 			'image' => esc_url( $base . 'collection-jeans.webp' ),
 		),
 		array(
-			'title' => __( 'Co-ord Sets', 'novan-base' ),
-			'meta'  => __( 'Complete looks', 'novan-base' ),
+			'title' => __( 'Co-ord Sets', 'maison' ),
+			'meta'  => __( 'Complete looks', 'maison' ),
 			'image' => esc_url( $base . 'collection-cord.webp' ),
 		),
 		array(
-			'title' => __( 'Skirts', 'novan-base' ),
-			'meta'  => __( 'Modern classics', 'novan-base' ),
+			'title' => __( 'Skirts', 'maison' ),
+			'meta'  => __( 'Modern classics', 'maison' ),
 			'image' => esc_url( $base . 'collection-skirts.webp' ),
 		),
 	);
@@ -161,11 +161,11 @@ function novan_collections() {
  *
  * @return array
  */
-function novan_editorial() {
+function maison_editorial() {
 	return array(
-		'eyebrow' => (string) novan_option( 'editorial_eyebrow', 'The Edit' ),
-		'title'   => (string) novan_option( 'editorial_title', 'Discover your signature style' ),
-		'text'    => (string) novan_option(
+		'eyebrow' => (string) maison_option( 'editorial_eyebrow', 'The Edit' ),
+		'title'   => (string) maison_option( 'editorial_title', 'Discover your signature style' ),
+		'text'    => (string) maison_option(
 			'editorial_text',
 			'Explore expressive layouts, striking imagery, and stories that elevate the way you dress — and the way you feel.'
 		),
@@ -177,19 +177,19 @@ function novan_editorial() {
  *
  * @return string
  */
-function novan_reading_time() {
+function maison_reading_time() {
 	$content   = get_post_field( 'post_content', get_the_ID() );
 	$words     = str_word_count( wp_strip_all_tags( $content ) );
 	$minutes   = max( 1, (int) ceil( $words / 200 ) );
 
 	/* translators: %d: number of minutes. */
-	return sprintf( _n( '%d min read', '%d min read', $minutes, 'novan-base' ), $minutes );
+	return sprintf( _n( '%d min read', '%d min read', $minutes, 'maison' ), $minutes );
 }
 
 /**
  * Fallback menu when no menu is assigned in Appearance > Menus.
  */
-function novan_default_menu() {
+function maison_default_menu() {
 	echo '<ul class="primary-menu__list">';
 	wp_list_pages(
 		array(
@@ -206,7 +206,7 @@ function novan_default_menu() {
  * @param string $direction 'up-right', 'left' or 'right'.
  * @return string
  */
-function novan_arrow_icon( $direction = 'up-right' ) {
+function maison_arrow_icon( $direction = 'up-right' ) {
 	$paths = array(
 		'up-right' => 'M5 19 19 5M8 5h11v11',
 		'left'     => 'M19 12H5m7-7-7 7 7 7',

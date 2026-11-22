@@ -1,19 +1,19 @@
 <?php
 /**
- * Novan Base theme bootstrap.
+ * Maison theme bootstrap.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NOVAN_THEME_VERSION', '1.0.0' );
-define( 'NOVAN_THEME_DIR', get_template_directory() );
-define( 'NOVAN_THEME_URI', get_template_directory_uri() );
+define( 'MAISON_THEME_VERSION', '1.0.0' );
+define( 'MAISON_THEME_DIR', get_template_directory() );
+define( 'MAISON_THEME_URI', get_template_directory_uri() );
 
-$novan_includes = array(
+$maison_includes = array(
 	'inc/setup.php',
 	'inc/enqueue.php',
 	'inc/template-tags.php',
@@ -23,9 +23,9 @@ $novan_includes = array(
 	'inc/woocommerce.php',
 );
 
-foreach ( $novan_includes as $novan_include ) {
-	$novan_path = NOVAN_THEME_DIR . '/' . $novan_include;
-	if ( file_exists( $novan_path ) ) {
-		require_once $novan_path;
+foreach ( $maison_includes as $maison_include ) {
+	$maison_path = MAISON_THEME_DIR . '/' . $maison_include;
+	if ( file_exists( $maison_path ) ) {
+		require_once $maison_path;
 	}
 }

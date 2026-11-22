@@ -17,7 +17,7 @@
 	var Button = wp.components.Button;
 	var __ = wp.i18n.__;
 
-	registerBlockType('novan/collection-card', {
+	registerBlockType('maison/collection-card', {
 		edit: function (props) {
 			var attributes = props.attributes;
 			var setAttributes = props.setAttributes;
@@ -33,12 +33,12 @@
 				? el('img', {
 						src: attributes.imageUrl,
 						alt: attributes.alt || '',
-						className: 'novan-collection-card__image'
+						className: 'maison-collection-card__image'
 				  })
 				: el(
 						'div',
-						{ className: 'novan-collection-card__placeholder' },
-						__('Choose an image', 'novan-base')
+						{ className: 'maison-collection-card__placeholder' },
+						__('Choose an image', 'maison')
 				  );
 
 			return el(
@@ -49,23 +49,23 @@
 					null,
 					el(
 						PanelBody,
-						{ title: __('Card content', 'novan-base') },
+						{ title: __('Card content', 'maison') },
 						el(TextControl, {
-							label: __('Title', 'novan-base'),
+							label: __('Title', 'maison'),
 							value: attributes.title,
 							onChange: function (value) {
 								setAttributes({ title: value });
 							}
 						}),
 						el(TextControl, {
-							label: __('Caption', 'novan-base'),
+							label: __('Caption', 'maison'),
 							value: attributes.meta,
 							onChange: function (value) {
 								setAttributes({ meta: value });
 							}
 						}),
 						el(TextControl, {
-							label: __('Link URL', 'novan-base'),
+							label: __('Link URL', 'maison'),
 							value: attributes.link,
 							onChange: function (value) {
 								setAttributes({ link: value });
@@ -82,8 +82,8 @@
 										Button,
 										{ onClick: obj.open },
 										attributes.imageUrl
-											? __('Replace image', 'novan-base')
-											: __('Choose image', 'novan-base')
+											? __('Replace image', 'maison')
+											: __('Choose image', 'maison')
 									);
 								}
 							})
@@ -92,11 +92,11 @@
 				),
 				el(
 					'div',
-					useBlockProps({ className: 'novan-collection-card' }),
+					useBlockProps({ className: 'maison-collection-card' }),
 					image,
-					el('h3', { className: 'novan-collection-card__title' }, attributes.title),
+					el('h3', { className: 'maison-collection-card__title' }, attributes.title),
 					attributes.meta
-						? el('p', { className: 'novan-collection-card__meta' }, attributes.meta)
+						? el('p', { className: 'maison-collection-card__meta' }, attributes.meta)
 						: null
 				)
 			);
@@ -104,29 +104,29 @@
 
 		save: function (props) {
 			var attributes = props.attributes;
-			var blockProps = useBlockProps.save({ className: 'novan-collection-card' });
+			var blockProps = useBlockProps.save({ className: 'maison-collection-card' });
 
 			var image = attributes.imageUrl
 				? el('img', {
 						src: attributes.imageUrl,
 						alt: attributes.alt || '',
-						className: 'novan-collection-card__image'
+						className: 'maison-collection-card__image'
 				  })
 				: null;
 
 			var heading = el(
 				'h3',
-				{ className: 'novan-collection-card__title' },
+				{ className: 'maison-collection-card__title' },
 				attributes.title
 			);
 			var meta = attributes.meta
-				? el('p', { className: 'novan-collection-card__meta' }, attributes.meta)
+				? el('p', { className: 'maison-collection-card__meta' }, attributes.meta)
 				: null;
 
 			var content = attributes.link
 				? el(
 						'a',
-						{ href: attributes.link, className: 'novan-collection-card__link' },
+						{ href: attributes.link, className: 'maison-collection-card__link' },
 						image,
 						heading,
 						meta

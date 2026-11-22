@@ -2,62 +2,62 @@
 /**
  * Styles and scripts.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'wp_enqueue_scripts', 'novan_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'maison_enqueue_assets' );
 /**
  * Enqueue front-end assets with cache-busting file versions.
  */
-function novan_enqueue_assets() {
-	$css = NOVAN_THEME_DIR . '/assets/css/main.css';
-	$js  = NOVAN_THEME_DIR . '/assets/js/main.js';
+function maison_enqueue_assets() {
+	$css = MAISON_THEME_DIR . '/assets/css/main.css';
+	$js  = MAISON_THEME_DIR . '/assets/js/main.js';
 
 	wp_enqueue_style(
-		'novan-fonts',
+		'maison-fonts',
 		'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap',
 		array(),
 		null
 	);
 
 	wp_enqueue_style(
-		'novan-main',
-		NOVAN_THEME_URI . '/assets/css/main.css',
+		'maison-main',
+		MAISON_THEME_URI . '/assets/css/main.css',
 		array(),
-		file_exists( $css ) ? (string) filemtime( $css ) : NOVAN_THEME_VERSION
+		file_exists( $css ) ? (string) filemtime( $css ) : MAISON_THEME_VERSION
 	);
 
 	wp_enqueue_script(
-		'novan-main',
-		NOVAN_THEME_URI . '/assets/js/main.js',
+		'maison-main',
+		MAISON_THEME_URI . '/assets/js/main.js',
 		array(),
-		file_exists( $js ) ? (string) filemtime( $js ) : NOVAN_THEME_VERSION,
+		file_exists( $js ) ? (string) filemtime( $js ) : MAISON_THEME_VERSION,
 		true
 	);
 }
 
-add_action( 'enqueue_block_editor_assets', 'novan_enqueue_editor_assets' );
+add_action( 'enqueue_block_editor_assets', 'maison_enqueue_editor_assets' );
 /**
  * Enqueue block editor styles and the custom block editor script.
  */
-function novan_enqueue_editor_assets() {
-	$css = NOVAN_THEME_DIR . '/assets/css/main.css';
+function maison_enqueue_editor_assets() {
+	$css = MAISON_THEME_DIR . '/assets/css/main.css';
 	wp_enqueue_style(
-		'novan-editor',
-		NOVAN_THEME_URI . '/assets/css/main.css',
+		'maison-editor',
+		MAISON_THEME_URI . '/assets/css/main.css',
 		array(),
-		file_exists( $css ) ? (string) filemtime( $css ) : NOVAN_THEME_VERSION
+		file_exists( $css ) ? (string) filemtime( $css ) : MAISON_THEME_VERSION
 	);
 
-	$editor_js = NOVAN_THEME_DIR . '/blocks/collection-card/index.js';
+	$editor_js = MAISON_THEME_DIR . '/blocks/collection-card/index.js';
 	if ( file_exists( $editor_js ) ) {
 		wp_enqueue_script(
-			'novan-collection-card-editor',
-			NOVAN_THEME_URI . '/blocks/collection-card/index.js',
+			'maison-collection-card-editor',
+			MAISON_THEME_URI . '/blocks/collection-card/index.js',
 			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
 			(string) filemtime( $editor_js ),
 			true
@@ -65,7 +65,7 @@ function novan_enqueue_editor_assets() {
 	}
 }
 
-add_filter( 'wp_resource_hints', 'novan_resource_hints', 10, 2 );
+add_filter( 'wp_resource_hints', 'maison_resource_hints', 10, 2 );
 /**
  * Add preconnect hints for Google Fonts.
  *
@@ -73,7 +73,7 @@ add_filter( 'wp_resource_hints', 'novan_resource_hints', 10, 2 );
  * @param string $relation_type Relation type.
  * @return array
  */
-function novan_resource_hints( $urls, $relation_type ) {
+function maison_resource_hints( $urls, $relation_type ) {
 	if ( 'preconnect' === $relation_type ) {
 		$urls[] = 'https://fonts.googleapis.com';
 		$urls[] = array(

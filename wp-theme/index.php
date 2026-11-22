@@ -2,7 +2,7 @@
 /**
  * General blog/archive fallback template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,7 +28,7 @@ get_header();
 		</div>
 		<?php the_posts_pagination(); ?>
 	<?php else : ?>
-		<p><?php esc_html_e( 'No posts found.', 'novan-base' ); ?></p>
+		<p><?php esc_html_e( 'No posts found.', 'maison' ); ?></p>
 	<?php endif; ?>
 </div>
 

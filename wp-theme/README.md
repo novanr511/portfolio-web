@@ -1,4 +1,4 @@
-# Novan Base — Custom WordPress Theme
+# Maison — Custom WordPress Theme
 
 Bespoke editorial WordPress theme built as a portfolio piece and as a practical
 demonstration of the skills required for a **Senior WordPress Developer / Tech Lead**
@@ -77,7 +77,7 @@ WordPress install (Local by Flywheel is used here):
 
 ```bash
 ln -s /Users/novandri511/Data-science-3/portfolio-novan/wp-theme \
-  "/Users/novandri511/Local Sites/supernova/app/public/wp-content/themes/novan-base"
+  "/Users/novandri511/Local Sites/supernova/app/public/wp-content/themes/maison"
 ```
 
 Then open **Appearance → Themes → Activate** in the Local site. Editing files in
@@ -132,7 +132,7 @@ content, so the theme never fatals.
 
 ## 7. Blocks
 
-- **`novan/collection-card`** — native Gutenberg block, `block.json` API v3,
+- **`maison/collection-card`** — native Gutenberg block, `block.json` API v3,
   editor UI built with `wp.*` globals (no webpack/build step). Supports image
   selection via `MediaUpload`.
 - **`acf/collection-showcase`** — ACF block rendered by PHP
@@ -166,5 +166,5 @@ content, so the theme never fatals.
 
 | Endpoint | Description |
 | --- | --- |
-| `GET /wp-json/novan/v1/collections` | Collection cards as JSON |
-| `GET /wp-json/novan/v1/site` | Brand and site metadata |
+| `GET /wp-json/maison/v1/collections` | Collection cards as JSON |
+| `GET /wp-json/maison/v1/site` | Brand and site metadata |

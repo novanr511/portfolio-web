@@ -2,7 +2,7 @@
 /**
  * Default post card.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

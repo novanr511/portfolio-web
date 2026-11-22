@@ -2,7 +2,7 @@
 /**
  * Product category card.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,7 +21,7 @@ if ( ! $term && isset( $post ) ) {
 		<?php
 		$thumbnail_id = get_term_meta( $term->term_id, 'thumbnail_id', true );
 		if ( $thumbnail_id ) {
-			echo wp_get_attachment_image( $thumbnail_id, 'novan-collection', false, array( 'loading' => 'lazy' ) );
+			echo wp_get_attachment_image( $thumbnail_id, 'maison-collection', false, array( 'loading' => 'lazy' ) );
 		}
 		?>
 		<h2 class="category-card__title"><?php echo esc_html( $term->name ); ?></h2>

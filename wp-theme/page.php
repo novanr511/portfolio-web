@@ -2,7 +2,7 @@
 /**
  * Page template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,7 +26,7 @@ get_header();
 				the_content();
 				wp_link_pages(
 					array(
-						'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Pages', 'novan-base' ) . '">',
+						'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Pages', 'maison' ) . '">',
 						'after'  => '</nav>',
 					)
 				);

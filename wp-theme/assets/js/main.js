@@ -1,5 +1,5 @@
 /**
- * Novan Base — front-end interactions.
+ * Maison — front-end interactions.
  * Vanilla JS, no dependencies.
  */
 (function () {

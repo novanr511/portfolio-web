@@ -2,19 +2,19 @@
 /**
  * Theme supports, menus and image sizes.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'after_setup_theme', 'novan_theme_setup' );
+add_action( 'after_setup_theme', 'maison_theme_setup' );
 /**
  * Register theme features and navigation menus.
  */
-function novan_theme_setup() {
-	load_theme_textdomain( 'novan-base', NOVAN_THEME_DIR . '/languages' );
+function maison_theme_setup() {
+	load_theme_textdomain( 'maison', MAISON_THEME_DIR . '/languages' );
 
 	add_theme_support( 'automatic-feed-links' );
 	add_theme_support( 'title-tag' );
@@ -57,15 +57,15 @@ function novan_theme_setup() {
 
 	register_nav_menus(
 		array(
-			'primary' => __( 'Primary Menu', 'novan-base' ),
-			'footer'  => __( 'Footer Menu', 'novan-base' ),
+			'primary' => __( 'Primary Menu', 'maison' ),
+			'footer'  => __( 'Footer Menu', 'maison' ),
 		)
 	);
 
-	add_image_size( 'novan-collection', 680, 1020, true );
-	add_image_size( 'novan-hero', 1672, 941, true );
-	add_image_size( 'novan-product', 900, 1350, true );
-	add_image_size( 'novan-article', 1400, 800, true );
+	add_image_size( 'maison-collection', 680, 1020, true );
+	add_image_size( 'maison-hero', 1672, 941, true );
+	add_image_size( 'maison-product', 900, 1350, true );
+	add_image_size( 'maison-article', 1400, 800, true );
 
 	add_theme_support(
 		'woocommerce',
@@ -88,7 +88,7 @@ function novan_theme_setup() {
 	add_theme_support( 'wc-product-gallery-slider' );
 }
 
-add_filter( 'nav_menu_css_class', 'novan_menu_classes', 10, 2 );
+add_filter( 'nav_menu_css_class', 'maison_menu_classes', 10, 2 );
 /**
  * Add a consistent class to nav items.
  *
@@ -96,7 +96,7 @@ add_filter( 'nav_menu_css_class', 'novan_menu_classes', 10, 2 );
  * @param WP_Post  $item    Menu item object.
  * @return array
  */
-function novan_menu_classes( $classes, $item ) {
+function maison_menu_classes( $classes, $item ) {
 	$classes[] = 'primary-menu__item';
 	return $classes;
 }

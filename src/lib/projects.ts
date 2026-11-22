@@ -44,11 +44,11 @@ export const projects: Project[] = [
     links: {},
   },
   {
-    slug: "novan-base-wordpress-theme",
-    name: "Novan Base — WordPress Theme",
+    slug: "maison-wordpress-theme",
+    name: "Maison — Ecommerce WordPress Theme",
     tagline: "A bespoke editorial theme, built from an empty folder",
     description:
-      "A custom WordPress theme built as hands-on evidence for a Senior WordPress Developer role: classic templates, native Gutenberg and ACF blocks, WooCommerce templates, WCAG 2.2 AA markup, REST endpoints, WebP assets, and a free live demo that boots straight from the GitHub repo with WordPress Playground.",
+      "A custom ecommerce WordPress theme built as hands-on evidence for a Senior WordPress Developer role: classic templates, native Gutenberg and ACF blocks, WooCommerce templates, WCAG 2.2 AA markup, REST endpoints, WebP assets, and a free live demo that boots straight from the GitHub repo with WordPress Playground.",
     tags: [
       "WordPress",
       "PHP",

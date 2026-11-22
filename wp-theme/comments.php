@@ -2,7 +2,7 @@
 /**
  * Comments template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <section class="comments" aria-labelledby="comments-title">
-	<h2 id="comments-title"><?php comments_number( esc_html__( 'Leave a comment', 'novan-base' ), esc_html__( '1 comment', 'novan-base' ), esc_html__( '% comments', 'novan-base' ) ); ?></h2>
+	<h2 id="comments-title"><?php comments_number( esc_html__( 'Leave a comment', 'maison' ), esc_html__( '1 comment', 'maison' ), esc_html__( '% comments', 'maison' ) ); ?></h2>
 
 	<?php
 	wp_list_comments(

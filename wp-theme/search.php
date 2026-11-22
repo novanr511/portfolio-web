@@ -2,7 +2,7 @@
 /**
  * Search results template.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ get_header();
 			<?php
 			printf(
 				/* translators: %s: search query. */
-				esc_html__( 'Results for: %s', 'novan-base' ),
+				esc_html__( 'Results for: %s', 'maison' ),
 				'<span>' . esc_html( get_search_query() ) . '</span>'
 			);
 			?>
@@ -36,7 +36,7 @@ get_header();
 		</div>
 		<?php the_posts_pagination(); ?>
 	<?php else : ?>
-		<p><?php esc_html_e( 'Nothing matched your search. Try another term.', 'novan-base' ); ?></p>
+		<p><?php esc_html_e( 'Nothing matched your search. Try another term.', 'maison' ); ?></p>
 		<?php get_search_form(); ?>
 	<?php endif; ?>
 </div>

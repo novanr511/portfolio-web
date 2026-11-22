@@ -2,34 +2,34 @@
 /**
  * Small public REST endpoints used by the theme demo.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'rest_api_init', 'novan_register_rest_routes' );
+add_action( 'rest_api_init', 'maison_register_rest_routes' );
 /**
  * Register custom REST routes.
  */
-function novan_register_rest_routes() {
+function maison_register_rest_routes() {
 	register_rest_route(
-		'novan/v1',
+		'maison/v1',
 		'/collections',
 		array(
 			'methods'             => 'GET',
-			'callback'            => 'novan_rest_collections',
+			'callback'            => 'maison_rest_collections',
 			'permission_callback' => '__return_true',
 		)
 	);
 
 	register_rest_route(
-		'novan/v1',
+		'maison/v1',
 		'/site',
 		array(
 			'methods'             => 'GET',
-			'callback'            => 'novan_rest_site',
+			'callback'            => 'maison_rest_site',
 			'permission_callback' => '__return_true',
 		)
 	);
@@ -40,8 +40,8 @@ function novan_register_rest_routes() {
  *
  * @return WP_REST_Response
  */
-function novan_rest_collections() {
-	$items = novan_collections();
+function maison_rest_collections() {
+	$items = maison_collections();
 	$data  = array();
 
 	foreach ( $items as $item ) {
@@ -60,12 +60,12 @@ function novan_rest_collections() {
  *
  * @return WP_REST_Response
  */
-function novan_rest_site() {
+function maison_rest_site() {
 	return rest_ensure_response(
 		array(
 			'name'        => get_bloginfo( 'name' ),
 			'description' => get_bloginfo( 'description' ),
-			'brand'       => novan_brand_name(),
+			'brand'       => maison_brand_name(),
 			'home'        => esc_url_raw( home_url( '/' ) ),
 		)
 	);

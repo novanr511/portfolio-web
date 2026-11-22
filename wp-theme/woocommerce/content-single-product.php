@@ -2,7 +2,7 @@
 /**
  * Single product layout.
  *
- * @package Novan_Base
+ * @package Maison
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,8 +15,8 @@ if ( ! is_a( $product, 'WC_Product' ) && function_exists( 'wc_get_product' ) ) {
 	$product = wc_get_product( get_the_ID() );
 }
 
-$novan_terms = get_the_terms( get_the_ID(), 'product_cat' );
-$novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0]->name : __( 'The Edit', 'novan-base' );
+$maison_terms = get_the_terms( get_the_ID(), 'product_cat' );
+$maison_cat  = ( $maison_terms && ! is_wp_error( $maison_terms ) ) ? $maison_terms[0]->name : __( 'The Edit', 'maison' );
 ?>
 
 <div class="product-single">
@@ -26,19 +26,19 @@ $novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0
 			the_post_thumbnail( 'woocommerce_single', array( 'fetchpriority' => 'high' ) );
 		}
 
-		$novan_gallery = $product ? $product->get_gallery_image_ids() : array();
-		if ( ! empty( $novan_gallery ) ) :
+		$maison_gallery = $product ? $product->get_gallery_image_ids() : array();
+		if ( ! empty( $maison_gallery ) ) :
 			?>
-			<div class="product-single__thumbs" aria-label="<?php esc_attr_e( 'Product images', 'novan-base' ); ?>">
-				<?php foreach ( $novan_gallery as $novan_attachment_id ) : ?>
-					<?php echo wp_get_attachment_image( $novan_attachment_id, 'thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div class="product-single__thumbs" aria-label="<?php esc_attr_e( 'Product images', 'maison' ); ?>">
+				<?php foreach ( $maison_gallery as $maison_attachment_id ) : ?>
+					<?php echo wp_get_attachment_image( $maison_attachment_id, 'thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
 	</div>
 
 	<div class="product-single__info" data-reveal="fade">
-		<p class="eyebrow"><?php echo esc_html( $novan_cat ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( $maison_cat ); ?></p>
 		<h1 class="product-single__title"><?php the_title(); ?></h1>
 
 		<div class="product-single__price"><?php woocommerce_template_single_price(); ?></div>
@@ -50,7 +50,7 @@ $novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0
 		<div class="product-single__meta"><?php woocommerce_template_single_meta(); ?></div>
 
 		<p class="product-single__note">
-			<?php esc_html_e( 'Complimentary shipping on orders over $150. Easy returns within 30 days.', 'novan-base' ); ?>
+			<?php esc_html_e( 'Complimentary shipping on orders over $150. Easy returns within 30 days.', 'maison' ); ?>
 		</p>
 	</div>
 </div>
@@ -59,7 +59,7 @@ $novan_cat  = ( $novan_terms && ! is_wp_error( $novan_terms ) ) ? $novan_terms[0
 
 <section class="related-products" aria-labelledby="related-title">
 	<div class="section-heading">
-		<h2 id="related-title"><?php esc_html_e( 'You may also like', 'novan-base' ); ?></h2>
+		<h2 id="related-title"><?php esc_html_e( 'You may also like', 'maison' ); ?></h2>
 	</div>
 	<?php woocommerce_output_related_products(); ?>
 </section>
