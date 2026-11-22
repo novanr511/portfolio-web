@@ -36,8 +36,14 @@ const components: MDXComponents = {
   ),
   // Inline figures: authors can place <Figure src=... alt=... caption=... />
   // anywhere in an MDX article to support the surrounding paragraph.
-  Figure: ({ src, alt, caption }) => (
-    <Figure src={String(src ?? "")} alt={String(alt ?? "")} caption={caption ? String(caption) : undefined} />
+  Figure: ({ src, alt, caption, width, height }) => (
+    <Figure
+      src={String(src ?? "")}
+      alt={String(alt ?? "")}
+      caption={caption ? String(caption) : undefined}
+      width={width ? Number(width) : undefined}
+      height={height ? Number(height) : undefined}
+    />
   ),
   Lead,
   KeyPoint,

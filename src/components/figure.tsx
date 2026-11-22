@@ -5,6 +5,9 @@ type FigureProps = {
   src: string;
   alt: string;
   caption?: string;
+  /** Intrinsic image size. Defaults to 16:9 for existing article figures. */
+  width?: number;
+  height?: number;
 };
 
 /**
@@ -12,14 +15,14 @@ type FigureProps = {
  * right after the text that introduces the concept it illustrates. Unlike
  * the single hero image in frontmatter, an article can contain many of these.
  */
-export function Figure({ src, alt, caption }: FigureProps) {
+export function Figure({ src, alt, caption, width = 1600, height = 900 }: FigureProps) {
   return (
     <figure className="my-8 overflow-hidden rounded-2xl border border-border bg-surface not-prose">
       <Image
         src={src}
         alt={alt}
-        width={1600}
-        height={900}
+        width={width}
+        height={height}
         sizes="(max-width: 672px) 100vw, 672px"
         className="h-auto w-full object-cover"
       />
