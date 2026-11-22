@@ -15,6 +15,8 @@ A single-model policy treats every request as equally hard. In practice, most ap
 
 **Direct answer:** FrugalGPT identifies three strategies for reducing LLM inference cost — "prompt adaptation, LLM approximation, and LLM cascade" — and describes its cascade as learning "which combinations of LLMs to use for different queries in order to reduce cost and improve accuracy". RouteLLM trains routers that "dynamically select between a stronger and a weaker LLM during inference", reporting cost reductions "by over 2 times in certain cases—without compromising the quality of responses". The boundary: the savings depend on your traffic having a real easy/hard split, and the router itself makes mistakes.
 
+<Figure src="/images/articles/inline/routing-between-llms-1.png" alt="A four-step flow: classify the query, route to a model, escalate on failure, then evaluate by cost and quality." caption="Conceptual: most traffic does not need the flagship. A router trained only on clean traffic misroutes the costly cases." />
+
 ## The three strategies
 
 **Prompt adaptation** reduces the tokens you send — shorter instructions, fewer examples, better compression. It is the cheapest intervention because it changes no infrastructure.

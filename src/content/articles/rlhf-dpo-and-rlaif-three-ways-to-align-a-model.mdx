@@ -15,6 +15,8 @@ A pretrained model predicts text; it does not know what a useful assistant shoul
 
 **Direct answer:** RLHF trains a reward model on human comparisons and optimises a policy against it; DPO optimises the policy directly from preference pairs without a separate reward model; RLAIF substitutes AI-generated feedback for some human feedback. The underlying papers — RLHF, DPO, and the RLAIF comparison — report different trade-offs. The boundary: these methods align a model to the preferences it was given, which is not the same as making it correct or safe in every context.
 
+<Figure src="/images/articles/inline/rlhf-dpo-and-rlaif-three-ways-to-align-a-model-1.png" alt="A four-step flow: name the feedback source, choose a reward model or not, apply to the policy, then measure." caption="Conceptual: method choice follows constraints. Method choice follows constraints, not a universal ranking." />
+
 ## Three mechanisms
 
 **RLHF.** Collect human comparisons between outputs, train a reward model to predict them, then optimise the policy to maximise reward while staying near the original model. The Anthropic helpful-and-harmless paper is the canonical description. Three stages, three sets of hyperparameters, and <Mark>a reward model that can be exploited</Mark>.

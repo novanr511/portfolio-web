@@ -15,6 +15,8 @@ tags:
 
 **Direct Answer:** A crawler selects the group whose product token matches its user-agent name (case-insensitively), merges all matching groups, and then matches `Allow`/`Disallow` path patterns against the request URI. The **longest matching pattern wins**, and on an exact tie the `Allow` rule wins. If no group matches and no `*` group exists, no rules apply and everything is allowed. Critically, a `robots.txt` that is *unreachable* means the crawler **MUST assume complete disallow** — while a `robots.txt` that returns a 4xx means the crawler **MAY access anything**. The same broken file can therefore either open or close your site depending on the status code your server returns.
 
+<Figure src="/images/articles/inline/robots-txt-is-a-parsing-specification-the-rules-your-crawler-follows-1.png" alt="A four-step flow: select the group, match by prefix, let the longest rule win, then let Allow break ties." caption="Conceptual: specificity is measured in octets. Specificity is measured in octets of the pattern, not in the idea." />
+
 ## Group selection: which rules apply to you
 
 The first decision is which group applies, and RFC 9309 is precise about it. Crawlers identify themselves with a *product token*, and the rules are: "Crawlers MUST use <Mark>case-insensitive matching</Mark> to find the group that matches the product token and then obey the rules of the group."

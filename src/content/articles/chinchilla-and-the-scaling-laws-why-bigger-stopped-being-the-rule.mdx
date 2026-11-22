@@ -15,6 +15,8 @@ For years the practical wisdom in large-model training was that parameter count 
 
 **Direct Answer:** The Chinchilla paper (Hoffmann et al., 2022) found that, for a *fixed compute budget*, the loss-minimizing allocation scales model size and training tokens together — doubling parameters requires roughly doubling tokens to keep the trade-off optimal. Its own headline model was trained on 1.4 trillion tokens, which works out to 20 tokens per parameter. The earlier Kaplan et al. (2020) result pointed the other way: they argued that very large models were *more* sample-efficient, so you should train big models on relatively modest data and stop well before convergence. Both sets of authors published; the disagreement was about method as much as about outcome.
 
+<Figure src="/images/articles/inline/chinchilla-and-the-scaling-laws-why-bigger-stopped-being-the-rule-1.png" alt="A comparison: scaling parameters alone versus scaling tokens alongside parameters under a fixed budget." caption="Conceptual: the compute-optimal point depends on the budget you defend. A model optimal to train but ruinous to serve is not optimal for anything that matters." />
+
 ## The two claims
 
 Kaplan et al. (January 2020) studied how cross-entropy loss scales with model size, dataset size, and training compute, reporting power-law behaviour spanning more than seven orders of magnitude, and that architectural details like width or depth had minimal effect within a wide range. Their practical conclusion was specific: "optimally compute-efficient training involves training very large models on a relatively modest amount of data and stopping significantly before convergence."

@@ -15,6 +15,8 @@ Federated learning is often described as "training on data without collecting it
 
 **Direct answer:** Federated learning keeps training data distributed and learns a shared model by aggregating locally computed updates. McMahan et al. describe the motivation precisely: mobile devices hold "a wealth of data suitable for learning models", but that data "is often privacy sensitive, large in quantity, or both, which may preclude logging to the data center". Their method "leaves the training data distributed on the mobile devices, and learns a shared model by aggregating locally-computed updates" through "iterative model averaging". The limitation is that this protects the data from being collected, not necessarily from being inferred — gradients can leak information, and the system has to handle clients that are slow, unreliable, or behave differently from one another.
 
+<Figure src="/images/articles/inline/federated-learning-privacy-preserving-distributed-machine-learning-1.png" alt="A four-step flow: keep data local, compute an update, aggregate updates, then add privacy controls." caption="Conceptual: what moves are the model updates. Keeping raw data on device does not make the resulting model private." />
+
 ## Why centralising is the default, and why it fails
 
 The standard ML pipeline assumes data can be moved to a place with compute. That assumption fails in three situations, all of which the founding paper names: the data is privacy-sensitive, it is too large to transfer efficiently, or it is generated on devices that are not continuously connected.

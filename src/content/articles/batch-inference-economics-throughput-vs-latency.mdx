@@ -15,6 +15,8 @@ A serving system can be fast for one request and inefficient for a thousand, or 
 
 **Direct answer:** Batch inference processes multiple requests in one pass, increasing throughput because the hardware is used more fully, while adding waiting time as requests accumulate into a batch. The vLLM/PagedAttention paper describes how continuous batching and memory management raise serving throughput. The boundary: the right batch size depends on the latency your users will accept, which is a product decision, not a hardware setting.
 
+<Figure src="/images/articles/inline/batch-inference-economics-throughput-vs-latency-1.png" alt="A comparison: filling a batch adds waiting time versus running requests together using hardware more fully." caption="Conceptual: the batch size is set by an accepted latency budget. With a budget in hand, batch size becomes a parameter chosen to meet it." />
+
 ## The trade-off
 
 Three variables interact:

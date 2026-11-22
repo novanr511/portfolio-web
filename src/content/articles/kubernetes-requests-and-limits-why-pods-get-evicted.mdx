@@ -15,6 +15,8 @@ A Pod can be healthy at noon and terminated at 3 a.m. without any code change. T
 
 **Direct answer:** A resource **request** is what the scheduler uses to place a Pod; a **limit** is what the kubelet and kernel enforce while it runs. CPU limits are enforced by throttling; memory limits by out-of-memory kills. Kubernetes assigns a QoS class — Guaranteed, Burstable, or BestEffort — at Pod creation, and uses it when deciding which Pods to evict under node pressure. The boundary: requests and limits are not autoscaling, and a QoS class cannot be changed without recreating the Pod.
 
+<Figure src="/images/articles/inline/kubernetes-requests-and-limits-why-pods-get-evicted-1.png" alt="A four-step flow: set the request, set the limit, get a QoS class, then face node pressure." caption="Conceptual: QoS is decided at pod creation. A request is a scheduling input and a reservation floor, not a ceiling." />
+
 ## Three different jobs
 
 The Kubernetes documentation separates the two fields cleanly. When you specify a **request**, "the kube-scheduler uses this information to decide which node to place the Pod on". When you specify a **limit**, "the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set". The kubelet "also reserves at least the request amount of that system resource specifically for that container to use".

@@ -15,6 +15,8 @@ A rollback is treated as the obvious answer when a release goes wrong, which is 
 
 **Direct answer:** Prepare a rollback before release, make it fast and tested, decide in advance when to roll back versus roll forward, and verify the result with signals. GitHub Actions documentation covers automation, and the SRE alerting workbook covers detection. The boundary: not every incident is fixed by a rollback — a bad data migration needs a forward fix, which the rollback-measures article distinguishes, as the publication standard forbids guaranteed recovery.
 
+<Figure src="/images/articles/inline/rollback-strategies-best-practices-1.png" alt="A four-step flow: prepare the path, choose back or forward, execute the change, then verify with signals." caption="Conceptual: a bad data migration needs a forward fix. If the fault is in data, rolling back code will not fix it." />
+
 ## The practices
 
 **Define the trigger.** What signal says roll back, which the SRE alerting workbook treats as alerting tied to service objectives, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) explains? A vague "it feels broken" <Mark>wastes the window in which a rollback is cheap</Mark>, as [Site Reliability Engineering: SLOs, Error Budgets, and Incident Response](/articles/site-reliability-engineering-slos-error-budgets-and-incident-response) advises for containment.

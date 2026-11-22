@@ -15,6 +15,8 @@ A query that used to return in milliseconds suddenly takes seconds, and the obvi
 
 **Direct answer:** An index lets the database find rows without scanning the whole table, but the query planner chooses between an index scan and a sequential scan based on estimated cost. PostgreSQL's documentation states that the planner "will use the index in queries when it thinks doing so would be more efficient than a sequential table scan" — and that you "might have to run the ANALYZE command regularly to update statistics to allow the query planner to make educated decisions". The boundary: indexes add overhead to writes, and an index that matches the wrong column order or predicate can be ignored entirely.
 
+<Figure src="/images/articles/inline/database-indexes-and-query-plans-1.png" alt="A four-step flow: the table grows, statistics go stale, the planner estimates cost, then chooses a scan." caption="Conceptual: the planner chooses between scans. Having an index and the query using an index are different claims." />
+
 ## What an index actually buys
 
 The documentation gives the clearest example. If a table has many rows and a query returns "perhaps zero or one", scanning every row is "clearly an inefficient method". With an index on the queried column, "it can use a more efficient method for locating matching rows".

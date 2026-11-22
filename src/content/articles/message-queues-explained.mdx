@@ -19,6 +19,8 @@ A queue stores messages until a consumer processes them, which decouples the pro
 
 **Direct answer:** The message-queue overview provides the general mechanism, and AMQP is a standard protocol for interoperable messaging. The boundary: a queue does not guarantee that work is processed correctly — it guarantees delivery semantics defined by its configuration, and duplicates and ordering need explicit handling, as the tool-calling article explains for at-least-once actions.
 
+<Figure src="/images/articles/inline/message-queues-explained-1.png" alt="A four-step flow: produce a message, choose delivery guarantee, handle duplicates, then handle ordering." caption="Conceptual: delivery semantics are a configuration. A queue does not guarantee work is processed correctly, only the semantics configured." />
+
 ## Choosing the right delivery guarantee
 
 Queues differ in what they promise about a message after it is accepted. At-most-once delivery avoids duplicates but can lose work; at-least-once delivery avoids loss but can deliver the same message twice; exactly-once is a strong claim that usually requires coordination with the consumer's own state, as the message-queue overview explains for different semantics. The choice is not a technical preference but <Mark>a business decision about what a lost order or a duplicate charge costs</Mark>, which the risk-assessment article frames as impact and likelihood.

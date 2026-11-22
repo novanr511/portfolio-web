@@ -15,6 +15,8 @@ A long conversation feels cheap because each new message is short. The model, ho
 
 **Direct answer:** The KV cache stores the attention keys and values computed for previous tokens so they need not be recomputed at each generation step. Its size grows linearly with context length and with the number of concurrent requests. FlashAttention reduces the memory cost of computing attention but does not eliminate the KV cache itself. The boundary: a large context window is a capacity limit, not a free resource — every token stored has a memory cost that affects throughput and cost.
 
+<Figure src="/images/articles/inline/kv-cache-and-memory-why-long-conversations-get-expensive-1.png" alt="A four-step flow: cache prior keys, grow with context, count concurrent requests, then bound memory." caption="Conceptual: every token carries cached attention state. Long-context serving is a memory problem as much as a compute problem." />
+
 ## What the cache holds
 
 During generation, each layer of a transformer produces a key and a value vector for every token so far. These are stored so the next token can attend to all previous ones without recomputing them. Three properties follow:

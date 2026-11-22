@@ -15,6 +15,8 @@ Caching is the single largest performance lever on the web, and the single most 
 
 **Direct Answer:** HTTP caching is governed by RFC 9111 (which obsoleted RFC 7234 in June 2022) and works in three stages — *freshness* (is the stored response still usable without asking the origin?), *validation* (if not fresh, can it be confirmed cheaply?), and *stale serving* (if validation fails, may an old copy be served anyway?). `max-age` and `s-maxage` control the first stage and apply to different audiences; `stale-while-revalidate` and `stale-if-error` control the third and are **not** defined in RFC 9111 at all — they come from RFC 5861, an Informational RFC from 2010.
 
+<Figure src="/images/articles/inline/cache-control-is-a-contract-not-a-suggestion-1.png" alt="A four-step flow: compute freshness, revalidate when stale, serve stale safely, then key the cache on Vary." caption="Conceptual: freshness, validation and Vary decide what users see. A CDN, a proxy and a browser each compute a different freshness lifetime from the same headers." />
+
 ## Stage 1: freshness
 
 RFC 9111 defines the freshness lifetime as the first match of a fixed list:

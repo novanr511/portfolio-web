@@ -21,6 +21,8 @@ Evaluate long-context retrieval by testing whether the right passage is used acr
 
 The Lost in the Middle paper is the primary source, and the Sentence-BERT paper explains the bi-encoder retrieval that a shorter pipeline uses. The boundary: <Mark>position behaviour is model-specific</Mark>, which the benchmarks article warns about applying a result broadly, and the gain must be weighed against token cost, as the cost estimator article requires.
 
+<Figure src="/images/articles/inline/how-to-evaluate-long-context-retrieval-1.png" alt="A four-step flow: fix a question set, move the right passage, compare short context, then read position effects." caption="Conceptual: test position sensitivity, not just capacity. A test with only the correct passage flatters the system." />
+
 ## What to test
 
 **Position sensitivity.** Place the relevant passage at the beginning, middle, and end of otherwise identical prompts and score the answer, as [Long Context Windows: What a 1M-Token Window Actually Buys You](/articles/long-context-windows-what-they-buy) recommends. A model that fails only in the middle has a position problem, which a better retriever can avoid by shortening the context, as [Reranking in Retrieval Pipelines: When and Why It Pays](/articles/reranking-in-retrieval-pipelines-when-and-why-it-pays) explains.

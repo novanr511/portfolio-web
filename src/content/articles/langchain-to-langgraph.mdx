@@ -24,6 +24,8 @@ Linear chains are adequate for single-turn, one-tool calls but cannot cleanly ex
 
 LangGraph models an agent as a state machine with typed state, nodes, and conditional edges, adding checkpoints and interrupts for resumability and human review. The move is justified when those failure modes appear, not for every LLM application.
 
+<Figure src="/images/articles/inline/langchain-to-langgraph-1.png" alt="A four-step flow: model the state, define nodes and edges, checkpoint state, then add approval gates." caption="Conceptual: state, branches and checkpoints are architecture. Linear chains handle single-turn calls, not long-horizon state and loops." />
+
 ## Why chains break in production
 
 A chain is a straight line: prompt in, response out, maybe a tool call in between. In a demo, every run is a gentle one-turn interaction. In production, agents face conditions chains structurally cannot represent:

@@ -15,6 +15,8 @@ Small teams rarely implement FlashAttention themselves, which is a good thing. I
 
 **Direct answer:** FlashAttention computes exact attention with fewer memory reads and lower peak memory, which matters for long sequences and prefill. The paper is the primary source, and the serving-frameworks article explains how IO-aware techniques reach an application through infrastructure. The boundary: <Mark>it does not change model capability</Mark>, does not remove the KV cache, and its benefit depends on sequence length and hardware, as the KV-cache article explains for the separate memory consumer.
 
+<Figure src="/images/articles/inline/flashattention-for-small-teams-1.png" alt="A four-step flow: pick the serving stack, check sequence length, measure prefill, then watch the KV cache." caption="Conceptual: the gain is workload-specific. The gain is workload-specific, which the benchmarks article warns about applying results." />
+
 ## The framework decision in practice
 
 <KeyPoint>

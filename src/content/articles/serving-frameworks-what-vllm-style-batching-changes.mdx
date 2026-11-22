@@ -21,6 +21,8 @@ Continuous batching replaces fixed batches with dynamic scheduling as requests f
 
 The vLLM paper reports substantial throughput improvements from these changes. The boundary: a framework improves hardware utilisation; it cannot fix a model that is too large for memory or a workload whose latency target is incompatible with batching.
 
+<Figure src="/images/articles/inline/serving-frameworks-what-vllm-style-batching-changes-1.png" alt="A four-step flow: schedule dynamically, allocate KV in blocks, measure utilisation, then tune the workload." caption="Conceptual: continuous batching and paged memory. The benefits of continuous batching grow with length variance." />
+
 ## Two mechanisms
 
 **Continuous batching.** In static batching, a group of requests is processed together and the next group waits for all of them to finish. Short requests wait for long ones. Continuous batching admits new requests as soon as a slot frees, keeping the hardware busy and reducing the tail caused by stragglers.

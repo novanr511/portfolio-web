@@ -15,6 +15,8 @@ A transformer processes all tokens in parallel, which is why it is fast and why 
 
 **Direct answer:** RoPE applies a position-dependent rotation to queries and keys so that their dot product encodes how far apart two tokens are. The RoFormer paper introduced the method, and it became a default in many later models. The boundary: RoPE encodes position, not meaning — a model can know two tokens are far apart without knowing what to do with that fact, and long-context behaviour still depends on training and data.
 
+<Figure src="/images/articles/inline/rope-and-position-encoding-how-models-understand-order-1.png" alt="A four-step flow: rotate query and key, encode relative distance, read frequencies, then learn the implication." caption="Conceptual: position is not meaning. A model that knows two tokens are ten positions apart still needs to learn what that implies." />
+
 ## Why position needs encoding
 
 Attention computes relationships between tokens without regard to order. Without additional information, "the cat sat on the mat" and "the mat sat on the cat" produce the same set of token-to-token relationships. Three properties are needed:

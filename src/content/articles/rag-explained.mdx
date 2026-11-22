@@ -16,6 +16,8 @@ Most RAG tutorials stop at "split your documents, embed them, ask the model." Th
 
 **Direct answer:** RAG grounds an LLM's answers in documents retrieved at query time, updating knowledge through the index rather than retraining the model. A production system depends on the retrieval pipeline: chunking, embeddings, hybrid search, reranking, and evaluation decide whether the right evidence reaches the generator. The real design choice is what to trade off at each stage, not whether to use retrieval at all.
 
+<Figure src="/images/articles/inline/rag-explained-1.png" alt="A four-step flow: chunk documents, retrieve embeddings, run hybrid search and reranking, then evaluate." caption="Conceptual: the pipeline decides what evidence reaches the model. Mixing embedding models breaks retrieval completely." />
+
 ## The problem RAG solves
 
 An LLM has two knowledge sources: its training data (frozen at a point in time, sometimes wrong, never *yours*) and whatever fits in its context window. RAG exploits the second source to fix the first. Instead of asking the model what it knows, you ask it to answer using **retrieved documents** — your product docs, your policies, your knowledge base — placed into the context at query time.

@@ -15,6 +15,8 @@ Every publicly trusted TLS certificate is now, in practice, a public record. Cer
 
 **Direct Answer:** CT proves that a specific certificate was submitted to at least one publicly monitored append-only log, not that the certificate is legitimate, that the domain owner wanted it, or that it is still safe to trust. The protocol guarantees *discoverability of misissuance*; everything after that — monitoring, response, revocation, reissuance — is operational work that the protocol deliberately leaves outside itself.
 
+<Figure src="/images/articles/inline/certificate-transparency-what-the-public-logs-prove-1.png" alt="A comparison: a certificate having an SCT proving it was logged versus legitimacy remaining unverified." caption="Conceptual: a logged certificate is discoverable, not automatically valid. It is a presence guarantee, not a validity guarantee." />
+
 ## What CT actually guarantees
 
 RFC 6962 (June 2013, Experimental) defines the core model. Each log is a single, ever-growing, append-only Merkle tree of submitted certificates. When a log accepts a valid chain it must immediately return a **Signed Certificate Timestamp (SCT)** — and the RFC is explicit about what that promise is: the SCT is the log's promise to incorporate the certificate in the Merkle tree within a fixed time known as the **Maximum Merge Delay (MMD)**.

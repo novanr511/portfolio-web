@@ -15,6 +15,8 @@ Most machine learning assumes the input is a neatly arranged vector. Graph data 
 
 **Direct answer:** A graph neural network learns a representation for each node by aggregating information from its neighbours, repeatedly, so that a node's vector comes to encode its position in the structure. The mechanism is message passing: collect information from neighbours, combine it with the node's own state, and update. It helps when relationships carry signal that node attributes alone do not — which is exactly the case in recommender systems, where the user-item interaction graph is the thing a matrix factorisation model used only as a training target.
 
+<Figure src="/images/articles/inline/graph-neural-networks-graph-convolutional-networks-and-applications-1.png" alt="A four-step flow: collect neighbour data, combine with own state, update the node, then check edge meaning." caption="Conceptual: message passing moves signal into representation. If the edges do not encode a meaningful relationship, message passing propagates noise." />
+
 ## The problem the graph solves
 
 Kipf and Welling's semi-supervised graph convolutional network established the modern pattern, and its value is in what it changed about the input. A node is no longer described only by its features but by its features *and* the features of the nodes around it, with the graph determining how information flows.

@@ -15,6 +15,8 @@ HTTP/3 is often described as “HTTP/2, but faster.” That shorthand hides the 
 
 **Direct answer:** HTTP/3 maps HTTP semantics onto QUIC. QUIC provides encrypted, multiplexed streams with transport-level reliability and flow control; TLS 1.3 is integrated into its handshake. Unlike HTTP/2 over TCP, packet loss affecting one QUIC stream does not inherently block delivery on every other stream in the connection. But performance still depends on the path, endpoint implementation, workload, and whether the client can establish QUIC over UDP. [RFC 9114](https://www.rfc-editor.org/rfc/rfc9114) and [RFC 9000](https://www.rfc-editor.org/rfc/rfc9000) define the protocol behavior.
 
+<Figure src="/images/articles/inline/http3-what-changes-when-http-runs-over-quic-1.png" alt="A four-step flow: negotiate HTTP/3, use QUIC over UDP, isolate streams, then verify the actual path." caption="Conceptual: independent streams over QUIC. No cross-stream head-of-line blocking is accurate; packet loss no longer affects performance is not." />
+
 ## What stays the same—and what changes
 
 HTTP/3 uses the same HTTP semantics: methods, status codes, fields, and resource representations remain part of HTTP. The framing and transport change. HTTP/3 carries messages in frames on QUIC streams; a request-response exchange uses a client-initiated bidirectional stream. QUIC can carry multiple streams concurrently over a connection.
