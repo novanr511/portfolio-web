@@ -1,27 +1,19 @@
-## The question
+## The series
 
-A risk summary is only as honest as its uncertainty. This demo takes a public daily price series and asks what belongs beside a return figure: volatility, drawdown, a tail-loss estimate, and the precision of that estimate. It makes no forecast and claims no edge.
-
-## Dataset and source
-
-The [Apple OHLC dataset from plotly](https://github.com/plotly/datasets/blob/master/finance-charts-apple.csv) contains 506 trading days from 2015-02-17 to 2017-02-16 with an adjusted close column sourced from Yahoo Finance. The window ends in February 2017 and is stale for any current risk decision. The adjusted series accounts for splits and dividends. Every figure below is computed by `scripts/build_data_analytics_demos.py`, which reads the unrounded prices; the endpoints shown here are rounded for display.
+A return of roughly ten percent over two years looks unremarkable until the drawdown is placed beside it. This demo takes 506 trading days of [Apple OHLC from plotly](https://github.com/plotly/datasets/blob/master/finance-charts-apple.csv), adjusted for splits and dividends, running from 2015-02-17 to 2017-02-16. The window ends in February 2017 and is stale for any current decision. Every figure is computed by `scripts/build_data_analytics_demos.py` from unrounded prices; endpoints shown here are rounded.
 
 <Figure src="/images/data-analytics/finance-price.png" alt="Line chart of Apple adjusted close from about 123 dollars in February 2015 to about 135 dollars in February 2017, with visible intermediate swings." caption="Adjusted close over the full window. The endpoints alone hide the path." width="1280" height="512" />
 
-## Findings
+## Return hides the path
 
-Adjusted close moves from **122.91** to **135.35**. Compounding the daily returns of the unrounded series gives **10.13%** over the window; the rounded endpoints alone give 10.12%, so the quoted figure comes from the full precision data. Daily returns are positive on **50.1%** of days. Annualized volatility, the standard deviation of daily returns scaled by the square root of 252, is **24.27%**.
-
-The drawdown view is the part a return headline omits. The maximum peak-to-trough decline is **-30.44%**. The fifth percentile of daily returns gives a 95% one-day historical VaR of about **-2.5%**. A bootstrap of 2,000 resamples puts the 95% interval for that percentile at **-2.67% to -2.20%**, so two decimal places would overstate precision.
-
-VaR also hides the tail. Expected shortfall at 95% is **-3.45%**, the worst observed day is **-6.57%**, and excess kurtosis is **3.11**. A risk reader needs those numbers beside VaR, not in a footnote.
+Adjusted close moves from **122.91** to **135.35**. Compounding daily returns of the unrounded series gives **10.13%** over the window; the rounded endpoints alone give 10.12%. Returns are positive on **50.1%** of days. Annualized volatility, daily standard deviation scaled by the square root of 252, is **24.27%**. The maximum peak-to-trough decline is **-30.44%**.
 
 <Figure src="/images/data-analytics/finance-drawdown.png" alt="Area chart of drawdown from the running peak, reaching roughly 30 percent below the peak at its worst point." caption="Drawdown from the running peak. The largest loss occurred well before the end of the window." width="1280" height="512" />
 
-## What a finance team would do with it
+## Tail risk with its uncertainty
 
-Report return and tail risk together, with the uncertainty of the estimate. A 10% two-year return with a 30% drawdown is a different proposition from the same return with a 5% drawdown. A complete assessment would add a benchmark, a cost model, a position-sizing rule, and a more recent window before anyone acted on the figure.
+The fifth percentile of daily returns gives a 95% one-day historical VaR near **-2.5%**. A bootstrap of 2,000 resamples places that percentile between **-2.67% and -2.20%**, so quoting two decimals would overstate precision. VaR also omits the tail: expected shortfall at 95% is **-3.45%**, the worst observed day is **-6.57%**, and excess kurtosis is **3.11**.
 
-## Limitations
+## What this is not
 
-This is one asset over one historical window ending February 2017, not a diversified portfolio and not a forecast. Historical VaR assumes the next return distribution resembles the observed one. That assumption is approximate here: absolute returns have lag-1 autocorrelation of **0.14**, and there is no benchmark, risk-free rate, transaction cost, or slippage in the window. No economic claim is made, and nothing here is investment advice.
+One asset, one historical window, no forecast. Historical VaR assumes the next distribution resembles the observed one; here absolute returns have lag-1 autocorrelation of **0.14**, so the assumption is approximate. There is no benchmark, risk-free rate, transaction cost, or slippage. A complete assessment would add all of them and a more recent window before anyone acted on the figure. No economic claim is made, and nothing here is investment advice.

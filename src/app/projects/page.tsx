@@ -106,7 +106,7 @@ export default function ProjectsPage() {
                         Sales, HR, finance, and research work in one place
                       </p>
                       <p className="mt-3 text-[14px] leading-relaxed text-muted">
-                        A summary of verified case studies and reproducible
+                        A summary of documented case studies and reproducible
                         public-data demos, including margin leakage in retail,
                         attrition drivers, and risk modeling.
                       </p>

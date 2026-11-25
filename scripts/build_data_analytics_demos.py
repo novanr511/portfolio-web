@@ -180,6 +180,9 @@ corr_income_attr = hr["MonthlyIncome"].corr((hr["Attrition"] == "Yes").astype(in
 categorical = [
     "JobRole", "Department", "JobInvolvement", "JobLevel", "OverTime",
     "BusinessTravel", "MaritalStatus", "JobSatisfaction", "WorkLifeBalance",
+    "TrainingTimesLastYear", "StockOptionLevel", "Education", "EducationField",
+    "EnvironmentSatisfaction", "RelationshipSatisfaction", "PerformanceRating",
+    "Gender", "Over18",
 ]
 split_rows = []
 for col in categorical:

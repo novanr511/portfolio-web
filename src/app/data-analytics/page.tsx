@@ -7,7 +7,7 @@ import { analyticsWork } from "@/lib/data-analytics";
 export const metadata: Metadata = {
   title: "Data Analytics",
   description:
-    "Data analytics work by Novandri R.: verified case studies and reproducible public-data demos covering sales performance, HR attrition, finance risk, time series, and retrieval systems.",
+    "Data analytics work by Novandri R.: documented case studies and reproducible public-data demos covering sales performance, HR attrition, finance risk, time series, and retrieval systems.",
   alternates: { canonical: "/data-analytics" },
   openGraph: {
     title: "Data Analytics — Novandri R.",
@@ -115,16 +115,16 @@ export default function DataAnalyticsPage() {
           <div className="editorial-card mt-20 rounded-2xl border border-border bg-surface px-7 py-8">
             <h2 className="page-title text-[24px]">Want the full method?</h2>
             <p className="page-subtitle mt-2 max-w-xl text-[14px]">
-              The chart and metric scripts live in this repository, so the
-              demos can be re-run against the same public source files.
+              Each demo names its public dataset and documents the exact
+              figures on its own page. The project source is open.
             </p>
             <a
-              href="https://github.com/novanr511/portfolio-web/tree/main/scripts"
+              href="https://github.com/novanr511/portfolio-web"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-[14px] font-medium text-accent-contrast transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              Browse the analysis scripts
+              View the repository
             </a>
           </div>
         </Reveal>

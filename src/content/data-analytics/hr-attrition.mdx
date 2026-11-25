@@ -1,35 +1,35 @@
-## The question
+## The file and its limits
 
-An HR analytics request usually arrives as "predict who will leave". The more useful analyst question is "which observable condition separates leavers from stayers, and is the gap large enough to act on". This demo answers that with a public employee attrition table and stops short of any causal claim.
-
-## Dataset and source
-
-The [IBM HR Attrition dataset](https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv) contains 1,470 employee records with attrition status, department, role, overtime, satisfaction, and income. The file is a synthetic teaching dataset created by IBM, not a record of real employees. Every figure below is computed by `scripts/build_data_analytics_demos.py` from the mirror linked here.
+Before naming a driver of attrition, I ranked all 18 categorical and ordinal fields in the file. That changed the headline. The source is the [IBM HR Attrition mirror](https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv), 1,470 records in a synthetic teaching dataset created by IBM. It contains no real employees. Figures are computed by `scripts/build_data_analytics_demos.py`.
 
 <Figure src="/images/data-analytics/hr-jobrole.png" alt="Bar chart of attrition rate by job role. Sales Representative is highest near 40 percent and Research Director lowest near 2.5 percent, against a dashed overall rate around 16 percent." caption="Job role has the widest spread of the categorical splits checked: 37.26 percentage points." width="1280" height="544" />
 
-## Findings
+## Ranking every split
 
-Overall attrition is **16.12%**. I ranked every categorical split available in the file before naming one. Job role has the widest spread at **37.26 percentage points**, from Sales Representative at **39.76%** to Research Director at **2.50%**. Job involvement follows at **24.71 points**, job level at **21.62 points**, and overtime at **20.09 points**.
+Overall attrition is **16.12%**. Each field was measured by the spread between its highest and lowest group rate, and by the best single-category gap from the overall rate of 16.12%. The five widest are shown; JobRole remains the widest of all 18.
 
 | Field | Spread across categories | Best single-category gap |
 |---|---:|---:|
-| JobRole | 37.26 pp | Sales Representative, 25.05 pp |
+| JobRole | 37.26 pp | Sales Representative, 23.64 pp |
 | JobInvolvement | 24.71 pp | level 1, 17.61 pp |
 | JobLevel | 21.62 pp | level 4, 11.41 pp |
 | OverTime | 20.09 pp | Yes, 14.41 pp |
-| WorkLifeBalance | 17.03 pp | level 1, 15.13 pp |
+| TrainingTimesLastYear | 18.55 pp | 0 trainings, 11.66 pp |
 
-The point of ranking them is to avoid naming a "strongest" split without having checked the alternatives. Overtime is a strong and operationally actionable split: **30.53%** for employees working overtime against **10.44%** for those who do not. It is not the widest split in this file.
+Job role runs from Sales Representative at **39.76%** to Research Director at **2.50%**. Overtime is a strong and operationally actionable split, but it is not the widest split in this file.
+
+## Two actionable signals
+
+Employees working overtime leave at **30.53%** against **10.44%** for those who do not, a gap of **20.09 points**. Mean monthly income is **USD 4,787.09** for leavers and **USD 6,832.74** for stayers, so leavers earn **29.94% less on average**; that figure divides the difference by the stayers mean. The point-biserial correlation between income and attrition is **-0.16**, a weak ranking signal.
 
 <Figure src="/images/data-analytics/hr-overtime.png" alt="Two bars comparing attrition for overtime and non-overtime employees, with overtime about 31 percent and non-overtime about 10 percent." caption="Overtime is a strong split, but job role spreads further." width="1280" height="544" />
 
-Income is a weak ranking signal here. Mean monthly income is **USD 4,787.09** for leavers and **USD 6,832.74** for stayers, so leavers earn **29.94% less on average**, computed as the difference divided by the stayers mean. The point-biserial correlation between monthly income and attrition is **-0.16**. Job satisfaction is broadly decreasing, though not strictly monotone: **22.84%** at level 1, **16.43%** at level 2, **16.52%** at level 3, and **11.33%** at level 4.
+Satisfaction is broadly decreasing, not strictly monotone: **22.84%** at level 1, **16.43%** at level 2, **16.52%** at level 3, and **11.33%** at level 4.
 
-## What a people team would do with it
+## Operational interpretation
 
-Treat overtime as an operational review trigger, not a prediction of individual departure. Segment retention work by role first, since the role spread is larger, then by overtime and satisfaction. A fuller analysis would test whether changing workload changes the rate.
+Review workload first, then segment retention work by role before income. A fuller analysis would test whether changing workload changes the rate rather than assuming the association is causal.
 
-## Limitations
+## Where this stops
 
-The dataset is synthetic, so no finding transfers to a real workforce. These are cross-sectional associations, not causes. The file has no longitudinal performance trajectory and no manager identifier, so neither performance over time nor manager effect can be examined. There are no confidence intervals or correction across the many categorical comparisons, so the ranking is descriptive, not a set of confirmed effects. The numbers demonstrate method and communication, not a claim about any company.
+The data is synthetic, so nothing transfers to a real workforce. These are cross-sectional associations. The file does contain `PerformanceRating`, `YearsWithCurrManager`, and `YearsInCurrentRole`, but a single rating and tenure fields are not a longitudinal performance trajectory or a manager identifier, so neither performance over time nor a manager effect can be established from them. There are no confidence intervals and no correction across the many categorical comparisons, so the ranking is descriptive. The numbers demonstrate method and communication, not a claim about any company.
