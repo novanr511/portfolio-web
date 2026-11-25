@@ -118,6 +118,13 @@ def main() -> None:
         "SELECT COUNT(*) FROM orders WHERE order_delivered_customer_date IS NOT NULL "
         "AND order_delivered_customer_date > order_estimated_delivery_date"
     ).fetchone()[0]
+    late_orders_date_only = conn.execute(
+        "SELECT COUNT(*) FROM orders WHERE order_delivered_customer_date IS NOT NULL "
+        "AND date(order_delivered_customer_date) > date(order_estimated_delivery_date)"
+    ).fetchone()[0]
+    reviews = frames["order_reviews"]["review_id"]
+    reused_review_ids = int(reviews[reviews.duplicated(keep=False)].nunique())
+    excess_review_rows = int(reviews.duplicated().sum())
     # q03 keeps only states with at least 100 delivered orders.
     late_orders = sum(r["late_orders"] for r in q["03_late_rate_by_state"])
     late_gmv_total = sum(r["late_gmv_brl"] for r in late_gmv)
@@ -129,6 +136,9 @@ def main() -> None:
         "total_orders": total_orders,
         "delivered_orders": delivered,
         "late_orders_all": late_orders_all,
+        "late_orders_date_only": late_orders_date_only,
+        "reused_review_ids": reused_review_ids,
+        "excess_review_rows": excess_review_rows,
         "late_orders_in_ranked_states": late_orders,
         "late_rate_all_pct": round(100 * late_orders_all / delivered, 2),
         "late_rate_pct": round(100 * late_orders / delivered, 2),
