@@ -90,6 +90,31 @@ export default function ProjectsPage() {
                       <ProjectCard project={project} />
                     </Reveal>
                   ))}
+                  <Reveal delay={others.length * 90}>
+                    <Link
+                      href="/data-analytics"
+                      transitionTypes={["nav-forward"]}
+                      className="editorial-card group flex h-full flex-col rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/40 hover:bg-tint/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                    >
+                      <span className="rounded-full bg-tint px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-accent">
+                        2026
+                      </span>
+                      <h3 className="mt-4 text-[19px] font-semibold tracking-tight text-foreground group-hover:text-accent">
+                        Data Analytics
+                      </h3>
+                      <p className="mt-1 text-[13.5px] font-medium text-accent">
+                        Sales, HR, finance, and research work in one place
+                      </p>
+                      <p className="mt-3 text-[14px] leading-relaxed text-muted">
+                        A summary of verified case studies and reproducible
+                        public-data demos, including margin leakage in retail,
+                        attrition drivers, and risk modeling.
+                      </p>
+                      <div className="mt-auto pt-5 text-[13px] font-medium text-accent">
+                        Browse data analytics
+                      </div>
+                    </Link>
+                  </Reveal>
                 </div>
               </>
             )}

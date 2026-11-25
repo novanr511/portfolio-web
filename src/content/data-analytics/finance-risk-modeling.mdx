@@ -1,0 +1,25 @@
+## The question
+
+A finance model is only as honest as its risk disclosure. This demo takes a public daily price series and asks what a risk summary should contain besides a return figure: volatility, drawdown, and a historical loss threshold. It makes no forecast and claims no edge.
+
+## Dataset and source
+
+The [Apple OHLC dataset from plotly](https://github.com/plotly/datasets/blob/master/finance-charts-apple.csv) contains 506 trading days from 2015-02-17 to 2017-02-16 with an adjusted close column sourced from Yahoo Finance. The adjusted series accounts for splits and dividends. Every figure below is computed by `scripts/build_data_analytics_demos.py`.
+
+<Figure src="/images/data-analytics/finance-price.png" alt="Line chart of Apple adjusted close from about 123 dollars in February 2015 to about 135 dollars in February 2017, with visible intermediate swings." caption="Adjusted close over the full window. The endpoints alone hide the path." width="1280" height="512" />
+
+## Findings
+
+Adjusted close moves from **122.91** to **135.35**, a cumulative return of **10.13%** over the window. Daily returns are positive on **50.1%** of days. Annualized volatility, computed as the standard deviation of daily returns scaled by the square root of 252, is **24.27%**.
+
+The drawdown view is the part a return headline omits. The maximum peak-to-trough decline is **-30.44%**. The fifth percentile of daily returns, used here as a historical one-day value at risk, is **-2.49%**.
+
+<Figure src="/images/data-analytics/finance-drawdown.png" alt="Area chart of drawdown from the running peak, reaching roughly 30 percent below the peak at its worst point." caption="Drawdown from the running peak. The largest loss occurred well before the end of the window." width="1280" height="512" />
+
+## What a finance team would do with it
+
+Report return and risk together. A 10% two-year return with a 30% drawdown is a different proposition from the same return with a 5% drawdown, and a volatility figure makes that comparison possible. A real mandate would add a benchmark, a cost model, and a position-sizing rule.
+
+## Limitations
+
+This is one asset over one historical window, not a diversified portfolio and not a forecast. Historical VaR assumes the next distribution resembles the observed one, which fails in regime changes. No transaction costs, taxes, or slippage are modelled, and nothing here is investment advice.

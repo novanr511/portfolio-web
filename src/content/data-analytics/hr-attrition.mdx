@@ -1,0 +1,25 @@
+## The question
+
+An HR analytics request usually arrives as "predict who will leave". The more useful analyst question is "which observable condition separates leavers from stayers, and is the gap large enough to act on". This demo answers that with a public employee attrition table and stops short of any causal claim.
+
+## Dataset and source
+
+The [IBM HR Attrition dataset](https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv) contains 1,470 employee records with attrition status, department, role, overtime, satisfaction, and income. The dataset is distributed by IBM for teaching and is widely understood to be synthetic. It contains no real employees. Every figure below is computed by `scripts/build_data_analytics_demos.py`.
+
+<Figure src="/images/data-analytics/hr-department.png" alt="Bar chart of attrition rate by department, with Sales highest and a dashed line for the overall rate." caption="Attrition rate by department against the overall rate of 16.12 percent." width="1280" height="544" />
+
+## Findings
+
+Overall attrition is **16.12%**. The single strongest split is overtime: **30.53%** for employees working overtime against **10.44%** for those who do not, a gap of roughly twenty percentage points. Sales has the highest departmental attrition at **20.63%**.
+
+<Figure src="/images/data-analytics/hr-overtime.png" alt="Two bars comparing attrition for overtime and non-overtime employees, with overtime close to 31 percent and non-overtime near 10 percent." caption="The overtime split is far larger than the departmental spread." width="1280" height="544" />
+
+Income tells the same story in a different direction. Mean monthly income is **USD 4,787.09** for leavers and **USD 6,832.74** for stayers, a gap of **29.94%**. The correlation between monthly income and attrition is **-0.16**, so income alone is a weak ranking signal. Job satisfaction is more interpretable: attrition is **22.84%** at satisfaction level 1 and **11.33%** at level 4.
+
+## What a people team would do with it
+
+Treat overtime as an operational review trigger, not a prediction of individual departure. Segment retention spend by department and satisfaction level, then test whether changing workload changes the rate. A dashboard without that test would only describe the problem.
+
+## Limitations
+
+The dataset is synthetic, so no finding transfers to a real workforce. These are cross-sectional associations, not causes, and there is no time-to-event structure, no manager effect, and no performance outcome. The numbers demonstrate method and communication, not a claim about any company.
