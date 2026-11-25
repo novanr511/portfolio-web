@@ -72,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   const analyticsPages: MetadataRoute.Sitemap = analyticsWork
-    .filter((work) => work.kind === "Public-data demo")
+    .filter((work) => work.kind === "Public-data demo" || work.kind === "Applied project")
     .map((work) => ({
       url: `${site.url}${work.href}`,
       changeFrequency: "yearly",

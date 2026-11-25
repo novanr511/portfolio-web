@@ -54,7 +54,11 @@ function WorkCard({ work, index }: { work: (typeof analyticsWork)[number]; index
           ))}
         </div>
         <span className="mt-5 text-[13px] font-medium text-accent">
-          {work.kind === "Case study" ? "Read the case study" : "Read the analysis"}
+          {work.kind === "Applied project"
+            ? "Read the project"
+            : work.kind === "Case study"
+              ? "Read the case study"
+              : "Read the analysis"}
         </span>
       </Link>
     </Reveal>
@@ -62,6 +66,7 @@ function WorkCard({ work, index }: { work: (typeof analyticsWork)[number]; index
 }
 
 export default function DataAnalyticsPage() {
+  const applied = analyticsWork.filter((w) => w.kind === "Applied project");
   const caseStudies = analyticsWork.filter((w) => w.kind === "Case study");
   const demos = analyticsWork.filter((w) => w.kind === "Public-data demo");
 
@@ -81,7 +86,25 @@ export default function DataAnalyticsPage() {
           </p>
         </Reveal>
 
-        <section className="page-band mt-12 -mx-6 px-6 py-11" aria-label="Analytics case studies">
+        {applied.length > 0 && (
+          <section className="mt-12" aria-label="Applied analytics projects">
+            <Reveal>
+              <p className="page-eyebrow">Applied project</p>
+              <h2 className="page-title mt-3 text-[28px]">Work on a real, multi-table dataset</h2>
+              <p className="page-subtitle mt-3 max-w-2xl">
+                SQL, a modelled dataset, tested queries, and a decision memo with
+                an explicit counterfactual limit.
+              </p>
+            </Reveal>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              {applied.map((work, i) => (
+                <WorkCard key={work.slug} work={work} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="page-band mt-16 -mx-6 px-6 py-11" aria-label="Analytics case studies">
           <Reveal>
             <p className="page-eyebrow">Shipped work</p>
             <h2 className="page-title mt-3 text-[28px]">Case studies</h2>

@@ -1,7 +1,7 @@
 export type AnalyticsWork = {
   slug: string;
   name: string;
-  kind: "Case study" | "Public-data demo";
+  kind: "Applied project" | "Case study" | "Public-data demo";
   summary: string;
   tags: string[];
   /** Internal route for every item. Case studies live under /projects. */
@@ -19,6 +19,19 @@ export type AnalyticsWork = {
  * client, a stakeholder, or a business outcome.
  */
 export const analyticsWork: AnalyticsWork[] = [
+  {
+    slug: "olist-delivery-risk",
+    name: "Olist Delivery Risk",
+    kind: "Applied project",
+    summary:
+      "A multi-table SQL case study on 99,441 orders: 7,827 late deliveries, R$1.16M of GMV exposed, and the five states holding 68.88% of it, with a stated decision and no claimed saving.",
+    tags: ["SQL", "SQLite", "Data Modeling", "Decision Memo", "Public data"],
+    href: "/data-analytics/olist-delivery-risk",
+    year: "2026",
+    dataset: "Olist Brazilian E-commerce, 99,441 orders, 8 CSV tables",
+    sourceUrl:
+      "https://github.com/ruan-narici/brazilian-ecommerce-analytics/tree/main/src/data",
+  },
   {
     slug: "btc-monthly-ml",
     name: "BTC Monthly ML",

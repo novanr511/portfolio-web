@@ -34,7 +34,9 @@ export function AnalyticsDemoPage({
 
         <Reveal delay={60}>
           <header className="mt-9">
-            <p className="page-eyebrow">Public-data demo</p>
+            <p className="page-eyebrow">
+              {work.kind === "Applied project" ? "Applied project" : "Public-data demo"}
+            </p>
             <h1 className="page-title mt-3 text-[30px] sm:text-[40px]">
               {work.name}
             </h1>

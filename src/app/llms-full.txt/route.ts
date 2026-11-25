@@ -36,7 +36,7 @@ export async function GET() {
 
   const demoSections = await Promise.all(
     analyticsWork
-      .filter((w) => w.kind === "Public-data demo")
+      .filter((w) => w.kind === "Public-data demo" || w.kind === "Applied project")
       .map(async (w) => {
         const raw = await readBody("data-analytics", w.slug);
         return `## ${w.name}\n\n- URL: ${site.url}${w.href}\n- Dataset: ${w.dataset ?? "see page"}\n\n${raw.trim()}\n`;
