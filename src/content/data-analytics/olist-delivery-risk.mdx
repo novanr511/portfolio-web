@@ -8,7 +8,7 @@ Three user stories were written before any query:
 - As a commercial lead, I want the BRL value of GMV exposed to late delivery so I can size the review.
 - As a data analyst, I want the result reproducible from raw tables so a reviewer can challenge every number.
 
-The accepted definition is stated up front: a delivery is late when `order_delivered_customer_date` is strictly later than `order_estimated_delivery_date`. GMV is the sum of `price` in `order_items`. GMV exposed to lateness is not lost revenue; it is the value of orders that arrived after the promise.
+The accepted definition is stated up front: a delivery is late when `order_delivered_customer_date` is strictly later than `order_estimated_delivery_date`. Estimated dates are midnight in this dataset, so an order delivered on the promised calendar day after midnight counts as late. Under a date-only definition the same data gives 6,535 late orders instead of 7,827, which is why the definition matters more than the chart styling. GMV is the sum of `price` in `order_items`. GMV exposed to lateness is not lost revenue; it is the value of orders that arrived after the promise.
 
 ## Source and model
 
@@ -20,21 +20,23 @@ The grain matters. Order status lives at order grain; price and seller live at l
 
 ## What the queries found
 
-Of 99,441 orders, 96,478 reached delivered status. **7,827 deliveries were late, a rate of 8.11%** across all delivered orders. Among states with at least 100 delivered orders, Alagoas leads at **21.41%**, followed by Maranhão at **17.43%** and Sergipe at **15.22%** ([03_late_rate_by_state.sql](/sql/olist/03_late_rate_by_state.sql)).
+Of 99,441 orders, 96,478 reached delivered status. **7,827 deliveries were late, a rate of 8.11%** across all delivered orders. Among states with at least 100 delivered orders, Alagoas leads at **23.93%**, followed by Maranhão at **19.67%**, Piauí at **15.97%**, Ceará at **15.32%**, and Sergipe at **15.22%** ([03_late_rate_by_state.sql](/sql/olist/03_late_rate_by_state.sql)).
 
-<Figure src="/images/olist/state-late-rate.png" alt="Bar chart of late-delivery rate by state, with Alagoas above 21 percent and Sao Paulo below 6 percent." caption="Late-delivery rate by state, states with at least 100 delivered orders." width="1280" height="544" />
+<Figure src="/images/olist/state-late-rate.png" alt="Bar chart of late-delivery rate by state, with Alagoas near 24 percent and Sao Paulo under 6 percent." caption="Late-delivery rate by state, states with at least 100 delivered orders." width="1280" height="544" />
 
-The BRL exposure is concentrated. GMV on late-delivered items is **R$1,158,950.50**. São Paulo contributes **R$269,383.42**, Rio de Janeiro **R$215,415.46**, and the top five states together hold **68.88%** of the exposed GMV ([04_late_gmv_by_state.sql](/sql/olist/04_late_gmv_by_state.sql)).
+The BRL exposure is concentrated. GMV on late-delivered items is **R$1,158,950.50**. São Paulo contributes **R$342,232.40**, Rio de Janeiro **R$238,881.29**, and the top five states (SP, RJ, MG, BA, RS) together hold **68.88%** of the exposed GMV ([04_late_gmv_by_state.sql](/sql/olist/04_late_gmv_by_state.sql)). Rate and value rank different states: Alagoas is the worst rate but only 14th by exposed GMV.
 
 <Figure src="/images/olist/late-gmv-state.png" alt="Bar chart of GMV exposed to late delivery by state, with Sao Paulo and Rio de Janeiro far ahead." caption="GMV exposed to late delivery, top five states, BRL." width="1280" height="544" />
 
-Cancellation is a separate, smaller problem: **625 orders** carry `canceled` status in the order table, of which **461** contain at least one line item, worth **R$95,235.27** ([06_cancellation_gmv.sql](/sql/olist/06_cancellation_gmv.sql)). Reviews confirm that lateness is visible to customers: mean review score is **2.567** on late deliveries against **4.214** otherwise ([07_review_score_vs_late.sql](/sql/olist/07_review_score_vs_late.sql)).
+The seller view answers the second user story. Among sellers with at least 100 line items, the highest late rate is **24.53%** on 106 items, followed by **23.46%** on 405 items and **19.70%** on 132 items ([05_seller_delivery_risk.sql](/sql/olist/05_seller_delivery_risk.sql)). These are the operational units to audit; the state view alone cannot tell a manager which contract to review.
+
+Cancellation is a separate, smaller problem: **625 orders** carry `canceled` status in the order table, of which **461** contain at least one line item, worth **R$95,235.27** ([06_cancellation_gmv.sql](/sql/olist/06_cancellation_gmv.sql)). Reviews confirm that lateness is visible to customers: mean review score is **2.567** on late deliveries against **4.214** for the band of on-time deliveries and orders with no recorded delivery date ([07_review_score_vs_late.sql](/sql/olist/07_review_score_vs_late.sql)). That second band is mixed, so the comparison is directional only.
 
 <Figure src="/images/olist/monthly-gmv.png" alt="Line chart of monthly GMV over the first 24 months of the dataset." caption="Monthly GMV context. The late-delivery problem sits inside a growing order book." width="1280" height="512" />
 
 ## Decision memo
 
-**Decision:** start a 30-day delivery review in the five states holding 68.88% of late-delivery GMV, beginning with Rio de Janeiro and Alagoas where the rate is far above the national 8.11%.
+**Decision:** start a 30-day delivery review in the five states holding 68.88% of late-delivery GMV (SP, RJ, MG, BA, RS), then audit Alagoas and Maranhão separately as rate outliers that do not rank by exposed value.
 
 **Owner:** logistics operations lead, with an analyst assigned to maintain the state-level query. **Timeline:** week 1 confirm the estimate dates are accurate, week 2 audit carrier handoffs in the top five states, week 3 report a revised late rate, week 4 decide whether to change carrier allocation.
 
@@ -42,7 +44,7 @@ Cancellation is a separate, smaller problem: **625 orders** carry `canceled` sta
 
 ## Data quality checks
 
-The queries in [11_quality_duplicates.sql](/sql/olist/11_quality_duplicates.sql) and [12_quality_referential_integrity.sql](/sql/olist/12_quality_referential_integrity.sql) found zero orphan foreign keys and zero duplicate order, customer, or item keys. They did find **814 duplicate `review_id` values** in the reviews table. The review-score comparison therefore describes review rows, not 99,224 unique reviews. That is a real limitation of the source, not a cleaning choice.
+The queries in [11_quality_duplicates.sql](/sql/olist/11_quality_duplicates.sql) and [12_quality_referential_integrity.sql](/sql/olist/12_quality_referential_integrity.sql) found zero orphan foreign keys and zero duplicate order, customer, or item keys. They did find **789 reused `review_id` values**, producing **814 excess rows** in the reviews table. Each reused ID maps to a different order, so the review-score comparison describes review rows, not 99,224 unique reviews. That is a real limitation of the source, not a cleaning choice.
 
 ## Limitations
 
