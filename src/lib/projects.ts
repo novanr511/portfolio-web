@@ -70,4 +70,25 @@ export const projects: Project[] = [
       source: "https://github.com/novanr511/portfolio-web/tree/main/wp-theme",
     },
   },
+  {
+    slug: "rag-research-agent",
+    name: "RAG Research Agent",
+    tagline: "A build log: answers you can trace back to the artifacts",
+    description:
+      "A build log of the retrieval agent built for the BTC monthly study: lexical retrieval with BM25 and TF-IDF fused by RRF, a LangGraph question-answering flow, a number_audit step, and SQLite checkpoints with a run registry. It kept memos consistent with the outputs; it could not prove the method valid.",
+    tags: [
+      "RAG",
+      "LangGraph",
+      "BM25",
+      "TF-IDF",
+      "Python",
+      "Evaluation",
+      "SQLite",
+    ],
+    year: "2026",
+    caseStudy: true,
+    links: {
+      source: "https://github.com/novanr511/btc-monthly-close-prediction",
+    },
+  },
 ];

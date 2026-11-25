@@ -59,12 +59,6 @@ const evidence = [
     href: "/projects/rag-research-agent",
   },
   {
-    kind: "Case study",
-    title: "SEO Content Curation",
-    note: "1,004 templated articles down to ~34. A documented decision, with no traffic outcome claimed.",
-    href: "/projects/seo-content-curation",
-  },
-  {
     kind: "Essay",
     title: "Why I killed 966 articles",
     note: "The first-hand account of the same decision, and the self-referential tell that triggered it.",

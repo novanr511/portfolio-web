@@ -39,23 +39,13 @@ export const analyticsWork: AnalyticsWork[] = [
     year: "2026",
   },
   {
-    slug: "seo-content-curation",
-    name: "SEO Content Curation",
-    kind: "Case study",
-    summary:
-      "A data-driven migration decision: 1,004 generated articles, 810 tags, and 21 colliding slugs reduced to roughly 34 curated pieces behind an allowlist.",
-    tags: ["Crawlability", "Content Strategy", "Next.js", "llms.txt"],
-    href: "/projects/seo-content-curation",
-    year: "2026",
-  },
-  {
     slug: "sales-performance",
     name: "Sales Performance Analysis",
     kind: "Public-data demo",
     summary:
       "A management-style read of 9,994 retail order lines. Discount bands explain far more about margin loss than revenue rank does.",
     tags: ["SQL-style grouping", "Margin", "Discount", "Public data"],
-    href: "#sales-performance",
+    href: "/data-analytics/sales-performance",
     year: "2026",
     dataset: "Sample Superstore, 9,994 order lines",
     sourceUrl:
@@ -68,7 +58,7 @@ export const analyticsWork: AnalyticsWork[] = [
     summary:
       "A people-analytics view of 1,470 records. Overtime separates leavers from stayers more strongly than department or income.",
     tags: ["HR analytics", "Segmentation", "Correlation", "Public data"],
-    href: "#hr-attrition",
+    href: "/data-analytics/hr-attrition",
     year: "2026",
     dataset: "IBM HR Attrition, 1,470 records (synthetic)",
     sourceUrl:
@@ -81,7 +71,7 @@ export const analyticsWork: AnalyticsWork[] = [
     summary:
       "A risk summary for a single public price series: return, annualized volatility, maximum drawdown, and historical one-day VaR.",
     tags: ["Risk", "Volatility", "Drawdown", "Public data"],
-    href: "#finance-risk-modeling",
+    href: "/data-analytics/finance-risk-modeling",
     year: "2026",
     dataset: "Apple OHLC, 506 trading days, 2015 to 2017",
     sourceUrl: "https://github.com/plotly/datasets/blob/master/finance-charts-apple.csv",

@@ -1,0 +1,110 @@
+---
+title: "A RAG research agent that checks its own numbers: a build log"
+description: "Build log of the BTC study's retrieval agent: BM25 + TF-IDF with RRF, LangGraph, number_audit, SQLite checkpoints. Consistent with the artifacts — not valid."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - RAG
+  - LangGraph
+  - BM25
+  - TF-IDF
+  - Evaluation
+  - Data Engineering
+  - Machine Learning
+inLanguage: en
+---
+
+This is a build log, not a research paper. It describes a tool I built for one job: making the written narrative of the BTC monthly study traceable to the files that produced it. The limit that matters is stated here first, before the architecture, because it is easy to lose sight of once the architecture gets interesting.
+
+> **The agent can tell you what the artifacts say. It cannot tell you the artifacts are right.** Consistency is not validity. Everything below should be read through that sentence.
+
+The wider study — 133 out-of-sample months, seven models, a walk-forward protocol, an analytic baseline that beat the model — is written up separately in [BTC Monthly ML](/projects/btc-monthly-ml). This document is about the layer on top of it.
+
+## The problem: a pile of artifacts is not a narrative
+
+A research pipeline ends with a directory of outputs: metrics JSON, information curves, ablation tables, multiple-testing results, forecast biases, holdout summaries. The BTC study produced all of them. Turning that directory into a readable memo is manual work, and manual work is where numbers drift. A percentage copied from one file, a threshold described in prose that no longer matches the configuration, a figure captioned from memory — each is a small, invisible error.
+
+The agent was built to close that specific loop. Its job is: take a question about the project, retrieve the artifacts that bear on it, draft an answer from those artifacts, then check every number in the draft against what was actually retrieved. It is not a general assistant and it is not meant to be one. It knows one corpus — this project's outputs, code, and notes.
+
+## Retrieval choice: lexical first (design decision)
+
+I started with BM25 and TF-IDF rather than embeddings. That was a design decision, not a finding that embeddings are bad.
+
+The reason is the shape of the corpus. The terms that matter here are literals: `p_Holm`, `mtd_ret`, `D25`, `EOM`, `roc_auc`, `sign(mtd_ret)`, file names like `information_curve.csv`, provider names like Returnsview and Bitstamp. A query containing `p_Holm` wants the document containing the exact token `p_Holm`. Semantic similarity is actively unhelpful when the answer is a specific string. Lexical scoring also has a practical virtue: I can inspect why a chunk was retrieved, because the score is a transparent function of term frequency and inverse document frequency. With an embedding, the useful signal is buried in a vector.
+
+The ceiling is equally clear. A paraphrase — "how often was the model right late in the month" — will not match an artifact that only says "accuracy at D25" unless some token overlaps. I did not solve that. The agent works well when the question uses the project's vocabulary and degrades when it does not. I consider that an honest trade for a system whose retrieval I can audit line by line.
+
+The two lexical rankings are merged with **reciprocal rank fusion (RRF)**. RRF combines rank positions rather than raw scores, so it does not need the two scorers' incomparable scales normalised against each other. Using two scorers with different weightings is itself a hedge: where BM25 and TF-IDF disagree about the ordering, fusion avoids betting everything on one weighting scheme. It is still lexical retrieval, not a semantic upgrade.
+
+## The graph structure (design decision)
+
+I expressed the flow as a small state graph in [LangGraph](/articles/langchain-to-langgraph) rather than a linear script. The states passed between steps are the question, the retrieved chunks, the draft, the audit results, and a run identifier.
+
+The broad shape is:
+
+```text
+index artifacts → retrieve (BM25 + TF-IDF → RRF) → draft → number_audit → persist
+                          ↑                              │
+                          └──────── revision if a number fails ────────┘
+```
+
+<Figure src="/images/projects/rag-pipeline.png" alt="A left-to-right flow: artifacts indexed locally, a user question, retrieval using BM25 and TF-IDF fused by RRF, drafting from chunks, then number_audit. A failed number routes back to drafting, and results persist to SQLite checkpoints." caption="The graph as built: retrieval is lexical, and the audit has a revision path back to drafting." width="1920" height="832" />
+
+The drafting step uses an OpenAI-compatible LLM with an offline fallback. The fallback is not a makeweight: it means the tool still runs in an environment without an API key, and it keeps the retrieval-and-audit behaviour testable independently of whichever model is wired in at the time. The instruction to the model is deliberately narrow — answer from the supplied chunks, cite the chunk you used, and do not introduce numbers that are not in them.
+
+I chose a graph rather than a single prompt because the audit step needs to be able to send the draft back. A linear chain either ignores a failed number or stops with an error; a graph can route the failure into a revision pass and record both attempts. Whether rerunning actually improves the draft is a separate question from whether the routing exists — the routing is a design decision, not a measured benefit.
+
+## `number_audit`: the part that earned its keep
+
+The `number_audit` module extracts numeric claims from a generated memo and checks each one against the retrieved context. A percentage that cannot be matched to a retrieved value is flagged. This is the one piece of the agent I would keep if I rebuilt it from scratch.
+
+It is crucial to be precise about what this check does. It compares **generated prose to retrieved artifacts**. It does not compare artifacts to reality. If an artifact contains a wrong number, the audit passes as long as the memo repeats it faithfully. If retrieval pulls the wrong artifact, the audit can pass with a beautifully cited wrong answer. The audit narrows one failure mode — drift between the write-up and the files — and leaves the larger failure modes alone.
+
+<Figure src="/images/projects/rag-audit-boundary.png" alt="Three boxes: a generated memo, retrieved artifacts, and reality. A solid arrow with the label number_audit connects the memo to artifacts. A dashed arrow labeled not checked connects artifacts to reality." caption="The audit checks prose against artifacts. It does not check artifacts against reality." width="1760" height="736" />
+
+There is a second, related check in the wider project: a 193-check consistency audit that compares numbers in the dashboard and reports against the pipeline files. On the day the figures were read from `outputs/` (18 November 2026) it reported **0 failed checks**, and the test suite reported **55 passed, 1 skipped**. Both are measured results about consistency. Neither is evidence that the method was right. I keep the two claims in separate sentences because collapsing them is exactly the mistake this project set out to expose.
+
+## SQLite checkpoints and a run registry (design decision)
+
+Every run is recorded locally in SQLite: the question asked, the chunks retrieved, the draft, and the audit outcome. The graph writes checkpoints so a run can resume instead of restarting from zero. A run registry makes it possible to compare two answers to the same question after an index change.
+
+SQLite was chosen because this is a single-user, local tool. A file-based store gives durable state with no service to run, and a checkpoint table fits naturally in the same database as the registry. This supports *reproducibility of the tool's behaviour* — I can see what it retrieved and why it answered that way — which is not the same as reproducibility of the research itself.
+
+## What it proved
+
+One thing, narrowly: memos generated by the agent stayed consistent with the artifacts they cited. The audit made drift visible instead of leaving it to a careful reader to spot. For a corpus with dozens of closely related percentages — accuracy at D10, D13, D20, D25, D27 and EOM; edge in percentage points; ROC-AUC; Holm-adjusted *p*-values; CRPS scores; probability bias — that is a real practical gain.
+
+The agent also made the corpus itself more legible. Asking "what did the ablation show?" forces you to have an artifact that answers the ablation question. Where none existed, the gap showed up during indexing rather than during writing.
+
+## What it could not prove
+
+Validity. The central result of the BTC study is that 92.5% accuracy at D25 loses to a zero-parameter rule, `sign(mtd_ret)`, at 94.0%, with a Holm-adjusted *p*-value of 1.0 and a frozen 12-month holdout edge of 0.0. The agent reports that faithfully. It would report the opposite just as faithfully if the artifacts said the opposite. It has no way to tell a well-executed protocol from a leaky one; both are just documents in the index.
+
+The consequence is worth spelling out. An agent that cites its sources can produce a more persuasive wrong answer than one that does not, because the citations lower the reader's guard. RAG does not cure a bad corpus — it distributes it more fluently. The honest framing is that this tool is an *epistemic amplifier*: it inherits whatever rigour or carelessness you put into the artifacts. No economic claim is made anywhere in this work — no PnL, Sharpe ratio, slippage, or transaction cost — and the agent does not manufacture one.
+
+## Design decisions and measured results, separated
+
+| Item | Kind | Status |
+|---|---|---|
+| Lexical retrieval (BM25 + TF-IDF) | Design decision | Chosen for exact-token matching in a literal-heavy corpus |
+| RRF fusion of two rankings | Design decision | Rank-based merge; no score normalisation needed |
+| LangGraph flow with a revision path | Design decision | Enables a failed audit to route back to drafting |
+| `number_audit` on every percentage | Design decision | Consistency check against retrieved context |
+| SQLite checkpoints + run registry | Design decision | Local durable state and run-to-run comparability |
+| Memos consistent with artifacts | Measured result | Verified through the audit step |
+| 193 checks / 0 failed; 55 tests passed / 1 skipped | Measured result | Wider pipeline, figures read 18 Nov 2026 |
+| Method validity | Not established | Outside what this tool can test |
+
+## What I would change
+
+The retrieval ceiling is the honest weak point. A hybrid that adds a small embedding index alongside the lexical one would help with paraphrased questions, but it would reintroduce the opacity I deliberately avoided; any such addition would need its own evaluation before I claimed an improvement. The audit could also be extended beyond percentages to dates and model names, which are currently checked only insofar as they appear in retrieved text. Neither change is implemented here, and neither is presented as a result.
+
+The thing I would not change is the ordering: build the consistency check before the fluent generator. The audit is what keeps the tool from being a very confident confabulator, and it is the reason I can write this page without claiming more than the artifacts support.
+
+## References & Further Reading
+
+- [Retrieval-Augmented Generation, Explained From the Inside Out](https://novandri.com/articles/rag-explained) — the retrieval pipeline this agent implements.
+- [From LangChain to LangGraph](https://novandri.com/articles/langchain-to-langgraph) — why the flow is a graph rather than a chain.
+- [Agent evaluation examples](https://novandri.com/articles/agent-evaluation-examples) — how I think about evaluating agent behaviour separately from model quality.
+- Cormack, R. S., Clarke, C. L. A. & Buettcher, S. (2009). *Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods*. SIGIR '09. [doi:10.1145/1571941.1572114](https://doi.org/10.1145/1571941.1572114).
+- [Source repository: novanr511/btc-monthly-close-prediction](https://github.com/novanr511/btc-monthly-close-prediction) — the agent lives in `agent/`; the audit script in `scripts/`.
