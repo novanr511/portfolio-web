@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { analyticsWork } from "@/lib/data-analytics";
 import { getSortedArticles } from "@/lib/articles";
 import { getProjectStudies } from "@/lib/project-studies";
 import { projects } from "@/lib/projects";
@@ -37,9 +38,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${site.url}/data-analytics`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${site.url}/about`,
       changeFrequency: "yearly",
       priority: 0.6,
+    },
+    {
+      url: `${site.url}/privacy`,
+      lastModified: new Date("2026-11-22"),
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
   ];
 
@@ -59,5 +71,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-  return [...staticPages, ...articlePages, ...studyPages];
+  const analyticsPages: MetadataRoute.Sitemap = analyticsWork
+    .filter((work) => work.kind === "Public-data demo")
+    .map((work) => ({
+      url: `${site.url}${work.href}`,
+      changeFrequency: "yearly",
+      priority: 0.7,
+    }));
+
+  return [...staticPages, ...articlePages, ...studyPages, ...analyticsPages];
 }

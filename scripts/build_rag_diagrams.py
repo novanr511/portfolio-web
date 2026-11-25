@@ -81,7 +81,7 @@ ax.text(0.3, 0.35,
         "Lexical retrieval is a design decision. The revision path is a routing decision, not a measured benefit.",
         fontsize=9.5, color=MUTED, ha="left")
 fig.tight_layout()
-fig.savefig(OUT / "rag-pipeline.png", bbox_inches="tight", facecolor="white")
+fig.savefig(OUT / "rag-pipeline.png", facecolor="white")
 plt.close(fig)
 
 # ---------------------------------------------------------------- boundary
@@ -112,7 +112,7 @@ ax.text(5.5, 0.6,
         "Consistency is not validity.",
         fontsize=11.5, color=WARN, ha="center", fontweight="bold")
 fig.tight_layout()
-fig.savefig(OUT / "rag-audit-boundary.png", bbox_inches="tight", facecolor="white")
+fig.savefig(OUT / "rag-audit-boundary.png", facecolor="white")
 plt.close(fig)
 
 print("wrote rag-pipeline.png and rag-audit-boundary.png")

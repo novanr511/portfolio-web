@@ -12,7 +12,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Data Analytics — Novandri R.",
     description:
-      "Verified case studies and reproducible public-data demos in analytics and applied AI.",
+      "Documented projects and reproducible public-data demos in analytics and applied AI.",
+    url: "/data-analytics",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Data Analytics — Novandri R.",
+    description:
+      "Documented projects and reproducible public-data demos in analytics and applied AI.",
   },
 };
 
@@ -69,9 +76,8 @@ export default function DataAnalyticsPage() {
           <p className="page-eyebrow">Data analytics</p>
           <h1 className="page-title mt-5">From data to a decision you can defend.</h1>
           <p className="page-subtitle mt-5 max-w-2xl">
-            Case studies from shipped systems, and demos computed from public
-            datasets. Every number on this page is tied to a source and a
-            stated limitation. Open a card for the full write-up.
+            Documented projects and demos computed from public datasets. Each
+            card links to a write-up with its sources and limitations.
           </p>
         </Reveal>
 
@@ -109,16 +115,16 @@ export default function DataAnalyticsPage() {
           <div className="editorial-card mt-20 rounded-2xl border border-border bg-surface px-7 py-8">
             <h2 className="page-title text-[24px]">Want the full method?</h2>
             <p className="page-subtitle mt-2 max-w-xl text-[14px]">
-              The chart and metric script is in this repository, so every demo
-              can be re-run against the same source files.
+              The chart and metric scripts live in this repository, so the
+              demos can be re-run against the same public source files.
             </p>
             <a
-              href="https://github.com/novanr511/portfolio-web/blob/main/scripts/build_data_analytics_demos.py"
+              href="https://github.com/novanr511/portfolio-web/tree/main/scripts"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-[14px] font-medium text-accent-contrast transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              Read the analysis script
+              Browse the analysis scripts
             </a>
           </div>
         </Reveal>

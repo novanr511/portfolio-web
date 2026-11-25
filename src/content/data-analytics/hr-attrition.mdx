@@ -4,22 +4,32 @@ An HR analytics request usually arrives as "predict who will leave". The more us
 
 ## Dataset and source
 
-The [IBM HR Attrition dataset](https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv) contains 1,470 employee records with attrition status, department, role, overtime, satisfaction, and income. The dataset is distributed by IBM for teaching and is widely understood to be synthetic. It contains no real employees. Every figure below is computed by `scripts/build_data_analytics_demos.py`.
+The [IBM HR Attrition dataset](https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv) contains 1,470 employee records with attrition status, department, role, overtime, satisfaction, and income. The file is a synthetic teaching dataset created by IBM, not a record of real employees. Every figure below is computed by `scripts/build_data_analytics_demos.py` from the mirror linked here.
 
-<Figure src="/images/data-analytics/hr-department.png" alt="Bar chart of attrition rate by department, with Sales highest and a dashed line for the overall rate." caption="Attrition rate by department against the overall rate of 16.12 percent." width="1280" height="544" />
+<Figure src="/images/data-analytics/hr-jobrole.png" alt="Bar chart of attrition rate by job role. Sales Representative is highest near 40 percent and Research Director lowest near 2.5 percent, against a dashed overall rate around 16 percent." caption="Job role has the widest spread of the categorical splits checked: 37.26 percentage points." width="1280" height="544" />
 
 ## Findings
 
-Overall attrition is **16.12%**. The single strongest split is overtime: **30.53%** for employees working overtime against **10.44%** for those who do not, a gap of roughly twenty percentage points. Sales has the highest departmental attrition at **20.63%**.
+Overall attrition is **16.12%**. I ranked every categorical split available in the file before naming one. Job role has the widest spread at **37.26 percentage points**, from Sales Representative at **39.76%** to Research Director at **2.50%**. Job involvement follows at **24.71 points**, job level at **21.62 points**, and overtime at **20.09 points**.
 
-<Figure src="/images/data-analytics/hr-overtime.png" alt="Two bars comparing attrition for overtime and non-overtime employees, with overtime close to 31 percent and non-overtime near 10 percent." caption="The overtime split is far larger than the departmental spread." width="1280" height="544" />
+| Field | Spread across categories | Best single-category gap |
+|---|---:|---:|
+| JobRole | 37.26 pp | Sales Representative, 25.05 pp |
+| JobInvolvement | 24.71 pp | level 1, 17.61 pp |
+| JobLevel | 21.62 pp | level 4, 11.41 pp |
+| OverTime | 20.09 pp | Yes, 14.41 pp |
+| WorkLifeBalance | 17.03 pp | level 1, 15.13 pp |
 
-Income tells the same story in a different direction. Mean monthly income is **USD 4,787.09** for leavers and **USD 6,832.74** for stayers, a gap of **29.94%**. The correlation between monthly income and attrition is **-0.16**, so income alone is a weak ranking signal. Job satisfaction is more interpretable: attrition is **22.84%** at satisfaction level 1 and **11.33%** at level 4.
+The point of ranking them is to avoid naming a "strongest" split without having checked the alternatives. Overtime is a strong and operationally actionable split: **30.53%** for employees working overtime against **10.44%** for those who do not. It is not the widest split in this file.
+
+<Figure src="/images/data-analytics/hr-overtime.png" alt="Two bars comparing attrition for overtime and non-overtime employees, with overtime about 31 percent and non-overtime about 10 percent." caption="Overtime is a strong split, but job role spreads further." width="1280" height="544" />
+
+Income is a weak ranking signal here. Mean monthly income is **USD 4,787.09** for leavers and **USD 6,832.74** for stayers, so leavers earn **29.94% less on average**, computed as the difference divided by the stayers mean. The point-biserial correlation between monthly income and attrition is **-0.16**. Job satisfaction is broadly decreasing, though not strictly monotone: **22.84%** at level 1, **16.43%** at level 2, **16.52%** at level 3, and **11.33%** at level 4.
 
 ## What a people team would do with it
 
-Treat overtime as an operational review trigger, not a prediction of individual departure. Segment retention spend by department and satisfaction level, then test whether changing workload changes the rate. A dashboard without that test would only describe the problem.
+Treat overtime as an operational review trigger, not a prediction of individual departure. Segment retention work by role first, since the role spread is larger, then by overtime and satisfaction. A fuller analysis would test whether changing workload changes the rate.
 
 ## Limitations
 
-The dataset is synthetic, so no finding transfers to a real workforce. These are cross-sectional associations, not causes, and there is no time-to-event structure, no manager effect, and no performance outcome. The numbers demonstrate method and communication, not a claim about any company.
+The dataset is synthetic, so no finding transfers to a real workforce. These are cross-sectional associations, not causes. The file has no longitudinal performance trajectory and no manager identifier, so neither performance over time nor manager effect can be examined. There are no confidence intervals or correction across the many categorical comparisons, so the ranking is descriptive, not a set of confirmed effects. The numbers demonstrate method and communication, not a claim about any company.

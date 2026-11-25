@@ -1,10 +1,10 @@
 ## The question
 
-A retail manager does not need another chart of total revenue. The useful question is where margin leaks, and whether discounting is buying the volume it claims to buy. This demo treats a public retail transaction table as if it were a monthly management pack, then reports what the decision would be.
+A retail manager does not need another chart of total revenue. The useful question is where margin leaks, and whether discounting is buying the volume it claims to buy. This demo treats a public retail transaction table as a decision brief, then states what the data cannot settle.
 
 ## Dataset and source
 
-The [Sample Superstore dataset](https://github.com/yashbhanu/EDA--Exploratory-Data-Analysis--SampleSuperstore/blob/main/SampleSuperstore.csv) contains 9,994 order lines with sales, quantity, discount, profit, region, category, and segment. It is a public teaching dataset from a US retailer, not a private company file. Every figure below is computed by `scripts/build_data_analytics_demos.py` from that CSV.
+The [Sample Superstore dataset](https://github.com/yashbhanu/EDA--Exploratory-Data-Analysis--SampleSuperstore/blob/main/SampleSuperstore.csv) contains 9,994 order lines with sales, quantity, discount, profit, region, category, and segment. This mirror omits the `Order Date` and `Customer ID` columns present in the canonical Superstore file, so there is no time dimension and no customer identifier in the data used here. It is a public teaching dataset, not a private company file. Every figure below is computed by `scripts/build_data_analytics_demos.py` from that CSV.
 
 <Figure src="/images/data-analytics/sales-category.png" alt="Grouped bars comparing sales and profit for Furniture, Office Supplies, and Technology. Technology has the highest profit." caption="Computed from the dataset: revenue and profit diverge by category, so revenue rank is not profit rank." width="1280" height="576" />
 
@@ -12,14 +12,16 @@ The [Sample Superstore dataset](https://github.com/yashbhanu/EDA--Exploratory-Da
 
 Total sales are **USD 2,297,200.86** and total profit is **USD 286,397.02**, a margin of **12.47%**. The Consumer segment contributes the most revenue at **USD 1,161,401.34**. Technology is the most profitable category, while Furniture contributes the least profit at **USD 18,451.27** despite being a major revenue line.
 
-The discount question is where the useful signal sits. Across order lines, discount and profit margin have a correlation of **-0.86**. Grouped by discount band, aggregate margin falls from **29.51%** at no discount, to **12.75%** at 1% to 15%, **9.21%** at 16% to 30%, then turns negative at **-24.80%** for 31% to 50% and **-119.20%** above 50%. **18.72%** of order lines carry a negative profit.
+Grouping order lines by discount band shows aggregate margin falling from **29.51%** at no discount, to **12.75%** at 1% to 15%, **9.21%** at 16% to 30%, then turning negative at **-24.80%** for 31% to 50% and **-119.20%** above 50%. **18.72%** of order lines carry a negative profit. The 51%+ band is not a thin tail: it holds **856 order lines, all loss-making**, and the five largest losses account for **25.17%** of that band's loss.
+
+The discount-band association is far stronger than the category or segment association. Measured by eta-squared, discount band accounts for **0.757** of the variation in row margin against **0.0084** for category and **0.0006** for segment. That is a descriptive comparison of grouping strength, not a causal estimate.
 
 <Figure src="/images/data-analytics/sales-discount.png" alt="A line chart showing aggregate margin falling as discount bands increase, crossing below zero after the 16 to 30 percent band." caption="Aggregate profit divided by aggregate sales within each discount band, not an average of row margins." width="1280" height="544" />
 
 ## What a manager would do with it
 
-Set a discount ceiling tied to category margin rather than a blanket percentage, and review Furniture separately because its revenue hides weak profit contribution. The next step in a real engagement would be an elasticity test, because this table cannot tell us how many discounted orders would have happened at full price.
+Treat discount bands as the first place to investigate margin leakage, then run an elasticity test before changing policy. A fuller analysis would need order identifiers and a time dimension to know how many discounted lines would have occurred at full price. Without that counterfactual, a discount ceiling is a hypothesis, not a recommendation from this table.
 
 ## Limitations
 
-This is a public teaching dataset with no customer identifiers, no costs beyond the supplied profit column, and no time dimension for seasonality. The margin by discount band is an aggregate ratio and is sensitive to a few large orders in the top bands. Nothing here establishes causation, and no result from this dataset is claimed as evidence about a real company.
+This is a public teaching dataset with no customer identifiers and no time dimension in the cited mirror. `Profit` is a supplied derived field, not a measured cost, and `Sales` is net of discount, so part of the **-0.86** correlation between discount and row margin is mechanical rather than behavioural. The margin by discount band is an aggregate ratio, sensitive to how lines are grouped, and it does not identify a causal effect. No seasonality, elasticity, or outcome after any decision is observed. Nothing here is evidence about a real company.

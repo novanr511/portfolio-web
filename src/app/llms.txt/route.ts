@@ -1,12 +1,15 @@
+import { analyticsWork } from "@/lib/data-analytics";
 import { getSortedArticles } from "@/lib/articles";
 import { getProjectStudies } from "@/lib/project-studies";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 /**
- * llms.txt (https://llmstxt.org) — a curated, machine-readable index of the
- * site for LLMs and AI answer engines. Generated from the same data sources
- * as the pages, so it stays in sync automatically.
+ * llms.txt (https://llmstxt.org) — a short, curated, machine-readable index of
+ * the site for LLMs and AI answer engines. Generated from the same data
+ * sources as the pages, so it stays in sync automatically. getSortedArticles()
+ * returns only the curated allowlist, so this index lists the pieces that are
+ * actually published rather than every file in the archive.
  */
 export async function GET() {
   const sortedArticles = await getSortedArticles();
@@ -32,6 +35,17 @@ export async function GET() {
     })
     .join("\n");
 
+  const analyticsLines = analyticsWork
+    .map((w) => `- [${w.name}](${site.url}${w.href}): ${w.summary} (Tech: ${w.tags.join(", ")})`)
+    .join("\n");
+
+  const analyticsSection = `## Data analytics
+
+Documented projects and reproducible public-data demos. Each linked page states its sources and limitations.
+
+${analyticsLines}
+`;
+
   const projectsSection = projects.length
     ? `## Projects
 
@@ -45,19 +59,20 @@ ${projectLines}
 
 > ${site.description}
 
-${site.author.name} is a web developer and SEO specialist based in ${site.location}, with years of WordPress and search-engine work, now building with Next.js and transitioning into data science and applied AI. This site is his portfolio and technical blog. All content is in English, free to read, and continuously updated.
+${site.author.name} is a web developer and SEO specialist based in ${site.location}, with years of WordPress and search-engine work, now building with Next.js and applying data science and AI to real problems. This is a curated technical portfolio and blog: ${sortedArticles.length} in-depth articles on technical SEO, AI search, applied AI and machine learning, each kept because it documents first-hand work or a sourced result. The archive of templated drafts is deliberately not published here. All content is in English and free to read.
 
 ## Articles
 
-In-depth, research-backed articles on AI engineering: how to get started, retrieval-augmented generation, and building agents with LangChain and LangGraph.
+A curated set of ${sortedArticles.length} research-backed articles on technical SEO, AI search, retrieval-augmented generation, model evaluation, and the measurement work behind the projects. This is a set of pieces worth reading, not a count of everything ever written.
 
 ${articleLines}
 
-${projectsSection}## Pages
+${projectsSection}${analyticsSection}## Pages
 
 - [Home](${site.url}): profile, latest articles, and highlighted projects
-- [Articles](${site.url}/articles): all articles
+- [Articles](${site.url}/articles): all ${sortedArticles.length} curated articles
 - [Projects](${site.url}/projects): ${projects.length ? "published project case studies" : "case studies in progress; no project entries are published yet"}
+- [Data analytics](${site.url}/data-analytics): documented projects and public-data demos
 - [About](${site.url}/about): bio, focus areas, and contact
 - [RSS feed](${site.url}/feed.xml): subscribe to new articles
 - [Full content for LLMs](${site.url}/llms-full.txt): complete article content in plain markdown
