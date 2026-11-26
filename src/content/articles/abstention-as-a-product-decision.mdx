@@ -1,0 +1,86 @@
+---
+title: "Abstention as a Product Decision"
+description: "Abstention trades coverage for correctness: a quiet model avoids a false answer but declines work. Set the threshold from the cost of each error, then report how often it fires."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Machine Learning
+  - Evaluation
+  - RAG
+---
+
+Abstention is a product decision before it is a modelling technique. A model that refuses to answer converts a possible false answer into a definite loss of coverage, and whether that trade is good depends on the two costs, not on the model's confidence in isolation. The threshold belongs in the product's decision rule, written down before the system is measured.
+
+The clearest local artifact is a guard from the [BTC monthly study](/projects/btc-monthly-ml). It forbade a signal unless the model beat the majority prediction and cleared an inner-validation ROC-AUC of at least 0.53; ties went to a zero-parameter analytic rule. That is a source-reported design rule from a finished study, figures read 18 November 2026, not a deployed control. The [RAG research agent](/projects/rag-research-agent) supplies the complementary record: 193 checks with no failures and 55 tests passed with one skipped, read 18 November 2026, showing that prose matched artifacts. Neither result says what a wrong answer would have cost a user.
+
+> **Educational only.** The Bitcoin material below is a finished research study used as an artifact for decision design. No security is recommended, no tradable edge is claimed, and no PnL, slippage or transaction-cost result is reported.
+
+## What does abstention actually cost a product?
+
+A false answer and a declined answer are different losses. The first spends the user's trust on a claim that may be wrong; the second spends their time and leaves the task unfinished. An abstention policy is an explicit choice about which loss the product prefers, expressed as a threshold rather than a preference.
+
+Start by naming the consumer. A wrong citation in a legal memo and a wrong suggestion in a shopping assistant do not carry the same downside, even if both come from the same retrieval stack. Cost ratios in this article are illustrative and ASSUMED-DERIVED: no cost study, support-ticket analysis or user experiment was run for the cases described here. The curation decision on 22 November 2026 recorded a structural change to the live set and stated that no traffic outcome was measured before or after it ([curation case study](/projects/seo-content-curation)). The useful question is reversibility. If a wrong answer is cheap to detect and cheap to undo, answering more often may win. If the answer is acted on immediately and hard to reverse, silence can be the cheaper failure. The ratio decides the threshold, not the model's average accuracy.
+
+## How does a guard decide when to stay silent?
+
+A guard withholds output when the evidence falls short of a threshold fixed in advance. The local example required two conditions — beating the majority prediction and clearing inner-validation ROC-AUC of at least 0.53 — and awarded ties to an analytic rule. Both conditions are source-reported from the case study, figures read 18 November 2026.
+
+A ranking check alone can be optimistic when a class is rare, so the majority comparison supplies a second floor; a model must show both that it orders cases better than chance and that it beats the trivial answer. The zero-parameter tie-break makes the default explicit: when the learned model cannot demonstrate an advantage, the simple rule speaks instead of the model. Silence and fallback are two different abstention forms, and the study used both.
+
+At day 25 the walk-forward model reached 92.5% accuracy and 0.980 ROC-AUC across 133 out-of-sample months, while the zero-parameter `sign(mtd_ret)` rule reached 94.0%; every model-versus-rule comparison carried a Holm-adjusted p-value of 1.0. The frozen twelve-month holdout gave 91.7% accuracy with an edge of 0.0. Those figures are source-reported and read on 18 November 2026. The guard did not manufacture a win. Its contribution was procedural: it specified in advance when the model would be allowed to speak.
+
+## Why is confidence alone a bad trigger?
+
+A confidence score is only useful for abstention if it tracks the chance of being right. Modern neural networks are often poorly calibrated, a result reported by [Guo et al., 2017](https://arxiv.org/abs/1706.04599). Calibration is a property to measure on held-out data, not one to assume from a training score.
+
+The case study makes the gap concrete. A ROC-AUC of 0.980 describes how the model ranks cases across thresholds; it does not make a predicted 70% trustworthy. The probability bias in the twelve-month path forecast stayed between −0.32 and +0.01 percentage points, source-reported and read 18 November 2026, while directional accuracy sat at 30–65%. Well-calibrated averages and useful direction are different things. A trigger built on the ranking metric would have admitted a signal that the cost question never justified.
+
+This is why abstention needs a decision rule around the score. Pick the trigger on data the model did not train on, check it by subgroup, and report the abstention rate next to accuracy. A single confidence number presented as "the model knows when it does not know" collapses three separate claims into one.
+
+## What does selective prediction guarantee?
+
+Selective prediction makes coverage explicit. A classifier may reject inputs, and the pair of accuracy on answered cases and the fraction of cases answered becomes the result. [Geifman & El-Yaniv, 2017](https://arxiv.org/abs/1705.08500) construct a selective classifier that rejects as needed to hold risk at a chosen level with high probability.
+
+The guarantee is statistical, not economic. It says something about error on the covered portion under the study's assumptions; it does not price the declined cases. [Conformal risk control](https://arxiv.org/abs/2208.02814) extends the idea by controlling the expected value of a monotone loss, with worked examples that bound a false-negative rate and token-level F1. A bound on a loss is still a bound on a number, unless the loss itself encodes the product's costs.
+
+That translation is the product team's job. If declining a case costs more than a wrong answer in that segment, a risk target that treats them equally is the wrong target. The research gives you a lever with a stated guarantee; the cost ratio tells you where to set it. Reporting only the error on answered cases hides the other half of the trade.
+
+## How should the threshold be set before launch?
+
+The threshold belongs in inner validation, chosen before the final holdout is opened. Pick it from data the selection process did not use, then freeze it; setting it on the holdout bakes the answer into the reported score. The local study followed that ordering, with inner chronological folds for selection and a sealed final holdout.
+
+Define the two costs and their ratio first. Choose a score that is checkable, not merely available. Set the trigger on inner validation and record its value. Open the holdout once, report accuracy and abstention rate together, and group declined cases by cause so a future reader can see what the guard removed. If the guard is retuned after the holdout, the old number is no longer a holdout result.
+
+No live cost measurement accompanied any of the figures here. The threshold was a design choice inside a finished study, not an optimisation against observed user harm. That keeps a procedural artifact from being read as a deployed policy with measured outcomes.
+
+## What did the research agent's audit contribute?
+
+The audit contributed traceability, not a verdict on abstention. It checked each percentage in a generated memo against the artifact retrieved for it; a number that could not be found in the source failed. The published run recorded 193 checks with no failures and 55 tests passed with one skipped, figures read 18 November 2026.
+
+That mechanism makes a refusal checkable in one narrow sense: a reviewer can confirm that no artifact was retrieved. It cannot tell you whether declining was the right product call. A wrong figure in a source artifact would pass just as faithfully, because the check compares prose to files and never files to the world. For the consistency-versus-validity gap in trajectories, see [Agent Evaluation Examples](/articles/agent-evaluation-examples); for the retrieval design, see [RAG Explained](/articles/rag-explained).
+
+Use the audit as one signal among several. Score completion, the path taken to the answer, and cost separately, and keep the raw logs. Neither replaces a cost decision made by the people who own the product.
+
+## When is abstaining the wrong default?
+
+Abstention is wrong when silence costs more than a checkable mistake, when the system has no escalation path, or when the decline rate is high enough that the product stops being useful. A guard that fires on most inputs has not solved uncertainty; it has moved the work back to the user without acknowledging the transfer.
+
+Consider a support assistant that declines whenever retrieval is thin. The decline avoids a fabrication, but a threshold set from a poorly calibrated score can rise on exactly the questions the assistant was meant to handle. The alternative is not to answer carelessly: route the case to a person, ask a clarifying question, or quote the retrieved text and name the gap. Each is coverage with a different cost.
+
+A single global threshold can abstain heavily in one segment and rarely in another, with the average looking reasonable. Check declines by segment before launch, for the same reason coverage is checked by subgroup in interval work.
+
+## What should a product team report?
+
+Report four things together: accuracy on answered cases, the fraction of cases answered, the threshold and the data it was chosen on, and the cost ratio used to justify it. Add the segments where the guard fires most often and a sentence naming what was not measured.
+
+The [NIST AI Risk Management Framework](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) treats measurement as one function within govern, map and manage, which is a useful reminder that a guard is a control with an owner. The number that matters over time is not the accuracy on answered cases alone; it is the pair of that accuracy and the decline rate, read against the cost ratio. Without the pair, abstention looks like free accuracy, and it is not free.
+
+For the statistical reading of the ranking figure behind the local example, see [Classification Metrics Beyond Accuracy](/articles/classification-metrics-beyond-accuracy). For the broader question of what an evaluation harness can and cannot establish, see [Evaluating LLM Applications](/articles/evaluating-llm-applications). The guard from the case study is a sound piece of decision discipline. Its honest description is that it specified when a model should stay quiet, not that anyone measured what the quiet cost.
+
+## References & Further Reading
+
+- Yonatan Geifman & Ran El-Yaniv, 2017. [Selective Classification for Deep Neural Networks](https://arxiv.org/abs/1705.08500) — risk and coverage targets with rejection, reported on CIFAR and ImageNet.
+- Chuan Guo, Geoff Pleiss, Yu Sun & Kilian Weinberger, 2017. [On Calibration of Modern Neural Networks](https://arxiv.org/abs/1706.04599) — miscalibration in modern networks and temperature scaling as a remedy.
+- Anastasios Angelopoulos et al., 2022. [Conformal Risk Control](https://arxiv.org/abs/2208.02814) — expected-loss bounds under a monotone loss, with vision and NLP examples.
+- NIST, 2023. [AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) — govern, map, measure and manage as one lifecycle.
+- novanr511, 2026. [Public reproduction package for the BTC monthly study](https://github.com/novanr511/btc-monthly-close-prediction) — the guard, audit script and figures read 18 November 2026.

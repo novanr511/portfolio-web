@@ -1,0 +1,68 @@
+---
+title: "Crawl Budget as a Decision, Not a Metric"
+description: "Crawl budget is an allocation decision: which pages earn a fetch. On 22 November 2026 a site cut 1,004 articles to a curated allowlist, choosing the pages worth crawling."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - Crawlability
+  - Evaluation
+---
+
+Crawl budget is a decision about which pages deserve the fetches a crawler will spend — an allocation of attention, rather than a score to chase. On 22 November 2026 this site's documented curation reduced 1,004 templated articles to a curated, restorable allowlist ([case study](/projects/seo-content-curation)). On the same date robots.txt answered HTTP/2 200, a request to www resolved to the apex in a single 308, and llms-full.txt moved from a roughly 7 MB per-request file served without a Cache-Control header to a build-time artifact. Google says it tries to crawl as much as it can without overwhelming a server ([overview of Google crawlers](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers)) and guarantees no crawl, index, or serve outcome ([how Search works](https://developers.google.com/search/docs/fundamentals/how-search-works)). The constraint is real at scale; the useful work is choosing what earns the fetch.
+
+## What does crawl budget actually describe?
+
+Crawl budget is a capacity ceiling: how many URLs a crawler can fetch from a host in a period before origin load slows it. Crawl demand is separate — which URLs it wants to fetch. Google frames its goal as crawling widely without overwhelming the server, making capacity a host property and demand a matter of crawler interest.
+
+Capacity is the part a site owner can influence. Slow responses, elevated 5xx rates, and rate limiting cause a crawler to back off so it does not overload the origin. Google documents that returning 500, 503, or 429 responses reduces crawl rate across a hostname, and that faceted navigation and date-based calendars are common sources of sharp increases in crawling (source-reported, docs read 24 November 2026). Demand sits largely outside the site's control: it reflects how often a URL changes and how much a crawler values it. A fast server does not manufacture interest. Keeping the two terms apart matters because the remedies target different causes, and only one of them is an engineering setting on your own infrastructure. Googlebot's 2 MB fetch cutoff and its ETag-based caching are further vendor behaviours recorded in its crawler documentation (read 24 November 2026); neither gives a site owner a quota dial.
+
+## Why treat it as a decision rather than a number?
+
+A number describes what a crawler did; a decision decides what the site offers it. Watching a crawl-rate graph rarely changes which URLs matter. Treating the budget as an allocation moves the question from "how do we get more crawls" to "which pages should receive the crawls we can get", which is a question the site owner can actually answer.
+
+Google states plainly that it does not accept payment to crawl a site more frequently or rank it higher (source-reported, docs read 24 November 2026). That removes the marketplace framing: there is no fee to pay and no number to purchase. What remains is a sequence of choices about the site's own surface — which URLs are published, which are consolidated, which are allowed to compete for a fetch. Each choice changes the denominator. A crawl-request count reported in a dashboard is a description of past behaviour under those choices, not a target to maximise in isolation. Chasing the number without changing the surface tends to produce activity rather than coverage: more fetches spent on variants that no reader needs. The decision frame keeps the causal direction honest, because the site's structure comes first and the crawl statistics follow from it.
+
+## Which pages deserve the crawl you can get?
+
+The pages that matter are the ones you can defend with evidence. On this site the answer comes from an allowlist: on 22 November 2026 the curation kept a rewritten, sourced core and made entry default-deny for everything else. That is an editorial decision expressed as a crawl surface, rather than a hope that volume would sort itself out.
+
+An allowlist inverts the default. With a denylist, every generated piece is live until someone remembers to remove it; with an allowlist, nothing becomes live until it earns an entry. The full archive stayed on disk and a slug can be restored by adding it back, so the decision was reversible rather than destructive. The same filter governs the derived surfaces, which is why the sitemap and the redirects describe the same published set. That coherence is a governance property, not a ranking technique. For the declaration side of the same mechanism see [XML Sitemaps at Scale](/articles/xml-sitemaps-at-scale); the reasoning behind the cut is written up in [Why I killed 966 articles](/articles/why-i-killed-966-articles). Neither is a claim about crawl volume — no crawl or traffic outcome was measured before or after the curation, so the only defensible claim is that the surface was chosen deliberately.
+
+## When does the budget stop being the binding constraint?
+
+On a small surface it usually has already stopped being the constraint. When the published set is a curated allowlist and the rest of the archive redirects with 308s, there is no queue to exhaust and no parameter explosion to tame. Pages missing from the index then reflect a publishing, quality, or discovery decision rather than a capacity one.
+
+Large sites are different. Google's own guidance on reducing crawl rate names faceted navigation, filtering, and calendar URLs as the typical causes of a sudden increase in requests (source-reported, read 24 November 2026), and its default 15 MB file limit (source-reported in the crawler overview, read 24 November 2026) shows where a generator can waste a fetch. Those are constraints worth engineering around when the address space is huge. On this site the published article surface is the curated set and non-curated slugs go to the hub with a permanent redirect, so there is no duplicate explosion to manage. Effort spent tuning crawl rate here would displace effort spent on why a specific page failed to qualify. The separate question of capacity versus demand as a diagnostic is handled in [Crawl Budget: When It Matters and How to Diagnose It](/articles/crawl-budget-when-it-matters-and-how-to-diagnose-it); this article keeps to the allocation decision.
+
+## What do the live responses actually tell you?
+
+Live responses describe delivery, not demand. On 22 November 2026 robots.txt answered HTTP/2 200, www reached the apex in one 308, and a missing URL returned a cached 404. A crawler's interest is a separate matter that no header reveals.
+
+The status line is the signal, not the rendered layout. A 404 can carry a complete HTML error page while the header still says 404, and an edge cache can serve that error as a HIT — a healthy combination, because the URL is not a soft 404 returning 200 and the repeat request costs no origin time. A plain HTTP request to the apex produced a single 308 to HTTPS, so the scheme upgrade costs one hop. These observations are captures of delivery on a named date; they say nothing about how many fetches were requested or which pages were indexed, because neither was measured. Google documents that 5xx and 429 responses slow crawling and that ETag and Last-Modified support varies by crawler (source-reported, read 24 November 2026). For what a log can and cannot attribute, see [Log File Analysis for Small Sites](/articles/log-file-analysis-for-small-sites).
+
+## Do AI-facing files change the crawl equation?
+
+They change waste, not quota. The 22 November 2026 curation made llms-full.txt a build-time artifact rather than a roughly 7 MB file regenerated on every request with no Cache-Control header. The change lowers delivery cost and earns no ranking credit.
+
+Regenerating several megabytes on every fetch is a delivery defect regardless of where anyone stands on whether these files influence AI search. The earlier llms.txt had also grown to roughly 1,034 lines, a catalogue long enough to stop functioning as a guide (case-study figures, 22 November 2026). Both files are downstream of the publication decision: they are generated from the curated set, so editing the files while the full archive still fed them could not have fixed the cause. Treating a shorter llms.txt as a visibility lever would be an unmeasured inference. This is response hygiene in the same category as the 404 and cache headers above, and it belongs in a decision about waste rather than a decision about crawl entitlement.
+
+## How do you decide where to spend the effort?
+
+Start by naming the constraint you can act on. Check the response codes and latency on a sample of URLs, then read the paths a crawler actually requests. If clean article URLs dominate, the budget is healthy and the work is editorial. If filter or parameter paths dominate, fix that cause rather than chasing a crawl-rate dial.
+
+A group-by on path is enough to reveal a trap: strip query strings, count requests, and read the top entries. If a search endpoint or a parameter combination dominates, you can name the waste. If the requests are mostly canonical article URLs, there is no trap to fix and the problem lies elsewhere. A robots.txt disallow stops crawling but also prevents a crawler from reading a noindex or canonical directive on the blocked URL, so it suits genuine traps rather than page removal. Roll changes to a small cohort and confirm the wire response before applying them broadly. The decision rule is to fix only the cause you can name, with the evidence recorded at the time you named it.
+
+## Where does this decision frame stop?
+
+A budget cannot create interest in a page. It governs how fetches are spent, not whether a crawler values the result, and Google's own documentation describes crawling, indexing and serving as best-effort. The evidence here is structural and dated; no crawl or traffic outcome was measured, so the honest claim concerns the decision, not a performance delta.
+
+The tempting counterargument is that enough capacity removes the need to choose. Capacity is not selection: a surface filled with every available URL is a larger queue, not a better one. The sourced evidence here is narrow — vendor documentation about crawl limits, error codes, and canonical signals, all read on 24 November 2026, plus a dated first-hand case. Vendor behaviour can change, and none of it measures your site. What the frame supports is a discipline: name the pages that matter, make the surface reflect that choice, verify the responses, and leave the outcome unclaimed until you have a measurement that can carry the claim.
+
+## References & Further Reading
+
+- Google Search Central, docs read 24 November 2026. [Overview of Google crawlers and fetchers](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers) — crawl goal, 15 MB default limit, and ETag caching.
+- Google, docs read 24 November 2026. [In-depth guide to how Google Search works](https://developers.google.com/search/docs/fundamentals/how-search-works) — no payment for crawling or ranking; no crawl, index, or serve guarantee.
+- Google Search Central, docs read 24 November 2026. [What is Googlebot](https://developers.google.com/search/docs/crawling-indexing/googlebot) — 2 MB cutoff and the distinction between crawling and indexing.
+- Google Search Central, docs read 24 November 2026. [Reduce the Google crawl rate](https://developers.google.com/crawling/docs/crawlers-fetchers/reduce-crawl-rate) — faceted navigation, calendar URLs, and 500/503/429 effects.
+- Google Search Central, docs read 24 November 2026. [Specify a canonical URL](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) — consolidating duplicates so fetches reach new pages.

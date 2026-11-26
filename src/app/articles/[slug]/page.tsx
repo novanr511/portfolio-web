@@ -7,6 +7,7 @@ import { Reveal } from "@/components/reveal";
 import {
   getAdjacentArticles,
   getArticle,
+  getArticleFaq,
   getSortedArticles,
   categorySlug,
 } from "@/lib/articles";
@@ -14,6 +15,7 @@ import { site } from "@/lib/site";
 
 /** Full prerender at build; skip instant-UI validation (static content) */
 export const instant = false;
+
 
 export function generateStaticParams() {
   return getSortedArticles().then((all) => all.map((a) => ({ slug: a.slug })));
@@ -63,6 +65,7 @@ export default async function ArticlePage({
 
   const { default: Post } = await import(`@/content/articles/${slug}.mdx`);
   const { newer, older } = getAdjacentArticles(await getSortedArticles(), slug);
+  const faq = await getArticleFaq(slug);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -135,6 +138,22 @@ export default async function ArticlePage({
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
+      {faq.length >= 2 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faq.map((entry) => ({
+                "@type": "Question",
+                name: entry.question,
+                acceptedAnswer: { "@type": "Answer", text: entry.answer },
+              })),
+            }).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
 
       <article className="mx-auto max-w-2xl px-6 pb-16 pt-14 sm:pt-20">
         {/* Back link */}

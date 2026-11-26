@@ -1,0 +1,66 @@
+---
+title: "llms.txt Common Questions"
+description: "Common questions about llms.txt and llms-full.txt answered directly: what they are, who reads them, what they cannot do, and how they differ from robots.txt."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - AI Search
+  - Technical SEO
+  - Crawlability
+---
+
+llms.txt is a small, optional Markdown file that points agents toward a site's most useful pages. It is a convention rather than a standard, adoption is limited, and no search engine has documented a ranking benefit. The questions below separate what the proposal actually says from what SEO advice often claims.
+
+## What is llms.txt?
+
+It is a proposed convention: a Markdown file at a site path that offers brief background and a curated list of links to detailed Markdown pages. An agent that chooses to read it gets a short map of the site instead of a full crawl. It does not create a new way to be indexed.
+
+The proposal, published by Jeremy Howard in September 2024 and now at version 2, also suggests `.md` versions of pages and discovery through `rel="alternate"` or a `Link:` header. The full text is at [llmstxt.org](https://llmstxt.org/).
+
+## Is llms.txt a ranking factor?
+
+No. Nothing in the proposal asks a search engine to rank a site differently, and no platform has documented such an effect. The file is read, if at all, by an agent that has already decided to fetch it — after the retrieval step that decides what can be cited has happened.
+
+It is a presentation choice for an interested consumer, not a promotion mechanism. Related answers on answer-engine visibility are collected in [AI Search Common Questions](/articles/ai-search-common-questions).
+
+## Does Google use llms.txt?
+
+Google's published position is that you do not need new machine-readable files or special AI text files to appear in its AI features. It has not announced llms.txt as an input to AI Overviews or AI Mode. The proposal's adopters are documentation platforms and AI labs, not general search engines.
+
+That is a statement about documented behaviour, not proof that no tool anywhere reads the file. Some agents and developer tools do opt in. The caveat is that this is a small, self-selected set of consumers, and the proposal's own adoption claims describe those consumers.
+
+If you publish the file anyway, treat it as developer experience: a convenience for an agent that has already chosen your site. It costs little and may be read by a handful of tools, but it does not belong in a plan whose goal is ranking or citation growth.
+
+## What is llms-full.txt?
+
+It is the exhaustive sibling: the site's content assembled as plain Markdown at a single URL, so an agent can load everything in one request. The convention is self-authored rather than specified by the llms.txt proposal. It is a convenience for a consumer that wants full text, not a ranking asset.
+
+A generated llms-full.txt can become very large. On this site, before curation, it assembled roughly 1.28 million words — about 7MB — on every request, with no Cache-Control header. The curation in progress reduces the article set toward roughly 40 pieces and treats the index as a short entry point rather than a complete inventory.
+
+## Is llms.txt a standard?
+
+No. It is a convention published as a proposal, with no standards body behind it and no consensus process. A different effort at the IETF is drafting ways to express AI usage preferences through a Content-Usage header and a robots.txt extension; those drafts are unfinished and address permission, not navigation.
+
+The distinction matters before implementing anything. Both IETF documents are Active Internet-Drafts, not RFCs, and the core section of the vocabulary draft is marked as lacking consensus. Intended status is not current status. Source: [IETF aipref vocabulary draft](https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/).
+
+## What should I put in llms.txt?
+
+Keep it short and curated: a sentence or two describing the site, then links to the pages that best answer real questions, each with a short description. Prefer Markdown versions where exact text matters, such as API references. Do not enumerate thousands of near-identical pages.
+
+A sitemap lists everything indexable; an llms.txt exists to be small enough to be worth reading in full. The design goal is selection. If your index runs to a thousand lines, it has stopped being a map and become a dump — which is the failure mode this site's curation is meant to fix.
+
+A practical check before publishing: open the file and read it as an agent with no other context. If the links do not say which page answers which question, or if the list runs longer than you can scan, it has lost the property that makes it useful. A short version note is harmless; an exhaustive inventory is not.
+
+## How is llms.txt different from robots.txt?
+
+robots.txt is a standardized access-control file, specified in RFC 9309, that crawlers choose to honor. llms.txt is an opt-in navigation aid that no crawler is obliged to read. One expresses permission; the other offers a reading list. Neither can make a page rank or be cited.
+
+Vendor documentation also assigns different robots.txt user agents to different purposes: answer-surface crawlers such as OAI-SearchBot build retrieval indexes, while training crawlers such as GPTBot feed model corpora. User-triggered fetchers generally ignore robots.txt. For the taxonomy, see [AI File Formats Sorted by Evidence](/articles/llms-txt-robots-txt-and-ietf-drafts-sorting-ai-file-formats-by-evidence).
+
+## References & Further Reading
+
+- Jeremy Howard, [The /llms.txt file, v2](https://llmstxt.org/). The proposal itself: purpose, path placement, the `.md` convention and adoption claims.
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features). States that no new machine-readable files or special schema are required for AI features.
+- IETF, [RFC 9309 — Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.txt). The standard robots.txt specification.
+- IETF, [A Vocabulary For Expressing AI Usage Preferences](https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/). The unfinished draft behind the Content-Usage proposal.
+- OpenAI, [Overview of OpenAI Crawlers](https://platform.openai.com/docs/bots). Vendor documentation separating answer-surface and training crawlers.

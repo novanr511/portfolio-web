@@ -1,0 +1,82 @@
+---
+title: "Inference Cost per Decision, Not per Token"
+description: "A token bill counts output; a decision consumes attempts. Price retries, rejects and review against accepted outcomes rather than generated strings."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Machine Learning
+  - Evaluation
+  - Web Performance
+---
+
+Billing counts tokens; a decision consumes attempts. The unit worth managing is the cost of one correct decision, with retries, rejects and review in the numerator. The 22 November 2026 BTC study reported 92.5% accuracy at day 25 against 94.0% for a zero-parameter rule, with Holm-adjusted p-values of 1.0 — the cheaper-looking model lost the task, so token spend bought no win. Its research agent's `number_audit` ran 193 checks comparing generated prose with retrieved files, a consistency record rather than a validity finding. That day's curation reduced 1,004 templated articles to a curated, restorable set behind an allowlist, and the `llms-full.txt` route moved assembly from each request to build time with `s-maxage=86400` and `stale-while-revalidate=604800`. OpenAI's [pricing page](https://platform.openai.com/docs/pricing) and Google's [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing) publish per-token tariffs; [Kwon et al.](https://arxiv.org/abs/2309.06180) report serving throughput. Both are inputs, not the decision.
+
+## What does a cost per decision actually measure?
+
+It measures total spend on one accepted decision divided by decisions that pass a defined check. Token price is an input; the numerator includes every attempt, retry, verification pass and rejection. The denominator is correct outcomes, not generated strings. Changing either term changes the unit, which is why it belongs in a decision log, not a price card.
+
+A tariff is a rate applied to a unit the vendor can count. A decision is a unit the product owner must define: an answer the caller accepts after a check that was fixed before the answer was seen. Those definitions rarely coincide. A model that needs two attempts and a human review can cost more than a model with a higher token rate that succeeds once. Writing the two rows separately prevents a discount on one from hiding growth in the other. The [inference cost pitfalls](/articles/llm-inference-cost-pitfalls) make the same structural point for request paths; here the path ends in an accepted or rejected outcome.
+
+## Why can a cheaper token bill produce a more expensive decision?
+
+Because a low rate multiplies attempts that never become correct answers. Failed calls, schema rejects, retrials and escalations all bill tokens; a wrong answer that passes review costs the decision regardless of rate. In the BTC study, 92.5% accuracy at day 25 lost to a zero-parameter rule at 94.0%, with Holm-adjusted p-values of 1.0.
+
+That result is source-reported from the [study record](/projects/btc-monthly-ml), figures read on 18 November 2026, and not a measurement made here. It covered 133 out-of-sample months. A team comparing two APIs on price per million tokens would have picked the cheaper column and still faced the same loss. The unit that mattered was whether a decision beat the rule, and under that test the model produced no win. Accuracy is not utility; the cost of the losing attempts was real even though the comparison was unpersuasive. No PnL, slippage or transaction cost was computed, so no tradable edge is claimed.
+
+## How are retries and rejects priced into the unit?
+
+Every attempt is charged, so the numerator counts attempts, not unique questions. A schema rejection still consumed input and output tokens; a retry consumes them again. Verification adds a recurring cost that is easy to omit: in the RAG agent's `number_audit` it ran on every output, and its review time was not measured.
+
+The audit's published status was 193 checks with no failures, alongside 55 tests passed and one skipped, figures read on 18 November 2026 from the [build log](/projects/rag-research-agent). It extracted numeric claims from a memo and matched each against retrieved context, flagging figures it could not find. That is a provenance gate: it rules out drift between prose and files. It does not price the gate, and it does not say the files were right. Treating "193 checks passed" as a validity certificate would put a zero in the numerator where an unmeasured cost belongs. [Agent evaluation examples](/articles/agent-evaluation-examples) separate the trajectory signal from the verdict for the same reason.
+
+## What do official price cards actually tell you?
+
+They give a dated tariff per token and mode, not an outcome. Source-reported on 22 November 2026: OpenAI listed `gpt-5-mini` at 0.25 input and 2.00 output per million tokens, with cached input at 0.025. Google listed Gemini 3.5 Flash-Lite at 0.30 input and 2.50 output, plus a 1.00 hourly caching storage charge per million tokens.
+
+None of those figures includes a failed attempt, a reviewer, or a wrong accepted answer. Both pages also publish batch and priority rates, which change the tariff without changing the decision. OpenAI's page notes that some promotional rates end on 30 November 2026, so a copied number decays; a dated snapshot is the only honest form. The [curation case study](/projects/seo-content-curation) records a similar discipline for content counts: the snapshot carries a date so the number can be disputed rather than silently inherited.
+
+## Where does serving design change the denominator?
+
+Serving design changes how many attempts fit a budget, not whether an attempt was right. Kwon and colleagues reported 2–4× throughput at comparable latency from PagedAttention, source-reported from their 12 September 2023 paper. Leviathan and colleagues reported 2–3× decoding acceleration on T5-XXL with identical outputs, source-reported from their paper revised 18 May 2023.
+
+Those are results on the authors' systems and tasks. They were not measured on this site, and they say nothing about acceptance rates. Throughput helps when requests overlap and a repeated prefix is reused; it does not make a wrong answer correct. The same distinction appears in the local record: the `llms-full.txt` route moved assembly from each request to build time, removing a repeated operation, while the 22 November 2026 www-to-apex 308 could only be observed after a certificate reissue let the handshake complete. Both changes altered where work happened; neither was presented as an accuracy gain.
+
+## What counts as a correct decision in the denominator?
+
+A correct decision survives a check fixed in advance, with the alternative and reversal condition named. In the BTC study the denominator was the frozen holdout compared with a zero-parameter rule; a Holm-adjusted p-value of 1.0 supplied no evidence of a win. Accuracy inside a month is not a decision that could have been taken at the prior month-end price.
+
+This is where a green check misleads. The agent's 193 checks established that the memo matched its artifacts, not that the comparison was worth making. A denominator defined by "the output looked complete" will admit the same errors as one defined by "the tokens arrived". Define the check, record who owns it, and keep the rejected cases visible; otherwise a high acceptance rate can be manufactured by weakening the check rather than improving the answer. See [tool-calling reliability under retries](/articles/tool-calling-reliability-when-function-calls-fail-in-agent-systems) for the failure modes that reappear when an action is replayed.
+
+## How do you compute the unit on a real workload?
+
+Write the inputs down, mark each ASSUMED or source-reported, and derive the total from an explicit denominator. The example below is a what-if, not an observed bill: no traffic, invoice or latency was measured for it. The tariff is the source-reported 22 November 2026 rate for `gpt-5-mini`; every other input is assumed so the arithmetic can be checked.
+
+| Quantity | Status | Basis |
+| --- | --- | --- |
+| Decisions in the window | ASSUMED | 1,000 |
+| First-pass accepted | ASSUMED | 92% of 1,000 = 920 |
+| Retried once | DERIVED | 8% of 1,000 = 80 |
+| Attempts billed | DERIVED | 920 + 80 = 1,080 |
+| Tokens per attempt | ASSUMED | 2,000 input, 500 output |
+| Token spend per attempt | DERIVED | (2,000 × 0.25 + 500 × 2.00) ÷ 1,000,000 = 0.0015 |
+| Total token spend | DERIVED | 1,080 × 0.0015 = 1.62 |
+| Correct after review | ASSUMED | 950 of 1,000 |
+| Cost per correct decision | DERIVED | 1.62 ÷ 950, about 0.0017 |
+
+The naive per-token figure divides 1.62 by 2.7 million tokens, about 0.0000006 per token, and tells you nothing about the 50 wrong outcomes. The per-decision figure divides by the 950 that survived review; adding review time to the numerator would raise it, and that time is not measured here. Which denominator you publish is a product decision, not a billing detail.
+
+Fix the acceptance rule before running the window, or the denominator becomes negotiable. Naming a baseline before seeing a result is the same discipline: a reviewer who decides what counts as correct after reading the outputs can manufacture a low cost per decision by relaxing the check. Record the rule, the rejected count and who applied it beside the tariff snapshot, so a later reader can recompute the unit from the inputs instead of trusting the summary.
+
+## What can the per-decision unit not establish?
+
+It cannot supply the value of a correct decision, the cost of review, or evidence that a check was well chosen. It keeps three rows apart: token spend, attempts and accepted outcomes. The BTC study refused a tradability claim without an economic evaluation; the same refusal applies to any cost per correct decision quoted without a defined correctness check.
+
+The 193-check audit is the sharpest warning. It would have reproduced a wrong figure faithfully if that figure sat in the source file, because it compared prose with artifacts and never artifacts with the world. A per-decision unit inherits whatever blind spots its denominator has. If acceptance is a reviewer's impression, the unit measures the reviewer as much as the model. The honest statement reports the arithmetic, names the ASSUMED inputs, and leaves the unmeasured rows empty rather than filling them with a plausible rate. [AI output verification costs explained](/articles/ai-output-verification-costs-explained) treats that recurring review row explicitly.
+
+## References & Further Reading
+
+- OpenAI, [API pricing](https://platform.openai.com/docs/pricing) — per-million-token tariffs, cached-input and mode-specific rates read on 22 November 2026; the page states that some promotional rates end on 30 November 2026.
+- Google, [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pricing) — per-million-token tariffs, context-caching and storage rates read on 22 November 2026, with dated promotional windows.
+- Woosuk Kwon et al., 12 September 2023 (SOSP 2023). [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) — source-reported 2–4× throughput at comparable latency on the authors' workloads.
+- Yaniv Leviathan, Matan Kalman and Yossi Matias, submitted 30 November 2022, revised 18 May 2023. [Fast Inference from Transformers via Speculative Decoding](https://arxiv.org/abs/2211.17192) — source-reported 2–3× acceleration on T5-XXL with identical outputs.
+- First-hand artifacts, figures read 18 and 22 November 2026. [BTC monthly study](/projects/btc-monthly-ml), [RAG research agent build log](/projects/rag-research-agent), [curation case study](/projects/seo-content-curation) and [llms-full.txt route](https://novandri.com/llms-full.txt) — the dated results and structural decisions used above.

@@ -1,0 +1,70 @@
+---
+title: "How to Get AI Document Extraction Right"
+description: "Extraction is right only relative to a named decision and a field-level tolerance. A retrieval agent's number_audit and official OCR docs frame the choice."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - RAG
+  - Evaluation
+  - Machine Learning
+  - Data Engineering
+---
+
+Extraction is right only relative to a named decision, a document type, and a field-level error tolerance someone owns. The [RAG research agent](/projects/rag-research-agent) is the first-hand analogy: its `number_audit` checks every percentage in a generated memo against the files it actually retrieved, a document-grounding mechanism rather than extraction. Google Cloud's [Document AI overview](https://cloud.google.com/document-ai/docs/overview) and Microsoft's [Azure Document Intelligence overview](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/overview) carry the tooling claims. Every figure below is labelled source-reported or ASSUMED.
+
+## What does "getting extraction right" actually decide?
+
+The decision is not which model to call. It is which fields may flow into a downstream system unattended, which must be checked against their source, and which must be escalated to a person. A pipeline is right only relative to a named decision, a document type, and an error tolerance someone owns.
+
+That framing changes what counts as evidence. A demo that turns a clean PDF into tidy JSON answers the easy half of the question. It says nothing about the misfiled quantity, the shifted table column, or the total copied from the wrong line, because all of those can arrive with the correct types and the correct keys. The useful question is what a wrong value would do downstream. A typo in a marketing summary is cheap; the same typo in a ledger posting is not. The tolerance, the check, and the review path should follow from that difference rather than from a benchmark table.
+
+## What was and was not measured here?
+
+No extraction pipeline was run for this article, so there is no measured accuracy, latency, or cost per field to report. The first-hand artifact is a retrieval agent from a finished study: it retrieved project files by lexical matching and ran a `number_audit` over every percentage in a memo. That checks prose against artifacts, not fields against documents.
+
+The agent used lexical retrieval — BM25 and TF-IDF merged by reciprocal rank fusion — because its corpus held literals such as metric filenames and column identifiers where a one-digit change alters a claim. A LangGraph flow ran ingest, validation, backtest, diagnosis, and composition in order, with SQLite checkpoints recording each run; a failed audit appended an unverified-numbers warning to the memo rather than correcting it. Its published result was source-reported from the [public reproduction package](https://github.com/novanr511/btc-monthly-close-prediction): 193 consistency checks with none failed, alongside 55 tests passed and one skipped, figures read 18 November 2026. Those are consistency results about memos and files. They say nothing about extraction on invoices, because the agent never extracted a field from a document. The distinction is developed in [Agent evaluation examples](/articles/agent-evaluation-examples).
+
+## What do the official document-AI docs actually promise?
+
+Google's Document AI overview describes digitizing with OCR, extracting key-value pairs and tables, classifying and splitting documents, and returning structured Document objects. Microsoft's Azure Document Intelligence overview lists Read and Layout models, prebuilt extractors, custom models, and strongly typed fields. Both document capabilities; neither promises correct values on your documents.
+
+Reading the two side by side is useful because they make the same split explicit. Google groups processors into Digitize, Extract, and Classify, and notes that OCR can include image-quality analysis and deskewing before extraction. Microsoft maps common invoice fields to declared types — a date for InvoiceDate, a currency for SubTotal — and requires labelled documents for a custom model. These are source-reported descriptions of what the services do, read 22 November 2026. They are orientation for a decision, not a measured result on your forms.
+
+## Why does a well-formed output still need grounding?
+
+A schema-shaped result is a format claim, not a truth claim. The paper behind Donut lists OCR error propagation as a motivation for OCR-free document understanding, which is a source-reported motivation rather than a measurement of your pipeline. Grounding means each value can be traced to a span in the source document.
+
+The same shape appears in the retrieval agent I built. Its audit compared generated prose with retrieved artifacts; it never compared artifacts with the world. If a source file held a wrong figure, a faithful memo passed. Extraction has the mirror-image problem: a value can be present, typed correctly, and absent from the document it came from. A schema check will not catch that. Only a check that points back to the source span, or an independent calculation such as recomputing a total from line items, can. This is why lexical retrieval mattered in that agent and why exact strings matter here. The mechanism is covered in [RAG explained](/articles/rag-explained).
+
+## How should a field become a decision instead of a guess?
+
+Give each field a rule, a check, and an owner. A check compares the extracted value with the source span or with an independent calculation; a tolerance, set locally and labelled ASSUMED until measured, decides when a value is held for review. High-stakes fields can require review regardless of confidence.
+
+That sounds bureaucratic until a field fails. Without a named owner, a threshold becomes a default that nobody remembers choosing. Without a source comparison, a confidence score becomes the only signal, and confidence can be poorly calibrated on a new template. Preserve blank fields rather than letting the model fill them with plausible guesses. Measure error rates per field on labelled documents from the actual stream, not on a vendor's sample set. The check is what makes an output auditable; the owner is what makes the audit actionable when the document mix changes.
+
+## What does a hypothetical invoice review look like?
+
+Assume, for illustration only, a batch of supplier invoices and three fields: total, date, and vendor. None of the figures in this scenario is measured; all are ASSUMED. The review asks whether each field maps to a document span, whether the total recomputes from line items, and who owns the hold rule.
+
+The sequence is the contribution, not the numbers. A schema check confirms the keys exist and parse. A source check finds the span for each value and recomputes the total. An escalation check applies the locally owned tolerance and routes uncertain or high-stakes fields to a person. Where no span can be found, the field stays empty and is flagged. No accuracy figure is reported at the end, because none was measured. A reviewer can still see which fields were validated, which were held, and which rule admitted each outcome.
+
+## What can extraction not settle?
+
+Extraction cannot authenticate a document, detect a forged signature, resolve two conflicting figures, or interpret an ambiguous clause. It structures what is present; it does not decide what is authoritative. Those judgments stay with a domain reviewer, and the output schema gives them no way to disappear.
+
+There is a limit worth stating plainly. A clean pass on today's templates says little about photographed forms, a new supplier's layout, or a scanned page with broken text. Drift changes the error profile without changing the code. Every tolerance therefore needs a recheck condition: a new template, a model change, or a shift in document mix. Keeping that record is the difference between a gate someone can defend and a number that was convenient on the day it was chosen.
+
+## How do you decide with the evidence available?
+
+Write the decision, the document type, and the field-level rule before choosing a tool. Measure on your own documents, label the source of every figure, and name an owner for each tolerance. Treat a vendor demo or a paper's table as orientation, not as evidence about your forms.
+
+The build-or-buy choice sits downstream of that evidence. A managed IDP service supplies prebuilt extractors and typed fields quickly, which helps when your documents resemble its prebuilt categories and you can live with its error profile. A custom extractor or an in-house pipeline buys control over schemas and review paths, at the cost of labelled data and maintenance. Neither option is right in the abstract. The deciding inputs are document variability, the volume that makes manual review expensive, and the cost of a wrong field. I have no measured comparison between those options to offer, so I will not rank them.
+
+A short decision test follows from that. Name the decision and the cost of a wrong field. Define the schema and the source span for each value. Build a labelled sample from the real stream. Score errors per field, not per document. Add a source comparison and a documented hold rule. Record who owns each tolerance and when it must be revisited. None of those steps requires a leaderboard claim, and all of them survive one. For the wider governance frame, see [AI Risk Assessment: A Pre-Deployment Checklist](/articles/ai-risk-assessment-a-pre-deployment-checklist).
+
+## References & Further Reading
+
+- Google Cloud, 2026. [Document AI overview](https://cloud.google.com/document-ai/docs/overview) — OCR, key-value extraction, classification, and processor types.
+- Microsoft, 2026. [What is Azure Document Intelligence](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/overview) — prebuilt and custom extraction models with typed fields.
+- Kim, G. et al., 2022. [OCR-free Document Understanding Transformer](https://arxiv.org/abs/2111.15664) — Donut and the stated motivation around OCR error propagation.
+- novanr511, 2026. [Public reproduction package for the BTC monthly study](https://github.com/novanr511/btc-monthly-close-prediction) — the retrieval agent, its `number_audit`, and the figures quoted above.

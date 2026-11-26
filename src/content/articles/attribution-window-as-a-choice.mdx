@@ -1,0 +1,84 @@
+---
+title: "Attribution Window as a Choice"
+description: "Fix the attribution window before results arrive; a later change rewrites channel credit while customer actions stay fixed."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Data Engineering
+---
+
+A measurement window is a decision made before the data are read, not a property discovered inside them. On 22 November 2026, a curation pass reduced 1,004 templated articles to a curated, restorable set behind an allowlist; the traffic outcome of that decision was not measured. The BTC study's research agent ran a `number_audit` of 193 checks that established consistency between prose and artifacts, not validity. In the same study, a 92.5% model lost to a zero-parameter rule at 94.0% with Holm-adjusted p-values of 1.0, and the authors refused a tradability claim. Google's [About conversion windows](https://support.google.com/google-ads/answer/3123169) documents settings from 1 to 90 days with a 30-day default: a choice, written down in advance.
+
+## What is chosen when an attribution window is set?
+
+A window is a rule for which actions enter the measurement and when they count. It sets the observation period after an ad interaction and the lookback before a conversion. Those rules decide which touches receive credit. A window defines the unit being counted, so it belongs in the decision log before any result is inspected.
+
+Google Ads separates two clocks. A conversion window is the period after an ad interaction during which a conversion is recorded in Google Ads; its [help page](https://support.google.com/google-ads/answer/3123169) lists 1 to 90 days depending on the conversion source, with a 30-day default for Search and Display when nothing is customised. The lookback window is different: the [attribution reports documentation](https://support.google.com/google-ads/answer/1722023) offers 30, 60 or 90 days for how far back from a conversion an ad interaction may receive credit, and notes that most reports open at 30 days. One clock controls recording, the other controls credit assignment. Choosing one while silently inheriting the other is where drift begins.
+
+The [attribution models guide](https://support.google.com/google-ads/answer/6259715) adds a third choice: how credit is split among the touches that made it into the window. Last click gives everything to one interaction; data-driven attribution distributes credit using account data. Source-reported on 22 November 2026, first click, linear, time decay and position-based are deprecated, and data-driven is the default for most conversion actions. None of these settings observes the customer differently; each re-describes the same events.
+
+## Why must the window be fixed before results are read?
+
+Because a window chosen after seeing outcomes becomes a way of selecting the answer. A longer window admits more touches, which tends to raise credited conversions and lower a cost per conversion. A reviewer who tests several windows and reports the most flattering one has run a search, not a measurement. Fixing the rule in advance removes that degrees-of-freedom problem.
+
+The discipline matches what the BTC study had to do with its comparator. It froze the last 12 months as a holdout and compared the model against a zero-parameter sign rule; at day 25 the model reached 92.5% and the rule 94.0%, with Holm-adjusted p-values of 1.0. The negative result is only credible because the baseline and the evaluation window were specified before the numbers were opened. Had the team chosen the comparator after seeing the accuracy curve, the same 92.5% could have been presented as a win against the majority baseline.
+
+The curation decision carries the same shape. The 22 November 2026 pass changed what the site published through a mechanical allowlist, and it explicitly recorded that no traffic outcome was measured. Writing down the rule first is what makes the later statement auditable; inventing a favourable window afterwards would have turned an engineering decision into a story. The [number_audit](/projects/rag-research-agent) did 193 checks for consistency with retrieved files and still could not certify the method. A window fixed in advance is a method decision, not a consistency check.
+
+## How does the window change customer acquisition cost?
+
+Customer acquisition cost divides spend by attributed conversions, so the window sits inside the denominator. Change the window and the same spend, the same ad clicks and the same customers produce a different CAC. The ratio is downstream of the measurement definition, not an independent fact about the business.
+
+The arithmetic is simple enough to make the point without a platform. The table is a what-if: no campaign, invoice or conversion log was measured for it. The 30-day default is source-reported from Google's conversion-window page, read 22 November 2026; every other input is ASSUMED and each total is DERIVED from those inputs.
+
+| Quantity | Status | Basis |
+| --- | --- | --- |
+| Media spend in the month | ASSUMED | 10,000 |
+| Conversions credited at 30 days | ASSUMED | 100 |
+| CAC at 30 days | DERIVED | 10,000 / 100 = 100 |
+| Conversions credited at 90 days | ASSUMED | 130 |
+| CAC at 90 days | DERIVED | 10,000 / 130, about 76.9 |
+| Change in reported CAC | DERIVED | about 23.1 lower at 90 days |
+
+Nothing about the product or the customers changed between those two rows; only the rule did. A [customer acquisition cost](/articles/customer-acquisition-cost-costs-explained) figure quoted without its window is therefore incomplete. The same issue appears in [SEO versus paid acquisition economics](/articles/seo-vs-paid-advertising-understanding-the-economics-of-customer-acquisition), where the comparison depends on what each channel is allowed to count. Record the window beside the ratio, and a later reader can recompute it instead of inheriting the headline.
+
+## What does a paid social report actually count?
+
+A paid social report counts conversions that the platform can see and choose to credit inside its own reporting view. It is a record of attributed activity, not a counterfactual. A well-chosen window makes that record more consistent; it does not turn credit into causal lift.
+
+This is a different question from window selection. You can set a defensible 30-day conversion window, agree on a 60-day lookback, and still have a campaign whose credited purchases would have happened without the ads. The [paid social measurement record](/articles/what-paid-social-actually-measures) documents what these platform-reported numbers can and cannot support. The useful move is to ask what would have happened to the same users with the campaign withheld, which requires a comparison group rather than a longer window.
+
+The BTC result is a compact warning about this mistake. Its 92.5% accuracy figure rose partly because most of the month had already happened by day 25; the number described `P(GREEN | move so far this month)`. A platform credit report can rise for an analogous reason: the window captures more of a purchase that was already underway. Both are descriptive quantities that become misleading when they are read as the effect of an intervention. [Incrementality testing](/articles/how-to-evaluate-incrementality-testing) starts from the comparison that window-based reporting omits.
+
+## Which Google Ads settings define the window?
+
+Four documented controls define most of it: the conversion window, the lookback window, the attribution model and the offline upload gate. Google's [attribution reports page](https://support.google.com/google-ads/answer/1722023) states that the lookback control is distinct from the conversion window, that "Default" sets it to each conversion's window, and that offline conversions uploaded after 7 days are excluded.
+
+Read on 22 November 2026, that page also fixes the date-range floor at two years and notes that older path data is deleted. The 7-day gate applies to the attribution engine; standard reporting and Smart Bidding record uploaded offline conversions according to the conversion window setting. The [conversion-window page](https://support.google.com/google-ads/answer/3123169) adds that changes apply going forward rather than retroactively. A switch from 30 days to 10 days does not recall conversions already excluded, and a later switch to 20 days does not restore a conversion that fell outside the intervening window. That asymmetry is another reason to decide early: the logs preserve the history of the setting, but the lost observations do not come back.
+
+The [model-change guidance](https://support.google.com/google-ads/answer/9203352) describes what happens after a change: fractional credit appears as decimals in conversion columns, time lag can cause a short dip in recent days, and credit shifts across campaigns. It recommends waiting until the average days-to-conversion has passed before evaluating performance. Google's [Switch to DDA documentation](https://support.google.com/google-ads/answer/10762625) also lists eligibility thresholds of 3,000 ad interactions and 300 conversions over 30 days for some conversion actions. These are operational details, but they show that the platform treats the window as a controlled setting with consequences.
+
+## How do you choose and document a window?
+
+Choose the window from the lag distribution of the purchase, then record the value, its date and its owner. Google's conversion-window page recommends the time lag report for this purpose; its example notes that if 75% of conversions arrive between day 25 and day 30, a shorter window misses recordings. The lag report supplies evidence; the decision stays yours.
+
+The [attribution reports page](https://support.google.com/google-ads/answer/1722023) points to "Avg. days to conversion" as the same input. Write four lines: the value chosen, the evidence used, the date it was fixed, and the condition that would trigger a revision. A revision rule matters because windows do age. A product with a weeklong promotion and one with a six-month enterprise cycle should not share a default. The 1,004-to-curated pass was implemented as a mechanical allowlist for the same reason: the rule is easy to audit, and the date makes the snapshot disputable rather than permanent.
+
+Keep the choice separate from the model choice. A team can hold the window fixed while comparing last click with data-driven attribution through the model comparison report; the [attribution models guide](https://support.google.com/google-ads/answer/6259715) describes that report as a way to see how credit moves between models. Mixing a window change with a model change in the same review makes it impossible to say which decision moved the number.
+
+## What can a fixed window not establish?
+
+A fixed window makes a number reproducible; it does not make the number causal. It cannot supply the value of an attributed conversion, the behaviour of customers never exposed, or evidence that recorded touches influenced the purchase. Those require a comparator, an economic frame and a stated uncertainty, none of which a platform setting provides.
+
+The three first-hand records keep these limits visible. The curation pass reported structural facts and left the traffic outcome unmeasured. The `number_audit` proved that 193 checks matched the artifacts, not that the artifacts described the world. The BTC study paired a 92.5% score with a 94.0% baseline, Holm-adjusted p-values of 1.0 and an explicit refusal to claim tradability. A window decision belongs in the same category of honesty: state what the rule includes, state what it excludes, and leave the unmeasured rows blank.
+
+That is the decision the reader can act on. Set the window before the report is opened, record the reason, and treat any later change as a new decision with its own date rather than a correction to an old one. The number will be less flexible, and that is the point.
+
+## References & Further Reading
+
+- Google Ads Help, [About conversion windows](https://support.google.com/google-ads/answer/3123169) — 1 to 90-day settings, 30-day default, forward-only changes; read 22 November 2026.
+- Google Ads Help, [About attribution reports](https://support.google.com/google-ads/answer/1722023) — 30/60/90-day lookback, distinction from conversion window, 7-day offline upload gate; read 22 November 2026.
+- Google Ads Help, [About attribution models](https://support.google.com/google-ads/answer/6259715) — last click, data-driven attribution, deprecated models, model comparison; read 22 November 2026.
+- Google Ads Help, [Best practices for managing attribution model changes](https://support.google.com/google-ads/answer/9203352) and [About "Switch to DDA"](https://support.google.com/google-ads/answer/10762625) — fractional credit, time lag, eligibility thresholds; read 22 November 2026.
+- First-hand artifacts, figures read 18 and 22 November 2026: [curation case study](/projects/seo-content-curation), [RAG agent build log](/projects/rag-research-agent) and [BTC monthly study](/projects/btc-monthly-ml).

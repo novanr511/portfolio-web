@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { ViewTransition } from "react";
-import { connection } from "next/server";
 import { Reveal } from "@/components/reveal";
 import { ArticleSearch } from "@/components/article-search";
 import { CategoryScroller } from "@/components/category-scroller";
-import { getSortedArticles, type Article } from "@/lib/articles";
+import { getSortedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 import Link from "next/link";
 import { categorySlug } from "@/lib/articles";
 
-/** Article inventory is read from the filesystem; the list itself is shuffled per request */
+/** Article inventory is read from the filesystem at build time; the list is stable for crawlers. */
 export const instant = false;
 
 export const metadata: Metadata = {
@@ -77,23 +75,6 @@ function blogJsonLd(sortedArticles: Awaited<ReturnType<typeof getSortedArticles>
   };
 }
 
-/**
- * Fisher-Yates shuffle, seeded by Math.random() on every request.
- * `connection()` opts this component out of prerendering so each visitor —
- * and each refresh — receives a different order in the streamed HTML itself.
- */
-async function ShuffledArticleList({ articles }: { articles: Article[] }) {
-  await connection();
-
-  const shuffled = [...articles];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-
-  return <ArticleSearch articles={shuffled} />;
-}
-
 export default async function ArticlesPage() {
   const sortedArticles = await getSortedArticles();
   return (
@@ -140,15 +121,7 @@ export default async function ArticlesPage() {
         </p>
 
         <div className="mt-12">
-          <Suspense
-            fallback={
-              <p className="text-sm text-muted" role="status">
-                Arranging articles…
-              </p>
-            }
-          >
-            <ShuffledArticleList articles={sortedArticles} />
-          </Suspense>
+          <ArticleSearch articles={sortedArticles} />
         </div>
       </div>
     </ViewTransition>

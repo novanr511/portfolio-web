@@ -1,0 +1,80 @@
+---
+title: "Structured Output Validation Boundaries"
+description: "A schema-valid response proves the interface worked; whether the value is true needs a separate check. A 193-check audit and a 92.5% result show the boundary."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Machine Learning
+  - Evaluation
+  - RAG
+---
+
+A schema-valid response is evidence about an interface, not about the world: format validation asks "did the output match the declared shape?" while fact validation asks "does the value correspond to anything true?" OpenAI's [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs) draws the line itself — it constrains completed, non-refusal output to a supplied JSON Schema and leaves business rules to the application. Three local records make that line concrete. The RAG research agent's `number_audit` ran 193 checks against retrieved artifacts (source-reported, read 18 November 2026) and proved consistency, not validity. The curation recorded on 22 November 2026 cut 1,004 templated articles to a curated set behind a reversible allowlist — a boundary drawn before any item was judged. And the BTC monthly study reported 92.5% accuracy at day 25 against 94.0% for a zero-parameter rule (source-reported, read 18 November 2026); both figures would parse into the same clean object.
+
+## Where does schema validation stop?
+
+A schema answers whether data fits a declared grammar: required keys, types, enumerations, and conditional rules. [JSON Schema's reference](https://json-schema.org/understanding-json-schema/) documents those keywords, and OpenAI's guide states that application code still handles refusals, incomplete responses, API errors, and business rules the schema cannot express. Grammar conformance and factual correctness are different properties, and only the first is on offer here.
+
+That is a claim about scope, not about mechanism — the mechanics of constrained decoding belong in [Structured Output and Constrained Decoding for Production APIs](/articles/structured-output-and-constrained-decoding-for-production-apis). What matters at the boundary is that a strict schema is a contract. Field names and enumerations become part of an interface, so a rename breaks every consumer, and a tight enum can force a wrong value when the input fits none of the options.
+
+The supported subset matters too. The OpenAI guide points readers to the schemas it supports and to model compatibility; a schema using an unsupported construct sits outside the guarantee. Refusals and incomplete responses are outside it as well. A client that assumes every response will be a completed, schema-valid object has misread what the source says, and the resulting failure will surface as a business-rule error rather than a parse error.
+
+## Why does a valid field still need a truth check?
+
+Because validation compares a value with a rule, not with a fact. A date-shaped string can carry the wrong date, and a number with two decimals can be the wrong amount. The check that matters asks what source the value came from: a span in the original document, a recomputation, or a labelled set.
+
+Take an invoice extractor with `total` and `line_items`. ASSUMED: three line items of 20, 30, and 50, with a `total` field of 90. Every field is well-formed; the total is wrong. The schema cannot catch it because "number" is a type, not an assertion about addition. Recomputing the sum from the line items can. The same pattern holds for a date that parses but names the wrong day, or a currency enum that forces an unlisted currency into a listed one.
+
+The remedy is not a bigger schema. It is a second check with an independent source, plus an escape value for cases the schema cannot represent. Keep the raw input beside the stored object so a disputed value can be traced to the text it came from. Without that pair, a reviewer can confirm that the object parses and has nothing further to inspect.
+
+## What did the 193-check audit actually establish?
+
+It established agreement between a generated memo and the artifacts the agent retrieved. The RAG agent matched every numeric claim against retrieved context; its published run recorded 193 checks with zero failures (source-reported, [build log](/projects/rag-research-agent), read 18 November 2026). That is provenance — the memo repeats its files faithfully. It says nothing about whether those files were right.
+
+The audit would have reproduced a wrong figure faithfully if that figure sat in a source artifact, because it compared prose with files and never files with the world. That is its design, not a defect in its execution. [Agent evaluation examples](/articles/agent-evaluation-examples) keep this trajectory signal separate from a verdict on answer quality for the same reason: a careful path and a lucky guess can end in identical prose, and only the log distinguishes them.
+
+For validation boundaries the implication is narrow but useful. A green check of any kind tells you which comparison was performed. Read the comparison before reading the result. "193 checks passed" describes the relationship between a memo and a corpus; it does not describe the corpus, the method, or the decision the memo supports.
+
+## How does the BTC result expose the gap?
+
+A clean schema would have carried both competing numbers without flinching. The BTC monthly study reported 92.5% accuracy at day 25 while a zero-parameter `sign(mtd_ret)` rule reached 94.0%, with Holm-adjusted p-values of 1.0 (source-reported from the [study record](/projects/btc-monthly-ml)). The 92.5% describes information already visible that month. Schema validation can confirm both figures are numbers; it cannot choose the comparator.
+
+Across 133 out-of-sample months the model's edge over the rule stayed small, and the frozen twelve-month holdout returned 91.7% accuracy with an edge of 0.0. The 92.5% is `P(GREEN | move so far this month)` — a descriptive quantity that rises because most of the month has already happened — not a signal executable at the prior month-end price. No PnL, slippage, or transaction costs were computed, so the study made no tradability claim.
+
+Those facts are source-reported, not measured here. They matter because they show a formatted field doing exactly what it was told: holding a number. The judgement that made the number interpretable was a decision about comparison and timing, made outside any schema. [Classification metrics beyond accuracy](/articles/classification-metrics-beyond-accuracy) covers that decision on its own terms.
+
+## Which checks belong outside the schema?
+
+Checks that need a source the model did not invent. Recompute arithmetic instead of trusting a total field; compare an extracted value with the exact span it came from; score a label against a labelled set; keep an escape value for unrepresentable cases. The [NIST AI RMF](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) places measurement inside a govern–map–measure–manage lifecycle, which keeps one green check in proportion.
+
+Format restrictions also carry a cost that format validation cannot see. Tam et al. report a significant decline in reasoning when models are restricted to structured formats, with stricter constraints producing greater degradation ([arXiv:2408.02442](https://arxiv.org/abs/2408.02442)). That is a source-reported finding on their tasks, not a measurement of your pipeline. It argues for the smallest schema that serves the decision, rather than the most expressive one available.
+
+The check list follows from that. Name the source for each field, decide what should happen when the source disagrees with the model, and log disagreements rather than silently repairing them. A validation layer that only re-checks the schema duplicates the guarantee it was meant to test.
+
+## What does a default-deny allowlist show about boundaries?
+
+The curation recorded on 22 November 2026 made entry default-deny: 1,004 templated articles were cut to a curated, restorable set behind a reversible allowlist ([curation case study](/projects/seo-content-curation)). That is the same shape as a schema escape value — the system decides what may enter before judging any individual item. No traffic outcome was measured there, and none is claimed here.
+
+An allowlist is a decision about admissibility, not a score for quality. Membership says the item passed a gate; it says nothing about the item's merits once inside. A schema works the same way: it admits values that fit a declaration and rejects those that do not, without commenting on whether admitted values are true.
+
+The dated snapshot matters. The curation figure describes the state on 22 November 2026; it is not a running count of the archive. Adding an item to a curated set, like adding a field to a schema, changes what the gate means for everything downstream. Record the rule and the date together, or a later reader will treat a boundary as a fact about the world.
+
+## What decision test should a team run before trusting a validated output?
+
+Name the downstream decision, then write the smallest schema that serves it and the source that will check each value. Include an escape for unrepresentable cases, validate the shape on receipt, and re-run a labelled set whenever the model or schema changes. Record which schema version produced each stored result. The test is whether a wrong value can be caught.
+
+1. Write the decision first; delete every field that does not change it.
+2. Assign a source to each field: document span, recomputation, or labelled set.
+3. Add an escape value and a failure path for cases the schema cannot express.
+4. Re-run a labelled set that includes awkward inputs before changing a schema or model.
+5. Store the schema version beside the result, and keep the raw input retrievable.
+
+This article stays with the boundary: what validation can and cannot certify. The constrained-decoding companion covers how the shape is produced. They answer different questions, and a team that treats one as the other will end up with clean objects and unexamined claims.
+
+## References & Further Reading
+
+- OpenAI, 2026. [Structured model outputs | OpenAI API](https://platform.openai.com/docs/guides/structured-outputs) — the guarantee covers conformance to a supplied JSON Schema; refusals, incomplete responses, errors and business rules stay with the application.
+- JSON Schema, 2026. [JSON Schema reference](https://json-schema.org/understanding-json-schema/) — keywords, type-specific constraints, conditional validation and composition; the vocabulary of shape, not of truth.
+- Tam et al., 2024. [Let Me Speak Freely? A Study on the Impact of Format Restrictions on Performance of Large Language Models](https://arxiv.org/abs/2408.02442) — source-reported degradation in reasoning under stricter output formats.
+- NIST. [AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) — govern, map, measure, manage; the lifecycle around a single passing check.
+- novanr511, 2026. [Public reproduction package for the BTC monthly study](https://github.com/novanr511/btc-monthly-close-prediction) — the artifacts behind the 193-check audit and the 92.5%/94.0% comparison.

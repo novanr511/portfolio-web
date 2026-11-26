@@ -1,0 +1,78 @@
+---
+title: "Redirect Chains and What They Hide"
+description: "A 308 from www to apex is one hop; a chain of hops hides which rule made which decision. Wire captures, RFC 9110 and Google's redirect guidance show what a trail records."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - Crawlability
+---
+
+A redirect chain is a stack of decisions, and its length tells you less than the ownership of each hop. On 22 November 2026 a header-only request to `https://www.novandri.com/` returned HTTP/2 308 with `location: https://novandri.com/`, a single rule installed in `src/middleware.ts` after a certificate covering `www` had been issued. That clean hop had a prehistory: the earlier request stopped at curl (60) with a name-mismatch error, because the certificate's SAN listed only the apex. RFC 9110 defines what 308 means; Google Search Central states that a permanent redirect is a signal the target URL should be canonical. The evidence here is the wire capture and what those sources actually say, not a ranking story.
+
+## What does a 308 preserve that a 301 does not?
+
+RFC 9110 calls both 301 and 308 permanent redirects, but its note on 301 records an escape hatch: a user agent MAY change a POST to GET on the follow-up request, and it points to 308 when that change is undesired. MDN states that a 308 leaves the method and body unchanged. On a GET-only page the difference is invisible.
+
+The distinction concerns method semantics, not how strongly a search engine weighs the hop. Google's redirect guidance lists HTTP 301 and HTTP 308 together as permanent server-side redirects and says the indexing pipeline uses a permanent redirect as a signal that the target should be canonical. Neither document describes a scoring difference between the two codes.
+
+RFC 9110 also notes that 308 is the younger status, dating to June 2014, and cautions that it might not be recognised everywhere. That is a deployment consideration rather than a reason to prefer 301 blindly. Choose 308 when a non-GET method could reach the URL and must survive; choose 301 when maximum legacy compatibility matters more. For the www-to-apex capture the request was HEAD, so what the observation establishes is the status and Location header, not method preservation.
+
+## What did the www-to-apex hop actually return?
+
+The capture is a wire observation, not a ranking result. On 22 November 2026, `curl -I https://www.novandri.com/` returned HTTP/2 308 with `location: https://novandri.com/`. An earlier request stopped at curl (60) because the certificate's SAN listed only the apex. HTTP on the apex upgraded to HTTPS in a single hop. Three responses, three different layers of the stack.
+
+The ordering is the useful part. A redirect cannot be validated while the TLS handshake fails, so the certificate was reissued first — `vercel domains add www.novandri.com` caused a certificate with `DNS:www.novandri.com` in its SAN — and a repeat `curl -I` returned HTTP/2 200. Only then was the middleware rule added. Diagnosing the original failure as a redirect problem would have changed the wrong file.
+
+Each response names a different decision. curl (60) said the hostname had no matching identity in the certificate. HTTP/2 200 said the name now resolved to a service with a valid certificate. HTTP/2 308 with a Location header said which hostname the owner preferred. None of those observations says anything about crawl rate or impressions; those outcomes were not measured.
+
+## Why does a long chain hide the original decision?
+
+Each hop in a chain is a rule written at a different time by a different layer: a CDN scheme upgrade, a platform hostname assignment, an application middleware rule, a trailing-slash normaliser. Followed end to end they produce a 200, but the final response carries no record of the earlier choices. A chain hides authorship more than it hides latency.
+
+Ask why `www` redirects and the answer may be the middleware rule. Ask why the apex is HTTPS and the answer is a separate platform setting. Ask why an old campaign URL carries a query parameter and a third rule appears. The chain is the visible symptom of decisions that were never consolidated into one place.
+
+This is where a redirect differs from a canonical tag. A redirect is a response that moves the client; a canonical is a statement about which URL should represent a set. The two mechanisms can cooperate or disagree, and a chain makes disagreement harder to see. [Canonical Tags and Duplicate URLs](/articles/canonical-tags-and-duplicate-urls-signals-not-commands) covers the statement side; the point here is that the redirect side leaves a sequence rather than a single assertion.
+
+The 22 November 2026 curation that reduced 1,004 templated articles to a curated set was the same kind of inventory problem: a visible surface hiding the decision layer beneath it. In both cases the useful question is which rule created the variant, not how many variants exist today. An undated count would go stale at the next release.
+
+## What traces does a redirect leave behind?
+
+A redirect leaves headers in the client, lines in the server log, and relationships in the index. A permanent response is heuristically cacheable under RFC 9110, so a browser may reuse it. Google tracks both source and target and may keep the old URL as an alternate name. The address bar is the thinnest part of the record.
+
+Google's redirect documentation, checked 24 November 2026, says it keeps track of both the redirect source and the target, and that the other URL becomes an alternate name which may still appear in results when a query suggests a user trusts it more. That is a documented behaviour, not a defect in the deployment. It explains why a migration can look incomplete from a search result even when every hop returns the intended code.
+
+At the edge, each hop appears as a log line with a status, a path and a Location value. Internal links, sitemap entries and canonical tags either agree with the chain or contradict it. Browsers may cache a permanent redirect, so a correction can be slow to reach a client that already stored the old answer. Reading the chain without the logs means reading only the part a client chose to show.
+
+One more trace is worth recording explicitly: the time of the observation. A permanent redirect cached by a browser last week can still be in force for that client after the rule is removed at the edge. Storing the fetch date alongside the status and Location turns a confusing report into a comparison between two moments. The 22 November 2026 captures in this article are labelled for the same reason.
+
+## How do you read a chain without guessing?
+
+Use a header-only request with redirects disabled first, then follow them one at a time and record each status, Location and server. `curl -I -L --max-redirs 5` shows the sequence; an explicit limit bounds a loop. Stop when the status is 200, the scheme is HTTPS, the host is intended, and the body is the page you expected.
+
+The commands below are a recipe, not a captured result from this site:
+
+```bash
+curl -sS -I -L --max-redirs 5 https://www.example.com/articles/example
+curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' \
+  -L --max-redirs 5 https://www.example.com/articles/example
+```
+
+The first prints each response's status and headers; the second prints only the terminal status and final URL, which is easier to diff across deploys. Run both against the hostname a reader actually uses, because the www, apex and HTTP variants can enter different rules. A 200 at the end of a chain is a start, not a finish: check that the final URL is the one your sitemap lists and your canonical tag names. [URL structure hygiene](/articles/seo-url-structure-normalize-hostnames-paths-parameters) covers the variants that should never be created in the first place.
+
+## When does collapsing a chain beat adding another rule?
+
+Collapse when two hops express one decision: a scheme upgrade and a hostname normalisation for the same page can usually be one rule at the edge. Keep separate hops only when different teams own them or a transition genuinely needs a reversible step. A canonical tag cannot remove a hop; it only nominates a URL among those that already exist.
+
+The fix belongs at the layer that created the first variant. Set the canonical scheme and host once, point internal links and the sitemap at that form, and verify a single hop from each legacy entry. If a rule exists only to undo another rule, delete both rather than documenting the pair.
+
+Verification is cheap and specific. Fetch each legacy hostname with the recipe above, confirm the terminal status and URL, and re-run after a deployment. A redirect that lands on a 200 with the wrong host has solved half the problem.
+
+What this buys is clarity about decisions, not a demonstrated traffic gain. Traffic and ranking outcomes for this site's www-to-apex change were not measured, and a healthy 308 is not evidence of an index effect. The honest claim stops at the response: one permanent hop, the correct Location, and a final page that matches the canonical address. See [HTTPS, TLS and SEO](/articles/https-tls-and-seo-diagnose-certificates-and-redirects) for the certificate half of that sequence.
+
+## References & Further Reading
+
+- IETF, RFC 9110 (June 2022), [Section 15.4.2 — 301 Moved Permanently](https://www.rfc-editor.org/rfc/rfc9110.html#section-15.4.2) and [Section 15.4.9 — 308 Permanent Redirect](https://www.rfc-editor.org/rfc/rfc9110.html#section-15.4.9) — permanence, the POST-to-GET note, cacheability and the deployment caution.
+- MDN Web Docs, [308 Permanent Redirect](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/308) — method and body preservation, and the older-client behaviour of 301.
+- Google Search Central, [Redirects and Google Search](https://developers.google.com/search/docs/crawling-indexing/301-redirects) — permanent versus temporary handling and alternate names after a move (checked 24 November 2026).
+- Google Search Central, [Consolidate duplicate URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) — how redirects relate to canonical signals.

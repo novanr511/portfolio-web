@@ -1,5 +1,8 @@
+import { readdirSync } from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
 import createMDX from "@next/mdx";
+import { CURATED_SLUG_SET } from "./src/lib/curated-slugs";
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -23,6 +26,24 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+
+  /**
+   * The curated archive stays on disk but is no longer published. Send every
+   * de-listed article URL to the hub with a permanent redirect so existing
+   * links keep their equity instead of becoming soft 404s.
+   */
+  async redirects() {
+    const articlesDir = path.join(__dirname, "src", "content", "articles");
+    return readdirSync(articlesDir)
+      .filter((file) => file.endsWith(".mdx"))
+      .map((file) => file.replace(/\.mdx$/, ""))
+      .filter((slug) => !CURATED_SLUG_SET.has(slug))
+      .map((slug) => ({
+        source: `/articles/${slug}`,
+        destination: "/articles",
+        permanent: true,
+      }));
+  },
 };
 
 const withMDX = createMDX({

@@ -16,6 +16,7 @@ type Props = { params: Promise<{ category: string }> };
  */
 export const instant = false;
 
+
 export async function generateStaticParams() {
   const categories = await getArticleCategories();
   return categories.map((category) => ({ category: categorySlug(category) }));

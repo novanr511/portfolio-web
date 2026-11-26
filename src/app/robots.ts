@@ -2,27 +2,36 @@ import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
 
 /**
- * Deliberately permissive: search crawlers AND AI answer-engine crawlers
- * (GEO). New AI agents get crawled by the generic rule automatically.
+ * Separate answer-surface crawlers from model-training crawlers.
+ *
+ * OAI-SearchBot, ChatGPT-User, Claude-SearchBot and PerplexityBot power
+ * answer engines that can cite a page, so they are allowed.
+ *
+ * GPTBot, ClaudeBot, CCBot, Google-Extended and Applebot-Extended are
+ * training/data-collection crawlers. Allowing them gives no search or
+ * citation benefit, so they are blocked.
  */
 export default function robots(): MetadataRoute.Robots {
-  const aiUserAgents = [
-    "GPTBot", // OpenAI training
-    "OAI-SearchBot", // ChatGPT Search
-    "ChatGPT-User", // user-triggered ChatGPT browsing
-    "ClaudeBot", // Anthropic training
-    "Claude-User", // user-triggered Claude browsing
-    "Claude-SearchBot", // Claude search
-    "PerplexityBot", // Perplexity answer engine
-    "Google-Extended", // Gemini grounding
-    "Applebot-Extended", // Apple Intelligence
-    "CCBot", // Common Crawl (feeds many engines)
+  const trainingCrawlers = [
+    "GPTBot",
+    "ClaudeBot",
+    "CCBot",
+    "Google-Extended",
+    "Applebot-Extended",
+  ];
+
+  const answerCrawlers = [
+    "OAI-SearchBot",
+    "ChatGPT-User",
+    "Claude-SearchBot",
+    "PerplexityBot",
   ];
 
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
-      { userAgent: aiUserAgents, allow: "/" },
+      { userAgent: trainingCrawlers, disallow: "/" },
+      { userAgent: answerCrawlers, allow: "/", disallow: "/keystatic" },
+      { userAgent: "*", allow: "/", disallow: "/keystatic" },
     ],
     sitemap: `${site.url}/sitemap.xml`,
     host: site.url,

@@ -1,0 +1,69 @@
+---
+title: "Tool Calling Reliability Under Retries"
+description: "A retry is safe only when a repeated tool call leaves a single effect; idempotency keys, call logs, and a decision rule decide which calls may be replayed."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Machine Learning
+  - Evaluation
+  - RAG
+---
+
+Retry policy is a decision about which side effects may legally happen twice: the RAG research agent's `number_audit` recorded 193 checks with zero failures when read on 18 November 2026 — a consistency result, not a validity result — while Anthropic's [tool use overview](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview) places execution of client tools, and therefore any duplicate execution, squarely in your application.
+
+The model proposes a call; your code performs it. That split is why a perfectly reasonable retry at the transport layer can become two refunds, two emails, or two rows in a database. The decision has to be made before the incident, while you can still name which calls are replayable. This article stays on that narrow question; the wider taxonomy of tool failures is covered in [Tool Calling Reliability: When Function Calls Fail in Agent Systems](/articles/tool-calling-reliability-when-function-calls-fail-in-agent-systems).
+
+## What does a retry actually repeat?
+
+A retry repeats the request, not just the intention behind it. Anthropic returns `tool_use` blocks for client tools and your application returns `tool_result`; OpenAI ties each output back with a `call_id`. Re-sending either shape runs your handler again. Whether that produces a second effect depends on the handler, not on the model.
+
+Anthropic's documentation makes the division explicit: with client tools, Claude responds with a `tool_use` block, your code runs the operation, and a second request carries the result back as `tool_result`. OpenAI's five-step flow has the same shape, with `call_id` linking the emitted call to its output. Neither protocol executes the side effect for you; both leave repetition to the code that owns the operation. A second request after a timeout can therefore replay the handler even when the first attempt completed its work and only the acknowledgement was lost.
+
+## Which calls are safe to retry?
+
+A call is safe to retry when repeating it leaves the same intended state. RFC 9110 (June 2022) names PUT, DELETE, and safe methods idempotent, defining the property by effect rather than by response text. Read-only retrieval, a status lookup, or a method-preserving 308 hop qualifies; a charge, a send, or a refund does not.
+
+The RFC is careful about scope. Idempotency describes what was requested, so a server may still log every attempt or retain a revision history. "Safe to retry" is a statement about intended effect, not a promise that the log looks identical. The same section says a client may retry automatically when a connection fails before the response is read, and should not retry a non-idempotent method unless it knows the semantics are idempotent by design or can detect that the original was never applied. The real www-to-apex 308 capture in the TLS case fits the repeatable side: a permanent, method-preserving redirect observed as HTTP/2 308 with a `location: https://novandri.com/` header. That certifies the routing hop alone; a POST forwarded through it is still a POST.
+
+## When does a retry duplicate an action?
+
+Duplication happens when the effect lives outside the returned result: an email sent, a payment captured, a row inserted. OpenAI's own function-calling examples include `send_email`, and its notes flag that one snapshot can emit several calls to the same tool when parallel calls are enabled. A uniform retry loop multiplies both.
+
+OpenAI recommends `parallel_tool_calls: false` to force zero or one call per turn, and notes a `gpt-4.1-nano` snapshot that can issue multiple calls to one tool with parallel calls enabled (source-reported, docs read 24 November 2026). Anthropic exposes `disable_parallel_tool_use` for the same reason. These are knobs on call generation; none makes a handler idempotent. The dangerous combination is a non-idempotent handler plus a generic retry wrapper that cannot tell "the call failed before execution" from "the call succeeded and the acknowledgement vanished". From outside, both look like an exception. The only reliable discriminator is state recorded by the handler itself.
+
+## What does an idempotency key buy?
+
+An idempotency key lets the receiver collapse repeated attempts into one operation. Stripe documents a client-generated key that returns the saved response on retry, including saved 500 errors; it suggests V4 UUIDs, caps keys at 255 characters, and lets API v1 results age out after 24 hours. The caller must know the key before calling.
+
+Three details matter more than the header name. The key is generated before the request, so the identity of the operation has to be known in advance — an order ID from your own state, not a value the model improvises. OpenAI's guidance makes the same point in different words: do not make the model fill arguments you already know; pass the `order_id` in code. Stripe compares incoming parameters with the original request and errors on a mismatch, so a key cannot be reused for a different payload. Persistence is bounded too: for API v1, keys can be pruned once at least 24 hours old, after which a reused key starts a new request. A key is a contract with a lifetime, not a permanent guarantee.
+
+## How do you decide before reading the logs?
+
+Decide from the effect, not from the error. Classify each tool as read-only, state-changing-but-deduplicable, or irreversible. Then attach a replay rule to each class: automatic for the first, keyed for the second, a human halt for the third. Write that map before an incident, because logs arrive after the decision you are trying to make.
+
+The ordering is the whole point. A retry policy written after an outage tends to be tuned to the loudest error, which is how a fix for a timeout becomes a mechanism for duplicate charges. Start by listing the tools that can change state and naming the unit of effect for each — one email, one refund, one row. Then ask what identifier survives a lost response. If the handler has no such identifier, the call has no safe automatic retry yet, whatever the status code says. The rule must also separate two questions that get merged in practice: retrying the model request, and replaying the side effect. A fresh model turn that preserves the prior `tool_use` and `tool_result` may be harmless; re-executing the handler is the part that needs permission.
+
+## What did the audit actually establish?
+
+The RAG agent's audit established provenance, not retry safety: 193 checks with zero failures and 55 tests passed with one skipped when the build log was read on 18 November 2026. It verified that figures in a memo appeared in retrieved artifacts. It says nothing about whether a repeated call produced a duplicate effect.
+
+Keeping those claims apart is easy to state and easy to lose. The same program's headline number is a negative result: at day 25 a walk-forward model reached 92.5% accuracy across 133 out-of-sample months, while a zero-parameter rule reached 94.0%, with Holm-adjusted p-values of 1.0. The [BTC monthly study](/projects/btc-monthly-ml) explicitly declines to claim tradability from that comparison. A green provenance check does not turn those figures into an edge, and it does not tell you what happened when a tool call was retried. For the separation of provenance signals from run-level verdicts, see [Agent Evaluation Examples](/articles/agent-evaluation-examples). The audit is one signal in a trajectory; the retry decision belongs to the boundary around it.
+
+## What should a retry-safe call log contain?
+
+A log needs enough state to answer one question later: did the effect happen once? Record the tool name, arguments, the call or tool-use identifier, the idempotency key, attempt number, outcome, and timestamp. A transcript of model turns shows intent; only handler-side state can show whether the action was applied and deduplicated.
+
+Anthropic's `tool_use` identifiers and OpenAI's `call_id` give a stable handle on the model side of the exchange. Carry that handle into the handler's own record so the two sides can be joined after a failure. The attempt number matters because a keyed retry should return the saved result rather than execute again; two executions under one key mean the deduplication contract is broken, and the fix belongs in storage rather than in a prompt. This is where a recovery list becomes checkable instead of aspirational: replay the exact call, re-validate the arguments, confirm the key, and inspect the recorded outcome before accepting the result.
+
+## Where does a retry policy stop?
+
+A retry policy cannot make a call correct, only bounded. A well-deduplicated request can still serve the wrong goal, and a handler with a valid key can still act on poisoned input. Irreversible steps need a person at the boundary; whether these rules changed duplicate rates in my own systems was not measured.
+
+That limit is not an argument for skipping the policy. It is an argument for stating its reach. The rules here cover repetition: which effects may be replayed, what identifier collapses attempts, and what the log must show. They do not decide permissions, data freshness, or the economics of calling a model at all. Those are separate decisions with their own evidence. A defensible position is modest: log the trajectory, classify the effect before the incident, give deduplicable calls a key with a stated lifetime, and keep a human halt where a repeat would be costly. Then report exactly what the checks cover, and attach the validity caveat whenever a green result is shown.
+
+## References & Further Reading
+
+- IETF, 2022. [RFC 9110 §9.2.2 — Idempotent Methods](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2) — idempotency defined by intended effect, and the conditions for automatic retry.
+- Anthropic, docs read 24 November 2026. [Tool use with Claude](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview) — client tools, the `tool_use`/`tool_result` round trip, strict schemas, and per-model tool token counts.
+- OpenAI, docs read 24 November 2026. [Function calling](https://platform.openai.com/docs/guides/function-calling) — the five-step loop, `call_id`, parallel-call guidance, and passing known IDs in code.
+- Stripe, docs read 24 November 2026. [Idempotent requests](https://docs.stripe.com/api/idempotent_requests) — client-generated keys, saved responses, parameter comparison, and key lifetime.

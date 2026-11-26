@@ -1,0 +1,76 @@
+---
+title: "When Retrieval Groundedness Checks Fail"
+description: "Groundedness checks confirm that prose matches retrieved files. The BTC agent's 193 passing checks show why agreement can coexist with a wrong answer."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - RAG
+  - Evaluation
+  - Machine Learning
+---
+
+A groundedness check that passes can sit beside a wrong answer. It establishes one relation: the sentence you wrote is supported by the text the retriever returned. It says nothing about whether that text is true, current or complete. A retrieval agent built for a monthly Bitcoin study makes the gap concrete. It fetched the artifact holding each figure before writing a memo, then a `number_audit` compared every percentage in the draft against the retrieved context. The published run recorded 193 checks with no failures and 55 tests passed with one skipped, figures read on 18 November 2026 and source-reported from the [reproduction package](https://github.com/novanr511/btc-monthly-close-prediction). The agent would have reproduced a misleading comparison as faithfully as a correct one, because both were strings in its index. [Ragas](https://arxiv.org/abs/2309.15217) separates retrieval quality, faithful use of context and generation quality; [RAGTruth](https://arxiv.org/abs/2401.00396) supplies a corpus of unsupported RAG claims. The two relations, prose against artifact and artifact against world, are different jobs.
+
+## What does a passing groundedness check establish?
+
+It establishes local agreement between a generated statement and the context supplied to the model. A check of that kind asks whether the claim can be traced to retrieved text, not whether that text describes the world correctly. Passing it rules out one error: a sentence with no support in the context it cites.
+
+A faithfulness score is a claim about a pipeline stage, not a fact. Ragas treats context relevance, faithfulness and answer relevance as separate dimensions because a strong result on one does not deliver the others. A retriever can return an irrelevant passage, the generator can summarise it faithfully, and the answer still miss the question. At the file level, an audit that reconciles a memo with its sources verifies transcription.
+
+The TLS failure on this site is a smaller example of the same shape. A certificate was valid for the apex name and inside its validity window, yet the `www` request stopped with curl error 60 because the Subject Alternative Name omitted that hostname. Checks passed at the layer they were designed for, and the request still failed. The diagnosis in [HTTPS, TLS and SEO](/articles/https-tls-and-seo-diagnose-certificates-and-redirects) starts by naming the layer being tested. Groundedness deserves the same discipline; for the retrieval mechanics, see [RAG Explained](/articles/rag-explained).
+
+## Why can prose match an artifact and still be wrong?
+
+Because the artifact is the reference, not the world. If a file contains a wrong figure, a stale date or a misleading comparison, a faithful sentence repeats that error with clean provenance. The check then makes the mistake harder to see, since a green result reads like independent verification when it is only a consistency result.
+
+Nothing in the agent's design compared its outputs with anything outside the project. A draft quoting the pipeline's numbers exactly was accepted; one quoting a corrected external figure would have been flagged. That is right behaviour for narrative fidelity and wrong behaviour for a tool someone mistakes for a fact-checker. The two uses look identical on a dashboard.
+
+Accuracy against an external record was not measured in that run, and none is claimed here. What was measured, and reported by the study, is agreement inside a document system. Keeping those sentences separate is the whole discipline. A reviewer who reads "193 checks, 0 failed" and concludes "the analysis is sound" has made an inference the check cannot support, whatever the colour of the indicator.
+
+## What did the number_audit in the Bitcoin agent actually verify?
+
+It verified that each percentage in a generated memo could be matched to retrieved context. The wider pipeline audit ran 193 checks comparing dashboard and report numbers with pipeline files; all passed on the day the figures were read, 18 November 2026. Both are source-reported results about agreement, and both are first-hand artifacts from the study.
+
+The build log records lexical retrieval with BM25 and TF-IDF fused by reciprocal rank fusion, a LangGraph question-answering flow, SQLite checkpoints and a run registry. Lexical matching was deliberate: the audit needed the exact string, not a plausible paraphrase. A number absent from the returned text was flagged before the memo was persisted. The accompanying test suite result is 55 passed with one skipped, source-reported on the same date. The [build log](/projects/rag-research-agent) and the [study](/projects/btc-monthly-ml) keep design decisions and results in separate sections, which is why the boundary is visible. The agent's role in scoring a path rather than a final answer is developed in [Agent Evaluation Examples](/articles/agent-evaluation-examples).
+
+The limit is structural, not a bug for a later version. The audit can only compare a draft with what the index holds. If the index holds a defensible but mistaken comparison, fidelity distributes that mistake more smoothly.
+
+## How can a restrained corpus change what retrieval returns?
+
+Retrieval returns what the index contains. On 22 November 2026 an archive of 1,004 templated articles was reduced to a curated set behind an allowlist, a decision with traffic outcomes unmeasured. A retriever aimed at the earlier archive would have found fluent, self-consistent prose. Fluency and agreement are easy to generate; an evidence trail is scarce.
+
+The [curation case study](/projects/seo-content-curation) records why the archive was a problem: most of it had been generated in a three-day window, and the taxonomy described the generator. None of that is a traffic finding, and no traffic outcome was measured before or after. A groundedness check over that corpus would have been technically successful: sentences would match passages, passages would match other passages, and the structure would agree with itself.
+
+That is the upstream decision in plain view. A retriever cannot invent an evidence standard that the collection lacks. Curating the index, keeping an owner and a date on each source, and defaulting to exclusion are corpus decisions made before any answer is generated. They determine what "grounded" means in practice. Treating groundedness as a model setting skips the part that decides which documents count as ground.
+
+## Can retrieval succeed and the answer still miss the evidence?
+
+Yes. A retriever can return the right passage and place it where the model underuses it. "Lost in the Middle" reports that performance on multi-document question answering and key-value retrieval degrades when relevant information sits in the middle of a long context. The support is present, the citation looks clean, and the answer can still go wrong.
+
+Liu and colleagues moved the position of relevant information in long inputs. Performance was often highest when evidence appeared at the beginning or end of the context and degraded in the middle, including for models described as long-context. A support check scanning the whole context can pass because the string is there. A generation check asking whether the answer used the string tells a different story. Ragas separates faithful use from context relevance for a similar reason.
+
+RAGTruth makes the complementary point from the output side. Its corpus contains naturally generated RAG responses with unsupported and contradictory claims annotated at the word level, showing that retrieval alone does not eliminate unsupported text. A grounded answer needs both a usable passage and a model that uses it; a single green check can certify either half while the other half fails.
+
+## What checks reach beyond agreement between text and file?
+
+Add checks that leave the document system: verify a source against an independent record, date the artifact, name its owner, and sample the claims that produced no flag. NIST's AI RMF treats measurement as one function inside govern, map and manage. A green internal check becomes one signal in that cycle rather than a verdict on truth.
+
+Independent corroboration is the obvious step and the one most often skipped. If a memo reports a percentage that matters, the check that finds it in a retrieved file answers "where did this come from?" A second check against a source outside that pipeline answers "is this still right?" Those questions have different failure modes and owners. The first can be automated cheaply; the second usually needs a named person and a date.
+
+Sampling the clean bucket matters just as much. An audit of flagged claims examines cases the system already worried about. The expensive failure is the assertion that passed without a flag because the source was wrong. A small review of unflagged claims, with the original open, finds that error class. None of this turns a consistency check into a truth check. It puts the check in a system where a person owns the part it cannot see, the position taken in [Generative AI Security Checklist](/articles/generative-ai-security-checklist) for generated text flowing into a decision.
+
+## What is the decision test before trusting a green check?
+
+Ask four questions in order: what relation did the check test, which artifact was the reference, what a wrong artifact would look like, and who inspects the unflagged cases. If the last answer is nobody, the check measures transcription fidelity only. Record that scope in the same place you record the score.
+
+The questions are cheap before a pilot and awkward after one. Write the reference for each claim in the system's own terms: "this number was checked against file X on date Y." Then say separately whether file X was checked against anything beyond itself. Keep the statements apart, the way the study reports 193 passing consistency checks alongside a result whose validity remains a claim about a method, not a proven edge.
+
+This evidence does not establish a general accuracy rate for retrieval agents, and it does not establish that the Bitcoin comparison was the right comparison to make. It establishes that a tool can be faithful to its inputs and that its inputs decide the ceiling on what it can report. The transferable decision is to curate the corpus, keep provenance with each number, corroborate outside the pipeline and label the green check for what it is: agreement between prose and artifact, with the question of agreement between artifact and world left open.
+
+## References & Further Reading
+
+- Shahul Es, Jithin James, Luis Espinosa-Anke and Steven Schockaert, 2023. [Ragas: Automated Evaluation of Retrieval Augmented Generation](https://arxiv.org/abs/2309.15217) — separates context relevance, faithfulness and answer relevance in RAG evaluation.
+- Cheng Niu et al., 2023. [RAGTruth: A Hallucination Corpus for Developing Trustworthy Retrieval-Augmented Language Models](https://arxiv.org/abs/2401.00396) — annotated unsupported and contradictory claims in generated RAG responses.
+- Nelson F. Liu et al., 2024. [Lost in the Middle: How Language Models Use Long Contexts](https://aclanthology.org/2024.tacl-1.9/) — position sensitivity in multi-document QA and key-value retrieval.
+- NIST, 2023. [AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) — govern, map, measure and manage as a lifecycle for trustworthiness.
+- novanr511, 2026. [btc-monthly-close-prediction repository](https://github.com/novanr511/btc-monthly-close-prediction) — reproduction package with the retrieval agent, `number_audit` and the dated consistency-audit figures.

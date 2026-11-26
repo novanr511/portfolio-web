@@ -1,0 +1,83 @@
+---
+title: "Robots Directives vs Access Control"
+description: "robots.txt expresses a crawler request; authority stays with the server. Read RFC 9309, compare three policy groups with the served file, and verify status on 22 November 2026."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - Crawlability
+---
+
+robots.txt is a request a crawler may choose to obey; access control is a decision the server enforces. On 22 November 2026 the policy source `src/app/robots.ts` declared three groups — training crawlers blocked from `/`, answer crawlers allowed with `/keystatic` excluded, and `*` allowed with the same exclusion — and a live check returned HTTP/2 200 for `/robots.txt`. RFC 9309 states the boundary plainly in its [introduction](https://www.rfc-editor.org/rfc/rfc9309.html#section-1): "These rules are not a form of access authorization." Google's [robots.txt introduction](https://developers.google.com/search/docs/crawling-indexing/robots/intro) adds that the file cannot enforce crawler behaviour. The distinction decides where a real boundary belongs.
+
+## What separates a directive from access control?
+
+A directive is text a compliant crawler interprets before it fetches a path. Access control is an enforcement point the server owns: credentials, a status code, or a network rule that decides whether bytes leave at all. RFC 9309 calls robots.txt rules a request, explicitly unlike an authorization check.
+
+The standard is blunt about the consequence in its [security section](https://www.rfc-editor.org/rfc/rfc9309.html#section-3): the protocol is a poor substitute for real content security, and listing a path in robots.txt makes that path publicly discoverable. When access matters, it points to application-layer measures such as HTTP Authentication. Google gives the same advice in operational language: password-protect the page, or use `noindex` if the goal is to keep a URL out of search results.
+
+A directive shapes the behaviour of well-behaved clients; an access-control layer changes what the server does for any client. They can coexist, but one does not substitute for the other. Confusing them produces a rule that reads reassuringly in a repository while the resource stays reachable.
+
+## What does a three-group robots policy actually say?
+
+It separates intent by crawler purpose. In the source policy dated 22 November 2026, five training agents get `Disallow: /`; four answer-surface agents get `Allow: /` with `/keystatic` excluded; `*` gets the same exclusion. A served-file check that day returned HTTP/2 200, which confirms delivery, not the group structure.
+
+The named agents come from the policy file itself, source-reported with that date: GPTBot, ClaudeBot, CCBot, Google-Extended and Applebot-Extended form the training group; OAI-SearchBot, ChatGPT-User, Claude-SearchBot and PerplexityBot form the answer-surface group. The counts of five and four are DERIVED by counting those lists. The split expresses a judgment about purpose — one class collects material for models, the other builds indexes that can cite a page — and that judgment is explained in [AI Crawlers Are Not Googlebot](/articles/ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control).
+
+A 200 response tells you the endpoint answered; it tells you nothing about how the rules were grouped. Consecutive user-agent lines form one group under RFC 9309, so a file with the right tokens in the wrong arrangement expresses a different policy from the source. The served bytes are the artifact to inspect. No log-based analysis of which crawlers honoured the groups was run for that 22 November 2026 check, so compliance was not measured; the only observation was the status line.
+
+## Can a Disallow rule keep a path private?
+
+No. A disallowed path stays reachable by anyone who knows the URL, and listing it in robots.txt makes it discoverable. RFC 9309 recommends application-layer security such as HTTP Authentication when access really matters; a directive only shapes the behaviour of crawlers that choose to honour it.
+
+The `/keystatic` exclusion in the case study illustrates the gap. The policy disallows the path for answer-surface crawlers and for `*`; it does not, by itself, reject a browser request or an uninvited client that ignores the file. No credential check against that path was performed during the 22 November 2026 verification, so its real protection was not measured and should not be assumed from the presence of a `Disallow` line.
+
+If a path must stay private, put a gate in front of it: authentication at the application layer, an edge rule, or a network control that returns an explicit rejection. Accept that the path name then appears in a public file. If secrecy of the path name itself matters, avoid advertising it at all and enforce at the server; a directive is the wrong tool for that job.
+
+## Why does blocking a fetch leave a URL in search results?
+
+Crawling and indexing are separate stages. A crawler that stops at robots.txt never receives a `noindex` on that page, so a linked URL can persist with a bare title and no description. This is a sequencing failure, evidence that the directive controls acquisition rather than authority over the index.
+
+Google describes exactly this outcome in its [robots.txt introduction](https://developers.google.com/search/docs/crawling-indexing/robots/intro): a blocked page can still appear if other pages point to it, with the URL and possibly anchor text but without a description. The fix, when removal is the goal, is to allow the fetch and serve a `noindex` directive, or to return 404 or 410 for a resource that is genuinely gone. Those mechanisms and their precedence are compared in [Robots.txt vs Noindex vs Sitemap](/articles/robots-txt-vs-noindex-vs-sitemap).
+
+The point for this discussion is narrower. A directive decides whether a crawler may acquire bytes; it does not decide what the index does with a URL already known through other links. Treating a `Disallow` as a deletion command conflates a request with an authority the site owner does not hold.
+
+## What happens when a crawler ignores the directive?
+
+Nothing in the protocol punishes it. Google states that robots.txt rules cannot enforce behaviour and that other crawlers may ignore them; user-triggered fetchers generally act on a person's request. The response available to a site owner is at the server: rate limits, authentication, edge rules, or simply serving the page.
+
+RFC 9309 also defines what a crawler should do when the file itself fails. A 4xx response means the file is unavailable and the crawler MAY access any resource; a 5xx or network failure means it is unreachable and the crawler MUST assume complete disallow. Those are source-reported rules from the September 2022 standard, not observations of a particular deployment. A crawler MAY cache a fetched copy and SHOULD NOT reuse it for more than 24 hours unless the file is unreachable.
+
+Those rules describe client behaviour, not server authority. A site cannot force compliance through robots.txt, but it can decide what a non-compliant request receives; the enforcement question therefore returns to the server. For the byte-level algorithm a crawler uses to choose a group, see [Robots.txt Is a Parsing Specification](/articles/robots-txt-is-a-parsing-specification-the-rules-your-crawler-follows).
+
+## Which evidence shows the policy was honoured?
+
+Fetch the served file and inspect its bytes, then check server logs for requests to paths you disallowed. A 200 status alone proves only that robots.txt was delivered. On the 22 November 2026 check the observed fact was HTTP/2 200; no log-based compliance analysis was run for that change.
+
+Server logs are the signal a site owner actually controls: a documented user-agent string requesting a disallowed path is direct evidence that the directive was ignored, while an absence of such requests is weaker because crawlers may simply never have discovered the URL. Search Console reports describe the indexed state, which answers a different question from crawl compliance. Neither instrument turns the directive into enforcement; they tell you how the request was received.
+
+The disciplined order is to verify delivery, then parse the served bytes into groups, then examine requests, then check index state. Starting at the index state invites the wrong conclusion, because a URL can be indexed for reasons unrelated to the rule. A practical diagnostic workflow is collected in [Google Search Console for Technical SEO](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow), and the fetch-side mechanics in [How Crawlers Actually Fetch Pages](/articles/how-crawlers-actually-fetch-pages-protocol-limits-and-caching).
+
+## How should a robots.txt change be governed?
+
+Treat it as a policy artifact with an owner, a reason and a date. Check the generated source, then fetch the served file and apply the group rules to its bytes. Wait past the cache window before judging effect, because crawlers may reuse a copy for up to 24 hours after a successful fetch.
+
+The 24-hour figure is source-reported from RFC 9309 section 2.4, published September 2022; it is the maximum a crawler SHOULD reuse a cached copy, not a promise that every crawler waits exactly that long. A correction deployed at noon may therefore be applied by different clients at different times, and a quick rollback can leave a confusing mixture of old and new rules in the wild. Judgement about a change should wait beyond that window.
+
+Keep the file small and stable, and re-check it after each deployment rather than trusting the template. Compare the served groups with the intended policy every time, because generated files are edited by several hands and group-merging errors are easy to introduce. The first-hand case here — a three-group source policy checked against a served endpoint that returned HTTP/2 200 — is a reminder that delivery and intent are separate facts requiring separate checks.
+
+## When do I need real access control instead?
+
+Use it when the content must stay private: staging areas, client files, admin panels, credential stores. Put authentication or an edge rule in front of the path and return 401 or 403. A robots.txt line advertises the path while asking politely; that is the wrong instrument for secrecy.
+
+The decision rule is short. Manage crawler traffic with a directive, because that is what the protocol expresses. Remove a public page from results with `noindex`, `404` or `410`, because that acts at the indexing stage described in [Google's noindex guide](https://developers.google.com/search/docs/crawling-indexing/block-indexing). Guard confidential bytes with authentication or a network control, because that changes what the server will do for an uninvited request.
+
+A directive has a real and useful job — reducing wasted fetches and stating the owner's crawling preference — but its authority ends where the crawler's willingness ends. Anything that must hold against a client that ignores the file belongs on the server, where the decision can be enforced.
+
+## References & Further Reading
+
+- IETF, [RFC 9309 — Robots Exclusion Protocol, section 1](https://www.rfc-editor.org/rfc/rfc9309.html#section-1). Published September 2022; source for the statement that the rules are requested of crawlers and are not a form of access authorization.
+- IETF, [RFC 9309 — Security Considerations](https://www.rfc-editor.org/rfc/rfc9309.html#section-3). Source for the warning that the protocol is not a substitute for content security, that listed paths become discoverable, and that HTTP Authentication is an appropriate application-layer measure.
+- IETF, [RFC 9309 — Caching](https://www.rfc-editor.org/rfc/rfc9309.html#section-2.4). Source for the 24-hour cache reuse guidance; the 4xx/5xx availability asymmetry is specified in section 2.3.1 of the same document.
+- Google Search Central, [Introduction to robots.txt](https://developers.google.com/search/docs/crawling-indexing/robots/intro). Source for the limits of the file: rules cannot enforce crawler behaviour, a disallowed URL can still be indexed when linked, and password protection is the alternative for private content.
+- Google Search Central, [Block Search indexing with noindex](https://developers.google.com/search/docs/crawling-indexing/block-indexing). Source for the crawlability requirement of `noindex` and the meta-tag versus header distinction.

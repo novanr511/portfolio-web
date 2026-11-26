@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Inter, Instrument_Serif } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { ConsentBanner } from "@/components/consent-banner";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -71,8 +72,21 @@ export const viewport: Viewport = {
  */
 const themeInitScript = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`;
 
+/**
+ * Consent Mode v2: the default state is pushed before GTM processes the
+ * dataLayer, so no analytics or advertising storage is written until the
+ * visitor opts in (the banner later pushes a `consent`/`update` message).
+ * Kept as the first `afterInteractive` script so it runs before gtm.js.
+ */
 const gtmInitScript = `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
+function gtag(){window.dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  'ad_storage': 'denied',
+  'analytics_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'wait_for_update': 500
+});
 gtag('js', new Date());`;
 
 /** Site-wide WebSite identity so Google uses our name instead of the host label. */
@@ -132,6 +146,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <ConsentBanner />
       </body>
     </html>
   );

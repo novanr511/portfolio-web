@@ -1,0 +1,95 @@
+---
+title: "Why I killed 966 articles"
+description: "A first-hand account of retiring almost all of a 1,004-article site: the self-referential tell, why internal links are not corroboration, what I lost, and what replaced it."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - AI Search
+  - Evaluation
+  - Crawlability
+  - Career
+---
+
+I published 944 articles in three days. Not for a client, not as part of a commissioned content plan — on my own site, novandri.com. By the time the batch finished, the site held **1,004 articles** and **1,287,042 words**. By the time I was done with it, roughly **34** were left.
+
+This is the story of that decision, by the person who made it. It is not a general argument about AI content. I did not measure traffic before or after; I have no ranking chart, no impressions graph, no AI-citation count. What I have is a set of things I observed in the files, a specific tell that made the corpus feel wrong, and a decision I can explain without dressing it up as a result.
+
+## The three-day publish burst
+
+The date range is 16–18 November 2026. Nine hundred and forty-four articles went live across those three days. That fact is visible in the repository with no analytics required.
+
+A site that publishes nearly a thousand pieces in seventy-two hours is emptying a queue, not responding to demand. I had built a generation pipeline, pointed it at a topic map, and let it fill the site. From a distance: a sitemap with a thousand URLs, a tag cloud, an impressive word count. Up close, it was a fast way to turn a topic list into a million words no one had asked for.
+
+**1,287,042 words** is a number designed to impress. It also describes almost nothing about usefulness. I know how many words I published because it is trivial to count; I do not know how many people read them, because I had set up nothing capable of telling me. That asymmetry — total visibility into output, zero into outcome — should have been the warning. It took longer than it should have.
+
+## The tell: "as the earlier article warns"
+
+The moment the site stopped feeling like a portfolio and started feeling like a machine was reading one of its own articles and noticing a sentence I had seen before.
+
+An article would make a claim and support it with a phrase like *"as the earlier article on this topic warns"* — except the "earlier article" was another piece from the same batch, from the same outline, with no more evidence behind it. A generated article citing a sibling as an authority. A closed loop wearing the costume of a literature review.
+
+Once I saw it, I saw it everywhere. A piece would hedge with "experts note that" and restate what the previous piece had asserted. A paragraph would refer to "the research" without naming research. Cross-references pointed sideways into the same corpus, creating the texture of corroboration — a link, a citation-shaped phrase — while the chain of evidence led nowhere.
+
+That is the tell: **self-referential authority**. Not a misspelling or repetition — those are easy to spot and fix. It is the structural imitation of a source: text that has learned what a supported claim *looks* like and produces the appearance without the thing underneath. On a small scale, a quirky error. At a thousand-article scale, the site's entire epistemics.
+
+To be precise: I am not saying every AI-assisted article is bad. I am saying that a corpus assembled this way had no mechanism for distinguishing a claim from a claim-shaped string — and I could not put my name on the result.
+
+## Internal links are not corroboration
+
+The self-referential pattern worked as well as it did because of a misconception I had absorbed from years of technical SEO work: links are signals of structure, and structure is a proxy for quality.
+
+That is true of a search index in a limited, mechanical sense. It is not true as a reasoning principle. If article A says "X is true" and article B says "as article A explains, X is true," you have one claim and one pointer. A link tells a crawler that pages relate; it does not tell a reader the claim survived contact with reality. Two generated pages agreeing because they share an outline are the same observation twice.
+
+This was the mistake I had to unlearn, because it is easy to make in SEO. We are trained to see internal linking as a tool: distribute authority, flatten architecture, guide crawlers. All of that is real, but it measures **relationships between pages**, not **between claims and evidence**. When the pages are empty, distributing authority moves an empty quantity around.
+
+The AI-facing files made it worse. `llms.txt` had grown to about **1,034 lines** — a catalogue listing everything and foregrounding nothing. `llms-full.txt` was about **7 MB**, generated on every request with no `Cache-Control` header. Both are lists of the same corpus. A larger list of pages that cite each other does not create evidence; it scales the illusion.
+
+The taxonomy told the same story. There were **810 tags**, of which **501 belonged to a single article**. More than half the tag system was singletons — labels generated per piece rather than categories a reader would navigate. There were also **21 colliding category slugs**: different categories resolving to the same URL token, which is an ambiguity in the site's own routing. I had optimised the shape of a huge site without ever asking whether the shape described anything a person wanted.
+
+## What the archive actually was
+
+The change was unglamorous: an **allowlist filter**. An article is either on the short list of pieces rewritten against real evidence, or it is not published. The default flipped. Before, anything generated was live unless removed; after, nothing is live unless it earns an entry.
+
+Thirty-three articles were rewritten with first-hand detail and verifiable claims. The rest were archived. The live set is now roughly **34 articles**, with around **10 tags** and no colliding slugs in the curated set. The `llms.txt` is generated from that smaller set, and the 7 MB per-request file is no longer produced from the full archive.
+
+Every one of those numbers is a property of the site, not an outcome. I cannot say the archive improved crawl efficiency or AI visibility, because I did not measure either. I can say the site is smaller, the taxonomy is coherent, and I can read the whole `llms.txt` in a minute. Modest facts, kept in the modest column.
+
+## What I sacrificed
+
+I sacrificed the appearance of authority by volume. A thousand-article site looks substantial; in a portfolio review, a four-digit sitemap does work that thirty-four URLs cannot. I gave that up knowingly.
+
+I also gave up the benefit of the doubt on long-tail coverage. Some removed pages targeted narrow queries that may have had a small, genuine audience; I did not measure which, if any, earned traffic. I will not call them worthless — I have no evidence for that either. But with no way to separate useful pages from noise, keeping everything is not neutral. It lets the generator decide for you.
+
+There was a personal cost too. When the audience expects proof, every remaining article has to carry its weight; there is no hiding in the long tail. The 33 rewritten pieces and case studies have to be inspected, and I have to be comfortable with what an inspector finds. That is more demanding than publishing a thousand pages and hoping.
+
+## What replaced it
+
+Proof did.
+
+The rewritten articles are the ones where I could point at something: a file, a measured number, a test result, a repository. The rest of the load-bearing evidence on this site is in long-form case studies. The [BTC monthly study](/projects/btc-monthly-ml) documents 133 out-of-sample months and, more importantly, the result that the machine lost to a zero-parameter rule `sign(mtd_ret)` — 92.5% versus 94.0% at D25, with a Holm-adjusted *p*-value of 1.0. The [Maison WordPress theme](/projects/maison-wordpress-theme) has a live demo running straight from the repository. The [RAG research agent](/projects/rag-research-agent) is written up as a build log that says plainly what its `number_audit` could and could not establish. The [curation decision itself](/projects/seo-content-curation) is documented as a migration with an explicit "no traffic outcome measured" row.
+
+The thing these have in common is not length or polish. It is that each one separates a design decision from a measured result. A design decision is something I chose — lexical retrieval, an allowlist, a graph instead of a chain. A measured result is something that happened and can be checked — 0 failed checks in the 193-check audit, 55 tests passed and 1 skipped, ~29 MB of theme images converted to about 500 KB of WebP. Conflating the two is how you end up with a self-referential article citing a sibling as an authority. That is the argument of this publication's standard: experience shown in the work, not asserted in a bio. I would rather write less and keep the boundary visible.
+
+## What I still cannot claim
+
+No traffic outcome was measured, before or after. No ranking improvement is claimed. No AI-citation lift is claimed. I did not run a GEO experiment with a control group, and I did not measure whether the shorter `llms.txt` changes anything for answer engines. The [evidence about those file formats](https://novandri.com/articles/llms-txt-robots-txt-and-ietf-drafts-sorting-ai-file-formats-by-evidence) is thinner than most of the marketing around it, and my own site is not a study that settles it.
+
+I also cannot claim the 966 removed articles were wrong about their topics. I can claim they were unsupported in a specific way — that they used the shape of a source without the source — and that I was not willing to attach my name to that shape at scale. That is a judgement about my standards, not a verdict on every sentence in the archive.
+
+## Why I'm writing this down
+
+The easily tellable version is "I grew a site to a thousand articles, then used AI to clean it up" — smoother, and unhelpful. The useful version is awkward: I built a machine that produced a million words, could not tell which mattered, and the most concrete improvement I can demonstrate is that I stopped publishing most of them and wrote down how.
+
+If you are judging my work from this portfolio, that is the signal I want you to have. Not that I have a large content library — I deliberately do not. That I can recognise when a number is impressive and meaningless at the same time, and act on the distinction even when the action costs me the impressive number.
+
+The archive is gone. The evidence is what's left.
+
+## References & Further Reading
+
+These are the published guidelines I read while making the decision — not a claim that the migration was validated by them:
+
+- [Google Search Central — Scaled content abuse policy](https://developers.google.com/search/docs/essentials/spam-policies#scaled-content-abuse) — the policy that names publishing large volumes of low-value pages as an abuse pattern.
+- [Google Search Central — Creating helpful, reliable, people-first content](https://developers.google.com/search/docs/fundamentals/creating-helpful-content) — the self-assessment questions I used as a prompt, not a score.
+- [Google Search Quality Evaluator Guidelines](https://static.googleusercontent.com/media/guidelines.raterhub.com/en//searchqualityevaluatorguidelines.pdf) — where the E-E-A-T language comes from; the Rater Guidelines are not a ranking algorithm.
+- [Measuring GEO: what you can actually count](/articles/measuring-geo-what-you-can-actually-count) — on the measurement gap I am explicitly not papering over here.

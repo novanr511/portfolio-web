@@ -1,0 +1,80 @@
+---
+title: "Paid Social: Frequency vs Reach"
+description: "Reach and frequency split one budget between breadth and repetition. A pre-set allocation rule decides which one the campaign buys; the dashboard records the consequence."
+date: 2026-12-23
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Data Engineering
+---
+
+Reach and frequency are two ways to spend the same budget: one buys breadth of exposure, the other buys repetition among people already reached, and a plan chooses which to prioritise before delivery begins. Google's [About audience segments](https://support.google.com/google-ads/answer/2497941?hl=en) documents a weekly target frequency that first serves an impression to as many matching users as possible, then makes those users eligible for later exposures over seven days. On 22 November 2026 a curation pass reduced 1,004 templated articles to a curated, restorable set behind an allowlist ([curation case study](/projects/seo-content-curation)): one rule applied to every URL. The RAG agent's `number_audit` ran 193 checks showing prose matched retrieved files ([build log](/projects/rag-research-agent)), and the BTC study paired 92.5% model accuracy with 94.0% for a zero-parameter sign rule at Holm-adjusted p = 1.0 ([study record](/projects/btc-monthly-ml)). Each is a rule or a comparator fixed before a conclusion was drawn. Every illustrative figure below is labelled ASSUMED or DERIVED.
+
+## What does a reach-versus-frequency decision actually allocate?
+
+A reach-versus-frequency decision allocates one budget between distinct people and repeat exposures. Reach counts people who saw an ad at least once; frequency is the average exposures per reached person. The plan fixes the trade-off in advance, and the report records what that trade-off purchased.
+
+Google's [target frequency documentation](https://support.google.com/google-ads/answer/2497941?hl=en) makes the ordering explicit: a first impression goes to as many matching users as possible, after which those users become eligible for remaining frequencies within a seven-day window. That is an allocation rule, not a finding about how many exposures are optimal. A frequency cap is another rule: a ceiling on repeated delivery to the same person.
+
+The arithmetic linking delivery figures is an identity. With 100,000 impressions ASSUMED and 50,000 reached people ASSUMED, frequency is 2.0 DERIVED, because 100,000 divided by 50,000 = 2. The same 100,000 impressions ASSUMED spread over 25,000 people ASSUMED gives 4.0 DERIVED. Nothing in that division says which allocation is worth buying; it only states how the two levers trade against each other for a fixed impression total.
+
+## Why does a bigger impression count fail as an allocation rule?
+
+A bigger impression count can mean more new people or more repeats among the same people, and the total alone cannot distinguish them. Without a stated distribution, a rising frequency is either planned repetition or an audience served again because it is cheap. Decide the distribution before reading the total.
+
+Platform delivery follows the rule it is given. The target frequency setting puts breadth first and repetition second within its seven-day window, so a plan that leaves frequency uncapped can concentrate impressions wherever delivery is easiest. That is a property of the mechanism, not a measured response curve. The point at which repetition stops helping a particular audience is not measured in any record cited here, and treating a high average as proof of fatigue or of persuasion would invent a result.
+
+A reach-first plan makes the opposite bet: it pays for many first exposures and accepts a lower average. Neither bet is "more" in any useful sense. Both spend the same impressions on different patterns of people. The question a budget review should ask is which pattern the plan set out to buy, and whether the delivery matched it, rather than whether the impression total grew.
+
+## How do credit rules and counting windows change what an allocation looks like?
+
+Credit rules and counting windows decide which exposures appear to have worked. A repeat impression can receive full credit under one rule and share it under another; the same spend can look efficient or wasteful without changing. Record both settings before comparing allocations, because a figure carries the rule that produced it.
+
+Google's [attribution-model definition](https://support.google.com/google-ads/answer/6259715?hl=en) makes the choice visible: last click assigns all credit to the final interaction, while data-driven distributes it using the account's own data. First-click, linear, time-decay and position-based models are no longer supported, and affected conversions were upgraded to data-driven. A comparison run under a rule that has since been retired is a comparison to a different instrument.
+
+The [conversion-window documentation](https://support.google.com/google-ads/answer/3123169?hl=en) adds a second setting: a window of 1 to 90 days, with a 30-day default for Search and Display and a one-day default for view-through conversions. Changes apply going forward, not retroactively. A frequency-heavy plan may collect more final-touch credit simply because it generates more late touches; that is an expectation from the rule's mechanics, labelled ASSUMED here, not an observed lift. The same page notes that the model-comparison report can filter out campaigns without enough data, so a missing row can be an eligibility artefact.
+
+## What would a pre-set allocation decision look like with labelled numbers?
+
+Fix the exposure you are buying, the budget ceiling, and the comparison that will judge the plan before any report is reviewed. Then choose the allocation whose trade-off you can defend and log the rule with its date. Rewriting it after the report would turn a decision into a story.
+
+A worked structure, with no platform rate or client result attached:
+
+1. **ASSUMED:** a fixed budget buys 100,000 impressions under a stated cost per thousand, invented for illustration.
+2. **ASSUMED:** a reach floor of 50,000 distinct people. **DERIVED:** if the floor holds, the frequency ceiling is 2.0, since 100,000 ÷ 50,000 = 2.
+3. **ASSUMED:** an alternative plan targets frequency 4.0. **DERIVED:** at the same impression total, implied reach is 25,000, since 100,000 ÷ 4 = 25,000.
+4. **DERIVED:** the comparison is 50,000 people at 2.0 versus 25,000 people at 4.0, not "good" against "bad". Choose the pattern the campaign can justify to a reader before the numbers arrive.
+5. **DERIVED:** no outcome figure is asserted. The check is whether delivery matched the chosen pattern and whether a later comparison survives the same credit rule and window.
+
+The arithmetic is scaffolding for a decision, not evidence of performance. A team that treats 100,000 impressions as a stable property of the campaign has already made an unstated assumption about how those impressions are distributed. Writing the assumption down is the gain.
+
+## What can the first-hand records tell you about rules and outcomes?
+
+The 22 November 2026 curation applied one allowlist rule to the whole archive, and its case study records structural before-and-after facts while leaving the traffic outcome blank. That is the shape of an allocation decision: a rule written first, its consequences recorded, and no outcome invented to make the record look stronger.
+
+As of that dated snapshot, 1,004 templated articles became a curated, restorable set of about 34 live pieces; distinct tags fell from 810 to roughly ten; 21 colliding category slugs resolved to zero in the curated set; `llms.txt` had been roughly 1,034 lines and `llms-full.txt` about 7 MB generated per request. Those are structural facts about a system, read from the [migration record](/articles/why-i-killed-966-articles) and the [curation case study](/projects/seo-content-curation). No traffic outcome was measured before or after the change.
+
+The other two records sharpen the point. The RAG agent's `number_audit` completed 193 checks on 18 November 2026 and found prose consistent with retrieved files; that is a consistency result, not evidence that the underlying comparison was sound. In the BTC study the model reached 92.5% accuracy at day 25 while a zero-parameter `sign(mtd_ret)` rule reached 94.0%, with Holm-adjusted p-values of 1.0 across model-versus-rule comparisons. A comparator fixed before the numbers were opened is what keeps 92.5% from reading as an unqualified win. Frequency planning needs the same discipline: name the alternative allocation before the delivery report is seen.
+
+## How should you compare two allocations without claiming lift?
+
+Compare allocations under the same credit rule and counting window, report reach and frequency side by side, and label outcome claims as hypotheses until a withheld group supports them. Keep the rule, window and decision in one dated record so a later reader can tell whether a change came from the plan or the measurement.
+
+The instrument for a causal claim is a comparison the dashboard does not contain. Vaver and Koehler's [geo-experiment method](https://research.google/pubs/measuring-ad-effectiveness-using-geo-experiments/) pairs markets on pre-period outcomes, checks power before launch, screens for spillover and fixes a stop rule in advance. It estimates an area-level effect under stated assumptions; it is a method description here, not an experiment run for this article. The design choices are covered in more detail in [How to Get Geo Experiments Right](/articles/how-to-get-geo-experiments-right).
+
+This article is about which exposure pattern a budget buys, a separate question from what a platform metric defines and from how a budget is divided across channels. For the definitions, see [What Paid Social Actually Measures](/articles/what-paid-social-actually-measures); for the budget-level trade-offs, see [Paid Social Trade-Offs](/articles/paid-social-trade-offs). Keeping the three questions apart prevents an allocation choice from being defended with a metric definition, or a metric definition from being sold as evidence of incrementality. [How to Evaluate Incrementality Testing](/articles/how-to-evaluate-incrementality-testing) addresses the comparison itself.
+
+## What decision can you make today with the evidence available?
+
+You can pick an allocation rule, state its cost and exposure target, and bound the decision with a dated recheck. That is a defensible choice under uncertainty, though the platform report cannot certify that repetition caused the result. Keep reversible bets small and record which rule produced every figure you quote.
+
+In practice, write the reach floor or frequency target beside the credit model and counting window in one document, add the date each was set, and schedule one read against the pre-stated pattern. If the plan changes mid-flight, start a new row rather than editing the old one, because a time series changes meaning when the rule behind it changes. When the decision is large and irreversible, the credited number is insufficient on its own; a withheld group or a documented pause comparison should come first, with its limits stated in the same record.
+
+What the available numbers do not establish here is the incremental effect of one pattern over the other. That gap stays visible instead of being filled with a platform benchmark or an invented fatigue curve. A frequency-versus-reach decision made this way is an honest allocation under uncertainty: explicit about the rule, modest about the claim, and checkable by the next person who reads the log.
+
+## References & Further Reading
+
+- Google Ads Help, 2026. [About attribution models](https://support.google.com/google-ads/answer/6259715?hl=en) — credit rules, deprecated models, model comparison and its data filters.
+- Google Ads Help, 2026. [About audience segments](https://support.google.com/google-ads/answer/2497941?hl=en) — target frequency, first-impression delivery and the seven-day frequency window.
+- Google Ads Help, 2026. [About conversion windows](https://support.google.com/google-ads/answer/3123169?hl=en) — 1–90 day settings, 30-day default, one-day view-through default and forward-only changes.
+- Jon Vaver and Jim Koehler, 2011. [Measuring Ad Effectiveness Using Geo Experiments](https://research.google/pubs/measuring-ad-effectiveness-using-geo-experiments/) — matched markets, power checks, spillover screening and pre-fixed stop rules.

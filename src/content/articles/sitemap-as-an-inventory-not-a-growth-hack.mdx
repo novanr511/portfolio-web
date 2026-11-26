@@ -1,0 +1,60 @@
+---
+title: "Sitemap as an Inventory, Not a Growth Hack"
+description: "A sitemap is an inventory of curated decisions rather than a growth lever. How one site derives its XML from an allowlist, and what the file cannot establish about visibility."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - Crawlability
+---
+
+A sitemap is an inventory of decisions, not a growth lever. On 22 November 2026 an archive of 1,004 templated articles was cut to a curated, restorable set behind an allowlist; sitemap.xml is generated from that same list, de-listed article slugs answer with a 308 to the /articles hub, and llms-full.txt is assembled at build time with s-maxage=86400 and stale-while-revalidate=604800. sitemaps.org defines the file format, and Google Search Central says inclusion invites crawling without guaranteeing it. The decision worth examining is what earns a place on the list.
+
+## What does a sitemap actually declare?
+
+A sitemap declares the URLs a site owner wants crawled, in a machine-readable format. Sitemaps.org defines a URL set with optional lastmod, changefreq and priority fields. Google Search Central describes inclusion as an invitation to crawl, not a guarantee of it. The file is therefore a statement about inventory that a reader can check against the site it describes.
+
+The format is deliberately thin. Sitemaps.org defines a URL set in which each `loc` entry names a page and optional fields describe its change history and relative emphasis. Google's guidance frames the same file as a way to surface addresses a site wants crawled, and its overview notes that a well-linked small site may manage without one. Neither source claims a ranking effect, so treating the file as one is an unsupported step. What matters for a decision is the status of the description: it is a statement a site makes about its own inventory, and a statement can be checked against the site it describes. This article is about that check, not about the mechanics of large files. The per-file URL and size limits, and the index structure that appears when a file outgrows them, are a generation concern covered in [XML Sitemaps at Scale](/articles/xml-sitemaps-at-scale). Here the question is smaller: does every entry still describe a page the site intends to serve? A reader can answer that with the file and a handful of requests, without a dashboard or a ranking export.
+
+## Why does an allowlist decide what enters the sitemap?
+
+This site generates sitemap.xml from the curated slug set that also decides what is published. One list feeds the loader, the index, the redirects and the AI-facing files, so the declaration cannot silently disagree with what the site serves. The list is the inventory; the XML is its export.
+
+The mechanism is visible in the repository rather than asserted in prose. The sitemap route calls the same article loader that filters every consumer by the curated slug set. On 22 November 2026 that set was the result of a documented decision: 1,004 templated articles, many of them published in a three-day burst, were reduced to a curated, restorable collection behind an allowlist. Nothing was deleted from disk; a slug returns everywhere by being added back. That reversibility is why the word inventory fits. An inventory records what is currently held and deliberately offered, and it can change by decision rather than by accident. The before-and-after state, including the stated absence of a traffic outcome, is recorded in the [curation case study](https://novandri.com/projects/seo-content-curation) and reasoned through in [why I killed 966 articles](/articles/why-i-killed-966-articles). The point for a sitemap is structural: the XML cannot drift away from publication, because there is no second list to maintain. A hand-edited file beside a publication list would be exactly the double entry this arrangement removes.
+
+## What happens to a slug that leaves the curated set?
+
+It stops appearing in the XML and answers with a permanent 308 redirect to the /articles hub. The redirect is generated from the same allowlist, so removal from the inventory and the address change happen together. Nothing is deleted from disk; adding the slug back restores the page, its sitemap entry and its canonical address.
+
+The 308 is chosen because the address has changed status rather than moved temporarily. The IETF registration of that code specifies that the request method is preserved and the redirect is permanent, which suits a de-listed article: the old URL should no longer be treated as a representation of a live page. The same code appears elsewhere in the site's URL hygiene. A request to www resolved to the apex with a single 308 on 22 November 2026, recorded alongside the HTTP and TLS captures in [SEO URL Structure](/articles/seo-url-structure-normalize-hostnames-paths-parameters). Different job, same mechanism: one authoritative destination, no intermediate hop. Because both the redirect rules and the sitemap read the allowlist, a slug's removal appears in the XML and at the edge on the same build. A canonical tag would be the wrong tool here; it is a signal about representation, not a statement that publication was withdrawn. The [migration walkthrough](/articles/site-migrations-pitfalls) covers how that distinction plays out when a large set of URLs changes status at once, and why a chain is harder to audit than a single hop.
+
+## How do lastmod and canonical entries follow from the same list?
+
+Google describes lastmod as a change hint and asks for canonical URLs rather than duplicates or redirects. This site sets each entry's lastmod from the article's updated-or-date frontmatter, and lists only addresses it actually serves. A build timestamp would describe the generator, not the page, so it would make the declaration false.
+
+Google describes lastmod as a value that helps a crawler judge when a page changed, and asks that sitemaps list canonical URLs rather than duplicate or redirected addresses. This site takes each entry's date from the article's `updated`-or-`date` frontmatter, so a change to the content is what moves the value. Emitting build time instead would make every entry look fresh on every deploy, which describes the generator rather than the page. The same logic excludes de-listed slugs: they answer with a redirect, so listing them would declare that a page lives at an address that no longer serves one. The generated AI-facing files follow the same derivation. llms-full.txt is produced from the curated sources during the build, and its response carries s-maxage=86400 with stale-while-revalidate=604800, values recorded from the repository on 22 November 2026. Those are source-reported configuration facts, not crawl results. Four surfaces have to agree in practice: the internal links, the sitemap `loc`, the canonical tag and the redirect rules. They are generated from different places, which is exactly why a single inventory is worth keeping.
+
+## Does a bigger sitemap improve visibility?
+
+No source supports that reading. Google states that listing a URL does not guarantee crawling or indexing, and sitemaps.org defines a format, not a ranking factor. A larger file can just as easily advertise duplicates, redirects or thin pages. Judge the declaration by whether every entry still describes a page the site intends to serve.
+
+This is where inventory thinking and growth thinking part company. Growth thinking reads a larger file as more surface and a smaller one as a loss, but the sources describe no such mechanism. Sitemaps.org specifies a format; Google's documentation calls the file a discovery aid and states plainly that listing a URL does not guarantee crawling or indexing. The curation recorded on 22 November 2026 made the file smaller because the published set became smaller. Calling that a visibility improvement would require crawl and ranking data that were not measured. A consistency check is not a validity check either: the research agent's 193-check audit (source-reported, figures read 18 November 2026) confirmed memo numbers matched pipeline files, not that the comparison behind them was sound. A sitemap that faithfully mirrors the allowlist is consistent in the same narrow way. It is a true inventory, not evidence that the inventory performed. The distinction matters because it tells you what to gather next: the served file is checkable today, while a visibility claim needs an observation window, a baseline and a stated comparison.
+
+## How do you verify the inventory without ranking data?
+
+Check the served file against the source of truth. Fetch sitemap.xml rather than its template, confirm the curated URLs and the /articles hub are present, spot-check a de-listed slug for the 308, and compare a few lastmod values with their frontmatter. Record the date; the set changes as articles are promoted.
+
+Fetch the served artifact, not the template that builds it, because the served bytes are what a crawler reads. A bounded check looks like this:
+
+```bash
+curl -sS https://novandri.com/sitemap.xml | grep -o '<loc>[^<]*</loc>' | head -20
+```
+
+The command is a method; I am not reporting the number it returns, because that number changes at every promotion. Confirm the curated article addresses and the hub are present, spot-check a de-listed slug for the 308, and compare a few lastmod values with their frontmatter. Each step can fail for a concrete reason, which is what makes the check worth running. A served robots.txt answered HTTP/2 200 with cache headers on 22 November 2026, which is the same kind of structural fact: the file exists at the expected address. None of this establishes what any crawler did with the file. That question belongs to a diagnostic export rather than to the XML, and the boundary is drawn in [Google Search Console for Technical SEO](/articles/google-search-console-for-technical-seo-a-diagnostic-workflow). The decision I am defending is modest: derive the declaration from one list, verify it against the served bytes, and leave the outcome unmeasured.
+
+## References & Further Reading
+
+- sitemaps.org, 2026. [Sitemaps.org protocol](https://www.sitemaps.org/protocol.html) — the URL-set format, optional fields and the per-file limits.
+- Google Search Central, 2026. [Learn about sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) — the discovery-aid framing, the note that inclusion is not a guarantee, and when a sitemap helps.
+- Google Search Central, 2026. [Create and submit a sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap?hl=en) — canonical URLs, `lastmod` and build guidance.
+- IETF, 2026. [RFC 7538: The HTTP 308 Status Code](https://www.rfc-editor.org/rfc/rfc7538) — permanent redirect with an unchanged request method.

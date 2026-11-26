@@ -1,0 +1,68 @@
+---
+title: "AI Search Common Questions"
+description: "Direct answers to eight questions about GEO, llms.txt, AI referrals, schema, crawlers and citations — with the limits of what each signal can prove."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - AI Search
+  - Technical SEO
+  - Crawlability
+---
+
+AI search optimization comes down to a short list of answerable questions: what GEO means, whether llms.txt helps, what you can measure, and which crawler policies affect citations. The honest answers are narrower than the marketing. Most of what earns a citation is ordinary crawlability, indexability and content that answers a specific question well.
+
+## What is GEO?
+
+GEO stands for Generative Engine Optimization: making content findable and citable in AI-generated answers. The abbreviation also means geographic ad experiments in other contexts, so specify which one you mean. In answer-engine work, GEO is a discipline for retrieval visibility, not a score you can buy.
+
+The term was formalised in a 2023 research paper that framed visibility in generative answers as a measurable property ([Aggarwal et al., 2023](https://arxiv.org/abs/2311.09735)). In practice it covers the same foundations as search — crawlable pages, clear structure, specific claims with sources — plus attention to whether answer surfaces retrieve and cite you.
+
+## How do I get cited in AI answers?
+
+You cannot submit a page to an answer engine's citation set. Citations come from retrieval: a system searches its own index, selects sources and composes an answer. What you control is eligibility and usefulness — crawlable, indexable pages that answer a specific question with evidence a system can quote.
+
+Write the answer near the top of the page, in text that can be lifted without heavy rewriting. State figures with their denominators and sources. Keep machine-readable files as navigation aids, not as a substitute for the page itself. There is no documented shortcut that inserts a URL into the retrieved set.
+
+## Does llms.txt improve rankings?
+
+No. llms.txt is an optional Markdown index that a site places at a root or path for agents to read. The proposal describes an inference-time convenience, not a ranking signal. A minority of tools opt in to read it; no search engine has documented a ranking benefit from publishing one.
+
+The adopters the proposal cites are documentation platforms and AI labs whose content is read by coding agents needing exact syntax. That is not evidence about general content sites. The full comparison, including what each AI-facing file can and cannot do, is in [AI File Formats Sorted by Evidence](/articles/llms-txt-robots-txt-and-ietf-drafts-sorting-ai-file-formats-by-evidence).
+
+## Can I measure AI referrals?
+
+Yes, but only the attributed portion. Answer surfaces send referrer headers inconsistently: some send their own domain, some send nothing, and in-app clicks may arrive without a referrer. Classify the referrers you do receive in their own analytics channel and report them as a floor, not a total.
+
+A useful classification separates answer engines such as chatgpt.com and perplexity.ai from assistant surfaces such as copilot.microsoft.com. Referrals can show direction and relative volume across surfaces; they cannot give you a share of traffic, because the denominator includes visits whose origin you cannot see.
+
+## Do I need special schema?
+
+No. Google states that no new machine-readable files or special schema.org markup are needed to appear in its AI Overviews or AI Mode. Ordinary structured data remains useful for the features search engines explicitly support, but there is no separate "AI schema" that changes answer inclusion.
+
+The FAQPage and Article vocabulary you may already use can still describe your content accurately. Treat structured data as description, not promotion: it helps a system understand a page, and it does not move that page into a retrieved set.
+
+## Should I block GPTBot?
+
+Decide by purpose, not by reflex. GPTBot is documented as a training crawler, while OAI-SearchBot serves search and answer surfaces. Blocking GPTBot does not remove a citation you have already earned, and allowing it does not place a URL into an answer engine's retrieval index.
+
+Vendor documentation assigns specific user agents to specific uses; Google-Extended and CCBot have different roles again. Note one limit: user-triggered fetchers such as ChatGPT-User and Perplexity-User act because a person asked for the page and generally ignore robots.txt. Crawler governance is an access decision, not a visibility lever.
+
+## How do I know if I was cited?
+
+Run your own fixed prompt set. Choose 10 questions in the language your audience uses, freeze them, run each more than once on different days or in fresh sessions, and record whether your URL appeared. Report a rate with its denominator, not a vendor visibility score.
+
+The 10-prompt protocol, including how to log surface state and keep a raw record, is set out in [Measuring GEO: What You Can Actually Count](/articles/measuring-geo-what-you-can-actually-count). A frozen set stops you choosing flattering prompts, and a fixed cadence turns a count into a series you can watch for drift. The result is a rate from a sample — never a rank, because answers are synthesised rather than listed.
+
+## Does more content mean more AI citations?
+
+No. Citations come from retrieval, and retrieval selects sources from an index; it does not reward volume. Publishing hundreds of near-identical templated pages adds noise and cost without changing whether any single page is eligible, useful enough to quote, or chosen for a particular answer.
+
+This site is a live example of the correction in progress: a corpus of 1,004 templated articles is being curated toward roughly 40 pieces, and the machine-readable index is being shortened rather than expanded. That is a change in what the files contain, not a measured traffic result.
+
+## References & Further Reading
+
+- Google Search Central, [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features). Documents that no new machine-readable files or special schema are required for AI Overviews and AI Mode.
+- K. Aggarwal et al., [GEO: Generative Engine Optimization](https://arxiv.org/abs/2311.09735). Research paper formalizing visibility measurement in generative answer engines.
+- Jeremy Howard, [The /llms.txt file, v2](https://llmstxt.org/). The proposal itself: purpose, path placement, `.md` convention and adoption claims.
+- OpenAI, [Overview of OpenAI Crawlers](https://platform.openai.com/docs/bots). User-agent definitions for OAI-SearchBot, GPTBot and ChatGPT-User.
+- Perplexity, [Perplexity Crawlers](https://docs.perplexity.ai/guides/bots). Definitions of PerplexityBot and Perplexity-User, including which fetchers honor robots.txt.

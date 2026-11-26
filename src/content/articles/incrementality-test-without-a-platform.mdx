@@ -1,0 +1,89 @@
+---
+title: "Incrementality Test Without a Platform"
+description: "A holdout, a comparator and a declared denominator turn a simple test into an incrementality estimate without buying a platform."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Data Engineering
+---
+
+A cheap incrementality test is a comparison declared in advance, not a feature of a tool. On 22 November 2026, a curation pass reduced 1,004 templated articles to a curated, restorable set behind an allowlist while recording that the traffic outcome was not measured — a change without a pre-declared comparison cannot support a lift claim. The BTC study's research agent ran a `number_audit` of 193 checks for consistency with artifacts, not validity. In that study a 92.5% model lost to a zero-parameter rule at 94.0% with Holm-adjusted p-values of 1.0, and the authors refused a tradability claim. Google's [multiple-test-period geo experiments](https://research.google/pubs/pub38356/) describe randomly assigning geographic regions and rotating test and control across periods: a design that needs geography and a plan, not a licence.
+
+## What does an incrementality test need beyond a dashboard?
+
+It needs a counterfactual stated before launch: what would have happened to the same units without the campaign. A dashboard shows outcomes after exposure; a test compares those outcomes with a group that did not receive the treatment. The holdout, comparator and denominator are decisions made before data arrive.
+
+A platform dashboard is useful for describing what it recorded. It cannot show the users who were withheld, because there is no withheld group unless you create one. The failure modes of the tooling itself are a separate subject, covered in [experimentation platform pitfalls](/articles/experimentation-platforms-pitfalls); the skeleton below survives whichever tool you use. The [incrementality testing evaluation](/articles/how-to-evaluate-incrementality-testing) treats the broader decision frame. Here the claim is narrower: the minimum viable test is three definitions and a random assignment, all written before the result is seen.
+
+The curation decision is the clearest local example of what a dashboard cannot supply. The 22 November 2026 pass changed the published set mechanically, and the case study states that no traffic outcome was measured. A reviewer could have selected a favourable before/after window afterwards, but that would be a story rather than an estimate. A holdout declared on the day of the change would have made a later comparison possible; none was declared, so none is claimed.
+
+## How do you build a holdout with free tools?
+
+Assign eligible units to treatment or holdout with a fixed random rule before the campaign starts, using a spreadsheet random seed or a scripted hash of stable identifiers. Keep the allocation file. Export outcomes from the analytics tool you already have, then compare the two groups on the same metric over the same window.
+
+A hash of a stable ID is convenient because the assignment is reproducible without storing a secret list of names; a seeded spreadsheet column is equally defensible if the file is versioned. What matters is that the rule is fixed before outcomes exist. Stratify on a pre-period metric if the population is uneven: a simple sort into high and low activity bands, then randomisation inside each band, costs nothing and reduces imbalance. A 5% holdout leaves most of the audience addressable while preserving a comparison group.
+
+The table is a what-if, not a measured campaign. No traffic, revenue or holdout was observed for it. Every input is ASSUMED and each derived row follows from those inputs.
+
+| Quantity | Status | Basis |
+| --- | --- | --- |
+| Eligible users at assignment | ASSUMED | 10,000 |
+| Holdout share | ASSUMED | 5% |
+| Users in holdout | DERIVED | 10,000 × 0.05 = 500 |
+| Users in treatment | DERIVED | 10,000 − 500 = 9,500 |
+| Orders in treatment | ASSUMED | 475 |
+| Orders in holdout | ASSUMED | 20 |
+| Order rate, treatment | DERIVED | 475 / 9,500 = 5.0% |
+| Order rate, holdout | DERIVED | 20 / 500 = 4.0% |
+| Absolute difference | DERIVED | 1.0 percentage point |
+
+The estimate is one percentage point under these assumptions; whether it is worth acting on depends on uncertainty and margin, neither of which the table supplies. [A/B testing decisions](/articles/ab-testing-making-decisions-with-experiments) cover the threshold question. Keep the allocation file and the export beside the estimate so a later reviewer can recompute every row.
+
+## Why does the comparator decide the answer?
+
+The comparator defines the question. Against an always-on baseline a model can look strong; against a sensible rule it can lose. The BTC study's 92.5% model beat the majority baseline but lost to the zero-parameter sign rule at 94.0% with Holm-adjusted p-values of 1.0. Choose the comparator before the result, or the result chooses it.
+
+That study is unusually explicit about the mechanism. Its frozen 12-month holdout delivered 91.7% accuracy with an edge of 0.0 over the sign rule. Relative to "always predict GREEN", the same walk-forward curve looked convincing; relative to the analytic rule, the advantage disappeared. The lesson for a cheap incrementality test is that the baseline deserves as much care as the treatment. A holdout compared with a conveniently weak reference produces a number that is arithmetically correct and decision-useless.
+
+The `number_audit` reinforces the point from a different angle. Its 193 checks confirmed that the written memo matched the pipeline files, so a wrong comparator would have been reproduced faithfully. Consistency with artifacts is not validity of the design. A spreadsheet that computes the difference between two groups correctly cannot tell you whether the two groups were comparable in the first place; that was settled by the assignment rule and the choice of comparator, before any orders were counted.
+
+## What belongs in the denominator?
+
+The denominator is the eligible population at the moment of assignment, fixed before outcomes are known: users who could have received the treatment, geos in scope, or orders in the test window. Report every exclusion with its reason. A rate built from a denominator chosen after the fact describes a subgroup, not the campaign.
+
+AAPOR's [Standard Definitions](https://www.aapor.org/Standards-Ethics/Standard-Definitions-(1).aspx) is the reference for outcome rates computed from explicit case dispositions; the principle is that a rate is a ratio with a declared denominator. The same principle applies here. If you drop users who never loaded the page, state when that rule was set and whether it could depend on the treatment. A denominator that shrinks after seeing results is a warning sign, because it can be tuned the same way a window can.
+
+Write the denominator rules into the allocation file: who was eligible, who was excluded, and the timestamp of the snapshot. The curation case study used a dated snapshot for exactly this reason — 1,004 templated articles reduced on 22 November 2026 to a curated set behind an allowlist, with the traffic outcome unmeasured. A dated snapshot can be disputed. An undated rate cannot be reconstructed, and the reader is left trusting the summary.
+
+## Can pre-period data improve a small test?
+
+Yes, when the covariate is measured before assignment. CUPED uses the same metric from a pre-experiment period to reduce variance; Deng and colleagues reported about 50% variance reduction on Bing. The requirement is that the covariate cannot be affected by the treatment, otherwise the estimate becomes biased in an unseen direction.
+
+The [CUPED paper](https://exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf) is source-reported, read 22 November 2026: three Bing experiments with one week of experiment and one week of pre-period data gave variance reductions of 45%, 52% and 49%. Using the same metric in the pre-period as the covariate worked best, and a 1–2 week pre-period was recommended. Variance for revenue per user fell by less than 5% because its pre-period correlation was low. These are the authors' results on Bing, not measurements made here; the transferable rule is to check correlation before expecting a gain.
+
+The warning is sharper than the benefit. The paper describes an experiment where a highly correlated in-experiment covariate produced an estimate in the direction opposite to the known effect, because that covariate was itself affected by the treatment. Pre-period or pre-triggering data satisfy the requirement; post-treatment data do not. A [platform pitfalls review](/articles/experimentation-platforms-pitfalls) lists other ways an apparently precise estimate can be contaminated. For a small test with no engineering support, the safest adjustment is often no adjustment at all.
+
+## What do geo experiments add when geos are few?
+
+Geo experiments randomise whole areas when individual users cannot be cleanly withheld. Vaver and Koehler described rotating test and control assignments across periods and pooling the results. Chen and colleagues later addressed small numbers of geos and heavy-tailed outcomes with pairing and trimmed matching. Both add design options, not a platform requirement.
+
+The [Google research paper](https://research.google/pubs/pub38356/) is source-reported from 2012: geographic regions are the experimental units, assignments rotate across multiple test periods, and the data can be pooled into a single aggregate measurement. The appeal is randomised rigor for spend decisions that are not static. The [trimmed match paper](https://arxiv.org/abs/2105.07060), submitted 14 May 2021 and revised 19 May 2021, names the practical problems: few geos, heavy-tailed revenue across geos, and responsive metrics that vary sharply over time. Its pairing and sample-splitting behaviour is a design response, not a product feature.
+
+A full geo design is a substantial undertaking; [getting geo experiments right](/articles/how-to-get-geo-experiments-right) covers that scope. The point for a constrained test is narrower. If user-level holdout is impossible because the channel cannot target individuals, the smallest credible design is a small set of matched areas with assignment fixed before the campaign, not a longer attribution window on the same report. The arithmetic stays the same: one comparator, one denominator, one declared window.
+
+## What can a cheap test still not establish?
+
+It can estimate a short-term difference under the rules you declared; it cannot supply long-run effects, profit, or performance on populations excluded from the frame. No spreadsheet fixes a contaminated holdout, a comparator chosen after the fact, or an outcome measured with a broken instrument. State those limits beside the estimate.
+
+The three first-hand records show the habit in practice. The curation pass left the traffic outcome unmeasured rather than inventing one. The RAG agent's 193 checks proved prose matched artifacts and stopped there. The BTC study paired a 92.5% score with a 94.0% baseline, Holm-adjusted p-values of 1.0, and an explicit refusal to claim tradability because no PnL, cost or capacity evaluation was performed. A credible incrementality estimate is the same kind of object: bounded by its design, honest about its denominator, and silent where the evidence runs out.
+
+The decision to take away is procedural. Write the holdout rule, the comparator and the denominator before the campaign starts, keep the allocation file, and publish the estimate with its assumptions attached. A platform can automate the arithmetic; it cannot supply the decision you made in advance.
+
+## References & Further Reading
+
+- Jon Vaver and Jim Koehler, Google Inc. (2012), [Periodic Measurement of Advertising Effectiveness Using Multiple-Test-Period Geo Experiments](https://research.google/pubs/pub38356/) — randomised geo assignments rotating across test periods, with pooling; read 22 November 2026.
+- Aiyou Chen, Marco Longfils and Nicolas Remy, submitted 14 May 2021, revised 19 May 2021, [Trimmed Match Design for Randomized Paired Geo Experiments](https://arxiv.org/abs/2105.07060) — few geos, heavy-tailed outcomes, pairing and sample splitting; read 22 November 2026.
+- Alex Deng, Ya Xu, Ron Kohavi and Toby Walker, WSDM 2013, [Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data](https://exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf) — CUPED, about 50% variance reduction on Bing, and the post-treatment covariate warning; read 22 November 2026.
+- AAPOR, [Standard Definitions](https://www.aapor.org/Standards-Ethics/Standard-Definitions-(1).aspx) — outcome rates defined from explicit case dispositions and declared denominators; cited 22 November 2026.
+- First-hand artifacts, figures read 18 and 22 November 2026: [curation case study](/projects/seo-content-curation), [RAG agent build log](/projects/rag-research-agent) and [BTC monthly study](/projects/btc-monthly-ml).

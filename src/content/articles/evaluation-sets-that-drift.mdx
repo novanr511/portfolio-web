@@ -1,0 +1,83 @@
+---
+title: "Evaluation Sets That Drift"
+description: "An evaluation set refreshed alongside production content measures a moving target; a frozen holdout measures a past one. The choice decides what a score can still mean."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Machine Learning
+  - RAG
+---
+
+An evaluation set that changes with production content cannot tell you whether a change helped. Both the system and the yardstick moved, so a higher score is evidence of nothing except that the two moved together. A frozen holdout answers a narrower question — did the system improve on the world as it was? — and stays useful precisely because it refuses to follow the content.
+
+The tension appears in two records from this portfolio. On 22 November 2026 the site's templated archive was replaced by a curated set behind an allowlist ([curation case study](/projects/seo-content-curation)); any score computed over "the site's content" before and after that date refers to two different objects. The [RAG research agent](/projects/rag-research-agent) recorded 193 checks with no failures, alongside 55 tests passed and one skipped, figures read 18 November 2026 — a consistency result that holds for the artifacts present in that corpus on that date. Drift research treats such shifts as a property of the data stream rather than a defect in the model ([Webb et al., 2014](https://doi.org/10.1145/2523813)).
+
+## What does it mean for an evaluation set to drift?
+
+A set drifts when the items it contains are edited, removed, or relabelled to track production content. The scorer keeps running and the number keeps changing, but the denominator now describes a different population. A score is a comparison, and a moving comparison has no fixed referent.
+
+Two mechanisms are easy to conflate. Label drift happens when the right answer for the same input changes — a policy is revised, a product is renamed, a category is retired. Corpus drift happens when the inputs themselves are replaced, added, or withdrawn while the scoring code stays identical. The curation on 22 November 2026 is a corpus-drift example. The allowlist changed which articles existed in the live set, so a retrieval score over "the site" measured one inventory before the decision and another after it. No traffic outcome was measured around that change; the shift is documented as structural, not as a performance result. The same reasoning applies at smaller scale whenever a knowledge base is refreshed.
+
+## Why does a frozen holdout behave differently?
+
+A frozen holdout is sealed before evaluation and opened once at the end. It measures performance on a population fixed in advance, so a later score cannot be inflated by adding easier cases. The cost is staleness: it describes the old distribution, not the one serving users today.
+
+The [BTC monthly study](/projects/btc-monthly-ml) shows both sides. Its final twelve-month holdout was kept separate from inner selection and yielded 91.7% accuracy with an edge of 0.0 against the analytic rule, across a study of 133 out-of-sample months. Those figures are source-reported from the case study and read on 18 November 2026. The holdout did not rescue a negative result: at day 25 the model reached 92.5% accuracy and 0.980 ROC-AUC, while a zero-parameter rule, `sign(mtd_ret)`, reached 94.0%, with Holm-adjusted p-values of 1.0.
+
+Whether that holdout predicts live behavior was not measured, and the study makes no economic claim. Its value is procedural: the rule for opening it was fixed before the result was known, so the number cannot be adjusted by choosing a friendlier cut-off afterwards. That property disappears the moment the holdout is refreshed to "keep it representative".
+
+## What does a growing set actually measure?
+
+A growing set measures the union of two changes: how the system behaves and what was added to the set. Unless new cases enter as a separately versioned cohort, the aggregate score cannot be decomposed. Growth is useful for coverage and destructive for before-and-after claims.
+
+It retrieved the artifact containing each figure before writing it into a memo, and a `number_audit` checked every percentage against the retrieved context. The published run recorded 193 checks with no failures and 55 tests passed with one skipped, read 18 November 2026. That is a statement about prose matching files in that corpus at that time. Re-run the audit after the corpus changes and a passing result describes a different set of files.
+
+Consistency and validity remain separate. The audit would have reproduced a wrong figure faithfully had that figure sat in a source artifact. The negative result it helped document — 92.5% losing to 94.0% with adjusted p-values of 1.0 — is a judgment about experimental design, not something a green check can produce. A set that grows without cohort boundaries lets one green check stand in for both claims.
+
+## How do you separate content change from system change?
+
+Keep two tracks. A frozen track stays immutable and answers whether a change helped. A living track absorbs new production content and answers whether the current system still works. Report both beside one run identifier, model version and prompt version, and never merge their scores.
+
+In practice this means giving every set a durable identifier and a content hash, then recording both with each score. When production adds material, score the new cohort on its own and keep its baseline from the first run in which it appeared. A paired comparison on unchanged items answers the improvement question; a separate comparison on the new cohort answers the coverage question. Combining them into one percentage answers neither.
+
+For trajectories, a careful path and a lucky guess end in identical prose; only the record of the run distinguishes them ([agent evaluation examples](/articles/agent-evaluation-examples)). Here the equivalent distinction is between a score that moved because the system changed and one that moved because the set did.
+
+## When should the set be allowed to grow?
+
+Grow the set when production produces a failure mode the frozen cases never contained — a new document layout, a new phrasing, a changed schema. Each addition becomes a versioned cohort with its own baseline. Growth without a stated reason is noise with a larger denominator.
+
+The allowlist decision is a useful model even though it concerns content rather than evaluation. It inverted the default: nothing became live until it earned an entry, and the rule was mechanical and auditable. An evaluation set can use the same shape. A new case arrives with a reason, an expected answer, a date, and a named owner; it does not silently join the aggregate. That prevents the common failure where a bad result is followed by quiet edits to the set until the dashboard recovers.
+
+The [NIST AI Risk Management Framework](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) places measurement inside a govern, map, measure and manage lifecycle, so a set change is a change to what is measured, not to the system being measured. [Datasheets for Datasets](https://arxiv.org/abs/1803.09010) supplies the parallel discipline for documenting composition and recommended uses. No traffic or ranking outcome was measured for the content change described above, so none is inferred here.
+
+## What does the drift literature actually assume?
+
+Concept drift research assumes labels and features arrive in sequence and that their relationship may change over time; adaptation is studied under that assumption ([Webb et al., 2014](https://doi.org/10.1145/2523813)). An evaluation set is not a stream unless you make it one, by treating each content change as a dated event.
+
+That framing matters because "drift" is often used as a synonym for "the score fell". In the literature it is a claim about a distribution changing between moments, with methods that detect or adapt to the change. A frozen set deliberately steps out of that stream: it keeps answering the old question after the world moves on. A living set deliberately steps into it: it tracks the new distribution but forfeits a stable comparison. Neither is wrong; claiming that one score does both jobs is.
+
+The response is to date every snapshot. Use a stable qualitative phrase for the curated set, or an explicitly dated snapshot when a count is unavoidable. Undated counts of published pages, tags or files go stale at the next promotion, which is precisely the drift being discussed. A set with a date and a hash is a measurement instrument; a set with neither is a rumor.
+
+## What can a drifting set never license you to claim?
+
+It cannot license a before-and-after improvement claim, a stable absolute score, or a claim that a green check validates the method. A consistent memo and a valid conclusion are different properties. Report what changed, what stayed fixed, and which measurement was not taken.
+
+The audit's 193 checks establish that numbers matched retrieved artifacts, read 18 November 2026; they do not establish that the underlying comparison was the right one. The holdout's 91.7% with edge 0.0 is source-reported from the same study and says what happened on sealed months, not what would happen after a content migration. The curation recorded a structural decision with no measured traffic outcome. Three different claims, three different scopes.
+
+For the broader harness — question sets, retrieval metrics and scorers — see [Evaluating LLM Applications](/articles/evaluating-llm-applications). For the baseline and ranking question behind the 92.5% figure, see [Classification Metrics Beyond Accuracy](/articles/classification-metrics-beyond-accuracy). A drifting set is not a broken tool; it is a tool whose reference point moved. Say when that happened, and the score becomes usable again.
+
+## What belongs in the report beside the score?
+
+A report needs a set identifier and content hash, the date of the snapshot, the model and prompt versions, per-cohort scores, and the exclusions or abstentions counted separately. It also needs a sentence naming what was not measured, so a reader can tell a gap in evidence from a gap in the product.
+
+That last line is the one most often skipped. The curation case study states that no traffic outcome was measured before or after the change; the BTC study states that no PnL, slippage or transaction costs were computed. Both claims are narrower for saying so. An evaluation report that omits the same sentence invites the reader to supply the missing conclusion, usually the most flattering one.
+
+If a cohort appears for the first time in a run, mark it as new rather than folding it into the historical average. When a set is edited, record the edit as a dated event with a reason. Those habits do not make the yardstick stop moving; they make the movement visible, which is the only honest answer to a set that changes with the content it evaluates.
+
+## References & Further Reading
+
+- Geoffrey Webb, Ian Žliobaitė, Albert Bifet, Mykola Pechenizkiy & Abdelhamid Bouchachia, 2014. [A Survey on Concept Drift Adaptation](https://doi.org/10.1145/2523813) — drift as a property of evolving data streams, with detection and adaptation methods.
+- Timnit Gebru et al., 2021. [Datasheets for Datasets](https://arxiv.org/abs/1803.09010) — documenting motivation, composition, collection process and recommended uses.
+- NIST, 2023. [AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) — govern, map, measure and manage as one lifecycle.
+- novanr511, 2026. [Public reproduction package for the BTC monthly study](https://github.com/novanr511/btc-monthly-close-prediction) — the artifacts, audit script and figures read 18 November 2026.

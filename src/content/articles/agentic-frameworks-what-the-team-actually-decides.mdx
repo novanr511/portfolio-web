@@ -1,0 +1,75 @@
+---
+title: "Agentic Frameworks: What the Team Actually Decides"
+description: "Choosing an agentic framework settles three questions: who owns state, who may call actions, and where a person halts a run. A first-hand artifact shows the boundary."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - RAG
+  - Evaluation
+  - Machine Learning
+---
+
+Choosing an agentic framework is a decision about who owns state, who may call actions, and where a person halts a run: the RAG research agent built for the [BTC monthly study](/projects/btc-monthly-ml) kept retrieval, drafting, and the number-audit inside one LangGraph flow with SQLite checkpoints ([build log](/projects/rag-research-agent)), while Make's [November 2026 framework overview](https://www.make.com/blog/agentic-frameworks) lists six jobs a framework handles and places app connections, permissions, and run history outside it.
+
+That split is the part worth arguing about. A framework supplies a reasoning loop, tool calling, memory, orchestration, a review pause, and tracing. It supplies no policy for which of those a team may turn on. Vendor lists rank orchestration styles; none names the person who signs off on a refund. The decision outlives the choice of library, which is why it deserves to be written down before the shortlist. Source figures below are attributed to their publisher and were read on 24 November 2026; nothing here is a framework benchmark from my own work.
+
+## What does a framework actually decide for you?
+
+A framework supplies structure for six jobs: the reasoning loop, tool calls, memory and state, orchestration, human review, and tracing. The real choice is which of those you adopt and which you build yourself. Make's [November 2026 overview](https://www.make.com/blog/agentic-frameworks) names all six and states plainly that app connections, permissions, and run history sit outside the framework.
+
+Treat that list as vocabulary, not a ranking. The same overview groups seven frameworks by orchestration style: graph-based, role-based, event-driven, and handoff-based. It reports a McKinsey 2026 survey in which 40% of respondents at organisations with annual revenue above $1 billion said they were scaling agents in one or more functions, up from 27% a year earlier. Those figures are source-reported from a vendor article; they describe adoption claims, not outcomes measured on your task.
+
+A second survey it cites put quality at the top barrier for 32% of 1,340 respondents. That is a useful warning: the hard part is rarely wiring a loop, it is knowing what a wrong action costs. These figures stay attributed to the source rather than being presented as my own measurement. A team can borrow the six-job vocabulary and still have to answer the three ownership questions itself.
+
+## Who owns the state, and for how long?
+
+State ownership is the first decision, ahead of model or vendor choice. A graph passes shared state between steps, a role-based crew gives each agent its own goals, and an event-driven flow keeps progress inside a run. Pick the owner before the tools, because a checkpoint helps only when someone can read it and resume from it.
+
+Anthropic's [context-engineering note](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) treats context as a scarce resource that has to be filled deliberately. That is a state decision in another vocabulary: what the model sees at each step is determined by whoever controls the buffer. Re-sending the same background to several agents changes where the decisive fact sits. [ReAct](https://arxiv.org/abs/2210.03629) keeps reasoning and tool calls interleaved in one loop, so state accumulates in a single place rather than being copied at handoffs.
+
+In the RAG agent, state lived in SQLite checkpoints and a run registry: the question, the retrieved chunks, the draft, and the audit outcome were stored locally so a run could resume and two answers to the same question could be compared after an index change. That is one owner for one corpus. The writer–QA–orchestrator split owns no shared runtime state; it is a written division of labour with each role permitted to edit a different set of files. Whether either design performs better was not measured.
+
+## Who is allowed to call an action?
+
+Tool access is a permission decision, not a model decision. Restrict the reachable actions, log every call, and put a person at the boundary for steps that cannot be undone. Make's [AI SDR description](https://www.make.com/blog/ai-sdr) puts a qualification score on the CRM record and requires approval before outreach is sent. Capability and authority are different things.
+
+The same source reports that most AI SDR tools hide how they score leads and cites a 2026 survey in which only 17% of 1,000 US workers said they would trust AI to act with minimal human oversight. Both are vendor-published, source-reported claims; they justify a visible score and an approval step as design choices, not as measured lifts. Make's [voice-agent guide](https://www.make.com/blog/ai-voice-agents) draws the same line in one sentence: most voice agents can hold a conversation, fewer can update a CRM mid-call. Holding a conversation and changing a record are different permissions.
+
+ReAct supplies the mechanism underneath this: the model interleaves reasoning with actions against an external source, so the tool set determines the blast radius. A short, documented list of tools is easier to audit than a long one. In the RAG agent the generative step used an OpenAI-compatible model with an offline fallback, which meant retrieval and audit behaviour stayed testable when no key was available. That fallback was a design decision about reachability; its effect on answer quality was not measured.
+
+## Where does the human boundary sit?
+
+A boundary is a named halt, not a hope: the run must pause before a send, a payment, or a record change so a person can approve, edit, or cancel it. Place the pause where the consequence is irreversible and log what the reviewer changed. Whether approval improves outcomes needs measurement on your own cases.
+
+The writer–QA–orchestrator split is the clearest boundary I can describe from my own work: a writer edits assigned article files, QA reviews and corrects within its batch, and the orchestrator promotes approved slugs and writes no prose. That is a protocol enforced by file permissions, not three software agents holding a conversation. At archive scale the reason is mechanical: a check performed by the same hands that wrote the draft tends to pass its own mistakes.
+
+The curation decision recorded on 22 November 2026 applied the same pattern to content: an allowlist made entry default-deny, and the structural before-and-after was written down ([curation case study](/projects/seo-content-curation)). No traffic outcome was measured there, and none is claimed here. Frameworks that advertise human review and tracing give you places to put such a gate; they do not choose its location for you.
+
+## What did my own systems actually do?
+
+I did not run a production framework deployment, and I make no claim about operating one. The RAG research agent is one agent expressed as a small state graph with an offline fallback; the writer–QA–orchestrator split is a written protocol. Neither produced a measured comparison of frameworks, tokens, or outcomes. The source claims stay attributed to their publisher.
+
+The RAG agent retrieved from one corpus by lexical search: BM25 and TF-IDF merged by reciprocal rank fusion, chosen because the material was literal strings where a digit changes a claim. It drafted an answer, then ran a `number_audit` over every numeric claim against the retrieved chunks. A 193-check consistency audit in the wider pipeline reported zero failures and the test suite 55 passed with one skipped, figures read on 18 November 2026. Those results establish consistency between prose and files, not validity, and they are source-reported from the build log.
+
+That distinction matters for framework choice. A graph that routes a failed audit back into drafting is a design decision; whether the rerun improved any answer was not measured. The [agent evaluation examples](/articles/agent-evaluation-examples) separate that provenance signal from a verdict on quality, and [From LangChain to LangGraph](/articles/langchain-to-langgraph) explains the substrate. A team choosing a framework should ask which of its own checks would survive a switch of library.
+
+## What decision test should a team run before choosing?
+
+Write down who owns state, which tools are reachable, and where a person halts the run; then build the same small task in two candidates and compare traces, checkpoints, and failure paths. Choose the simpler candidate that makes those three answers inspectable. That is a decision procedure, not a promise about performance.
+
+1. Name the state owner and the period that state must survive.
+2. List the tools the agent may call and who grants each permission.
+3. Mark the steps where a person must approve, edit, or cancel.
+4. Pilot one real task in two finalists and read both traces side by side.
+5. Test the resume path after an interruption, not only the happy path.
+6. Price the review time and the failure path at your real volume.
+
+This article covers a narrower question than [AI agents vs traditional automation](/articles/ai-agents-vs-traditional-automation-what-is-actually-different) or [multi-agent coordination](/articles/multi-agent-coordination-when-more-agents-make-things-worse): where the framework decision sits relative to a team's own boundaries. For the governance layer around it, see [AI Governance](/articles/ai-governance-managing-ai-responsibly-at-scale) and [Human-in-the-Loop by Design](/articles/human-in-the-loop-by-design). The library is the easy part to swap; the ownership and the halt are the parts a reader has to write down.
+
+## References & Further Reading
+
+- Make, 3 November 2026. [Agentic frameworks: 7 top options and how to choose them](https://www.make.com/blog/agentic-frameworks) — vendor overview; six framework jobs, four orchestration styles, and the boundary around apps and permissions. Used as vocabulary, not as an independent benchmark.
+- Make, 2 November 2026. [AI SDR: how it works, benefits & examples](https://www.make.com/blog/ai-sdr) — source-reported observations on hidden scoring, a 17% oversight figure, and approval before outreach.
+- Make, 16 November 2026. [AI voice agents: how they work and 7 top platforms](https://www.make.com/blog/ai-voice-agents) — source-reported distinction between holding a conversation and updating a CRM mid-call.
+- Anthropic, 2025. [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — context treated as a scarce resource to be filled deliberately.
+- Yao et al., 2022. [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — interleaved reasoning and tool use in a single loop.

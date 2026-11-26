@@ -1,0 +1,72 @@
+---
+title: "Profit, Not Revenue, as the Optimization Target"
+description: "Net profit per order is a more defensible conversion value than order revenue: a worked example shows how a larger sale can consume margin while a smaller one earns it."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Machine Learning
+---
+
+Optimizing the order total can buy revenue that loses money, and the closest local precedent is the BTC monthly study, where a 92.5% model lost to a zero-parameter rule at 94.0% with Holm-adjusted p-values of 1.0 and no claim of tradability ([study record](/projects/btc-monthly-ml)); Make's [October 2026 optimization article](https://www.make.com/blog/profit-based-ad-optimization-how-to-send-net-profit-to-meta-conversions-api-with-make) describes the commercial version: a $200 sale at 6% margin barely registers in the bank account.
+
+A headline figure can improve while the thing it was meant to represent worsens. This article treats net profit per order as a conversion value and asks what a team must believe before handing that number to an optimizer. The question is about the target, not about a particular tool. Every worked input below is ASSUMED and every output is DERIVED; the Make article is a source case study, not a result I produced.
+
+> **Educational only.** This article illustrates a measurement decision with hypothetical numbers. It is advertising and investment neutral, reports no campaign result, client account, or author position, and gives no recommendation to buy or sell anything.
+
+## Why can optimized revenue still lose money?
+
+Revenue is the order total; profit is what remains after the costs that ride with the order. An optimizer handed the total will find buyers who generate large totals, including buyers whose margin disappears once goods, shipping, fees, and returns are paid. The signal is behaving correctly; the target is wrong.
+
+Make's article opens with the mismatch in plain terms: reported return on ad spend looks strong while the accountant sees a loss, because the order total ignores cost of goods, shipping, payment fees, and returns. That framing is source-reported from a vendor publication read on 24 November 2026, not a measured account. The mechanism is general enough to state independently: an optimizer maximises the number you give it. Attribution adds a second trap. A platform-reported conversion is credited under a rule chosen by the platform, and credit is not the same as causal lift; [Return on Ad Spend at Scale](/articles/return-on-ad-spend-at-scale) separates the ratio from the decision it is meant to inform.
+
+Neither point requires a new tool. Both require someone to decide what the number stands for before the algorithm starts looking for more of it. A team that cannot say what one order earns after variable costs has not yet chosen a target.
+
+## What value should a conversion event carry?
+
+A conversion value should carry the economic quantity the business wants more of. For a product order that is net profit per order: gross revenue less cost of goods, shipping, payment fees, tax, and a return allowance. Sending that figure makes a profitable small order outweigh an unprofitable large one.
+
+Make states the same formula and notes that the value parameter of a Purchase event can carry a custom number. The technical path is documented by Meta: the [Conversions API parameters](https://developers.facebook.com/documentation/ads-commerce/conversions-api/parameters) define the value field, and server events are processed for measurement and optimization like other event sources. Google's [conversion measurement guidance](https://support.google.com/google-ads/answer/1722022?hl=en) makes the underlying choice explicit: the advertiser decides what counts. Those documents describe a mechanism; they do not tell any business which value is correct for it.
+
+Profit per order is a boundary choice as much as an accounting fact. It excludes fixed costs, cash timing, and future purchases, so it answers one question about one order and leaves the rest outside the frame. That boundary is the same discipline behind [Understanding Unit Economics](/articles/understanding-unit-economics-cac-ltv-churn-contribution-margin): define the unit before computing the ratio.
+
+## What does the worked arithmetic actually show?
+
+The arithmetic below is hypothetical. It holds ad spend fixed and changes what the conversion event reports, so the swing follows from the chosen value rather than from a market observation. Each input is ASSUMED and each result is DERIVED. The point is to show where a revenue target and a profit target disagree.
+
+**ASSUMED** per order: ad spend of $20 and a payment fee of 3% of gross revenue. Product A has gross revenue of $200, cost of goods of $170, shipping of $12, and a return allowance of $10. **DERIVED:** payment fee $6; total variable costs $170 + $12 + $6 + $10 = $198; net profit $200 − $198 = $2; profit after ad spend $2 − $20 = −$18; revenue-based ROAS 200 ÷ 20 = 10.0; profit-on-ad-spend 2 ÷ 20 = 0.1.
+
+Product B, under the same assumptions, has gross revenue of $60, cost of goods of $20, shipping of $6, and a return allowance of $2.20. **DERIVED:** payment fee $1.80; total variable costs $20 + $6 + $1.80 + $2.20 = $30; net profit $60 − $30 = $30; profit after ad spend $30 − $20 = $10; ROAS 60 ÷ 20 = 3.0; profit-on-ad-spend 30 ÷ 20 = 1.5.
+
+The revenue target ranks A above B by 10.0 to 3.0. The profit target ranks B above A by 1.5 to 0.1, and only B earns anything after ad spend. Now move one input. **ASSUMED:** A's return allowance rises from $10 to $20; **DERIVED:** net profit becomes $200 − $208 = −$8 and profit after ad spend −$28. The model did not change; a stale input did. These are arithmetic consequences of assumed figures, not observations about a product, a campaign, or a market.
+
+## What inputs must exist before this value is trustworthy?
+
+A profit value is only as good as its inputs: current cost of goods, shipping, payment fees, tax treatment, and a return allowance for every order. If any input is stale or missing, the optimizer learns a margin that does not exist. Clean the source before you change the target, and record which figures were assumed.
+
+The Make article calls stale cost data the most common weak spot and describes cost figures a year old leading an optimizer toward a margin that no longer exists. That is source-reported advice, not a measured failure rate. The operational requirement is plainer: each event needs a value that can be traced to a record with a date. A return allowance that is guessed once and reused silently is no different from a revenue figure with the costs omitted. This is a data-quality decision that precedes the advertising decision, and it is why the [customer acquisition cost definition](/articles/customer-acquisition-cost-costs-explained) starts by fixing the numerator before dividing.
+
+None of this was tested on a live account here. The checks are about provenance: can the team name the source of each input, its refresh date, and the person who owns it? An unowned input will drift, and the optimizer will keep chasing the number it was given.
+
+## How do you judge the change once the target moves?
+
+Judge the change by profit on ad spend against a pre-set threshold, not by reported revenue. Expect reported revenue to fall when the event value becomes net profit, because the unit changed. Tell the team before the dashboard moves, give the algorithm time to learn, and compare like with like.
+
+Make's article anticipates exactly that reporting drop and advises comparing profit on ad spend before and after the switch, with time allowed for learning. Those are source-reported expectations from the same vendor publication. The honest measurement question sits one level deeper: did the change cause more profit, or did the audience mix move for another reason? A platform report cannot answer that on its own; a holdout or geo test is the design that can, and [Incrementality Testing Without a Platform](/articles/how-to-evaluate-incrementality-testing) covers that comparison. Reporting a before-and-after movement as lift would repeat the attribution error this article started with.
+
+A pre-set threshold matters because the number will move for both reasons at once. Decide in advance what level of profit on ad spend would justify keeping the new target, then read the result against that level rather than against the old revenue chart.
+
+## What does this decision leave unsettled?
+
+This decision sets an objective, not a strategy. It says nothing about whether the ad channel is incremental, whether profit per order captures long-term value, or whether fixed costs are covered. A correct value can still feed a bad channel. The framework narrows one error while leaving larger questions to other tests.
+
+Profit per order is deliberately narrow. It excludes a second purchase, a subscription renewal, or a refund that arrives after the reporting window; those belong to lifetime value and retention, which [Customer Lifetime Value](/articles/customer-lifetime-value-the-metric-that-guides-acquisition) treats separately. It also excludes rent and salaries, so a healthy per-order figure can coexist with an unprofitable company. Cash timing sits outside it too: ad spend is paid now while a return may be processed weeks later.
+
+The lens test is the same one applied to the archive on 22 November 2026: a decision is honest when its boundary and its uncertainty are written down where someone can check them ([curation case study](/projects/seo-content-curation)). Here the boundary is one order, the uncertainty is in the cost inputs, and the outcome is unmeasured. A team that adopts profit per order has chosen a better target for the optimizer; it has not thereby chosen a better business. That second decision needs the wider evidence this article does not claim to have.
+
+## References & Further Reading
+
+- Natalia Mrazova, 22 October 2026. [Profit-based ad optimization: how to send net profit to Meta Conversions API with Make](https://www.make.com/blog/profit-based-ad-optimization-how-to-send-net-profit-to-meta-conversions-api-with-make) — source case study for the revenue-versus-profit framing, the cost formula, and the reporting-drop expectation; vendor-published, source-reported.
+- Make, 2 November 2026. [AI SDR: how it works, benefits & examples](https://www.make.com/blog/ai-sdr) — supporting source on visible scoring and human approval before an automated send.
+- Meta, 2026. [Conversions API parameters](https://developers.facebook.com/documentation/ads-commerce/conversions-api/parameters) — official documentation of the value field on a server-sent event.
+- Google Ads, 2026. [About conversion measurement](https://support.google.com/google-ads/answer/1722022?hl=en) — the advertiser chooses what counts as a conversion.

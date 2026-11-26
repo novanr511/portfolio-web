@@ -11,6 +11,7 @@ import { site } from "@/lib/site";
 /** Full prerender at build; skip instant-UI validation (static content) */
 export const instant = false;
 
+
 export function generateStaticParams() {
   return getProjectStudies().then((all) => all.map((s) => ({ slug: s.slug })));
 }

@@ -1,0 +1,83 @@
+---
+title: "Launch Metrics That Survive Review"
+description: "A launch metric survives review when its definition, window, and owner are fixed before the numbers are opened, leaving an auditable record."
+date: 2026-12-05
+updated: 2026-11-22
+tags:
+  - Evaluation
+  - Data Engineering
+---
+
+No number in a launch report survives review on its own; it survives because someone fixed its definition, window and owner before the launch and can show the record. On 22 November 2026 a curation pass reduced 1,004 templated articles to a curated, restorable set behind an allowlist, and the traffic outcome was not measured. The RAG agent's `number_audit` ran 193 checks proving its memos matched retrieved files, not that the method was sound. In the Bitcoin study a 92.5% model lost to a zero-parameter rule at 94.0% with Holm-adjusted p-values of 1.0, and the authors refused a tradability claim. Google Analytics counts only events that have been implemented, and AAPOR asks researchers to disclose their method when they release a finding. This is a guide to that audit trail, not to launch strategy ([go-to-market strategy](/articles/go-to-market-strategy-how-to-launch-a-product)) or to building a waitlist ([waitlist campaigns](/articles/waitlist-campaigns-costs-explained)).
+
+## What makes a launch metric auditable?
+
+An auditable metric carries four things a reviewer can inspect: a definition written before launch, a dated collection window, an owner accountable for changes, and a record of what was excluded. Without those fields a number is an assertion. The definition fixes what counts, the window fixes when, and the owner makes the figure reproducible when someone asks again.
+
+The distinction matters because a launch report is read twice: once in the room where it is presented, and once by someone who was not there. The second reader has only the artifact. A signup figure with a named event, a start date and an owner can be recomputed from raw data; one without them can only be taken on trust. The [curation decision](/articles/why-i-killed-966-articles) was recorded in that second form deliberately: a rule, a date and structural facts, so a later reader could dispute a specific row.
+
+Auditable does not mean accurate in a larger sense. It means the path from an observation to a reported number is short enough to walk backwards — a narrower standard than "the launch worked", which needs a comparison the audit trail alone cannot supply.
+
+## What did the curation decision actually measure?
+
+The 22 November 2026 curation changed what goes live by default, not what readers did afterwards. It moved 1,004 templated articles to a curated set behind an allowlist and recorded structural facts such as tag counts. No traffic outcome was measured, so it supports a claim about a rule, not a growth claim.
+
+The recorded snapshot describes the archive at that date: fewer templated pages, a narrower tag set, no colliding slugs in the curated set. Those are facts about files and configuration, each checkable against the repository. The mechanism is the important part. An allowlist flips the default so nothing goes live until it is rewritten against evidence and earns an entry — a decision a reviewer can inspect, unlike a goal such as "improve quality".
+
+The empty outcome column is equally deliberate. Attaching a traffic figure without instrumentation would have made the record look more persuasive and less checkable. Leaving it blank preserved the boundary between what was observed and what was wished. A launch review needs the same willingness; [attribution window as a choice](/articles/attribution-window-as-a-choice) shows the measurement rule fixed before results are read.
+
+## Why does an event need a definition before launch?
+
+Google Analytics defines an event as a measured interaction, and an event you have not implemented cannot appear in a report. That makes the definition a precondition of measurement, not a cleanup task. Marking an event as a key event is a separate, explicit act. Both choices belong in the review record before traffic arrives.
+
+The platform's [event documentation](https://support.google.com/analytics/answer/9322688?hl=en), read 22 November 2026, distinguishes automatic, enhanced-measurement, recommended and custom events. Only the first two arrive with a standard setup; the owner must implement the rest. The same page names the Realtime report and DebugView as checks that an event is arriving with its parameters — verification steps, not growth metrics, and the right things to report on launch day before an outcome has accumulated.
+
+The page also notes that any collected event can become a key event, and that marking one is an explicit act rather than a property of the interaction. A report saying "conversions rose" without naming the marked event has skipped that step. The definition is the unit of the metric; a number without it is like a temperature with no stated scale.
+
+## What can the BTC study teach a launch dashboard?
+
+The study reported a 92.5% model that lost by 1.5 points to a zero-parameter rule at 94.0%, with Holm-adjusted p-values of 1.0. Its 193-check audit proved the report matched its files, not that the method was sound. A launch dashboard needs the same pairing: the attractive figure, the simple comparator, plus a plain statement of scope.
+
+The comparator was fixed before results were read. The model's 92.5% was `P(GREEN | move so far this month)` — a description of information already visible by day 25, not a signal executable at the previous month-end price. A frozen twelve-month holdout returned 91.7% accuracy with an edge of 0.0. No PnL, slippage or transaction costs were computed, so no tradability claim was made. Figures are source-reported from the [public reproduction package](https://github.com/novanr511/btc-monthly-close-prediction), read 18 and 22 November 2026.
+
+For a launch, name the simplest rival explanation in advance. If signups rose during launch week, the rival is a trend already rising beforehand; if activation rose, the rival is a change in its definition. A dashboard showing only the flattering line invites the reader to supply the missing comparator, and readers are usually generous to a number they want to believe. [Classification metrics beyond accuracy](/articles/classification-metrics-beyond-accuracy) works through the same problem for a single rate.
+
+## What does AAPOR require before a finding is released?
+
+AAPOR makes no judgment about method quality. Its Transparency Initiative asks organizations to disclose collection method, sponsor, wording, population, sampling, dates and limitations at the same time as the finding. That is the review standard for a launch number: disclose enough that a reader can judge it, and say plainly where the evidence stops instead of letting the headline stand.
+
+The [Transparency Initiative](https://aapor.org/standards-and-ethics/transparency-initiative/), read 24 November 2026, states that it makes no judgment about the approach, quality or rigour of disclosed methods; its purpose is disclosure so readers can reach their own conclusions. The [Standard Definitions](https://aapor.org/standards-and-ethics/standard-definitions/) page, read the same date, adds that a response rate alone is insufficient to determine nonresponse error. Both standards reject a single summary figure as a verdict.
+
+Translated to a launch, the requirement is unglamorous. Name who collected the number, from which logs, over which dates, with which filters, and what it excludes. If a self-selected group supplied survey responses, say so. A disclosure that lets a skeptical reader reproduce the figure is worth more at review time than a cleaner headline.
+
+## How do you build a launch review that survives scrutiny?
+
+Fix the metric definitions before launch, record their owners, and write down the simple comparator you would accept as a rival explanation. Publish the table beside the headline, including the rows you could not fill. A review that can reproduce the number from the record is useful; one that needs the author to explain it aloud is not an artifact.
+
+The table below is a what-if. No campaign, product or conversion log was measured for it; the 193-check audit and the dated curation are separate, first-hand records. Every input is ASSUMED and every total is DERIVED from those inputs, in the same way a reviewer would recompute a real launch report.
+
+| Quantity | Status | Basis |
+| --- | --- | --- |
+| Signups reported by the platform in week one | ASSUMED | 2,000 |
+| Signups carrying the defined event | ASSUMED | 1,800 |
+| Verified share of reported signups | DERIVED | 1,800 / 2,000 = 90% |
+| Activation events counted under the fixed definition | ASSUMED | 450 |
+| Activation rate among verified signups | DERIVED | 450 / 1,800 = 25% |
+
+Nothing in that table is a result. Its purpose is to show that a review can be checked: the denominator is named, the definition is stated, and a reader can substitute their own inputs. A report without those columns asks to be believed on the one number that matters most. The `number_audit` ([build log](/projects/rag-research-agent)) is a model here in one respect only — it verifies that prose agrees with its sources.
+
+## Which launch numbers should be left blank?
+
+Leave blank any cell that needs an outcome you did not instrument: traffic lift, launch-caused conversion, or first-week retention. Fill cells that describe the artifact — what shipped, which events were verified, which definition was fixed on which date. A blank with a reason records discipline; a guessed figure in the same cell is the vanity metric this review removes.
+
+The distinction between a rosy picture and a decision-relevant measure predates dashboards: the [lean startup entry](https://en.wikipedia.org/wiki/Lean_startup#Actionable_metrics_vs_vanity_metrics), read 24 November 2026, describes vanity metrics as measurements giving "the rosiest picture possible" without reflecting key drivers, and notes that the same metric can be vanity for one company and actionable for another. Its example — new users per day — means little beside acquisition cost.
+
+The honest close is narrow. Curation recorded a structure and left the traffic outcome unmeasured. The audit proved consistency and left validity untested. The BTC study reported an accuracy figure and refused the tradability claim it seemed to support. None of those refusals weakened the work; each made the remaining number usable. A launch metric survives review for the same reason — definition, window and owner are on the page, and cells without evidence are left blank.
+
+## References & Further Reading
+
+- Google Analytics Help, [About events](https://support.google.com/analytics/answer/9322688?hl=en) — event types, implementation requirement, key events, Realtime and DebugView verification; read 22 November 2026.
+- American Association for Public Opinion Research, [Transparency Initiative](https://aapor.org/standards-and-ethics/transparency-initiative/) — disclosure elements released alongside findings, with no judgment on method quality; read 24 November 2026.
+- American Association for Public Opinion Research, [Standard Definitions](https://aapor.org/standards-and-ethics/standard-definitions/) — disposition codes and why a response rate alone is insufficient; read 24 November 2026.
+- Wikipedia, [Lean startup — actionable metrics vs vanity metrics](https://en.wikipedia.org/wiki/Lean_startup#Actionable_metrics_vs_vanity_metrics) — the rosiest-picture definition and the context-dependence of a vanity metric; read 24 November 2026.
+- First-hand artifacts, figures read 18 and 22 November 2026: [curation case study](/projects/seo-content-curation), [RAG agent build log](/projects/rag-research-agent) and [BTC monthly study](/projects/btc-monthly-ml).
