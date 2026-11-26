@@ -73,6 +73,7 @@ ${projectsSection}${analyticsSection}## Pages
 - [Articles](${site.url}/articles): all ${sortedArticles.length} curated articles
 - [Projects](${site.url}/projects): ${projects.length ? "published project case studies" : "case studies in progress; no project entries are published yet"}
 - [Data analytics](${site.url}/data-analytics): documented projects and public-data demos
+- [Links](${site.url}/links): the Pindah Karir channel and the Urunan untuk Hutan fundraiser
 - [About](${site.url}/about): bio, focus areas, and contact
 - [RSS feed](${site.url}/feed.xml): subscribe to new articles
 - [Full content for LLMs](${site.url}/llms-full.txt): complete article content in plain markdown
