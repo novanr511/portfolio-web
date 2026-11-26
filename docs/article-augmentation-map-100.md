@@ -1,8 +1,8 @@
 # Article augmentation map: 100 ideas
 
-Source brief: 2026-11-26. These are **not 100 new articles**. Each idea is mapped to an existing article where a new paragraph belongs, or marked `skip` when no host is genuinely relevant.
+Source brief: 2026-11-26. These are **not 100 new articles**. Each idea is mapped to a published article where a new paragraph belongs, or marked `skip` when no published host is genuinely relevant.
 
-`augment`: 93. `skip`: 7. No article has been edited yet; this document is for review.
+`augment`: 90. `skip`: 10. No article has been edited yet; this document is for review.
 
 | No | Cluster | Idea | Host article | Paragraph kind |
 |---:|---|---|---|---|
@@ -39,11 +39,11 @@ Source brief: 2026-11-26. These are **not 100 new articles**. Each idea is mappe
 | 31 | AI Engineering, RAG & AI Agents | How to Build a Production-Ready RAG Application Using LangChain and Qdrant? | `rag-explained` | worked-example |
 | 32 | AI Engineering, RAG & AI Agents | How to Build a Multi-Tenant RAG System for a SaaS Application? | - | skip: no existing article covers multi-tenant RAG isolation |
 | 33 | AI Engineering, RAG & AI Agents | How to Evaluate RAG Systems Using Recall@K, Precision, MRR, and Faithfulness? | `evaluating-llm-applications` | metrics |
-| 34 | AI Engineering, RAG & AI Agents | How to Build an MCP Server with Authentication, Permissions, and Tool Validation? | `ai-agent-permissions-least-privilege` | worked-example |
+| 34 | AI Engineering, RAG & AI Agents | How to Build an MCP Server with Authentication, Permissions, and Tool Validation? | `tool-calling-reliability-when-function-calls-fail-in-agent-systems` | published-host-substituted |
 | 35 | AI Engineering, RAG & AI Agents | How to Build Multi-Agent Workflows Using LangGraph? | `langchain-to-langgraph` | worked-example |
 | 36 | AI Engineering, RAG & AI Agents | How to Monitor AI Agent Performance, Latency, Tool Failures, and Token Costs? | `agent-observability-trade-offs` | decision |
 | 37 | AI Engineering, RAG & AI Agents | How to Implement Human-in-the-Loop Approval in Autonomous AI Agents? | `human-in-the-loop-by-design` | worked-example |
-| 38 | AI Engineering, RAG & AI Agents | How to Protect AI Agents Against Prompt Injection and Tool Exploitation? | `prompt-injection-llm-applications-threat-model` | boundary |
+| 38 | AI Engineering, RAG & AI Agents | How to Protect AI Agents Against Prompt Injection and Tool Exploitation? | `what-prompt-injection-defenses-actually-measures` | published-host-substituted |
 | 39 | Machine Learning & Data Science | How Do You Choose the Right Machine Learning Algorithm for a Business Problem? | `how-companies-use-predictive-analytics-to-make-business-decisions` | decision |
 | 40 | Machine Learning & Data Science | What Is the Difference Between Supervised, Unsupervised, and Reinforcement Learning? | `how-to-start-learning-ai` | taxonomy |
 | 41 | Machine Learning & Data Science | Why Does High Model Accuracy Not Always Mean a Good Machine Learning Model? | `classification-metrics-beyond-accuracy` | worked-example |
@@ -58,39 +58,39 @@ Source brief: 2026-11-26. These are **not 100 new articles**. Each idea is mappe
 | 50 | Machine Learning & Data Science | How to Monitor Machine Learning Models for Data Drift and Performance Degradation? | `model-monitoring-detecting-drift-bias-and-performance-degradation` | decision |
 | 51 | Marketing Analytics, Growth & Business Intelligence | How Do You Build a Data-Driven Marketing Strategy for a Growing Business? | `how-data-changes-the-way-marketing-decisions-are-made` | decision |
 | 52 | Marketing Analytics, Growth & Business Intelligence | What Is the Difference Between Marketing ROI, ROAS, CAC, and LTV? | `understanding-unit-economics-cac-ltv-churn-contribution-margin` | comparison |
-| 53 | Marketing Analytics, Growth & Business Intelligence | How Do You Measure Incremental Revenue from Marketing Campaigns? | `incrementality-test-without-a-platform` | method |
+| 53 | Marketing Analytics, Growth & Business Intelligence | How Do You Measure Incremental Revenue from Marketing Campaigns? | `how-to-get-geo-experiments-right` | published-host-substituted |
 | 54 | Marketing Analytics, Growth & Business Intelligence | What Is the Difference Between Marketing Attribution and Incrementality Testing? | `marketing-attribution-multi-touch-models-incrementality-and-budget-allocation` | comparison |
 | 55 | Marketing Analytics, Growth & Business Intelligence | How Should Businesses Allocate Marketing Budgets Across Different Channels? | `marketing-budget-template-and-allocation-rules` | decision |
 | 56 | Marketing Analytics, Growth & Business Intelligence | How to Build a Marketing Budget Allocation Model Using Google Sheets? | `marketing-budget-template-and-allocation-rules` | worked-example |
-| 57 | Marketing Analytics, Growth & Business Intelligence | How to Calculate Incremental ROAS Instead of Relying on Platform ROAS? | `how-to-evaluate-incrementality-testing` | worked-example |
+| 57 | Marketing Analytics, Growth & Business Intelligence | How to Calculate Incremental ROAS Instead of Relying on Platform ROAS? | `how-to-get-geo-experiments-right` | published-host-substituted |
 | 58 | Marketing Analytics, Growth & Business Intelligence | How to Build a Unified Marketing Performance Dashboard Using GA4 and Advertising Data? | `what-marketing-dashboards-actually-measures` | method |
-| 59 | Marketing Analytics, Growth & Business Intelligence | How to Measure Influencer Marketing ROI Beyond Views and Engagement? | `influencer-marketing-measurement` | worked-example |
+| 59 | Marketing Analytics, Growth & Business Intelligence | How to Measure Influencer Marketing ROI Beyond Views and Engagement? | - | skip: no published article on influencer measurement |
 | 60 | Marketing Analytics, Growth & Business Intelligence | How to Build a Customer Segmentation Model Using RFM Analysis and Python? | `how-to-get-customer-segmentation-right` | worked-example |
 | 61 | Marketing Analytics, Growth & Business Intelligence | How to Calculate Customer Lifetime Value for Subscription and E-Commerce Businesses? | `customer-lifetime-value-the-metric-that-guides-acquisition` | worked-example |
 | 62 | Marketing Analytics, Growth & Business Intelligence | How to Measure SEO's Contribution to Revenue and Customer Acquisition? | - | skip: no existing article ties SEO to revenue with defensible attribution |
-| 63 | Retail Analytics & Visual Merchandising | What Is Retail Analytics and How Does It Improve Store Performance? | `how-to-get-retail-analytics-right` | definition |
-| 64 | Retail Analytics & Visual Merchandising | What Is the Difference Between Sell-In, Sell-Out, and Sell-Through in Retail? | `the-difference-between-sell-in-and-sell-out-in-retail` | comparison |
+| 63 | Retail Analytics & Visual Merchandising | What Is Retail Analytics and How Does It Improve Store Performance? | `retail-analytics-costs-explained` | published-host-substituted |
+| 64 | Retail Analytics & Visual Merchandising | What Is the Difference Between Sell-In, Sell-Out, and Sell-Through in Retail? | - | skip: the matching article exists in archive but is not published |
 | 65 | Retail Analytics & Visual Merchandising | How Does Product Assortment Optimization Improve Retail Profitability? | `why-product-assortment-matters-more-than-having-more-products` | decision |
-| 66 | Retail Analytics & Visual Merchandising | How Do Retailers Decide Which Products Deserve Limited Shelf Space? | `how-retailers-use-data-to-optimize-product-placement` | decision |
-| 67 | Retail Analytics & Visual Merchandising | How to Optimize SKU Assortment Based on Store Grade, Shelf Capacity, and Sales Performance? | `product-assortment-in-practice` | worked-example |
-| 68 | Retail Analytics & Visual Merchandising | How to Measure Retail Display ROI When Sell-Out Data Is Incomplete? | `what-sell-out-actually-measures` | limitation |
-| 69 | Retail Analytics & Visual Merchandising | How to Build a Store Performance Scoring Model Using Sales, Inventory, and Store Capacity? | `how-to-get-retail-analytics-right` | model |
+| 66 | Retail Analytics & Visual Merchandising | How Do Retailers Decide Which Products Deserve Limited Shelf Space? | `why-product-assortment-matters-more-than-having-more-products` | published-host-substituted |
+| 67 | Retail Analytics & Visual Merchandising | How to Optimize SKU Assortment Based on Store Grade, Shelf Capacity, and Sales Performance? | `why-product-assortment-matters-more-than-having-more-products` | published-host-substituted |
+| 68 | Retail Analytics & Visual Merchandising | How to Measure Retail Display ROI When Sell-Out Data Is Incomplete? | - | skip: the matching article exists in archive but is not published |
+| 69 | Retail Analytics & Visual Merchandising | How to Build a Store Performance Scoring Model Using Sales, Inventory, and Store Capacity? | `retail-analytics-costs-explained` | published-host-substituted |
 | 70 | Retail Analytics & Visual Merchandising | How to Measure Beauty Advisor Sales Performance When Employees Move Between Stores? | - | skip: no existing article on employee movement and performance attribution |
 | 71 | Retail Analytics & Visual Merchandising | How to Identify Slow-Moving Products and Dead Stock Using Retail Analytics? | `inventory-accuracy-without-the-hype` | worked-example |
-| 72 | Retail Analytics & Visual Merchandising | How to Calculate Sales per Square Meter and Shelf Productivity in Retail? | `how-to-get-retail-analytics-right` | worked-example |
-| 73 | Retail Analytics & Visual Merchandising | How to Optimize Store Space Allocation Using Data-Driven Decision Models? | `product-assortment-in-practice` | decision |
+| 72 | Retail Analytics & Visual Merchandising | How to Calculate Sales per Square Meter and Shelf Productivity in Retail? | `retail-analytics-costs-explained` | published-host-substituted |
+| 73 | Retail Analytics & Visual Merchandising | How to Optimize Store Space Allocation Using Data-Driven Decision Models? | `why-product-assortment-matters-more-than-having-more-products` | published-host-substituted |
 | 74 | Retail Analytics & Visual Merchandising | How to Build a Retail Visual Merchandising Performance Dashboard Using Power BI? | `power-bi-for-business-analytics-data-modeling-dax-and-dashboard-best-practices` | dashboard |
 | 75 | Finance, Economics & Quantitative Trading | How Do Macroeconomic Indicators Affect Financial Markets? | `macroeconomics-for-business-leaders-inflation-gdp-and-monetary-policy` | mechanism |
-| 76 | Finance, Economics & Quantitative Trading | How Do Inflation, Interest Rates, and Bond Yields Affect Gold Prices? | `gold-markets-in-practice` | worked-example |
+| 76 | Finance, Economics & Quantitative Trading | How Do Inflation, Interest Rates, and Bond Yields Affect Gold Prices? | `commodity-markets-oil-gold-and-price-discovery` | published-host-substituted |
 | 77 | Finance, Economics & Quantitative Trading | What Is the Difference Between Fundamental Analysis, Technical Analysis, and Quantitative Analysis? | `stock-market-fundamentals-valuation-indices-and-market-mechanics` | comparison |
 | 78 | Finance, Economics & Quantitative Trading | What Makes a Trading Strategy Statistically Profitable Over the Long Term? | `sharpe-ratio-metrics-that-matter` | decision |
 | 79 | Finance, Economics & Quantitative Trading | How to Backtest a Trading Strategy Using Python Without Lookahead Bias? | `data-leakage-in-machine-learning` | worked-example |
 | 80 | Finance, Economics & Quantitative Trading | How to Measure Trading Strategy Performance Using Sharpe Ratio, Sortino Ratio, and Maximum Drawdown? | `sharpe-ratio-metrics-that-matter` | worked-example |
 | 81 | Finance, Economics & Quantitative Trading | How to Build a Bitcoin Market Regime Detection Model Using Machine Learning? | `anomaly-detection-statistical-ml-and-deep-learning-approaches` | worked-example |
-| 82 | Finance, Economics & Quantitative Trading | How to Analyze Gold Price Reactions to CPI, PPI, and NFP Announcements? | `gold-markets-in-practice` | worked-example |
+| 82 | Finance, Economics & Quantitative Trading | How to Analyze Gold Price Reactions to CPI, PPI, and NFP Announcements? | `commodity-markets-oil-gold-and-price-discovery` | published-host-substituted |
 | 83 | Finance, Economics & Quantitative Trading | How to Build a Risk Management System for Algorithmic Trading? | `sharpe-ratio-metrics-that-matter` | decision |
 | 84 | Finance, Economics & Quantitative Trading | How to Use Walk-Forward Validation to Evaluate Financial Time-Series Models? | `data-leakage-in-machine-learning` | method |
-| 85 | Finance, Economics & Quantitative Trading | How to Detect Overfitting in Quantitative Trading Strategies? | `why-a-lower-accuracy-model-can-win-a-task` | limitation |
+| 85 | Finance, Economics & Quantitative Trading | How to Detect Overfitting in Quantitative Trading Strategies? | `classification-metrics-beyond-accuracy` | published-host-substituted |
 | 86 | Finance, Economics & Quantitative Trading | How to Build a Cryptocurrency Market Screener Using Python and Exchange APIs? | - | skip: no existing article on exchange APIs or market screening |
 | 87 | Career, Technology & Professional Development | How to Transition from Marketing or SEO into Data Science and AI Engineering? | `career-transitions-moving-between-industries-and-roles` | worked-example |
 | 88 | Career, Technology & Professional Development | What Skills Do You Need to Become an AI Engineer in 2027? | `how-to-start-learning-ai` | checklist |
@@ -109,10 +109,13 @@ Source brief: 2026-11-26. These are **not 100 new articles**. Each idea is mappe
 
 ## Skipped ideas
 
-These have no defensible host in the current library. They should not be forced into an unrelated article.
+These have no published host in the current library. They should not be forced into an unrelated article.
 
 - #32 How to Build a Multi-Tenant RAG System for a SaaS Application?: skip: no existing article covers multi-tenant RAG isolation
+- #59 How to Measure Influencer Marketing ROI Beyond Views and Engagement?: skip: no published article on influencer measurement
 - #62 How to Measure SEO's Contribution to Revenue and Customer Acquisition?: skip: no existing article ties SEO to revenue with defensible attribution
+- #64 What Is the Difference Between Sell-In, Sell-Out, and Sell-Through in Retail?: skip: the matching article exists in archive but is not published
+- #68 How to Measure Retail Display ROI When Sell-Out Data Is Incomplete?: skip: the matching article exists in archive but is not published
 - #70 How to Measure Beauty Advisor Sales Performance When Employees Move Between Stores?: skip: no existing article on employee movement and performance attribution
 - #86 How to Build a Cryptocurrency Market Screener Using Python and Exchange APIs?: skip: no existing article on exchange APIs or market screening
 - #97 How Do You Design a Scalable Multi-Tenant SaaS Architecture?: skip: no existing article on multi-tenant SaaS architecture
