@@ -10,14 +10,14 @@ export const metadata: Metadata = {
     "Data analytics work by Novandri R.: documented case studies and reproducible public-data demos covering sales performance, HR attrition, finance risk, time series, and retrieval systems.",
   alternates: { canonical: "/data-analytics" },
   openGraph: {
-    title: "Data Analytics — Novandri R.",
+    title: "Data Analytics: Rachmadwipa Novandri",
     description:
       "Documented projects and reproducible public-data demos in analytics and applied AI.",
     url: "/data-analytics",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Data Analytics — Novandri R.",
+    title: "Data Analytics: Rachmadwipa Novandri",
     description:
       "Documented projects and reproducible public-data demos in analytics and applied AI.",
   },
