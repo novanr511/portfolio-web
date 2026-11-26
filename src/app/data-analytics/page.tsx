@@ -7,7 +7,7 @@ import { analyticsWork } from "@/lib/data-analytics";
 export const metadata: Metadata = {
   title: "Data Analytics",
   description:
-    "Data analytics work by Novandri R.: documented case studies and reproducible public-data demos covering sales performance, HR attrition, finance risk, time series, and retrieval systems.",
+    "Data analytics work by Rachmadwipa Novandri: documented case studies and reproducible public-data demos covering sales performance, HR attrition, company finance, and applied machine learning.",
   alternates: { canonical: "/data-analytics" },
   openGraph: {
     title: "Data Analytics: Rachmadwipa Novandri",

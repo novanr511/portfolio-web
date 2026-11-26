@@ -12,7 +12,6 @@ would stretch or clip the image.
 Sources:
   Sales:  SampleSuperstore.csv, yashbhanu/EDA--Exploratory-Data-Analysis--SampleSuperstore
   HR:     WA_Fn-UseC_-HR-Employee-Attrition.csv, mrc03/IBM-HR-Analytics-Employee-Attrition-Performance
-  Finance: finance-charts-apple.csv, plotly/datasets (Yahoo Finance OHLC)
 """
 
 from __future__ import annotations
@@ -36,9 +35,8 @@ CACHE.mkdir(exist_ok=True)
 SOURCES = {
     "sales": "https://raw.githubusercontent.com/yashbhanu/EDA--Exploratory-Data-Analysis--SampleSuperstore/main/SampleSuperstore.csv",
     "hr": "https://raw.githubusercontent.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/master/WA_Fn-UseC_-HR-Employee-Attrition.csv",
-    "finance": "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv",
 }
-EXPECTED_ROWS = {"sales": 9994, "hr": 1470, "finance": 506}
+EXPECTED_ROWS = {"sales": 9994, "hr": 1470}
 
 INK = "#1b2a42"
 ACC = "#264a80"
@@ -258,66 +256,6 @@ ax.set_title("Attrition by overtime status", color=INK, fontsize=12, loc="left")
 style(ax)
 fig.tight_layout()
 fig.savefig(OUT / "hr-overtime.png")
-plt.close(fig)
-
-# ---------------------------------------------------------------- finance
-fin = load("finance")
-fin["date"] = pd.to_datetime(fin["Date"])
-fin = fin.sort_values("date").reset_index(drop=True)
-price = fin["AAPL.Adjusted"].astype(float)
-ret = price.pct_change().dropna()
-cum = (1 + ret).prod() - 1
-vol = ret.std() * np.sqrt(252) * 100
-running_max = price.cummax()
-drawdown = (price / running_max - 1) * 100
-max_dd = drawdown.min()
-var95 = np.percentile(ret, 5) * 100
-es95 = ret[ret <= np.percentile(ret, 5)].mean() * 100
-worst = ret.min() * 100
-kurt = ret.kurtosis()
-abs_auto = ret.abs().autocorr(lag=1)
-rng = np.random.default_rng(42)
-boot = np.percentile(
-    [np.percentile(rng.choice(ret.values, size=len(ret), replace=True), 5) * 100 for _ in range(2000)],
-    [2.5, 97.5],
-)
-
-metrics["finance"] = {
-    "rows": len(fin),
-    "start": str(fin["date"].iloc[0].date()),
-    "end": str(fin["date"].iloc[-1].date()),
-    "start_price": r2(price.iloc[0]),
-    "end_price": r2(price.iloc[-1]),
-    "cumulative_return_pct": r2(cum * 100),
-    "annualized_volatility_pct": r2(vol),
-    "max_drawdown_pct": r2(max_dd),
-    "historical_var95_daily_pct": r2(var95),
-    "var95_ci_low_pct": r2(boot[0]),
-    "var95_ci_high_pct": r2(boot[1]),
-    "expected_shortfall95_pct": r2(es95),
-    "worst_day_pct": r2(worst),
-    "excess_kurtosis": r2(kurt),
-    "abs_return_lag1_autocorr": r2(abs_auto),
-    "positive_day_share_pct": r2((ret > 0).mean() * 100),
-}
-
-fig, ax = plt.subplots(figsize=(8, 3.2), dpi=160)
-ax.plot(fin["date"], price, color=ACC, linewidth=1.5)
-ax.set_ylabel("Adjusted close (USD)")
-ax.set_title("Apple adjusted close, 2015-2017", color=INK, fontsize=12, loc="left")
-style(ax)
-fig.tight_layout()
-fig.savefig(OUT / "finance-price.png")
-plt.close(fig)
-
-fig, ax = plt.subplots(figsize=(8, 3.2), dpi=160)
-ax.plot(fin["date"], drawdown, color=SAGE, linewidth=1.2)
-ax.fill_between(fin["date"], drawdown, 0, color=SAGE, alpha=0.18)
-ax.set_ylabel("Drawdown %")
-ax.set_title("Drawdown from running peak", color=INK, fontsize=12, loc="left")
-style(ax)
-fig.tight_layout()
-fig.savefig(OUT / "finance-drawdown.png")
 plt.close(fig)
 
 (ROOT / "scripts" / "data-analytics-metrics.json").write_text(

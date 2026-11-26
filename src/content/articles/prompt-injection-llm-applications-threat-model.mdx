@@ -10,7 +10,7 @@ tags:
 ---
 
 <Lead>
-A language model application usually receives instructions from two places: the system prompt written by the developer and content supplied by users, retrieved documents, or tools. Those two sources arrive in the same channel. Prompt injection is the class of attacks that exploit that fact, by placing instructions in data, an attacker can make the system treat untrusted content as a command.
+A language model application usually receives instructions from two places: the system prompt written by the developer and content supplied by users, retrieved documents, or tools. Those two sources arrive in the same channel. Prompt injection is the class of attacks that exploit that fact. By placing instructions in data, an attacker can make the system treat untrusted content as a command.
 </Lead>
 
 **Direct answer:** OWASP ranks prompt injection as **LLM01:2025**, the first risk in its Top 10 for LLM applications. The distinction that matters operationally is between *direct* injection, where the user supplies malicious instructions in their own prompt, and *indirect* injection, where the instructions arrive inside content the system retrieves — a document, a webpage, an email. The boundary: this is <Mark>a trust-boundary problem, not a string-matching problem</Mark>. A filter that blocks known phrases does not address a model that cannot reliably distinguish instructions from data.
@@ -83,7 +83,7 @@ A filter that catches "ignore previous instructions" misses "disregard the earli
 
 **Output filtering alone.** Checking the final text for suspicious content does not undo an action that a tool already performed, and a model that has been diverted can produce perfectly ordinary-looking output.
 
-The counterargument — that models are getting better at resisting injection — is plausible and unfalsifiable as a defence strategy.
+The counterargument that models are getting better at resisting injection is plausible and unfalsifiable as a defence strategy.
 
 <PullQuote>
 A control that depends on the model continuing to behave correctly is not a control; it is an assumption.
