@@ -32,10 +32,22 @@ export function Footer() {
             Projects
           </Link>
           <Link
+            href="/data-analytics"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
+          >
+            Data Analytics
+          </Link>
+          <Link
             href="/about"
             className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
           >
             About
+          </Link>
+          <Link
+            href="/privacy"
+            className="inline-flex min-h-11 items-center text-muted transition-colors hover:text-accent"
+          >
+            Privacy
           </Link>
           <a
             href="/feed.xml"

@@ -46,18 +46,12 @@ export default async function Home() {
       topicCounts.set(tag, (topicCounts.get(tag) ?? 0) + 1);
     }
   }
-  const topics = [
-    ...new Set([
-      ...[...topicCounts.entries()]
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .slice(0, 8)
-        .map(([tag]) => tag),
-      // Explicitly surfaced because they map directly to the work I do.
-      "Technical SEO",
-      "SEO",
-      "Data Analytics",
-    ]),
-  ];
+  // Topics come only from tags on the curated articles, ranked by frequency.
+  // No hand-injected topics: a tag with zero curated articles never appears.
+  const topics = [...topicCounts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 8)
+    .map(([tag]) => tag);
 
   return (
     <ViewTransition
@@ -131,6 +125,15 @@ export default async function Home() {
             <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-muted sm:text-[18px]">
               {site.description}
             </p>
+          </Reveal>
+          <Reveal delay={200}>
+            <Link
+              href="/data-analytics"
+              transitionTypes={["nav-forward"]}
+              className="mt-7 inline-flex min-h-11 items-center text-[14px] font-medium text-accent transition-opacity hover:opacity-70"
+            >
+              See the data analytics work
+            </Link>
           </Reveal>
         </div>
       </section>
