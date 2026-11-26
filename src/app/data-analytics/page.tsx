@@ -139,15 +139,13 @@ export default function DataAnalyticsPage() {
             <h2 className="page-title text-[24px]">Want the full method?</h2>
             <p className="page-subtitle mt-2 max-w-xl text-[14px]">
               Each demo names its public dataset and documents the exact
-              figures on its own page. The project source is open.
+              figures on its own page. Ask for the code or the working notes.
             </p>
             <a
-              href="https://github.com/novanr511/portfolio-web"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="mailto:novandri511@gmail.com"
               className="mt-6 inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-[14px] font-medium text-accent-contrast transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              View the repository
+              Email me
             </a>
           </div>
         </Reveal>
