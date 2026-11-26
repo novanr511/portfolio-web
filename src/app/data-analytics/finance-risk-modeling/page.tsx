@@ -1,30 +1,9 @@
-import type { Metadata } from "next";
-import Content from "@/content/data-analytics/finance-risk-modeling.mdx";
-import { AnalyticsDemoPage } from "@/components/analytics-demo-page";
-import { analyticsWork } from "@/lib/data-analytics";
+import { permanentRedirect } from "next/navigation";
 
-const work = analyticsWork.find((w) => w.slug === "finance-risk-modeling")!;
-
-export const metadata: Metadata = {
-  title: work.name,
-  description: work.summary,
-  alternates: { canonical: `/data-analytics/${work.slug}` },
-  openGraph: {
-    title: `${work.name} — Novandri R.`,
-    description: work.summary,
-    url: `/data-analytics/${work.slug}`,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${work.name} — Novandri R.`,
-    description: work.summary,
-  },
-};
-
-export default function Page() {
-  return (
-    <AnalyticsDemoPage work={work}>
-      <Content />
-    </AnalyticsDemoPage>
-  );
+/**
+ * The stock-price risk summary was replaced by a company finance model built
+ * from SEC filings. Older URLs keep working and consolidate ranking signals.
+ */
+export default function RetiredFinanceRiskDemo() {
+  permanentRedirect("/data-analytics/msft-finance-model");
 }

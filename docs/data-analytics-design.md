@@ -30,7 +30,10 @@ rhythm stays varied.
 - Sales: `SampleSuperstore.csv`, public teaching dataset, 9,994 order lines.
 - HR: `WA_Fn-UseC_-HR-Employee-Attrition.csv`, IBM teaching dataset, 1,470
   records, synthetic.
-- Finance: `finance-charts-apple.csv`, plotly datasets, 506 trading days.
+- Finance: SEC XBRL companyfacts for Microsoft, annual 10-K facts FY2022 to
+  FY2026. The former stock-price risk demo was retired in favour of a company
+  finance model because a hiring manager asked for corporate finance work,
+  not market data. Forward assumptions are labelled ILLUSTRATIVE.
 
 Rebuild charts and metrics with:
 

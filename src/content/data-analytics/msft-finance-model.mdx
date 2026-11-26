@@ -1,0 +1,56 @@
+## The question
+
+A finance team does not ask for a share-price chart. It asks which operating lever moves profit, and how wrong the answer would be if conditions change. This model answers that with Microsoft's reported annual results, then labels every forward-looking choice as an assumption.
+
+## Source and reported history
+
+The source is the [SEC XBRL companyfacts API](https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json) for Microsoft Corp, CIK 0000789019. `scripts/build_msft_finance_model.py` selects annual 10-K facts with a June fiscal year-end and keeps the most recently filed value for each year. All figures below are reported facts in USD millions, not estimates.
+
+| FY | Revenue | Gross profit | Operating income | Net income | R&D | Operating cash flow | Capex |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 2022 | 198,270 | 135,620 | 83,383 | 72,738 | 24,512 | 89,035 | 23,886 |
+| 2023 | 211,915 | 146,052 | 88,523 | 72,361 | 27,195 | 87,582 | 28,107 |
+| 2024 | 245,122 | 171,008 | 109,433 | 88,136 | 29,510 | 118,548 | 44,477 |
+| 2025 | 281,724 | 193,893 | 128,528 | 101,832 | 32,488 | 136,162 | 64,551 |
+| 2026 | 331,839 | 225,465 | 155,237 | 133,749 | 35,562 | 182,935 | 115,948 |
+
+<Figure src="/images/msft-finance/history.png" alt="Bars of annual revenue from 198 billion dollars in FY2022 to 332 billion in FY2026, with a line of gross margin around 68 to 70 percent." caption="Reported revenue and gross margin from SEC 10-K facts. FY2026 was filed in August 2026." width="1280" height="544" />
+
+Revenue grew from **USD 198,270m** in FY2022 to **USD 331,839m** in FY2026. Gross margin stayed in a narrow band of **67.94% to 69.76%**. Operating margin rose from **42.06%** to **46.78%**. That stability is the reason a margin-driven model is defensible here: the structure did not swing wildly while revenue scaled.
+
+## Model structure and assumptions
+
+The model has three drivers: revenue growth, gross margin, and operating cost ratios. R&D and other operating costs are held at their five-year median share of revenue. The base growth and gross-margin assumptions are also five-year medians.
+
+| Driver | Value | Basis |
+|---|---:|---|
+| Revenue growth | 15.30% | ILLUSTRATIVE, median of FY2022-FY2026 growth |
+| Gross margin | 68.82% | ILLUSTRATIVE, median of reported margins |
+| R&D as % of revenue | 12.04% | ILLUSTRATIVE, median of reported ratios |
+| Other opex as % of revenue | 13.08% | ILLUSTRATIVE, derived from gross profit less R&D less operating income |
+
+Every number in this table is a **choice made for this exercise**, not Microsoft guidance and not a prediction. The historical inputs are reported facts; the projections are arithmetic on stated assumptions.
+
+Under the base assumptions, FY2029 revenue reaches **USD 508,646m** and operating income **USD 222,278m**, an operating margin of **43.70%**. That margin is below the FY2026 reported 46.78% because the five-year median cost ratios are slightly less favourable than the latest year. The model is deliberately not fitted to the endpoint.
+
+<Figure src="/images/msft-finance/scenarios.png" alt="Three line scenarios of revenue from 332 billion dollars in FY2026 to roughly 509 billion in FY2029, with base, upside and downside paths." caption="Illustrative revenue paths. Upside adds two growth points and one margin point; downside removes three and two." width="1280" height="544" />
+
+## Sensitivity and the lever that matters
+
+The grid below varies growth by plus or minus three points and gross margin by plus or minus two points, holding other ratios at the stated medians.
+
+<Figure src="/images/msft-finance/sensitivity.png" alt="Heatmap of FY2029 operating income in billions of dollars across five revenue-growth rows and five gross-margin columns." caption="FY2029 operating income, USD billions, under the illustrative sensitivity grid." width="1280" height="576" />
+
+At the base growth of 15.30%, moving gross margin from 66.82% to 70.82% changes FY2029 operating income by **USD 20,346m** across four points, about **USD 5,087m per point**. At the base margin of 68.82%, moving growth from 12.30% to 18.30% changes it by **USD 34,709m** across six points, about **USD 5,785m per point**. Growth is slightly stronger per point and the tested range is wider, so its total swing is larger. A conclusion has to state both the per-point effect and the range tested.
+
+## Decision memo
+
+**Decision:** if this were a real planning cycle, the first request would be a segment-level growth driver, because one point of revenue growth is worth about USD 5.8bn of FY2029 operating income here and the plausible range is wider. Gross-margin composition would be second, at about USD 5.1bn per point, because it is easier to influence inside a quarter.
+
+**Owner:** finance planning lead, with an analyst maintaining the driver table. **Timeline:** one week to validate reported inputs against the 10-K, two weeks to replace the median ratios with segment-level drivers, one week to present a range rather than a point estimate.
+
+**Not claimed:** no revenue, cost, or margin outcome was achieved by this work. The memo is a proposal built on public filings and illustrative assumptions.
+
+## Limitations
+
+The model is one company, five reported years, and three forward years. It uses consolidated figures because the SEC companyfacts endpoint does not carry segment dimensions; a real planning model would need the 10-K segment tables. No balance-sheet or cash-flow forecast is built here, so this is not a full three-statement model. Capex jumped from **USD 44,477m** in FY2024 to **USD 115,948m** in FY2026, which makes a constant-ratio cash-flow projection misleading. The scenarios are arithmetic, not probabilities, and no guidance from the company is used or implied.

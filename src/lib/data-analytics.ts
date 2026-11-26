@@ -79,15 +79,15 @@ export const analyticsWork: AnalyticsWork[] = [
       "https://github.com/mrc03/IBM-HR-Analytics-Employee-Attrition-Performance/blob/master/WA_Fn-UseC_-HR-Employee-Attrition.csv",
   },
   {
-    slug: "finance-risk-modeling",
-    name: "Finance Risk Summary",
-    kind: "Public-data demo",
+    slug: "msft-finance-model",
+    name: "Microsoft Finance Model",
+    kind: "Applied project",
     summary:
-      "A descriptive risk snapshot for a single public price series: return, annualized volatility, maximum drawdown, historical VaR with uncertainty, and expected shortfall.",
-    tags: ["Risk", "Volatility", "Drawdown", "Public data"],
-    href: "/data-analytics/finance-risk-modeling",
+      "A driver-based company finance model from Microsoft SEC filings: five reported years, three illustrative scenarios, and a sensitivity grid with stated decision limits.",
+    tags: ["Financial Modeling", "SEC XBRL", "Scenario Analysis", "Decision Memo"],
+    href: "/data-analytics/msft-finance-model",
     year: "2026",
-    dataset: "Apple OHLC, 506 trading days ending February 2017",
-    sourceUrl: "https://github.com/plotly/datasets/blob/master/finance-charts-apple.csv",
+    dataset: "Microsoft annual 10-K facts, FY2022 to FY2026",
+    sourceUrl: "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
   },
 ];
