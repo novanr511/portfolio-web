@@ -1,0 +1,61 @@
+---
+title: "Log File Analysis for Small Sites"
+description: "Server logs record requests, not intent. What a small site can read from status codes and bot user agents, and the attribution a log cannot support."
+date: 2026-11-22
+updated: 2026-11-22
+tags:
+  - Technical SEO
+  - Crawlability
+  - AI Search
+---
+
+A server log records requests, not reasons. On 22 November 2026 I audited the surfaces of novandri.com: robots.txt answered HTTP/2 200, a request to www resolved to the apex in a single 308, and the article archive sat behind an allowlist after a documented cut from 1,004 templated articles to a curated, restorable set. RFC 9110 defines the status vocabulary; Google's crawler documentation explains why a user-agent token is weak evidence of identity. The useful question is not how much traffic a log contains, but which conclusions the recorded fields can honestly carry.
+
+## What does a server log actually record?
+
+A log records a request and a response, not a reason. Each line carries a timestamp, an address, a method, a path, a status code and a user-agent string, per the HTTP semantics in RFC 9110. Those fields let you count requests and group them. They do not tell you who sent the request or why.
+
+Access logs come in a few formats, but the same idea underlies them: the server writes one line per request after it has answered. RFC 9110 defines what a status code means and how headers behave, which is why the status field is the most reliable column in the file. The user-agent column is a string the client chose to send; the server did not verify it. On a small site the whole file can fit in a text editor, so the first pass is reading rather than tooling. The 200 on robots.txt and the single-hop 308 from www to apex, both captured on 22 November 2026, are examples of responses a server can report exactly. Neither capture says anything about a crawler's decision. A line is evidence that bytes moved between two addresses at a recorded time. Everything beyond that is interpretation, and interpretation needs a second source.
+
+## Which status codes are worth reading on a small site?
+
+The useful codes group by who owns the problem. Source-reported in RFC 9110: 2xx means the request succeeded, 3xx that further action is needed, 4xx that the client appears at fault, 5xx that the server failed. On a small archive a 404 cluster names a broken internal link, and a 301 or 308 cluster names a rule doing its job.
+
+RFC 9110 groups status codes into five classes, and the class is usually enough for a first pass. A 4xx cluster on article paths points at links the site itself publishes, which is a defect you can fix. A 5xx cluster points at the server, where a log line alone gives you a symptom rather than a cause. The redirect codes deserve a separate reading because a 3xx is a decision the site made. The 308 from www to apex recorded on 22 November 2026 is a deliberate consolidation: one hostname, one scheme, one hop. A 308 also preserves the request method, which matters for forms and APIs but is invisible in a plain access line. When you count redirects, count them by destination. A cluster ending at the same canonical address is a rule working; a cluster ending in another redirect is a chain, and chains hide the final target from a quick read. That distinction is a property of the responses, not a claim about crawl efficiency.
+
+## What can bot hits in a log tell you?
+
+A user-agent string in a log is an observation: a request arrived carrying that token. Google documents that the Googlebot token alone is weak evidence, because any client can send it. It publishes verification by reverse DNS and forward lookup. So you can count requests bearing a token, but a count describes headers, not proof of a crawler's visit.
+
+Google's documentation puts the point plainly: the user-agent header used by Googlebot is often spoofed, and a problematic request should be verified against the source IP before anyone acts on it. The published method is a reverse lookup on the address followed by a forward lookup on the returned hostname, checking that the two agree. Google also publishes IP ranges for common crawlers, special-case crawlers and user-triggered fetchers, with different rules about robots.txt. This site's own policy, recorded in the repository on 22 November 2026, blocks named training agents and allows named answer agents; the purpose split behind those two groups is set out in [AI Crawlers Are Not Googlebot](/articles/ai-crawlers-are-not-googlebot-governing-crawlers-you-do-not-control). A log line showing a blocked token is not a violation: a robots.txt disallow is a request a well-behaved crawler reads, not a network barrier. Conversely, an allowed token does not prove a citation happened. The field records what the client claimed in a header. Treat it as a label to group by, then verify the source address when the decision depends on who actually called.
+
+## How do you separate observation from attribution?
+
+Observation is a field you can point to: a token, a path, a timestamp. Attribution is a claim about an actor's identity, which needs a second source. Pair the token with a source address and check it against a published range. Where the two disagree, the honest label is "a request claimed to be X", not "X crawled this page."
+
+The discipline is the same one a consistency audit applies to numbers. The BTC study's research agent ran a `number_audit` over its memo, and a wider consistency check reported 193 checks with 0 failures on the day the figures were read, 18 November 2026 (source-reported, public reproduction package). That result confirms the prose matched the retrieved artifacts. It does not confirm the underlying comparison was the right one. A log line has the same shape: it confirms that a request occurred with certain headers, not that the named actor intended what the label suggests. On this site, the 200 on robots.txt confirms the file is served and cacheable; it does not show that any crawler fetched or obeyed it. No crawl outcome, ranking change or citation was measured as of 22 November 2026, so I leave those cells empty. The distinction between a stage you can observe and an outcome you cannot is the subject of [Discovered, Crawled, Rendered, Indexed](/articles/discovered-crawled-rendered-indexed-why-stages-differ).
+
+## What can a small site do without a paid log tool?
+
+Start with the host's access log and a single question per pass. Grep one status family, group by path, and read the top lines by hand. On a curated archive the request surface is small enough that a few queries replace a dashboard. Record the query and the date so the next pass compares like with like.
+
+A one-off query is a method, not a finding, and I report no count from it. On a small archive the point is to ask a narrow question that a single command can answer:
+
+```bash
+awk '$9 ~ /^4/ {print $7}' access.log | sort | uniq -c | sort -rn | head -20
+```
+
+That lists the paths most often answered with a 4xx. Change the pattern to `^3` and you have the redirect destinations; change it to `^5` and you have server failures. The numbers change with every promotion and every bot burst, which is why I do not print a snapshot count here. What stays stable is the question. The curation recorded on 22 November 2026 cut 1,004 templated articles to a curated, restorable set behind an allowlist, and that smaller surface is what makes a text-level pass practical. A second, different observation is the build-time llms-full.txt response, which carries s-maxage=86400 and stale-while-revalidate=604800 (repository, 22 November 2026). Those are source-reported header values, not numbers derived from the log. Keeping the two kinds of evidence in separate sentences is the habit that makes the report readable.
+
+## Which conclusions must stay out of the log report?
+
+A log cannot tell you what a crawler decided, whether a page was indexed, or whether a citation occurred. RFC 9110 defines the response; Google's crawler docs describe verification and behaviour, not a promise that a logged visit became an index entry. If you need an outcome, name the missing measurement and leave the cell empty.
+
+There is a temptation to read a token in the log as a verdict about visibility. The sources do not support that step. RFC 9110 says what a 200 or a 308 means; it says nothing about what a search engine did next. Google's crawler pages explain how to verify a request and note that certain user-triggered fetchers ignore robots.txt, which is a statement about classes of requests rather than a guarantee about any one visit. On this site the observed facts are structural: one host, one scheme, a served robots.txt, a generated set of AI-facing files, and a curated inventory. No traffic, ranking or citation outcome was measured as of 22 November 2026. The discipline for a small site is to write the observation, write the interpretation, and mark the boundary between them. If a question needs crawl statistics from Search Console or a controlled before-and-after, that is a different artifact to gather, and it belongs in a different section of the report. For how redirects and files are kept aligned, see [SEO URL Structure](/articles/seo-url-structure-normalize-hostnames-paths-parameters).
+
+## References & Further Reading
+
+- IETF, 2026. [RFC 9110: HTTP Semantics, status codes](https://www.rfc-editor.org/rfc/rfc9110#section-15) — the normative meaning of response status classes and header behaviour.
+- Google Search Central, 2026. [What Is Googlebot](https://developers.google.com/search/docs/crawling-indexing/googlebot) — the note that the user-agent header is often spoofed, and the distinction between crawling and indexing.
+- Google Search Central, 2026. [Verify requests from Google crawlers and fetchers](https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot) — reverse DNS plus forward lookup, and published IP ranges by crawler class.
+- MDN Web Docs, 2026. [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent) — the request header as client-supplied data.
