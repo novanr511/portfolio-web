@@ -1,6 +1,6 @@
 # Article draft list: 100 titles
 
-Source brief: 2026-11-26. Titles are standardised to the publication style (no trailing question mark), checked against all 1,060 article files and the canonical registry, and reserved in `docs/article-title-registry.json` under `drafts_100`.
+Source brief: 2026-11-26. This is an **idea inventory**, not a list of articles to publish. The owner decided on 2026-11-26 to deepen existing articles instead of writing 100 new ones. Titles below are standardised to the publication style (no trailing question mark) and are **not reserved** in the canonical registry. The actual mapping to host articles is in `docs/article-augmentation-map-100.md`.
 
 `check-title-duplicates` result: no duplicate titles or slugs, including the near-duplicate guard.
 
