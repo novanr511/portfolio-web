@@ -41,6 +41,7 @@ const entries = [
   ...registry.planned.map((e) => ({ ...e, source: "planned" })),
   ...registry.high_traffic_backlog.map((e) => ({ ...e, source: "backlog" })),
   ...(registry.title_bank_2 ?? []).map((e) => ({ ...e, source: "title_bank_2" })),
+  ...(registry.drafts_100 ?? []).map((e) => ({ ...e, source: "drafts_100" })),
 ];
 
 const problems = [];
