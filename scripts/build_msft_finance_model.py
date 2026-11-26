@@ -197,9 +197,9 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(8, 3.6), dpi=160)
     im = ax.imshow(data, cmap="Blues", aspect="auto")
     ax.set_xticks(range(len(gm_axis)))
-    ax.set_xticklabels([f"{g:.0f}%" for g in gm_axis])
+    ax.set_xticklabels([f"{g:.2f}%" for g in gm_axis])
     ax.set_yticks(range(len(sens)))
-    ax.set_yticklabels([f"{r['growth_pct']:.1f}%" for r in sens])
+    ax.set_yticklabels([f"{r['growth_pct']:.2f}%" for r in sens])
     ax.set_xlabel("Gross margin")
     ax.set_ylabel("Revenue growth")
     for i in range(data.shape[0]):
